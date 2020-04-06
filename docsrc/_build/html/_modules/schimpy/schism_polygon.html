@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>schimpy.schism_polygon &#8212; schimpy 0+unknown documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for schimpy.schism_polygon</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains polygon data holders and related operations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">schism_yaml</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry.polygon</span> <span class="kn">import</span> <span class="n">orient</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">osgeo.osr</span> <span class="kn">import</span> <span class="n">SpatialReference</span>
+<span class="kn">from</span> <span class="nn">osgeo.ogr</span> <span class="kn">import</span> <span class="n">Open</span><span class="p">,</span> <span class="n">CreateGeometryFromWkb</span><span class="p">,</span> <span class="n">OFTString</span><span class="p">,</span> <span class="n">GetDriverByName</span><span class="p">,</span> <span class="n">wkbPolygon</span><span class="p">,</span> <span class="n">FieldDefn</span><span class="p">,</span> <span class="n">Feature</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="SchismPolygon"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygon">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygon</span><span class="p">(</span><span class="n">Polygon</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A polygon class based on shapely.geometry.Polygon.</span>
+<span class="sd">    This class has extra information</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">holes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shell : sequence</span>
+<span class="sd">            A sequence of (x, y [,z]) numeric coordinate pairs or triples</span>
+<span class="sd">        holes : sequence</span>
+<span class="sd">            A sequence of objects which satisfy the same requirements as the</span>
+<span class="sd">            shell parameters above</span>
+<span class="sd">        props: dict</span>
+<span class="sd">            property dict. Keys as properties are name, type and attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SchismPolygon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">shell</span><span class="p">,</span> <span class="n">holes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">prop</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">prop</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;attribute&#39;</span><span class="p">)</span>
+
+    <span class="nd">@attribute</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span>
+
+    <span class="nd">@type</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prop</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prop</span>
+
+    <span class="nd">@prop</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prop</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_prop</span> <span class="ow">and</span>
+                <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_prop</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SchismPolygon.contains"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygon.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check the polygon contains the point</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            point: np.ndarray or shapely.geometry.polygon.Polygon</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">point</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">point</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SchismPolygon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">point</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SchismPolygon.intersects"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygon.intersects">[docs]</a>    <span class="k">def</span> <span class="nf">intersects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check the polygon intersects with the point</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            point: np.ndarray or shapely.geometry.polygon.Polygon</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SchismPolygon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SchismPolygonIo"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonIo">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygonIo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; SchismPolygon I/O abstract class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SchismPolygonIo.read"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonIo.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="SchismPolygonDictConverter"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonDictConverter">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygonDictConverter</span><span class="p">(</span><span class="n">SchismPolygonIo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert a tree to a list of polygons</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SchismPolygonDictConverter.read"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonDictConverter.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">polygons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;polygons&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="n">prop</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;vertices&#39;</span><span class="p">:</span>
+                        <span class="n">vertices</span> <span class="o">=</span> <span class="p">[[</span><span class="nb">float</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+                                    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">prop</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SchismPolygon</span><span class="p">(</span><span class="n">orient</span><span class="p">(</span>
+                    <span class="n">Polygon</span><span class="p">(</span><span class="n">vertices</span><span class="p">)),</span> <span class="n">prop</span><span class="o">=</span><span class="n">prop</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">polygons</span></div></div>
+
+
+<div class="viewcode-block" id="SchismPolygonYamlReader"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonYamlReader">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygonYamlReader</span><span class="p">(</span><span class="n">SchismPolygonIo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read polygons from a SCHSIM YAML polygon file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SchismPolygonYamlReader.read"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonYamlReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpath</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_in</span><span class="p">:</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">schism_yaml</span><span class="o">.</span><span class="n">load_raw</span><span class="p">(</span><span class="n">f_in</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">SchismPolygonDictConverter</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;File not found&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SchismPolygonShapefileReader"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonShapefileReader">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygonShapefileReader</span><span class="p">(</span><span class="n">SchismPolygonIo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read polygons from a shape file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SchismPolygonShapefileReader.read"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonShapefileReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpath</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Read polygons from a Shapefile and return a list of</span>
+<span class="sd">            SchismPolygons.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            fpath: str</span>
+<span class="sd">                Filename of a Shapefile containing Polygons with</span>
+<span class="sd">                data columns such as name, type, and attribute.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            list</span>
+<span class="sd">                list of SchismPolygons</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+            <span class="n">datasource</span> <span class="o">=</span> <span class="n">Open</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">GetLayer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">feat</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">GetFeature</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">feat</span><span class="o">.</span><span class="n">GetFieldDefnRef</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">GetName</span><span class="p">()</span>
+                           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">GetFieldCount</span><span class="p">())]</span>
+            <span class="c1"># fld_idx = [field_names.index(x)</span>
+            <span class="c1">#            for x in (&#39;name&#39;, &#39;type&#39;, &#39;attribute&#39;)]</span>
+            <span class="n">polygons</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
+                <span class="n">geom</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">GetGeometryRef</span><span class="p">()</span>
+                <span class="n">name_geom</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">GetGeometryName</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">name_geom</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;POLYGON&#39;</span><span class="p">,</span> <span class="s1">&#39;MULTIPOLYGON&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">name_geom</span> <span class="o">==</span> <span class="s1">&#39;MULTIPOLYGON&#39;</span><span class="p">:</span>
+                        <span class="n">geoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">geom</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">geoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="p">,</span> <span class="p">]</span>
+                    <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">geoms</span><span class="p">:</span>
+                        <span class="n">shell</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">point</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">GetGeometryRef</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">GetPoints</span><span class="p">()]</span>
+                        <span class="n">prop</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">field_names</span><span class="p">):</span>
+                            <span class="n">prop</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">GetFieldAsString</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                        <span class="n">polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SchismPolygon</span><span class="p">(</span>
+                            <span class="n">orient</span><span class="p">(</span><span class="n">Polygon</span><span class="p">(</span><span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">)),</span> <span class="n">prop</span><span class="o">=</span><span class="n">prop</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">polygons</span>
+            <span class="c1"># return SchismPolygonDictConverter().read({&#39;polygons&#39;: polygons})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;File not found: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fpath</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="SchismPolygonYamlWriter"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonYamlWriter">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygonYamlWriter</span><span class="p">(</span><span class="n">SchismPolygonIo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Write polygons into a YAML file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SchismPolygonYamlWriter.write"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonYamlWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpath</span><span class="p">,</span> <span class="n">polygons</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;polygons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">polygons</span><span class="p">:</span>
+                <span class="n">leaf</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">leaf</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">leaf</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+                    <span class="n">leaf</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">attribute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">attribute</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+                        <span class="n">leaf</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">attribute</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;polygons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">leaf</span><span class="p">)</span>
+            <span class="n">schism_yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SchismPolygonShapefileWriter"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonShapefileWriter">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygonShapefileWriter</span><span class="p">(</span><span class="n">SchismPolygonIo</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SchismPolygonShapefileWriter.write"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonShapefileWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpath</span><span class="p">,</span> <span class="n">polygons</span><span class="p">,</span> <span class="n">spatial_reference</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">driver_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Convert SCHISM polygon YAML file to a shapefile</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fpath: str</span>
+<span class="sd">            output file name</span>
+<span class="sd">        polygons: array of schism_polygon.SchismPolygon</span>
+<span class="sd">            polygons to write</span>
+<span class="sd">        spatial_reference: osgeo.osr.SpatialReference or proj4 string</span>
+<span class="sd">            default: NAD83, UTM zone 10N, meter</span>
+<span class="sd">        driver_name: osgeo.ogr Driver name</span>
+<span class="sd">            default: ESRI Shapefile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">spatial_reference</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Not sure if this changed. it should be EPSG 26910 </span>
+            <span class="c1">#spatial_reference = &#39;+proj=utm +zone=10N +ellps=NAD83 +datum=NAD83 +units=m&#39;</span>
+            <span class="n">spatial_reference</span><span class="o">=</span> <span class="s1">&#39;+proj=utm +zone=10 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spatial_reference</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">spatial_reference_obj</span> <span class="o">=</span> <span class="n">SpatialReference</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">spatial_reference_obj</span><span class="o">.</span><span class="n">ImportFromProj4</span><span class="p">(</span><span class="n">spatial_reference</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;spatial reference could not be created from string: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">spatial_reference</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spatial_reference</span><span class="p">,</span> <span class="n">SpatialReference</span><span class="p">):</span>
+            <span class="n">spatial_reference_obj</span> <span class="o">=</span> <span class="n">spatial_reference</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not support spatial_reference type&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">driver_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">driver_name</span> <span class="o">=</span> <span class="s1">&#39;ESRI Shapefile&#39;</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="n">GetDriverByName</span><span class="p">(</span><span class="n">driver_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not available.&#39;</span> <span class="o">%</span> <span class="n">driver_name</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">()</span>
+        <span class="n">datasource</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">CreateDataSource</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fpath</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">datasource</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot create a GIS file&quot;</span><span class="p">)</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">datasource</span><span class="o">.</span><span class="n">CreateLayer</span><span class="p">(</span><span class="s1">&#39;layer&#39;</span><span class="p">,</span>
+                                       <span class="n">spatial_reference_obj</span><span class="p">,</span>
+                                       <span class="n">wkbPolygon</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;attribute&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">CreateField</span><span class="p">(</span><span class="n">FieldDefn</span><span class="p">(</span><span class="n">field</span><span class="p">))</span>
+        <span class="n">feature_defn</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">GetLayerDefn</span><span class="p">()</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">Feature</span><span class="p">(</span><span class="n">feature_defn</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">polygons</span><span class="p">):</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">SetGeometry</span><span class="p">(</span><span class="n">CreateGeometryFromWkb</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">wkb</span><span class="p">))</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">SetField</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">polygon</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">SetField</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">polygon</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">SetField</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">polygon</span><span class="o">.</span><span class="n">attribute</span><span class="p">)</span>
+            <span class="n">layer</span><span class="o">.</span><span class="n">CreateFeature</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+        <span class="n">datasource</span><span class="o">.</span><span class="n">Destroy</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="SchismPolygonIoFactory"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonIoFactory">[docs]</a><span class="k">class</span> <span class="nc">SchismPolygonIoFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A factory class for SchismPolygonIo</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">registered_readers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dict&#39;</span><span class="p">:</span> <span class="s1">&#39;SchismPolygonDictConverter&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;yaml&#39;</span><span class="p">:</span> <span class="s1">&#39;SchismPolygonYamlReader&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;shp&#39;</span><span class="p">:</span> <span class="s1">&#39;SchismPolygonShapefileReader&#39;</span><span class="p">}</span>
+    <span class="n">registered_writers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;yaml&#39;</span><span class="p">:</span> <span class="s1">&#39;SchismPolygonYamlWriter&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;shp&#39;</span><span class="p">:</span> <span class="s1">&#39;SchismPolygonShapefileWriter&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="SchismPolygonIoFactory.get_reader"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonIoFactory.get_reader">[docs]</a>    <span class="k">def</span> <span class="nf">get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_readers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">globals</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_readers</span><span class="p">[</span><span class="n">name</span><span class="p">]]()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not in the SchismPolygonIoFactory&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SchismPolygonIoFactory.show_registered_readers"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonIoFactory.show_registered_readers">[docs]</a>    <span class="k">def</span> <span class="nf">show_registered_readers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_readers</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SchismPolygonIoFactory.get_writer"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.SchismPolygonIoFactory.get_writer">[docs]</a>    <span class="k">def</span> <span class="nf">get_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_writers</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">globals</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">registered_writers</span><span class="p">[</span><span class="n">name</span><span class="p">]]()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not in the SchismPolygonIoFactory&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="read_polygons"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.read_polygons">[docs]</a><span class="k">def</span> <span class="nf">read_polygons</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read a polygon file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.yaml&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SchismPolygonIoFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="s1">&#39;yaml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.shp&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SchismPolygonIoFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="s1">&#39;shp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not supported file type&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_polygons"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_polygon.write_polygons">[docs]</a><span class="k">def</span> <span class="nf">write_polygons</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">polygons</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.yaml&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SchismPolygonIoFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_writer</span><span class="p">(</span><span class="s1">&#39;yaml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">polygons</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fpath</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.shp&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SchismPolygonIoFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_writer</span><span class="p">(</span><span class="s1">&#39;shp&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">polygons</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValueErroreError</span><span class="p">(</span><span class="s2">&quot;Not supported file type&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">schimpy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">schimpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">schimpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Eli Ateljevich.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

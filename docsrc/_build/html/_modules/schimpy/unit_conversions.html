@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>schimpy.unit_conversions &#8212; schimpy 0+unknown documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for schimpy.unit_conversions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">brentq</span>
+
+<span class="c1"># Constants for conversions</span>
+<span class="n">J1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">16.072</span>
+<span class="n">J2</span> <span class="o">=</span>  <span class="mf">4.1495</span>
+<span class="n">J3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5345</span>
+<span class="n">J4</span> <span class="o">=</span>  <span class="mf">0.0261</span>
+
+<span class="n">K1</span> <span class="o">=</span>  <span class="mf">0.0120</span>
+<span class="n">K2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.2174</span>
+<span class="n">K3</span> <span class="o">=</span> <span class="mf">25.3283</span>
+<span class="n">K4</span> <span class="o">=</span> <span class="mf">13.7714</span>
+<span class="n">K5</span> <span class="o">=</span> <span class="o">-</span><span class="mf">6.4788</span>
+<span class="n">K6</span> <span class="o">=</span>  <span class="mf">2.5842</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mf">0.0162</span>
+<span class="n">s_sea</span> <span class="o">=</span> <span class="mf">35.</span>
+<span class="n">ec_sea</span><span class="o">=</span><span class="mf">53087.0</span>
+
+<span class="n">M2FT</span> <span class="o">=</span> <span class="mf">3.28084</span>
+<span class="n">FT2M</span> <span class="o">=</span> <span class="mf">0.3048</span>
+<span class="n">CFS2CMS</span> <span class="o">=</span> <span class="mf">0.028316847</span>
+<span class="n">CMS2CFS</span> <span class="o">=</span> <span class="mf">35.31466621</span>
+
+
+<div class="viewcode-block" id="m_to_ft"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.m_to_ft">[docs]</a><span class="k">def</span> <span class="nf">m_to_ft</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert meter to foot</span>
+<span class="sd">        WARNING: The function modifies the input argument if it is TimeSeries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ft&#39;</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="n">M2FT</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">M2FT</span></div>
+
+
+<div class="viewcode-block" id="ft_to_m"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.ft_to_m">[docs]</a><span class="k">def</span> <span class="nf">ft_to_m</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert foot to meter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;m&#39;</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="n">FT2M</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">FT2M</span></div>
+
+
+<div class="viewcode-block" id="cms_to_cfs"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.cms_to_cfs">[docs]</a><span class="k">def</span> <span class="nf">cms_to_cfs</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert cms to cfs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cfs&#39;</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="n">CMS2CFS</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">CMS2CFS</span></div>
+
+
+<div class="viewcode-block" id="cfs_to_cms"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.cfs_to_cms">[docs]</a><span class="k">def</span> <span class="nf">cfs_to_cms</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert cfs to cms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;cms&#39;</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="n">CFS2CMS</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">CFS2CMS</span></div>
+
+
+<div class="viewcode-block" id="fahrenheit_to_celcius"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.fahrenheit_to_celcius">[docs]</a><span class="k">def</span> <span class="nf">fahrenheit_to_celcius</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert cfs to cms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;deg C&#39;</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">-=</span> <span class="mf">32.</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="mf">5.</span> <span class="o">/</span> <span class="mf">9.</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mf">32.</span><span class="p">)</span> <span class="o">*</span> <span class="mf">5.</span> <span class="o">/</span> <span class="mf">9.</span></div>
+
+
+<div class="viewcode-block" id="celcius_to_fahrenheit"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.celcius_to_fahrenheit">[docs]</a><span class="k">def</span> <span class="nf">celcius_to_fahrenheit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert cfs to cms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;deg F&#39;</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">*=</span> <span class="mf">1.8</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="o">+=</span> <span class="mf">32.</span>
+        <span class="k">return</span> <span class="n">x</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="mf">1.8</span> <span class="o">+</span> <span class="mf">32.</span></div>
+
+
+<div class="viewcode-block" id="psu_ec_resid"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.psu_ec_resid">[docs]</a><span class="k">def</span> <span class="nf">psu_ec_resid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">psu</span><span class="p">,</span><span class="n">hill_correction</span><span class="p">):</span>
+    <span class="k">return</span>  <span class="n">ec_psu_25c</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">hill_correction</span><span class="p">)</span><span class="o">-</span><span class="n">psu</span></div>
+
+
+<div class="viewcode-block" id="ec_psu_25c"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.ec_psu_25c">[docs]</a><span class="k">def</span> <span class="nf">ec_psu_25c</span><span class="p">(</span><span class="n">ts_ec</span><span class="p">,</span><span class="n">hill_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Convert scalar or vector ec to psu assuming 25C temperature</span>
+<span class="sd">        and no low salinity correction</span>
+<span class="sd">        Note: The input argument, ts_ec, will be altered.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ts_ec</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PSU&#39;</span>
+        <span class="n">ec</span> <span class="o">=</span> <span class="n">ts_ec</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">ec</span> <span class="o">=</span> <span class="n">ts_ec</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span><span class="n">ec_sea</span><span class="p">)</span>
+    <span class="n">sqrtR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+    <span class="n">Rsq</span> <span class="o">=</span> <span class="n">R</span> <span class="o">*</span> <span class="n">R</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">K1</span> <span class="o">+</span> <span class="n">K2</span><span class="o">*</span><span class="n">sqrtR</span> <span class="o">+</span> <span class="n">K3</span><span class="o">*</span><span class="n">R</span> <span class="o">+</span> <span class="n">K4</span><span class="o">*</span><span class="n">R</span><span class="o">*</span><span class="n">sqrtR</span> <span class="o">+</span> <span class="n">K5</span><span class="o">*</span><span class="n">Rsq</span> <span class="o">+</span> <span class="n">K6</span><span class="o">*</span><span class="n">Rsq</span><span class="o">*</span><span class="n">sqrtR</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mf">0.0162</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="mf">25.</span><span class="o">-</span><span class="mf">15.</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">k</span><span class="o">*</span><span class="p">(</span><span class="mf">25.</span><span class="o">-</span><span class="mf">15.</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">hill_correction</span><span class="p">:</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mf">100.</span><span class="o">*</span><span class="n">R</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mf">400.</span><span class="o">*</span><span class="n">R</span>
+        <span class="n">a_0</span> <span class="o">=</span> <span class="mf">0.008</span>
+        <span class="n">b_0_f</span> <span class="o">=</span> <span class="mf">0.0005</span><span class="o">*</span><span class="n">f</span>  <span class="c1"># = f(T=25)*0.0005</span>
+        <span class="n">sqrty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">-</span> <span class="n">a_0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span><span class="o">+</span><span class="mf">1.5</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">b_0_f</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span> <span class="n">sqrty</span> <span class="o">+</span> <span class="n">y</span><span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="n">sqrty</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ts_ec</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PSU&#39;</span>
+        <span class="n">ts_ec</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">s</span>
+        <span class="k">return</span> <span class="n">ts_ec</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="psu_ec_25c_scalar"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.psu_ec_25c_scalar">[docs]</a><span class="k">def</span> <span class="nf">psu_ec_25c_scalar</span><span class="p">(</span><span class="n">psu</span><span class="p">,</span><span class="n">refine</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">hill_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Conversion from psu to ec for a scalar. If used without refinement,</span>
+<span class="sd">        this is the Schemel conversion, otherwise uses root-finding</span>
+<span class="sd">        Note that the round trip ec-psu-ec tends to wander a lot without refine = True.</span>
+<span class="sd">        The refinement usually takes 4-6 iterations</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">psu</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Negative psu not allowed: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psu</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">psu</span><span class="p">):</span> <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">hill_correction</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">refine</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrefined (refine=False) psu-to-ec correction cannot have hill_correction&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">refine</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">psu</span> <span class="o">&gt;</span> <span class="mf">34.99969</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;psu is over sea salinity: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">psu</span><span class="p">)</span>
+        <span class="n">ec</span> <span class="o">=</span> <span class="n">brentq</span><span class="p">(</span><span class="n">psu_ec_resid</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="n">ec_sea</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">psu</span><span class="p">,</span><span class="n">hill_correction</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sqrtpsu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">psu</span><span class="p">)</span>
+        <span class="n">ec</span> <span class="o">=</span> <span class="p">(</span><span class="n">psu</span><span class="o">/</span><span class="n">s_sea</span><span class="p">)</span><span class="o">*</span><span class="n">ec_sea</span> <span class="o">+</span> <span class="n">psu</span><span class="o">*</span><span class="p">(</span><span class="n">psu</span><span class="o">-</span><span class="n">s_sea</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">J1</span> <span class="o">+</span> <span class="n">J2</span><span class="o">*</span><span class="n">sqrtpsu</span> <span class="o">+</span> <span class="n">J3</span><span class="o">*</span><span class="n">psu</span> <span class="o">+</span> <span class="n">J4</span><span class="o">*</span><span class="n">sqrtpsu</span><span class="o">*</span><span class="n">psu</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ec</span></div>
+
+
+<span class="n">psu_ec_25c_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">psu_ec_25c_scalar</span><span class="p">,</span><span class="n">otypes</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span><span class="n">excluded</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;refine&quot;</span><span class="p">,</span><span class="s2">&quot;hill_correction&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="psu_ec_25c"><a class="viewcode-back" href="../../schimpy.html#schimpy.unit_conversions.psu_ec_25c">[docs]</a><span class="k">def</span> <span class="nf">psu_ec_25c</span><span class="p">(</span><span class="n">psu</span><span class="p">,</span><span class="n">refine</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">hill_correction</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Conversion from psu to ec. If used without refinement,</span>
+<span class="sd">        this is the Schemel conversion, otherwise uses root-finding</span>
+<span class="sd">        Note that the round trip ec-psu-ec tends to wander a lot without refine = True.</span>
+<span class="sd">        The refinement usually takes 4-6 iterations</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">psu</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">psu_ec_25c_scalar</span><span class="p">(</span><span class="n">psu</span><span class="p">,</span><span class="n">refine</span><span class="p">,</span><span class="n">hill_correction</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">psu</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,:]</span> <span class="o">=</span> <span class="n">psu_ec_25c_vec</span><span class="p">(</span><span class="n">psu</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span><span class="n">refine</span><span class="p">,</span><span class="n">hill_correction</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">except</span><span class="p">:</span>	
+            <span class="k">return</span> <span class="n">psu_ec_25c_vec</span><span class="p">(</span><span class="n">psu</span><span class="p">,</span><span class="n">refine</span><span class="p">,</span><span class="n">hill_correction</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+     <span class="kn">import</span> <span class="nn">sys</span>
+     <span class="k">if</span> <span class="s2">&quot;--help&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">:</span>
+         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Usage:&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;unit_conversions.py conversion input [input...]&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;where&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;conversion is the op to perform, only ec_psu and psu_ec currently supported&quot;</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;input      can be multiple values&quot;</span><span class="p">)</span>
+     <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;ec_psu&quot;</span><span class="p">:</span>
+         <span class="n">ec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+         <span class="n">psu</span> <span class="o">=</span> <span class="n">ec_psu_25c</span><span class="p">(</span><span class="n">ec</span><span class="p">,</span><span class="kc">True</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="n">psu</span><span class="p">)</span>
+     <span class="k">elif</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;psu_ec&quot;</span><span class="p">:</span>
+         <span class="n">psu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+         <span class="n">ec</span> <span class="o">=</span> <span class="n">psu_ec_25c</span><span class="p">(</span><span class="n">psu</span><span class="p">)</span>
+         <span class="nb">print</span><span class="p">(</span><span class="n">ec</span><span class="p">)</span>
+         <span class="c1">#ec_round = psu_ec_25c(psu,True,True)</span>
+         <span class="c1">#print ec_round</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">schimpy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">schimpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">schimpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Eli Ateljevich.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
