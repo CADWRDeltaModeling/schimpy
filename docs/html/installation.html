@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Installation &#8212; schimpy 0.1.1+0.g36a3d01.dirty documentation</title>
+    <title>Installation &#8212; schimpy 0.1.2+0.g5fc488f.dirty documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -57,7 +57,10 @@ you through the process.</p>
 </pre></div>
 </div>
 <p>Once you have a copy of the source, you can install it with:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> python setup.py install
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">#</span> make sure all dependencies from setup_devenv.bat are installed by conda
+<span class="gp">$</span> setup_devenv.bat <span class="c1"># or copy and paste the commands into shell</span>
+<span class="gp">$</span> conda activate dev_schimpy
+<span class="gp">$</span> pip install -e .
 </pre></div>
 </div>
 </div>
@@ -70,9 +73,6 @@ you through the process.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-            <p class="logo"><a href="index.html">
-              <img class="logo" src="_static/dwrsmall.jpg" alt="Logo"/>
-            </a></p>
 <p class="logo">
   <a href="index.html">
     <img class="logo" src="_static/dwrsmall.jpg" alt="Logo"/>
