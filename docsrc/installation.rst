@@ -44,7 +44,10 @@ Once you have a copy of the source, you can install it with:
 
 .. code-block:: console
 
-    $ python setup.py install
+    # make sure all dependencies from setup_devenv.bat are installed by conda
+    $ setup_devenv.bat # or copy and paste the commands into shell
+    $ conda activate dev_schimpy
+    $ pip install -e .
 
 
 .. _Github repo: https://github.com/CADWRDeltaModeling/schimpy
