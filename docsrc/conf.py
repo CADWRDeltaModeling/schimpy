@@ -31,10 +31,26 @@ import schimpy
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = ['nbsphinx', 'sphinx.ext.mathjax',
+          'sphinx.ext.autodoc', 'sphinx.ext.viewcode',
+          'matplotlib.sphinxext.mathmpl',
+          'matplotlib.sphinxext.plot_directive',
+          'sphinx.ext.intersphinx',
+          'sphinx.ext.autodoc',
+          'sphinxarg.ext',
+          'sphinx.ext.doctest',
+          'numpydoc']
 
+autodoc_member_order = 'alphabetical'
+  
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# mappings for intersphinx extension
+intersphinx_mapping = {'pandas': ('http://pandas.pydata.org/pandas-docs/stable',None),
+ 'python': ('http://docs.python.org/', None),
+ 'xarray' : ('http://xarray.pydata.org/en/stable',None)
+ }
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -47,8 +63,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'schimpy'
-copyright = "2020, Eli Ateljevich"
-author = "Eli Ateljevich, Kijin Nam"
+copyright = "2020, California Department of Water Resources"
+author = "Eli Ateljevich, Kijin Nam, Nicky Sandhu"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -69,7 +85,8 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
+    '*test*','_build','**.ipynb_checkpoints']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -84,13 +101,14 @@ todo_include_todos = False
 # a list of builtin themes.
 #
 html_theme = 'alabaster'
-
+html_theme_options = {
+    'logo': 'dwrsmall.jpg'}
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
 # html_theme_options = {}
-
+html_logo = 'dwrsmall.jpg'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -129,7 +147,7 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'schimpy.tex',
      'schimpy Documentation',
-     'Eli Ateljevich', 'manual'),
+     'Eli Ateljevich, Kijin Nam', 'manual'),
 ]
 
 
@@ -154,7 +172,7 @@ texinfo_documents = [
      'schimpy Documentation',
      author,
      'schimpy',
-     'One line description of project.',
+     'Python scripts for SCHISM',
      'Miscellaneous'),
 ]
 

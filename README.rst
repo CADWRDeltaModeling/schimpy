@@ -3,24 +3,11 @@ schimpy
 =======
 
 
-.. image:: https://img.shields.io/pypi/v/schimpy.svg
-        :target: https://pypi.python.org/pypi/schimpy
-
-.. image:: https://img.shields.io/travis/water-e/schimpy.svg
-        :target: https://travis-ci.com/water-e/schimpy
-
-.. image:: https://readthedocs.org/projects/schimpy/badge/?version=latest
-        :target: https://schimpy.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
-
-
-
-
 Python package for SCHISM
 
 
 * Free software: MIT license
-* Documentation: https://schimpy.readthedocs.io.
+* Documentation: https://cadwrdeltamodeling.github.io/schimpy/html/index.html
 
 
 Features
