@@ -11,10 +11,10 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=7.0', 'rtree>=0.9', 'numpy>=1.18', 'gdal>=3.0', 'xarray>=0.15', 
+requirements = ['rtree>=0.9', 'numpy>=1.18', 'gdal>=3.0', 'xarray>=0.15', 
     'matplotlib>=3.1', 'shapely>=1.6', 'pyyaml>=5.3', 'scipy>=1.4', 'pyproj>=2.4', 'geopandas>=0.6']
 
-install_requires = ['Click>=7.0', 'rtree>=0.9', 'numpy>=1.18', 'gdal>=3.0', 'xarray>=0.15', 
+install_requires = ['rtree>=0.9', 'numpy>=1.18', 'gdal>=3.0', 'xarray>=0.15', 
     'matplotlib>=3.1', 'shapely>=1.6', 'pyyaml>=5.3', 'scipy>=1.4', 'pyproj>=2.4', 'geopandas>=0.6']
 
 setup_requirements = ['pytest-runner', ]
@@ -39,7 +39,17 @@ setup(
     description="Python package for SCHISM",
     entry_points={
         'console_scripts': [
-            'schimpy=schimpy.cli:main',
+            'batch_metrics=schimpy.batch_metrics:main',
+            'clip_dems=schimpy.clip_dems:main',
+            'contour_smooth=schimpy.contour_smooth:main',
+            'convert_mesh=schimpy.convert_mesh:main',
+            'convert_linestrings=schimpy.convert_linestrings:main',
+            'combine_consume=schimpy.combine_consume:main',
+            'prepare_schism=schimpy.prepare_schism:main',
+            'create_vgrid_lsc2=schimpy.create_vgrid_lsc2:main',
+            'schism_hotstart=schimpy.schism_hotstart:main',
+            'split_quad=schimpy.split_quad:main',
+            'model_time=schimpy.model_time:main'
         ],
     },
     install_requires=requirements,
