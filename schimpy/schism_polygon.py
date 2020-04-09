@@ -2,7 +2,7 @@
 """
 This module contains polygon data holders and related operations.
 """
-from . import schism_yaml
+from schimpy import schism_yaml
 from shapely.geometry.polygon import orient
 from shapely.geometry import Polygon, Point
 from osgeo.osr import SpatialReference

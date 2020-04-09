@@ -104,9 +104,7 @@ def create_arg_parser():
     parser.add_argument('demlist', help='file containing prioritized (high to low) list of dems.')
     return parser
     
-            
-if __name__ == "__main__":
-
+def main():
     parser = create_arg_parser()
     args = parser.parse_args()
     if (not (args.coords[0] or args.infile)):
@@ -122,3 +120,7 @@ if __name__ == "__main__":
         
     clip_dem(x0,x1,args.demlist,args.outformat,args.hshift,args.prefix, args.verbose)    
 
+
+        
+if __name__ == "__main__":
+    main()

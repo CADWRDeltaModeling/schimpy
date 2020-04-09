@@ -3,7 +3,7 @@
 """ Command line tool to convert SCHISM polygons in YAML
     to Shapefile and vice versa
 """
-from schism_polygon import read_polygons, write_polygons
+from schimpy.schism_polygon import read_polygons, write_polygons
 import argparse
 
 def create_arg_parser():
