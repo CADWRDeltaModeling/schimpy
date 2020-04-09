@@ -10,18 +10,17 @@ import matplotlib
 import pandas as pd
 
 matplotlib.use('Agg')  # To prevent an unwanted failure on Linux
-from metricsplot import (plot_metrics, plot_comparison, get_common_window,
-                         safe_window, check_if_all_tss_are_bad, fill_gaps)
+from schimpy.metricsplot import plot_metrics, plot_comparison, get_common_window,\
+                                safe_window, check_if_all_tss_are_bad, fill_gaps
 
 import matplotlib.pyplot as plt
-from unit_conversions import (
-    cfs_to_cms, ft_to_m, ec_psu_25c, fahrenheit_to_celcius)
-import schism_yaml
+from schimpy.unit_conversions import cfs_to_cms,ft_to_m,ec_psu_25c,fahrenheit_to_celcius
+import schimpy.schism_yaml as schism_yaml
 from vtools.data.vtime import days, hours
 from vtools.functions.error_detect import med_outliers
 import argparse
 from vtools.datastore.read_ts import read_ts
-import station
+import schimpy.station as station
 import numpy as np
 from datetime import datetime
 import os

@@ -3,7 +3,7 @@ import os.path
 import os
 import sys
 import pandas as pd
-from unit_conversions import *
+from schimpy.unit_conversions import *
 
 
 if sys.version_info[0] < 3:

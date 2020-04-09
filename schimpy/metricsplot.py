@@ -2,7 +2,9 @@
 """ Metrics plot
 """
 import pandas as pd
-from plot_default_formats import set_color_cycle_dark2, set_scatter_color, make_plot_isometric, set_dual_axes, set_xaxis_dateformat, rotate_xticks,brewer_colors
+from schimpy.plot_default_formats import set_color_cycle_dark2, set_scatter_color,\
+                                         make_plot_isometric, set_dual_axes, set_xaxis_dateformat,\
+                                         rotate_xticks,brewer_colors
 from vtools.functions.filter import cosine_lanczos
 #, interpolate_ts, interpolate_ts_nan, LINEAR, shift
 from vtools.functions.skill_metrics import rmse, median_error, skill_score, corr_coefficient
