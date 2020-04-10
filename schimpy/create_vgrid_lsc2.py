@@ -12,10 +12,10 @@
     with minlayer and maxlayer attributes.
 """
 from lsc2 import * #default_num_layers, gen_sigma, flip_sigma
-from schism_vertical_mesh import SchismLocalVerticalMesh, write_vmesh
-from schism_mesh import read_mesh,write_mesh
-from schism_polygon import read_polygons
-from vgrid_opt2 import *
+from schimpy.schism_vertical_mesh import SchismLocalVerticalMesh, write_vmesh
+from schimpy.schism_mesh import read_mesh,write_mesh
+from schimpy.schism_polygon import read_polygons
+from schimpy.vgrid_opt2 import *
 import numpy as np
 import scipy.spatial
 fix_minmax = False

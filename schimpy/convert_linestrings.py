@@ -3,7 +3,7 @@
 """ Command line tool to convert SCHISM line strings in YAML
     to Shapefile and vice versa
 """
-from schism_linestring import read_linestrings, write_linestrings
+from schimpy.schism_linestring import read_linestrings, write_linestrings
 import argparse
 
 def create_arg_parser():
