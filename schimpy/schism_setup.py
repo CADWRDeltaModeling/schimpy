@@ -262,7 +262,10 @@ class SchismSetup(object):
             npoint = len(line)
             for ip in range(npoint-1):
                 line_segment = np.array(line[ip:ip+2],dtype='d').flatten()
-                on_line,neighbors = mesh.find_neighbors_on_segment(line_segment)  
+                try: 
+                    on_line,neighbors = mesh.find_neighbors_on_segment(line_segment)
+                except:
+                    raise ValueError("Neighbor set not found for linestring {}".format(name))                
                 #if not set(neighbors).isdisjoint(assigned): raise ValueError("Element assigned twice in fluxline:".format(name))
                 #if not set(neighbors).isdisjoint(assigned): raise ValueError("Element assigned twice in fluxline:".format(name))
                 #if not set(on_line).isdisjoint(assigned): raise ValueError("Element assigned twice in fluxline:".format(name))

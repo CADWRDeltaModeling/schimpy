@@ -50,7 +50,8 @@ setup(
             'create_vgrid_lsc2=schimpy.create_vgrid_lsc2:main',
             'schism_hotstart=schimpy.schism_hotstart:main',
             'split_quad=schimpy.split_quad:main',
-            'model_time=schimpy.model_time:main'
+            'model_time=schimpy.model_time:main',
+            'gen_elev2d=schimpy.gen_elev2D:main'
         ],
     },
     install_requires=requirements,

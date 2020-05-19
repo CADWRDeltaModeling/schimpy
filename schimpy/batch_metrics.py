@@ -106,7 +106,6 @@ class BatchMetrics(object):
             -------
             list of vtools.data.timeseries.TimeSeries
         """
-        raise ValueError("werewte")
         tss_sim = list()
         for sim_output in sim_outputs:
             if variable == 'flow':
@@ -128,11 +127,11 @@ class BatchMetrics(object):
             str
         """
         if alias is None:
-            fout_name = "%s_%s" % (variable, station_id)
+            fout_name = "{}_{}" % (variable, station_id)
         else:
-            fout_name = "%s_%s" % (variable, alias)
+            fout_name = "{}_{}".format(variable, alias)
             if alias != station_id:
-                fout_name += "_%s" % station_id
+                fout_name += "_{}".format(station_id)
         if variable in self.VAR_3D:
             if vert_pos == 0:
                 fout_name += "_upper"
@@ -160,6 +159,7 @@ class BatchMetrics(object):
             str
                 a file path of an observation file
         """
+        
         mapvar = self.MAP_VAR_FOR_STATIONDB[variable]
         if station_id in db_stations:
             flag_station = db_stations.loc[station_id,mapvar]
@@ -196,7 +196,6 @@ class BatchMetrics(object):
             if os.path.exists(fpath_obs):
                 try:
                     ts_obs = read_ts(fpath_obs, start=window[0], end=window[1])
-
                     if ts_obs.shape[1] > 1:
                         raise Exception("Multiple column series received. Need to implement selector")
                     ts_obs = ts_obs.iloc[:,0]
@@ -205,9 +204,11 @@ class BatchMetrics(object):
                     self.logger.warning(
                         "Got ValueError while reading an observation file: {}".format(e))
                     ts_obs = None
-                if ts_obs is None:
+                if ts_obs is None or len(ts_obs)==0:
+                    #todo: settle this behavior as None or len==0
                     self.logger.warning(
                         "File {} does not contain useful data for the requested time window".format( os.path.abspath(fpath_obs)))
+                    ts_obs = None
                 return ts_obs
             else:
                 self.logger.warning(
@@ -449,7 +450,7 @@ class BatchMetrics(object):
                 adj_obs += adj
             if ts_obs is not None and fill_gap is True:
                 self.logger.info("Filling gaps in the data.")
-                fill_gaps(ts_obs, max_gap_to_fill)
+                ts_obs = fill_gaps(ts_obs, max_gap_to_fill)
 
             # Plot
             if check_if_all_tss_are_bad([ts_obs] + tss_sim):

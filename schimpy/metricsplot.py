@@ -7,7 +7,7 @@ from schimpy.plot_default_formats import set_color_cycle_dark2, set_scatter_colo
                                          rotate_xticks,brewer_colors
 from vtools.functions.filter import cosine_lanczos
 #, interpolate_ts, interpolate_ts_nan, LINEAR, shift
-from vtools.functions.skill_metrics import rmse, median_error, skill_score, corr_coefficient
+from vtools.functions.skill_metrics import rmse, median_error, mean_error, skill_score, corr_coefficient
 import statsmodels.formula.api as sm
 from vtools.functions.lag_cross_correlation import calculate_lag
 from vtools.data.vtime import days, hours, minutes
@@ -123,6 +123,7 @@ def filter_timeseries(tss, cutoff_period=hours(40)):
         list of vtools.data.timeseries.TimeSeries
             filtered time series
     """
+
     filtered = []
     for ts in tss:
         if ts is None:
@@ -136,6 +137,7 @@ def filter_timeseries(tss, cutoff_period=hours(40)):
 
 
 def fill_gaps(ts, max_gap_to_fill=None):
+
     if max_gap_to_fill is None or max_gap_to_fill == hours(0): 
         return ts
     try:
@@ -145,6 +147,7 @@ def fill_gaps(ts, max_gap_to_fill=None):
     if limit == 0:
         raise ValueError("max_gap_to_fill must be longer than time step")
     unit = ts.unit
+
     ts = ts.interpolate(method='time',limit=limit)
     ts.unit = unit
     return ts
@@ -222,6 +225,7 @@ def plot_comparsion_to_figure(fig, tss, title=None,
         -------
         matplotlib.figure.Figure
     """
+
     grids = gen_simple_grid()
     axes = dict(list(zip(list(grids.keys()), list(map(fig.add_subplot,
                                       list(grids.values()))))))
@@ -229,6 +233,7 @@ def plot_comparsion_to_figure(fig, tss, title=None,
                       label_loc, legend_size)
     if title is not None:
         axes['inst'].set_title(title)
+
     return fig
 
 
@@ -480,7 +485,7 @@ def calculate_metrics(tss, lags, interpolate_method='linear'):
             ts1 = ts_base[window_common[0]:window_common[1]]
         else:
             ts2_interpolated = ts2
-        bias = median_error(ts2_interpolated, ts1)
+        bias = mean_error(ts2_interpolated, ts1,0.01)
         nse = skill_score(ts2_interpolated, ts1)
         corr = corr_coefficient(ts2_interpolated, ts1)
         metrics.append({'rmse': rmse_, 'bias': bias,
