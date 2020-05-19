@@ -653,7 +653,8 @@ class TriQuadMesh(object):
         normal = np.array((x[0, 1] - x[1, 1], x[1, 0] - x[0, 0]))
         box = self._box_from_points(x)
         hits = list(self._elem_index.intersection(box))
-        assert len(hits) > 0
+        if len(hits) == 0: 
+            raise ValueError("No hits for line_segment")
         # Test which one is actually intersect
         neighborset = set()
         real_hits = []
