@@ -12,8 +12,8 @@ import pandas as pd
 
 from netCDF4 import Dataset
 import gdal
-from separate_species import separate_species
-from schism_mesh import read_mesh
+from schimpy.separate_species import separate_species
+from schimpy.schism_mesh import read_mesh
 from vtools.data.vtime import hours, days, seconds
 from vtools.datastore.read_ts import read_noaa, read_ts
 import numpy as np
