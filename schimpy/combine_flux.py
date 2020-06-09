@@ -9,8 +9,13 @@ import numpy as np
 def combine_flux(infiles,outfile,prefer_last=False):
     """ Merge possibly overlapping flux.dat files from hostart runs
     """
-    
-    filedata = [np.loadtxt(f) for f in infiles]
+    filedata = []
+    for f in infiles:
+        try:
+            filedata.append(np.loadtxt(f))
+        except:
+            print("Problem reading file: {}".format(f))
+            raise
     nfile = len(filedata)
     starts = np.array([fd[ 0,0] for fd in filedata])
     ends   = np.array([fd[-1,0] for fd in filedata])
