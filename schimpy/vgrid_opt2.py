@@ -5,7 +5,7 @@ Created on Sun Jul 17 16:28:10 2016
 @author: eli
 """
 from scipy.ndimage.filters import gaussian_filter1d
-from lsc2 import *
+from schimpy.lsc2 import *
 
 def incr_grad(grad,i,k,val,ndx):
     n = ndx[i,k]

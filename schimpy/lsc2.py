@@ -25,7 +25,7 @@
 
 
 import numpy as np
-from laplace_smooth_data import *
+from schimpy.laplace_smooth_data import *
 
 showlist = [0,1,2] #,419,28778,28923,237892,237893,232311]
 showlist = [7942, 7967, 7968, 7969, 7972]

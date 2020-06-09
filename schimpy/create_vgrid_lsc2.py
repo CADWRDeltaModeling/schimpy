@@ -11,10 +11,11 @@
     The min and max layers can be specified in polygons in yaml or shp
     with minlayer and maxlayer attributes.
 """
-from lsc2 import * #default_num_layers, gen_sigma, flip_sigma
+from schimpy.lsc2 import * #default_num_layers, gen_sigma, flip_sigma
 from schimpy.schism_vertical_mesh import SchismLocalVerticalMesh, write_vmesh
 from schimpy.schism_mesh import read_mesh,write_mesh
 from schimpy.schism_polygon import read_polygons
+from schimpy.lsc2 import default_num_layers
 from schimpy.vgrid_opt2 import *
 import numpy as np
 import scipy.spatial
@@ -103,7 +104,7 @@ def main():
 
 def vgrid_gen(hgrid,vgrid_out,eta,
               minmaxlayerfile,archive_nlayer=None,nlayer_gr3=None):
-    from lsc2 import default_num_layers
+    
 
     meshfun = BilinearMeshDensity()
 
@@ -194,8 +195,8 @@ def vgrid_gen(hgrid,vgrid_out,eta,
 
 
 def plot_vgrid(hgrid_file,vgrid0_file,vgrid_file,eta,transectfiles):
-    from lsc2 import default_num_layers,plot_mesh
-    from schism_vertical_mesh import read_vmesh
+    from schimpy.lsc2 import default_num_layers,plot_mesh
+    from schimpy.schism_vertical_mesh import read_vmesh
     import matplotlib.pylab as plt
     import os.path as ospath
 
