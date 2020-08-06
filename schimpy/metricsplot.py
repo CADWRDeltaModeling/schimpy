@@ -33,11 +33,11 @@ def safe_window(ts, window):
     -------
     vtools.data.timeseries.TimeSeries
     """
-    if ts is None: 
+    if ts is None:
         return None
-    # If this line bombs recommend fixing the problem upstream, not catching 
+    # If this line bombs recommend fixing the problem upstream, not catching
     unit = ts.unit
- 
+
     if ts.last_valid_index() is None or ts.first_valid_index() is None:
         print("Valid index None")
         return None
@@ -138,7 +138,7 @@ def filter_timeseries(tss, cutoff_period=hours(40)):
 
 def fill_gaps(ts, max_gap_to_fill=None):
 
-    if max_gap_to_fill is None or max_gap_to_fill == hours(0): 
+    if max_gap_to_fill is None or max_gap_to_fill == hours(0):
         return ts
     try:
         limit = int(max_gap_to_fill/ts.index.freq)
@@ -166,13 +166,13 @@ def plot_metrics_to_figure(fig, tss,
         -------
         matplotlib.figure.Figure
     """
-        
-    
+
+
     grids = gen_metrics_grid()
     axes = dict(list(zip(list(grids.keys()), list(map(fig.add_subplot,
                                       list(grids.values()))))))
-    
-    plot_inst_and_avg(axes, tss, window_inst, 
+
+    plot_inst_and_avg(axes, tss, window_inst,
                       window_avg, labels, label_loc, legend_size)
     if title is not None:
         axes['inst'].set_title(title)
@@ -180,15 +180,15 @@ def plot_metrics_to_figure(fig, tss,
         tss_clipped = [safe_window(ts, window_avg) for ts in tss]
     else:
         tss_clipped = tss
-        
+
     lags = calculate_lag_of_tss(tss_clipped, max_shift, minutes(1))
     metrics, tss_scatter = calculate_metrics(tss_clipped, lags)
-    unit = tss[1].unit  # Get from the simulation 
-    
+    unit = tss[1].unit  # Get from the simulation
+
     if tss_scatter is not None:
         if tss_scatter[0] is not None:
             tss_scatter[0].unit = unit
-        tss_scatter[1].unit = unit        
+        tss_scatter[1].unit = unit
         ax_scatter = axes['scatter']
         plot_scatter(ax_scatter, tss_scatter)
 
@@ -216,7 +216,7 @@ def plot_inst_and_avg(axes, tss, window_inst, window_avg, labels, label_loc, leg
     plot_tss(axes['avg'], tss_filtered, window_avg,cell_method='ave')
 
 
-def plot_comparsion_to_figure(fig, tss, title=None,
+def plot_comparison_to_figure(fig, tss, title=None,
                               window_inst=None, window_avg=None, labels=None,
                               label_loc=1, legend_size=12):
     """ Plot a metrics plot
@@ -275,10 +275,10 @@ def plot_tss(ax, tss, window=None,cell_method='inst'):
     else:
         ts_plotted = None
         for ts in tss_plot:
-            if ts is None: 
+            if ts is None:
                 l, = ax.plot([], [])
             else:
-                l, = ax.plot(ts.index,ts.values)
+                l, = ax.plot(ts.index, ts.values)
                 ax.grid(True, linestyle='-', linewidth=0.1, color='0.5')
                 if ts_plotted is None:
                     ts_plotted = ts
@@ -349,8 +349,8 @@ def add_regression_line(axes, d1, d2):
 
 
     result = sm.ols(formula="model~obs", data=df).fit().params
-    
-    
+
+
     x = np.array([d1.min(), d1.max()])
     y = result[1] * x + result[0]
     bc1 = brewer_colors[1]
@@ -381,13 +381,12 @@ def plot_scatter(ax, tss):
     ts_obs = tss[0]
     ts_est = tss[1]
     unit = ts_obs.unit
-    print(unit)
     #nonnan_flag = np.logical_not(np.logical_or(np.isnan(ts_base.data),
     #                                           np.isnan(ts_target.data)))
     #ts_target = ts_target.data[nonnan_flag]
     #ts_base = ts_base.data[nonnan_flag]
     ax.grid(True, linestyle='-', linewidth=0.1, color='0.5')
-    
+
     artist = ax.scatter(ts_obs, ts_est)
 
     #if self._have_regression is True:
@@ -414,7 +413,7 @@ def calculate_lag_of_tss(tss, max_shift, period):
         raise ValueError("Number of time series is less than two.")
     for i in range(len(tss) - 1):
         if tss[0] is not None:
-            allbad = True if tss[i+1] is None else tss[i+1].isnull().all() 
+            allbad = True if tss[i+1] is None else tss[i+1].isnull().all()
             if tss[i+1] is None or allbad:
                 lags.append(None)
                 continue
@@ -461,7 +460,7 @@ def calculate_metrics(tss, lags, interpolate_method='linear'):
             metrics.append(None)
             continue
         if ts1.index[0] != ts2.index[0] or ts1.index.freq != ts2.index.freq:
-            if ts1.index.freq != ts2.index.freq:               
+            if ts1.index.freq != ts2.index.freq:
                 ts2_interpolated = ts2.resample(ts1.index.freq).interpolate(limit=1)
             else:
                 ts2_interpolated = ts_target
@@ -479,7 +478,7 @@ def calculate_metrics(tss, lags, interpolate_method='linear'):
         if lags[i] is not None:
             #todo: disabled
             ts_target_shifted = ts_target.shift(1,-lags[i])
-            ts2_interpolated = ts2.resample(ts1.index.freq).interpolate(limit=1)       
+            ts2_interpolated = ts2.resample(ts1.index.freq).interpolate(limit=1)
             window_common = get_common_window((ts_base, ts2_interpolated))
             ts2_interpolated = ts2_interpolated[window_common[0]:window_common[1]]
             ts1 = ts_base[window_common[0]:window_common[1]]
@@ -500,6 +499,7 @@ def set_figure():
     """
     fig = plt.gcf()
     fig.clear()
+    # fig = plt.figure()
     fig.set_size_inches(12, 7.5)
     set_color_cycle_dark2()
     return fig
@@ -509,9 +509,8 @@ def check_if_all_tss_are_bad(tss):
     """ Check if all time series in a list are not good.
         'Not good' means that a time series is None or all np.nan
     """
-    def bad(ts): 
+    def bad(ts):
         return True if ts is None else ts.isnull().all()
-    bads = [bad(ts) for ts in tss]
     return all([bad(ts) for ts in tss])
 
 
@@ -549,5 +548,5 @@ def plot_comparison(*args, **kwargs):
     matplotlib.pyplot.figure.Figure
     """
     fig = set_figure()
-    fig = plot_comparsion_to_figure(fig, args, **kwargs)
+    fig = plot_comparison_to_figure(fig, args, **kwargs)
     return fig
