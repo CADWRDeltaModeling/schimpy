@@ -11,11 +11,12 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['rtree>=0.9', 'numpy>=1.18', 'gdal>=3.0', 'xarray>=0.15', 
-    'matplotlib>=3.1', 'shapely>=1.6', 'pyyaml>=5.3', 'scipy>=1.4', 'pyproj>=2.4', 'geopandas>=0.6']
+install_requires = ['geopandas>=0.6', 'holoviews>=1.13', 'datashader>=0.10',
+                    'xarray>=0.15', 'netcdf4>=1.4', 'scipy>=1.4',
+                    'matplotlib>=3.1', 'statsmodels>=0.11',
+                    'palettable>=3.3' ]
 
-install_requires = ['rtree>=0.9', 'numpy>=1.18', 'gdal>=3.0', 'xarray>=0.15', 
-    'matplotlib>=3.1', 'shapely>=1.6', 'pyyaml>=5.3', 'scipy>=1.4', 'pyproj>=2.4', 'geopandas>=0.6']
+requirements = install_requires
 
 setup_requirements = ['pytest-runner', ]
 
@@ -43,7 +44,7 @@ setup(
             'clip_dems=schimpy.clip_dems:main',
             'contour_smooth=schimpy.contour_smooth:main',
             'convert_mesh=schimpy.convert_mesh:main',
-            'convert_polygons=schimpy.convert_polygons:main',            
+            'convert_polygons=schimpy.convert_polygons:main',
             'convert_linestrings=schimpy.convert_linestrings:main',
             'combine_consume=schimpy.combine_consume:main',
             'prepare_schism=schimpy.prepare_schism:main',

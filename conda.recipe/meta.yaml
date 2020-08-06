@@ -26,16 +26,15 @@ requirements:
   run:
     - python
     - Click >=7.0
-    - rtree >=0.9
-    - numpy >=1.18
-    - gdal >=3.0
+    - geopandas >=0.6
+    - holoviews >=1.13
+    - datashader >=0.10
+    - netcdf4 >=1.4
     - xarray >=0.15
     - matplotlib>=3.1
-    - shapely>=1.6
-    - pyyaml>=5.3
     - scipy>=1.4
-    - pyproj>=2.4
-    - geopandas>=0.6
+    - statsmodels >=0.11
+    - palettable >=3.3
   test:
     imports:
       - schimpy
