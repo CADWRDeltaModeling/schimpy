@@ -10,3 +10,5 @@ del get_versions
 from .schism_mesh import *
 from .prepare_schism import *
 from .split_quad import *
+from .metricsplot import *
+from .batch_metrics import *

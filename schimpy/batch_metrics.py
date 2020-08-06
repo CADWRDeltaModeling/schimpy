@@ -28,6 +28,8 @@ import re
 import logging
 from copy import deepcopy
 
+__all__ = ['generate_metricsplots', ]
+
 pd.plotting.register_matplotlib_converters()
 
 def process_time_str(val):
@@ -83,7 +85,7 @@ class BatchMetrics(object):
                     station_in = os.path.join(working_dir, "flowlines.yaml")
                 else:
                     station_in = stations_input[i]
-                datafname = os.path.join(working_dir,"flux.out")                
+                datafname = os.path.join(working_dir,"flux.out")
                 sim_out = station.read_flux_out(datafname,station_in,reftime=time_basis)
                 sim_outputs.append(sim_out)
         else:
@@ -159,7 +161,7 @@ class BatchMetrics(object):
             str
                 a file path of an observation file
         """
-        
+
         mapvar = self.MAP_VAR_FOR_STATIONDB[variable]
         if station_id in db_stations:
             flag_station = db_stations.loc[station_id,mapvar]
@@ -170,7 +172,7 @@ class BatchMetrics(object):
         fpath_obs_fnd = (station_id,subloc,variable) in db_obs.index
         if fpath_obs_fnd:
             fpath_obs = db_obs.loc[(station_id,subloc,variable),"path"]
-        else: 
+        else:
             fpath_obs = None
 
         if fpath_obs_fnd:
@@ -313,11 +315,11 @@ class BatchMetrics(object):
         stations_input = params.get('stations_input')
         if stations_input is None:
             stations_input = params.get('flow_station_input') if variable == "flow" else params.get('station_input')
-        else: 
+        else:
             raise ValueError("Old style input file. \nUse 'station_input' and 'flow_station_input' respectively for staout* and flow.dat")
         if isinstance(stations_input, str):
             stations_input = stations_input.split()
-        
+
         db_stations = station.read_station_dbase(params['stations_csv'])
         db_obs = station.read_obs_links(params['obs_links_csv'])
         excluded_stations = params.get('excluded_stations')
@@ -347,7 +349,7 @@ class BatchMetrics(object):
         if 'max_gap_to_fill' in params:
             max_gap_to_fill =pd.tseries.frequencies.to_offset(params['max_gap_to_fill'])
         else: max_gap_to_fill = hours(1)
-        
+
 
         # Prepare readers of simulation outputs
         sim_outputs = self.read_simulation_outputs(variable,
@@ -383,7 +385,7 @@ class BatchMetrics(object):
                                      "In the list of the excluded stations: %s",
                                      station_id)
                     continue
-                
+
             if variable == 'flow':
                 vert_pos = 'default'
             else:
@@ -411,7 +413,7 @@ class BatchMetrics(object):
                     self.logger.info(
                         "Adjusting obs value with the value in the table...")
                     ts_obs += adj
-                    
+
                     if obs_unit == 'ft':
                         adj = ft_to_m(adj)
                     else:
@@ -421,7 +423,7 @@ class BatchMetrics(object):
                     obs_unit = db_obs.loc[(station_id, subloc, variable),'unit']
 
                     ts_obs = self.convert_unit_of_ts_obs_to_SI(ts_obs,obs_unit)
-                    
+
                     obs_unit = ts_obs.unit
                 except Exception as e:
                     raise Exception("Station {}".format(station_id)) from e
@@ -432,17 +434,17 @@ class BatchMetrics(object):
 
             else:
                 tss_sim = [simout.loc[:,(station_id,subloc)].iloc[:,0] for simout in sim_outputs]
-            
+
             for ts in tss_sim:
                 if ts is None: continue
-                if ts_obs is None or ts_obs.isnull().all(): 
-                    ts.unit = self.variable_units[variable] 
+                if ts_obs is None or ts_obs.isnull().all():
+                    ts.unit = self.variable_units[variable]
                 else:
                     ts.unit = obs_unit
 
             # Adjust datum if necessary
             if adjust_datum and ts_obs is not None:
-                ts_obs, adj = self.adjust_obs_datum(ts_obs,                        
+                ts_obs, adj = self.adjust_obs_datum(ts_obs,
                                                     tss_sim[0],
                                                     station_id,
                                                     variable,
@@ -460,7 +462,7 @@ class BatchMetrics(object):
             source = db_obs.loc[(station_id,subloc,variable),"agency"].upper()
             figtitle = self.create_title(
                 db_stations, station_id, source, variable, vert_pos)
-            
+
             title = None
             if type(tss_sim) == list: tss_sim=tuple(tss_sim)
 
@@ -471,7 +473,7 @@ class BatchMetrics(object):
                     labels_to_plot[0] += " + {:g}".format(adj_obs)
                 else:
                     labels_to_plot[0] += " - {:g}".format(-adj_obs)
-            
+
             if plot_format == 'simple':
                 fig = plot_comparison(ts_obs, tss_sim,
                                       window_inst=(start_inst, end_inst),
@@ -534,14 +536,19 @@ def get_params(fname):
     return params
 
 
+def generate_metricsplots(path_inputfile):
+    params = get_params(path_inputfile)
+    init_logger()
+    BatchMetrics(params).plot()
+
+
 def main():
     """ Main function
     """
     parser = create_arg_parser()
     args = parser.parse_args()
-    params = get_params(args.main_inputfile)
-    init_logger()
-    BatchMetrics(params).plot()
+    generate_metricsplots(args.main_inputfile)
+
 
 if __name__ == "__main__":
     main()

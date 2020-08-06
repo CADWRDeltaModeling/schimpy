@@ -47,7 +47,7 @@ def set_color_cycle_dark2():
         brewer_colors: list
             list of the colors
     """
-    
+
     mpl.rcParams['axes.prop_cycle'] = cycler(color=brewer_colors)
     return brewer_colors
 
