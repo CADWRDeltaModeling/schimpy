@@ -528,6 +528,11 @@ def init_logger():
     logging.getLogger('').addHandler(console)
 
 
+def shutdown_logger():
+    for handler in logging.root.handlers:
+        logging.root.removeHandler(handler)
+
+
 def get_params(fname):
     """ Read in parameters from a YAML file
     """
@@ -540,6 +545,7 @@ def generate_metricsplots(path_inputfile):
     params = get_params(path_inputfile)
     init_logger()
     BatchMetrics(params).plot()
+    shutdown_logger()
 
 
 def main():
