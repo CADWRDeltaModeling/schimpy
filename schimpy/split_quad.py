@@ -97,7 +97,7 @@ def calculate_skewness(nodes):
     return angle_max / angle_min
 
 
-def split_quad(mesh, elems_to_split):
+def split_quads(mesh, elems_to_split):
     """ Split given quad elements into two tri ones
 
         Parameters
@@ -113,7 +113,7 @@ def split_quad(mesh, elems_to_split):
     for i, elem_i in enumerate(elems_to_split):
         elem = np.array(mesh.elem(elem_i), dtype=int)
         if len(elem) != 4:
-            raise ValueError('split_quad requires quad elements')
+            raise ValueError('split_quads requires quad elements')
         skew = []
         for index1, index2 in split_index:
             re = np.max((calculate_skewness(mesh.nodes[elem[index1]]),
@@ -192,52 +192,43 @@ def create_arg_parser():
         "value than the given skewness into triangular elements."
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('meshinput', type=str,
-                        help="Mesh input file to process in GR3 format.")
+                        help="Mesh input file to process in gr3 or SMS 2dm format.")
     parser.add_argument('meshoutput', type=str,
-                        help="Output mesh file name in GR3 format.")
-    parser.add_argument('--skewness', dest='skewness', type=float,
+                        help="Output mesh file name in gr3 format.")
+    parser.add_argument('--skewness', dest='skewness', type=float, default=None,
                         help="Maximum skewness (not normalized.) to split. "
                         "If the skewness of an element is bigger than this, "
                         "the element will be split.")
-    parser.add_argument('--minangle', dest='minangle', type=float,
-                        help="Minimum angle to keep in quads. If any of "
+    parser.add_argument('--minangle', dest='minangle', type=float, default=None,
+                        help="Minimum angle (degrees) to keep in quads. If any of "
                         "internal angles of a quad is smaller than mingangle, "
                         "the quad will be split.")
-    parser.add_argument('--maxangle', dest='maxangle', type=float,
-                        help="Minimum angle to keep in quads. If any of "
+    parser.add_argument('--maxangle', dest='maxangle', type=float, default=None,
+                        help="Minimum angle (degrees) to keep in quads. If any of "
                         "internal angles of a quad is larger than maxgangle, "
                         "the quad will be split.")
-    # parser.add_argument('--region_to_split', dest='polygon_split',
-    #                     type=str,
-    #                     help="Area to split quads")
-    parser.add_argument('--prop', dest='prop', type=str,
+    parser.add_argument('--propfile', dest='propfile', type=str,default=None,
                         help="Write a prop file that shows elements that are split")
     return parser
 
 
-def main():
+def split_quad(mesh,skewness=None,minangle=None,maxangle=None,meshout=None,propfile=None,logger=None):
     """ main function for CLI
     """
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    fpath_mesh_in = args.meshinput
-    if not os.path.exists(fpath_mesh_in):
-        raise ValueError('The given input file not found')
-    fpath_mesh_out = args.meshoutput
-    skewness = args.skewness
+    if logger is not None:
+        logger.info("Splitting quads")
     if skewness is not None:
         if skewness < 0.:
             raise ValueError('Skewness must be bigger than zero')
-    minangle = args.minangle
-    maxangle = args.maxangle
     if minangle is not None:
         minangle = np.pi * minangle / 180.
     if maxangle is not None:
         maxangle = np.pi * maxangle / 180.
     if skewness is None and minangle is None and maxangle is None:
-        raise ValueError('No splitting criteria are given')
+        raise ValueError('No splitting criteria were given')
 
-    mesh = schism_mesh.read_mesh(fpath_mesh_in)
+    if isinstance(mesh,str): 
+        mesh = schism_mesh.read_mesh(mesh)
     if sys.version_info[0] < 3:
         elems_to_split = sets.Set()
     else:
@@ -264,20 +255,42 @@ def main():
                     if angle_max > maxangle:
                         elems_to_split.add(elem_i)
 
-    print("Found %d quad element(s) to spilt." % len(elems_to_split))
+    print("Found {} quad element(s) to spilt.".format( len(elems_to_split)))
 
     if len(elems_to_split) < 1:
         print("No element to split.")
         return
 
     print("Start splitting...")
-    split_quad(mesh, elems_to_split)
+    split_quads(mesh, elems_to_split)
     print("Writing output file...")
-    schism_mesh.write_mesh(mesh, fpath_mesh_out)
-    if args.prop is not None:
-        fpath_prop = args.prop
-        write_prop(elems_to_split, n_elems_ori, fpath_prop)
-    print("Done.")
+    if meshout is not None:
+        schism_mesh.write_mesh(mesh, meshout)
+    if propfile is not None:
+        write_prop(elems_to_split, n_elems_ori, propfile)
+
+    return mesh
+
+
+def main():
+    """ main function for CLI
+    """
+    parser = create_arg_parser()
+    args = parser.parse_args()
+    meshin = args.meshinput
+    if not os.path.exists(meshin):
+        raise ValueError('The given input file not found')
+    meshout = args.meshoutput
+    fpath_prop = args.propfile
+    skewness = args.skewness
+    minangle = args.minangle
+    maxangle = args.maxangle
+    newmesh=split_quad(meshin,skewness,minangle,maxangle,\
+                       meshout,fpath_prop)
+    return 
+                       
+
+
 
 
 if __name__ == '__main__':

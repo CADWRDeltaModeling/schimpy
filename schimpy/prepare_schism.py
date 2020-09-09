@@ -14,6 +14,8 @@ Example jobs in this pre-processing are:
 from .schism_setup import create_schism_setup, check_and_suggest
 from .grid_opt import GridOptimizer
 from .stacked_dem_fill import stacked_dem_fill
+from .small_areas import small_areas
+from .split_quad import split_quad
 from . import schism_yaml
 import numpy as np
 import subprocess
@@ -34,11 +36,20 @@ def create_arg_parser():
 
 
 def create_hgrid(s, inputs, logger):
-    """ Preprocessed the hgrid file
+    """ Preprocess the hgrid file
     """
     section_name = 'mesh'
     section = inputs.get(section_name)
     if section is not None:
+        split_param  = section.get("split_quad")
+        if split_param is not None:
+            # This should be an in-place
+            split_quad(s.mesh,logger=logger,**split_param)
+        small_area_param = section.get("small_areas")
+        if small_area_param is not None:
+            # This just emits warnings unless the fail threshold is met
+            small_areas(s.mesh,logger=logger,**small_area_param)
+
         open_boundaries = section.get('open_boundaries')
         if open_boundaries is not None:
             logger.info("Processing open boundaries...")
@@ -49,7 +60,8 @@ def create_hgrid(s, inputs, logger):
         logger.info("Filling missing land and island boundaries...")
         s.mesh.fill_land_and_island_boundaries()
 
-        # Second, Mesh optimization
+
+        # Volumetric optimization of mesh
         option_name = 'depth_optimization'
 
         # if option_name in section.keys():
@@ -311,7 +323,7 @@ def prepare_schism(args, use_logging=True):
     in_fname = args.main_inputfile
 
     if not os.path.exists(in_fname):
-        logger.error("The main input file, %s, is not found", in_fname)
+        logger.error("The main input file, %s, not found", in_fname)
         raise ValueError("Main input file not found")
     with open(in_fname, 'r') as f:
         inputs = schism_yaml.load(f)
@@ -332,7 +344,7 @@ def prepare_schism(args, use_logging=True):
         logger.info("Processing mesh section...")
         mesh_items = inputs['mesh']
         keys_mesh_section = ["mesh_inputfile", "dem_list",
-                             "open_boundaries",
+                             "open_boundaries","split_quad","small_areas",
                              "depth_optimization",
                              "gr3_outputfile", "ll_outputfile"] \
             + schism_yaml.include_keywords
