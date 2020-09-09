@@ -25,7 +25,7 @@ def staout_name(var):
     except:
         raise ValueError("Input variable is not standard station variable: {}".format(var))
 
-def read_staout(fname,station_infile,reftime,ret_station_in = False,multi=False,elim_default=False):
+def read_staout(fname,station_infile,reftime,ret_station_in = False,multi=False,elim_default=False,time_unit='s'):
     """Read a SCHISM staout_* file into a pandas DataFrame
 
     Parameters
@@ -48,7 +48,10 @@ def read_staout(fname,station_infile,reftime,ret_station_in = False,multi=False,
 
     elim_default : bool
         If the MultiIndex is collapsed, stations with subloc "default" will be collapsed. Eg. ("CLC","default") becomes "CLC_default"
-
+        
+    time_unit : string
+        Convertible to pandas frequency string, this is the timestamp of the file.
+        
      Returns
      -------
      Result : DataFrame
@@ -72,14 +75,15 @@ def read_staout(fname,station_infile,reftime,ret_station_in = False,multi=False,
     # todo: hardwire
     staout.mask(staout<=-999.,inplace=True)
     staout.columns = station_index
-    elapsed_datetime(staout,reftime=reftime,inplace=True)
+    elapsed_datetime(staout,reftime=reftime,inplace=True,time_unit=time_unit)
+    staout.index = staout.index.round('s')
     if not multi:
         if elim_default:
             staout.columns = [f'{loc}_{subloc}' if subloc != 'default' else f'{loc}' for loc,subloc in staout.columns]
         else:
             staout.columns = [f'{loc}_{subloc}' for loc,subloc in staout.columns]
     f = pd.infer_freq(staout.index)
-    staout = staout.asfreq(f)
+    staout = staout.resample(f).asfreq(f)    
     return (staout, station_infile) if ret_station_in else staout
 
 

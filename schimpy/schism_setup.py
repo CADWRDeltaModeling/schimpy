@@ -547,6 +547,7 @@ class SchismSetup(object):
             vertices = np.array(vertices)
             poly_type = polygon['type'].lower() \
                 if 'type' in polygon else "none"
+            if poly_type == '': poly_type = 'none'
             attribute = polygon['attribute']
             prop = {'name': name, 'type': poly_type, 'attribute': attribute}
             poly = SchismPolygon(shell=vertices,

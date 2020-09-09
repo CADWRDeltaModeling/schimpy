@@ -91,20 +91,26 @@ def create_hgrid(s, inputs, logger):
                                                                   s.mesh.nodes[:, :2],
                                                                   require_all=False,
                                                                   na_fill=default_depth_for_missing_dem))
+                                                                  
+        elev_enforce_params = section.get("elev_enforcement")
+        if elev_enforce_params is not None:
+            s.mesh.nodes[:,2] = s._partition_nodes_with_polygons(default=None,**elev_enforce_params)
+
+        
 
         # Write hgrid.gr3
         option_name = 'gr3_outputfile'
         if option_name in section:
             logger.info("Writing hgrid file...")
             hgrid_out_fpath = os.path.expanduser(section[option_name])
-            s.write_hgrid(hgrid_out_fpath)
+            s.write_hgrid(hgrid_out_fpath,boundary=True)
 
         # Write hgrid.ll
         option_name = 'll_outputfile'
         if option_name in section:
             logger.info("Creating hgrid.ll file...")
             hgrid_ll_fpath = os.path.expanduser(section[option_name])
-            s.write_hgrid_ll(hgrid_ll_fpath)
+            s.write_hgrid_ll(hgrid_ll_fpath,boundary=True)
 
 
 def create_source_sink(s, inputs, logger):
@@ -345,7 +351,7 @@ def prepare_schism(args, use_logging=True):
         mesh_items = inputs['mesh']
         keys_mesh_section = ["mesh_inputfile", "dem_list",
                              "open_boundaries","split_quad","small_areas",
-                             "depth_optimization",
+                             "depth_optimization","elev_enforcement",
                              "gr3_outputfile", "ll_outputfile"] \
             + schism_yaml.include_keywords
         check_and_suggest(list(mesh_items.keys()), keys_mesh_section)
