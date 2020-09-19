@@ -70,10 +70,7 @@ def main():
     import glob
     fulldir = getcwd()
     head,tail=os.path.split(fulldir)
-    if not transect:
-        transect = tail
-        transectfiles = glob.glob(tail+"_*.csv")
-    else:
+    if transect is not None:
         with open(transect,"r") as f:
             lines = f.readlines()
             transectfiles = [line.strip() for line in lines if ("csv" in line) and (not line.startswith("#"))]
@@ -94,11 +91,11 @@ def main():
                        "frank_tract_sjr_5.csv"]
 
     #transectfiles = transect_franks
-
-    vgrid_out = "vgrid.in"
-    vgrid0_out = "D:/Delta/BayDeltaSCHISM.bak/BayDeltaSCHISM/calibration_20171101_v87d/run58/vgrid.in.58d"
-    vgrid0_out = "vgrid.in"
-    plot_vgrid(hgrid,vgrid_out,vgrid0_out,eta,transectfiles)
+    
+    if transect is not None:
+        vgrid_out = "vgrid.in"
+        vgrid0_out = "vgrid.in"
+        plot_vgrid(hgrid,vgrid_out,vgrid0_out,eta,transectfiles)
 
 
 
