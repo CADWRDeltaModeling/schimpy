@@ -96,11 +96,11 @@ def create_arg_parser():
     parser = argparse.ArgumentParser(description="Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS")
     parser.add_argument('--coords', type=float, nargs=4, metavar=('ul_x','ul_y','lr_x','lr_y'), default = (None, None, None, None),
                         help='bounding coordinates to which DEMs will be clipped (upper left, lower right)')
-    parser.add_argument('--image', dest='infile', default = None, help='image or DEM used to infer bounding coordinates for clipping. This argument is mutually exclusive with --coords. If a sample is provided its upper left and lower right corner will be used.')
+    parser.add_argument('--image', dest='infile', default = None, help='image or DEM used to infer bounding coordinates for clipping. Use jpeg for the image. This argument is mutually exclusive with --coords. If a sample is provided its upper left and lower right corner will be used.')
     parser.add_argument('--prefix', dest='prefix', default = 'clipped', help='prefix used for output file names')
     parser.add_argument('--outformat', default='AAIGrid',help='output format, default is AAIGrid (ArcInfo ascii.')
     parser.add_argument('--verbose',action = 'store_true', default=False, help='more verbose output.')    
-    parser.add_argument('--hshift', action = 'store_true', default=False,help='shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS < 11.1')
+    parser.add_argument('--hshift', action = 'store_true', default=False,help='(deprecated) shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS < 11.1')
     parser.add_argument('demlist', help='file containing prioritized (high to low) list of dems.')
     return parser
     
