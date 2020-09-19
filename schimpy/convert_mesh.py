@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """ Mesh converter
 """
-from schism_mesh import read_mesh, write_mesh
+from schimpy.schism_mesh import read_mesh, write_mesh
 import argparse
 
 
