@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """ Line String data based on Shapely LineStrings
 """
@@ -110,12 +111,14 @@ class LineStringShapefileWriter(LineStringIo):
                 list of LineStrings
             spatial_reference: osgeo.osr.SpatialReference
             default: NAD83, UTM zone 10N, meter
+            
+            todo: reference needs to be in api right now hard to use
         """
         # Boilerplate to create a SHP file
         if spatial_reference is None:
             spatial_reference = SpatialReference()
-            spatial_reference.ImportFromProj4(
-                '+proj=utm +zone=10N +ellps=NAD83 +datum=NAD83 +units=m')
+            spatial_reference_str= '+proj=utm +zone=10 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
+            spatial_reference.ImportFromProj4(spatial_reference_str)
         if driver_name is None:
             driver_name = 'ESRI Shapefile'
         driver = GetDriverByName(driver_name)
@@ -134,7 +137,8 @@ class LineStringShapefileWriter(LineStringIo):
                 for k in l.prop:
                     if k not in fields and k != 'coordinates':
                         fields.append(k)
-        map(layer.CreateField, [FieldDefn(field) for field in fields])
+        for field in fields:
+            layer.CreateField(FieldDefn(field))
         feature_defn = layer.GetLayerDefn()
         feature = Feature(feature_defn)
 
