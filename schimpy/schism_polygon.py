@@ -210,8 +210,9 @@ class SchismPolygonYamlWriter(SchismPolygonIo):
                 leaf = {}
                 leaf['name'] = p.name
                 leaf['vertices'] = list([list(xy) for xy in p.exterior.coords])
-                if p.type is not None and p.type.lower() != 'none':
-                    leaf['type'] = p.type
+                if p.type is not None:
+                    leaf['type'] = p.type 
+                else: leaf['type'] = 'none'
                 if not p.attribute is None:
                     if p.attribute.lower() != 'none':
                         leaf['attribute'] = p.attribute
