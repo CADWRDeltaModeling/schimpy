@@ -196,7 +196,7 @@ class SchismSetup(object):
         """
         schism_mesh.write_mesh(self._input.mesh, fname, attr, boundary)
 
-    def write_hgrid_ll(self, fname, input_epsg=26910, output_epsg=4269):
+    def write_hgrid_ll(self, fname, boundary, input_epsg=26910, output_epsg=4269):
         """ Write a hgrid.ll, lat-long mesh file, of the current mesh.
 
             Parameters
@@ -221,15 +221,22 @@ class SchismSetup(object):
             # but orders of magnitude slow for pyproj 2.1.0
             project = partial(transform,proj_in,proj_out)
 
-        new_mesh = SchismMesh()
-        new_mesh._nodes = np.copy(self.mesh.nodes)
-        new_mesh._elems = np.copy(self.mesh._elems)
+        #new_mesh = SchismMesh()
+        new_mesh = copy.copy(self.mesh)
+        new_mesh._nodes = np.copy(new_mesh._nodes)
+        #new_mesh._elems = np.copy(self.mesh._elems)
+
+        #new_mesh = SchismMesh()
+        #new_mesh._nodes = np.copy(self.mesh.nodes)
+        #new_mesh._elems = np.copy(self.mesh._elems)
+        #new_mesh._nodes = transform(project,self.mesh.nodes[:,0],self.mesh.nodes[:,1])
+        
         for i, node in enumerate(self.mesh.nodes):
             point = Point(node[0], node[1])
             point = transform(project, point)
             new_mesh.nodes[i, 0] = point.xy[0][0]
             new_mesh.nodes[i, 1] = point.xy[1][0]
-        write_mesh(new_mesh, fname)
+        write_mesh(new_mesh, fname,write_boundary=boundary)
 
 
     def elements_on_linestring(self, coords):
@@ -417,6 +424,7 @@ class SchismSetup(object):
         for item in structures:
             struct = SchismStructure()
             name = item.get('name')
+            self._logger.info('Processing structure: {}'.format(name))
             struct.name = name
             end_points = item.get('end_points')
             if end_points is None:
@@ -506,9 +514,9 @@ class SchismSetup(object):
     def _parse_attribute(self, expr):
         """ Parse expression that can be understood by the tool
         """
-        expr = re.sub(r"\bx\b", "node[0]", expr)
-        expr = re.sub(r"\by\b", "node[1]", expr)
-        expr = re.sub(r"\bz\b", "node[2]", expr)
+        expr = re.sub(r"(\b)x(\b)", "\g<1>node[0]\g<2>", expr)
+        expr = re.sub(r"(\b)y(\b)", "\g<1>node[1]\g<2>", expr)
+        expr = re.sub(r"(\b)z(\b)", "\g<1>node[2]\g<2>", expr)
         return expr
 
     def _partition_nodes_with_polygons(self, polygons, default):
@@ -601,18 +609,134 @@ class SchismSetup(object):
                 self._logger.warning(msg)
         return attr
 
-    def create_node_partitioning(self, gr3_fname, polygons, default):
+    def apply_polygons(self, polygons, default):
+        """ Partition the grid with the given polygons.
+            Each node (not element) will be assigned with an integer ID
+            which is the index of the polygons.
+            If some polygons overlap, the latter one will trump the former one.
+            The area that are not covered by any of the given polygons
+            will have a default negative one attribute.
+
+            Parameters
+            ----------
+            polygons: list
+                a list of polygon dict (from YAML most of time)
+
+            Returns
+            -------
+            numpy.ndarray
+                attributes
+        """
+        import importlib
+        import math
+        import numbers
+        mesh = self.mesh
+        if default is None:
+            # Use depth
+            attr = np.copy(mesh.nodes[:, 2])
+        else:
+            # Fill default values
+            val = float(default)
+            attr = np.empty(mesh.n_nodes())
+            attr.fill(val)
+               
+            
+        for polygon in polygons:
+            name = polygon.get('name')
+            imports = polygon.get('imports')
+            if isinstance(imports,str): imports = [imports]
+            names = {}
+            if imports is not None:
+                for imp in imports:
+                    iname = imp.split('.')[-1]
+                    ipack = '.'.join(imp.split('.')[0:-1])
+                    try:
+                        names[iname] = importlib.import_module(imp) # if len(ipack) > 0 else importlib.import_module(iname)
+                    except:
+                        print("Failed to import {} for polygon {}".format(imp,name))
+            vertices = np.array(polygon.get('vertices'))
+            if vertices.shape[1] != 2:
+                raise ValueError(
+                    'The number of coordinates in vertices are wrong.')
+            vertices = np.array(vertices)
+            poly_type = polygon['type'].lower() \
+                if 'type' in polygon else "none"
+            if poly_type == '': poly_type = 'none'
+            attribute = polygon['attribute']
+            prop = {'name': name, 'type': poly_type, 'attribute': attribute}
+            poly = SchismPolygon(shell=vertices,
+                                 prop=prop)
+            if isinstance(attribute, str):
+                is_eqn = True
+                expr = compile(self._parse_attribute(attribute),"fail.txt","eval")
+            else:
+                expr = None
+                is_eqn = False
+            box = np.array(poly.bounds)[[0, 2, 1, 3]]
+            nodes = mesh.find_nodes_in_box(box)
+            empty = True
+            for node_i in nodes:
+                node = mesh.nodes[node_i]
+                flag = poly.contains(Point(node[:2]))
+                if flag:
+                    if is_eqn:
+                        try:
+                            newglobals = {} 
+                            newglobals['mesh'] = mesh
+                            newglobals.update(names)
+                            newglobals['node'] = node
+                            value = eval(expr,newglobals)
+                        except Exception as e:
+                            msg = "Egn: %s" % attribute
+                            self._logger.error(msg)
+                            raise ValueError(
+                                "The polygon equation does not seem to be well-formed for polygon: {} ".format(name))
+                    else:
+                        value = attribute
+                    empty = False
+                    if poly.type == "none":
+                        attr[node_i] = value
+                    elif poly.type == "min":
+                        if attr[node_i] < value:
+                            attr[node_i] = value
+                    elif poly.type == "max":
+                        if attr[node_i] > value:
+                            attr[node_i] = value
+                    else:
+                        raise Exception("Not supported polygon type ({}) for polygon ({})".format(poly.type,name))
+            if empty:
+                msg = "This polygon contains no nodes: %s" % poly.name
+                self._logger.error(poly)
+                self._logger.error(msg)
+
+        n_missed = sum(1 for i, a in enumerate(attr) if a == default)
+        if n_missed > 0:
+            msg = "There are %d nodes that do not belong " \
+                  "to any polygon." % n_missed
+            self._logger.warning(msg)
+            if default is not None:
+                msg = "Default value of %.f is used for them." % default
+                self._logger.warning(msg)
+        return attr
+
+
+    def create_node_partitioning(self, gr3_fname, polygons, default, smooth):
         """ Create a gr3 file with node partitioning using
             polygons in the polygon file.
             gr3_fname = output gr3 file name
             polygons = polygons
         """
+        from schimpy.laplace_smooth_data import laplace_smooth_data2
         # option_name = 'default'
         # if option_name in polygon_data.keys():
         #     default = polygon_data[option_name]
         # else:
         #     default = None
-        attr = self._partition_nodes_with_polygons(polygons, default)
+        #attr = self._partition_nodes_with_polygons(polygons, default)
+        attr = self.apply_polygons(polygons, default)
+        if smooth is not None:
+            self._logger.info("Smoothing data. This process can take several minutes")
+            attr=laplace_smooth_data2(self.mesh,data=attr,**smooth)
         if gr3_fname != 'hgrid.gr3':
             self.write_hgrid(gr3_fname, attr, False)
         else:
@@ -968,4 +1092,4 @@ def check_and_suggest(testees, list_words, logger=None):
                 logger.error(msg)
             else:
                 print(msg)
-            raise ValueError("Unrecognizable item")
+            raise ValueError("Unrecognizable item (see log for details): ".format(keyword))

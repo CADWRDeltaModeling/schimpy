@@ -143,12 +143,12 @@ def create_gr3_with_polygons(s, inputs, logger):
     if dict_gr3 is None:
         return
     logger.info("Processing gr3 outputs...")
-    expected_items = ('polygons', 'default')
+    expected_items = ('polygons', 'default','smooth')
     for fname, item in dict_gr3.items():
         check_and_suggest(item, expected_items)
         polygons = item.get('polygons', [])
         if polygons is not None:
-            polygon_items = ('name', 'vertices', 'type', 'attribute')
+            polygon_items = ('name', 'vertices', 'type', 'attribute','imports','smooth')
             for polygon in polygons:
                 check_and_suggest(polygon, polygon_items)
     for fname, item in dict_gr3.items():
@@ -159,7 +159,8 @@ def create_gr3_with_polygons(s, inputs, logger):
         polygons = item.get('polygons', [])
         default = item.get('default')
         logger.info("Creating %s..." % fname)
-        s.create_node_partitioning(fname, polygons, default)
+        smooth = item.get('smooth')
+        s.create_node_partitioning(fname, polygons, default, smooth)
 
 
 def create_prop_with_polygons(s, inputs, logger):

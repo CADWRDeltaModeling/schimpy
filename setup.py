@@ -52,7 +52,8 @@ setup(
             'schism_hotstart=schimpy.schism_hotstart:main',
             'split_quad=schimpy.split_quad:main',
             'model_time=schimpy.model_time:main',
-            'gen_elev2d=schimpy.gen_elev2D:main'
+            'gen_elev2d=schimpy.gen_elev2D:main',
+            'small_areas=schimpy.small_areas:main'
         ],
     },
     install_requires=requirements,
