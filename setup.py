@@ -11,10 +11,10 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-install_requires = ['geopandas>=0.6', 'holoviews>=1.13', 'datashader>=0.10',
+install_requires = ['geopandas>=0.6',
                     'xarray>=0.15', 'netcdf4>=1.4', 'scipy>=1.4',
                     'matplotlib>=3.1', 'statsmodels>=0.11',
-                    'palettable>=3.3' ]
+                    'palettable>=3.3', 'pyyaml>=5.3']
 
 requirements = install_requires
 
