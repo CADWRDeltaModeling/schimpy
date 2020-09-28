@@ -13,7 +13,7 @@ Python package for SCHISM
 Features
 --------
 
-* TODO
+* TODO see issues
 
 Credits
 -------

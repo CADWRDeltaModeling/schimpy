@@ -256,6 +256,7 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
                 else:
                     outline = line.replace(timestr, "%-10.1f " % msec)
                     use = (msec >= 0.0)
+
                 if use and not prev_use:
                     if prev_outline and not exact:
                         outfile.write(prev_outline)
@@ -267,7 +268,8 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
                 prev_outline = outline
                 prev_use = use
         if no_record:
-            outfile.write(prev_outline)
+            if prev_outline is not None:
+                outfile.write(prev_outline)
     if outfile != sys.stdout:
         outfile.close()
 

@@ -53,7 +53,8 @@ setup(
             'split_quad=schimpy.split_quad:main',
             'model_time=schimpy.model_time:main',
             'gen_elev2d=schimpy.gen_elev2D:main',
-            'small_areas=schimpy.small_areas:main'
+            'small_areas=schimpy.small_areas:main',
+            'station=schimpy.station:main'
         ],
     },
     install_requires=requirements,

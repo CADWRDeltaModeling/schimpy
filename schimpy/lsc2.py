@@ -424,6 +424,8 @@ def gen_sigma(nlayer, minlayer, maxlayer, eta, h, mesh, meshfun, nsmoothlay=0):
 
         meshfun: float
             S coordinate parameter b
+            
+        nsmoothlay: how many layers to smooth on the bottom
 
         hc: float
             S coordinate parameter hc (do not alter)
