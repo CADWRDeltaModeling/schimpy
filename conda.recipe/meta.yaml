@@ -14,7 +14,21 @@ build:
   noarch: python
   script: python setup.py install --single-version-externally-managed --record=record.txt
   entry_points:
-    - schimpy = schimpy.cli:main
+    - batch_metrics = schimpy.batch_metrics:main
+    - clip_dems = schimpy.clip_dems:main
+    - contour_smooth = schimpy.contour_smooth:main
+    - convert_mesh = schimpy.convert_mesh:main
+    - convert_polygons = schimpy.convert_polygons:main
+    - convert_linestrings = schimpy.convert_linestrings:main
+    - combine_consume = schimpy.combine_consume:main
+    - prepare_schism = schimpy.prepare_schism:main
+    - create_vgrid_lsc2 = schimpy.create_vgrid_lsc2:main
+    - schism_hotstart = schimpy.schism_hotstart:main
+    - split_quad = schimpy.split_quad:main
+    - model_time = schimpy.model_time:main
+    - gen_elev2d = schimpy.gen_elev2D:main
+    - small_areas = schimpy.small_areas:main
+    - station = schimpy.station:main 
   #skip:           true
 
 requirements:
