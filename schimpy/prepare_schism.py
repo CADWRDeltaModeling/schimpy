@@ -11,12 +11,13 @@ Example jobs in this pre-processing are:
   6. Create an ocean boundary file, elev2D.th
 """
 
-from .schism_setup import create_schism_setup, check_and_suggest
-from .grid_opt import GridOptimizer
-from .stacked_dem_fill import stacked_dem_fill
-from .small_areas import small_areas
-from .split_quad import split_quad
-from . import schism_yaml
+from schimpy.schism_setup import create_schism_setup, check_and_suggest
+from schimpy.grid_opt import GridOptimizer
+from schimpy.stacked_dem_fill import stacked_dem_fill
+from schimpy.small_areas import small_areas
+from schimpy.split_quad import split_quad
+from schimpy import schism_yaml
+from schimpy.create_vgrid_lsc2 import vgrid_gen
 import numpy as np
 import subprocess
 import os
@@ -112,6 +113,22 @@ def create_hgrid(s, inputs, logger):
             hgrid_ll_fpath = os.path.expanduser(section[option_name])
             s.write_hgrid_ll(hgrid_ll_fpath,boundary=True)
 
+def create_vgrid(s,inputs,logger):
+    section_name = 'vgrid'
+    section = inputs.get(section_name)
+    if section is not None:
+        if 'hgrid' in section:
+            hgrid = section['hgrid']
+        else: 
+            msection = inputs.get('mesh')    
+            if 'gr3_outputfile' in msection:
+                logger.info('Using gr3_outputfile from mesh section for generating vgrid')
+                hgrid = msection['gr3_outputfile']
+            elif 'mesh_inputfile' in msection:
+                logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
+                hgrid  = msection['mesh_inputfile']
+        
+        vgrid_gen(hgrid,archive_nlayer='out',**section)
 
 def create_source_sink(s, inputs, logger):
     """ Create source_sink.in
@@ -262,6 +279,7 @@ def update_spatial_inputs(s, inputs, logger):
             inputs from an input file
     """
     create_hgrid(s, inputs, logger)
+    create_vgrid(s, inputs, logger)
     create_gr3_with_polygons(s, inputs, logger)
     create_source_sink(s, inputs, logger)
     create_prop_with_polygons(s, inputs, logger)
@@ -334,7 +352,7 @@ def prepare_schism(args, use_logging=True):
         raise ValueError("Main input file not found")
     with open(in_fname, 'r') as f:
         inputs = schism_yaml.load(f)
-    keys_top_level = ["mesh", "gr3",
+    keys_top_level = ["mesh", "gr3","vgrid",
                       "prop", "hydraulics",
                       "sources_sinks", "flow_outputs"] \
         + schism_yaml.include_keywords
