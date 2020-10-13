@@ -143,13 +143,14 @@ def write_station_in(fpath,station_in,request=None):
     if request == "all": request = ["all"]
     request_str = station_variables if request[0] == "all" else request
     request_int = [(1 if var in request_str else 0) for var in station_variables]
+    request_explain = ' !' + ','.join(station_variables)
     dfmerged =station_in.reset_index()
     dfmerged.index += 1
     dfmerged["excl"] = "!"
     nitem = len(dfmerged)
     # First two lines are a space delimited 1 or 0 for each request then the
     # total number of station requests
-    buffer = " ".join([str(x) for x in request_int]) + "\n{}\n".format(nitem)
+    buffer = " ".join([str(x) for x in request_int]) + "{}\n{}\n".format(request_explain,nitem)
     # Then the specific requests, here written to a string buffer
     buffer2 = dfmerged.to_csv(None,columns=["x","y","z","excl","id","subloc","name"],index_label="id",
         sep=' ',float_format="%.2f",header=False)
