@@ -10,10 +10,6 @@ from shutil import copyfile
 import datetime as dtm
 
 FBASE_5_6 = ["schout.nc"]
-#FBASE_SALT = ["zcor.63","salt.63"]
-#FBASE_PTM = ["elev.61","hvel.64","vert.63","zcor.63"]
-#FBASE_BINARY= ["elev.61","hvel.64","zcor.63","salt.63"]
-
 
 SCHISM_INCOMPLETE_COMBINE = 36   # error code for incomplete file
 
@@ -290,8 +286,8 @@ def create_arg_parser():
     parser.add_argument('--hotstart_only', action = 'store_true', help = "Only combine hotstart -- avoids file search errors when nothing left to combine")
     parser.add_argument('--consume',  action = 'store_true', help = "Delete combined files or unrequested files")
     parser.add_argument('--assume_done',  action = 'store_true', help = "Assume that the simulation is finished, so incomplete blocks can be deleted")
-    parser.add_argument('--combiner',  default="combine_output9", help = "Executable for combine_output.")
-    parser.add_argument('--hot_combiner',  default="combine_hotstart6", help = "Executable for combine_output.")
+    parser.add_argument('--combiner',  default=f"{combine_exe}", help = "Executable for combine_output.")
+    parser.add_argument('--hot_combiner',  default=f"{combine_hotstart_exe}", help = "Executable for combine_output.")
     parser.add_argument('--sndx',  default=None, type=int, help = "First index to consider for processing.")    
     parser.add_argument('--endx',  default=None, type=int, help = "Last index to consider for processing.") 
     parser.add_argument('--sndx_hot',  default=None, type=int, help = "First index to consider for processing.")    
@@ -306,6 +302,9 @@ def create_arg_parser():
 def combine_consume(is_test=False):
     parser = create_arg_parser()
     args = parser.parse_args()
+    combine_exe = args.combiner
+    combine_hotstart_exe = args.hot_combiner
+
     wdir = args.dir
     fbase = args.fbase
     blocks_per_day = args.blocks_per_day
@@ -318,8 +317,8 @@ def combine_consume(is_test=False):
     sndx = args.sndx    
     endx = args.endx
     assume_done = args.assume_done
-    combine_exe = args.combiner
-    combine_hotstart_exe = args.hot_combiner
+
+
 
     if is_test: 
         setup(wdir,fbase)
@@ -352,7 +351,9 @@ def combine_consume(is_test=False):
         combine(wdir,blocks,fbase,combine_exe,consume=consume,assume_done=assume_done)
     if hotstart:
         combine_hotstart(wdir,combine_hotstart_exe,consume=consume)
-      
+
+def main():
+    combine_consume()      
           
 if __name__ == "__main__":
     wdir = "./test_archive"
