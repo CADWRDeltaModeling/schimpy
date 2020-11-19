@@ -519,6 +519,68 @@ class SchismSetup(object):
         expr = re.sub(r"(\b)z(\b)", "\g<1>node[2]\g<2>", expr)
         return expr
 
+
+    def apply_linestring_ops(self,default,linestrings):
+        mesh = self.mesh             
+        attr = np.copy(mesh.nodes[:, 2])
+        
+        for istring,linestring in enumerate(linestrings):
+            line = linestring.get('coordinates')
+            name = linestring.get('name')
+            widen_left = linestring.get('widen_left')
+            widen= False if widen_left is None else widen_left
+             
+            if name is None:
+                name = linestring.get('Name')
+            npoint = len(line)
+            attribute = linestring.get("attribute")
+            #optype = linestring.get("type")
+            if attribute == 'local_min':
+                op = np.min
+            elif attribute == 'local_max':
+                op = np.max
+            elif attribute == 'local_mean':
+                op = np.mean
+            elif attribute == 'local_median':
+                op = np.median
+            else:
+                try:
+                    opval=float(attribute)
+                    op = lambda x: opval
+                except:
+                    ValueError("Linestring attribute was not a known value (e.g. local_min, local_med) or a float")
+                     
+            
+            for ip in range(npoint-1):   # loop through segments on linestring
+                line_segment = np.array(line[ip:ip+2],dtype='d').flatten()
+                try: 
+                    on_line,neighbors = mesh.find_neighbors_on_segment(line_segment)
+                    if widen:
+                        on_line = on_line + neighbors
+                except:
+                    raise ValueError("Elements or neighbors not found for linestring {}".format(name))  
+                
+  
+                node_local_nds = {}
+                for iel in on_line:
+                    elnodes=mesh.elem(iel)
+                    for inode in elnodes:
+                        # list all the nodes on the element as being local to one another
+                        # ultimately this list will include items pertinent to each node from
+                        # multiple elements
+                        if inode in node_local_nds:
+                            node_local_nds[inode].update(elnodes)
+                        else: 
+                            node_local_nds[inode]=set(elnodes)
+
+
+                for inode in node_local_nds:
+                    support_nodes = list(node_local_nds[inode])
+                    orig = mesh.nodes[support_nodes,2]
+                    valreplace=op(orig)
+                    attr[inode]=valreplace
+        return attr
+
     def _partition_nodes_with_polygons(self, polygons, default):
         """ Partition the grid with the given polygons.
             Each node (not element) will be assigned with an integer ID

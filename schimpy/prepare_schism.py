@@ -92,11 +92,20 @@ def create_hgrid(s, inputs, logger):
                                                                   s.mesh.nodes[:, :2],
                                                                   require_all=False,
                                                                   na_fill=default_depth_for_missing_dem))
-                                                                  
-        elev_enforce_params = section.get("elev_enforcement")
-        if elev_enforce_params is not None:
-            s.mesh.nodes[:,2] = s._partition_nodes_with_polygons(default=None,**elev_enforce_params)
-
+        # This deprecation can be removed at some point                                                          
+        try:
+            ee = section.get("elev_enforcement")
+        except: 
+            ee = None
+        if ee is not None: 
+            raise ValueError("elev_enforcement has been renamed depth_enforcement")
+        
+        depth_enforce_params = section.get("depth_enforcement")
+        if depth_enforce_params is not None:
+            if "polygons" in depth_enforce_params:
+                s.mesh.nodes[:,2] = s._partition_nodes_with_polygons(default=None,polygons=depth_enforce_params['polygons'])
+            if "linestrings" in depth_enforce_params:
+                s.mesh.nodes[:,2] = s.apply_linestring_ops(default=None,linestrings=depth_enforce_params['linestrings'])
         
 
         # Write hgrid.gr3
@@ -113,6 +122,10 @@ def create_hgrid(s, inputs, logger):
             hgrid_ll_fpath = os.path.expanduser(section[option_name])
             s.write_hgrid_ll(hgrid_ll_fpath,boundary=True)
 
+
+
+
+
 def create_vgrid(s,inputs,logger):
     section_name = 'vgrid'
     section = inputs.get(section_name)
@@ -128,7 +141,7 @@ def create_vgrid(s,inputs,logger):
                 logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
                 hgrid  = msection['mesh_inputfile']
         
-        vgrid_gen(hgrid,archive_nlayer='out',**section)
+        vgrid_gen(hgrid,**section)
 
 def create_source_sink(s, inputs, logger):
     """ Create source_sink.in
@@ -370,7 +383,7 @@ def prepare_schism(args, use_logging=True):
         mesh_items = inputs['mesh']
         keys_mesh_section = ["mesh_inputfile", "dem_list",
                              "open_boundaries","split_quad","small_areas",
-                             "depth_optimization","elev_enforcement",
+                             "depth_optimization","depth_enforcement",
                              "gr3_outputfile", "ll_outputfile"] \
             + schism_yaml.include_keywords
         check_and_suggest(list(mesh_items.keys()), keys_mesh_section)
