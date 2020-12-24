@@ -42,8 +42,8 @@ from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import os
 # import from schimpy
-from schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader
-import geo_tools
+from .schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader
+from . import geo_tools
 
 # %%
 
@@ -65,6 +65,11 @@ class hotstart(object):
             self.param_in = kwargs['param_in']
         else:
             self.param_in = "param.in"
+        if 'proj4' in kwargs:
+            self.proj4 = kwargs['proj4']
+        else:
+            self.proj4 = None
+            
         self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
             n_tracers(self.param_in, modules=self.modules)
 
@@ -117,10 +122,11 @@ class hotstart(object):
             kwargs_options.update({'Nbed': self.Nbed})
         if kwargs_options:
             var = VariableField(v_meta, variable, self.mesh,
-                                self.depths, self.date, **kwargs_options)
+                                self.depths, self.date, self.proj4,
+                                **kwargs_options)
         else:
             var = VariableField(v_meta, variable, self.mesh,
-                                self.depths, self.date)
+                                self.depths, self.date, self.proj4)
         return var.GenerateField()
 
     def initialize_netcdf(self, default_turbulence=True):
@@ -276,12 +282,13 @@ class VariableField(object):
     A class initializing each varaible for the hotstart file 
     """
 
-    def __init__(self, v_meta, vname, mesh, depths, date, **kwargs):
+    def __init__(self, v_meta, vname, mesh, depths, date, proj4, **kwargs):
         self.centering = v_meta['centering']
         self.variable_name = vname
         self.mesh = mesh
         self.depths = depths
         self.date = date
+        self.proj4 = proj4
         self.n_edges = mesh.n_edges()
         self.n_nodes = mesh.n_nodes()
         self.n_elems = mesh.n_elems()
@@ -535,7 +542,8 @@ class VariableField(object):
                     "regional polygon file is needed for pathch_ini implementation")
         if poly_fn.endswith('shp'):
             # perform contiguity check and return a mapping array if successful.
-            mapping = geo_tools.Contiguity_Check(self.mesh, poly_fn)
+            mapping = geo_tools.Contiguity_Check(self.mesh, poly_fn,
+                                                 proj4=self.proj4)
         else:
             raise NotImplementedError("Poly_fn can only be shapefile")
 
@@ -605,6 +613,9 @@ class VariableField(object):
         # partition the grid domain by polaris stations based on horizontal distance
         grid_df = pd.DataFrame({})
         g_xy = self.hgrid[inpoly]
+        if self.proj4 == 'EPSG:32610': # utm 10N 
+            g_xy = geo_tools.utm2ll(g_xy.T).T  # conver to (lon, lat).  
+
         for s in polaris_cast.index.unique():
             s_xy = [stations.loc[s].West_Longi, stations.loc[s].North_Lati]
             grid_df[str(s)] = distance.cdist([s_xy], g_xy)[0]
@@ -681,7 +692,7 @@ class VariableField(object):
         """
         obs_file includes Lat, Lon, and values for the variable. 
         """
-        import Interp2D  # now onl 2D interpolation IDW is implemented.
+        from . import Interp2D  # now onl 2D interpolation IDW is implemented.
         if ini_meta:
             obs_file = ini_meta['data']
             variable = ini_meta['variable']
@@ -747,7 +758,9 @@ def read_param_in(infile):
             line = line.rstrip('\n')
             # only take the portion of the arguement before the comment
             line = line.strip().split('!')[0]
-            if line.startswith('#') or line.startswith('!') or not line:
+            if (line.startswith('#') or line.startswith('!') or
+                line.startswith('&') or line.startswith('/') or 
+                not line):
                 continue
             else:
                 try:
@@ -886,7 +899,8 @@ def n_tracers(param_in, modules=['TEM', 'SAL']):
     return ntracers, ntrs, irange_tr, tr_mname
 
 
-def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3', vgrid_fn='vgrid.in', outname="hotstart_out.nc"):
+def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3', 
+                         vgrid_fn='vgrid.in', outname="hotstart_out.nc"):
     """
     convert hotstart.nc to schism output nc file format that can be read by VisIt. 
     """
