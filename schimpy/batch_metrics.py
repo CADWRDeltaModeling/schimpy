@@ -8,6 +8,7 @@
 """
 import matplotlib
 import pandas as pd
+import glob
 
 matplotlib.use('Agg')  # To prevent an unwanted failure on Linux
 from schimpy.metricsplot import plot_metrics, plot_comparison, get_common_window,\
@@ -195,7 +196,7 @@ class BatchMetrics(object):
                                        db_stations, db_obs)
 
         if fpath_obs:
-            if os.path.exists(fpath_obs):
+            if os.path.exists(fpath_obs) or len(glob.glob(fpath_obs)) > 0:
                 try:
                     ts_obs = read_ts(fpath_obs, start=window[0], end=window[1])
                     if ts_obs.shape[1] > 1:
@@ -214,7 +215,7 @@ class BatchMetrics(object):
                 return ts_obs
             else:
                 self.logger.warning(
-                    "Observation file not found on file system: {}".format(os.path.abspath(fpath_obs)))
+                    "Data file not found on file system: {}".format(os.path.abspath(fpath_obs)))
                 return None
         else:
             return None
@@ -433,8 +434,16 @@ class BatchMetrics(object):
                 tss_sim = [None if simout[station_id].isnull().all() else simout[station_id] for simout in sim_outputs]
 
             else:
-                tss_sim = [simout.loc[:,(station_id,subloc)].iloc[:,0] for simout in sim_outputs]
-
+                tss_sim = []
+                try:
+                    for simout in sim_outputs:
+                        s = simout.loc[:,(station_id,subloc)]
+                        if isinstance(s,pd.DataFrame):
+                            raise("Station,Sublocation pair ({},{}) not unique".format((station_id,subloc)))
+                        tss_sim.append(s)
+                except:
+                    self.logger.warning("Problem reading time series for station {},{}".format(station_id,subloc))         
+                    raise                    
             for ts in tss_sim:
                 if ts is None: continue
                 if ts_obs is None or ts_obs.isnull().all():
