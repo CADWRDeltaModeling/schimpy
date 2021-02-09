@@ -22,6 +22,11 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
     """ Calculate the means of raster values of the element balls
         around the nodes.
 
+        When an element is completely outside of the raster data, zero will be
+        assigned for the it.
+        When an element is partly covered by the raster data, an masked average
+        is calculated.
+
         If the bins are provided, the raster data will be binned or mapped to
         the mapped_values first and processed. The length of the mapped values
         should be larger by one than that of the bins.
@@ -38,6 +43,9 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
                 type: none
                 vertices:
                 ...
+
+        The variables "mesh" and "node_i" in the example above are
+        'magic words' that the pre-processor understands.
 
         Parameters
         ----------
@@ -95,13 +103,15 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
                         for elem_i in elements_in_polygon]
     path_data = path_raster if bins is None else path_temp
     zs = rasterstats.zonal_stats(element_polygons, path_data, stats='mean')
-    sav_in_elemnts = dict(zip(elements_in_polygon, [s['mean'] for s in zs]))
+    sav_in_elements = dict(zip(elements_in_polygon, [s['mean']
+                                                     if s['mean'] is not None else 0.
+                                                     for s in zs]))
     elem_areas = mesh.areas()
     sav_at_nodes = np.empty((len(nodes_i),))
     for i, node_i in enumerate(nodes_i):
         ball = list(mesh.get_elems_i_from_node(node_i))
         sav_at_nodes[i] = np.average(
-            [sav_in_elemnts[e_i] for e_i in ball], weights=elem_areas[ball])
+            [sav_in_elements[e_i] for e_i in ball], weights=elem_areas[ball])
 
     # Remove the temporary file if exists
     if bins is not None:
