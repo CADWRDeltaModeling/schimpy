@@ -7,6 +7,7 @@
 import os
 import tempfile
 import itertools
+from copy import deepcopy
 import numpy as np
 import gdal
 from shapely.geometry import Polygon
@@ -18,6 +19,8 @@ __all__ = ['raster_to_nodes', ]
 def raster_to_nodes(mesh, nodes_i, path_raster,
                     bins=None,
                     mapped_values=None,
+                    mask_value=None,
+                    fill_value=None,
                     band=1):
     """ Calculate the means of raster values of the element balls
         around the nodes.
@@ -28,9 +31,14 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
         is calculated.
 
         If the bins are provided, the raster data will be binned or mapped to
-        the mapped_values first and processed. The length of the mapped values
-        should be larger by one than that of the bins.
-        The binning uses numpy.digitize to classification.
+        the mapped_values first and processed. The left end of the bins is
+        included but the right end is not for binning.
+        The length of the mapped values should be larger by one than
+        that of the bins. The binning uses numpy.digitize to classification.
+
+        If the mask_value is given, the raster data with the given mask value
+        will be swapped with the fill_value before binning the data. This
+        masking will work only when the bins are provided.
 
         An example of this function in the pre-processor yaml is below:
 
@@ -38,7 +46,7 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
           sav_N.gr3:
             default: 0.
             polygons:
-              - attribute: raster_to_nodes.raster_to_nodes(mesh, nodes_i, 'NDVI.tif', bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.])
+              - attribute: raster_to_nodes.raster_to_nodes(mesh, nodes_i, 'NDVI.tif', bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)
                 imports: schimpy.raster_to_nodes
                 type: none
                 vertices:
@@ -46,6 +54,10 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
 
         The variables "mesh" and "node_i" in the example above are
         'magic words' that the pre-processor understands.
+        The exmaple bins (or classifies) the raster values from 0.0001 to 0.3
+        to 0. and so forth. The outside of the bins are binned to -999.
+        Also raster points with the value of -10. will be switched to 0.2 first
+        before binning, so they will be mapped to 40.
 
         Parameters
         ----------
@@ -82,7 +94,16 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
         raster_array = band.ReadAsArray()
 
         # TODO:This converts the whole raster and not very efficient.
-        digitized = np.digitize(raster_array, bins, right=False).reshape((-1,))
+        if mask_value is not None:
+            if fill_value is None:
+                raise ValueError(
+                    "The arugment fill_value must be given when mask_value is set.")
+            raster_array_masked = deepcopy(raster_array)
+            raster_array_masked[raster_array == mask_value] = fill_value
+        else:
+            raster_array_masked = raster_array
+        digitized = np.digitize(raster_array_masked,
+                                bins, right=False).reshape((-1,))
         classified_array = np.array(mapped_values)[
             digitized].reshape(raster_array.shape)
 
