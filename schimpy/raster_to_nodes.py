@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ Functions to process raster data for schimpy pre-processing.
 
-    This add rasterstats dependency to calculate raster stastistics such as
+    This add rasterstats, boto3 dependency to calculate raster stastistics such as
     means.
 """
 import os
@@ -128,7 +128,7 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
                                                      if s['mean'] is not None else 0.
                                                      for s in zs]))
     elem_areas = mesh.areas()
-    sav_at_nodes = np.empty((len(nodes_i),))
+    sav_at_nodes = np.empty((len(nodes_i),),dtype=float)
     for i, node_i in enumerate(nodes_i):
         ball = list(mesh.get_elems_i_from_node(node_i))
         sav_at_nodes[i] = np.average(
