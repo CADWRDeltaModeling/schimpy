@@ -720,8 +720,8 @@ class SchismSetup(object):
             prop = {'name': name, 'type': poly_type, 'attribute': attribute}
             poly = SchismPolygon(shell=vertices, prop=prop)
             if isinstance(attribute, str):
-                expr = compile(self._parse_attribute(
-                    attribute), "fail.txt", "eval")
+                expr_str = self._parse_attribute(attribute)
+                expr = compile(expr_str, "fail.txt", "eval")
             else:
                 expr = compile(str(attribute), "fail.txt", "eval")
 
@@ -738,16 +738,20 @@ class SchismSetup(object):
                 msg = "This polygon contains no nodes: %s" % poly.name
                 self._logger.error(poly)
                 self._logger.error(msg)
-
-            if poly.type == "none":
-                attr[nodes_i] = vals
-            elif poly.type == "min":
-                attr[nodes_i][attr[nodes_i] < vals] = vals
-            elif poly.type == "max":
-                attr[nodes_i][attr[nodes_i] > vals] = vals
-            else:
-                raise Exception(
-                    "Not supported polygon type ({}) for polygon ({})".format(poly.type, name))
+                continue
+            try:
+                if poly.type == "none":
+                    attr[nodes_i] = vals
+                elif poly.type == "min":
+                    attr[nodes_i]=np.where(attr[nodes_i] < vals,vals,attr[nodes_i])
+                elif poly.type == "max":
+                    attr[nodes_i]=np.where(attr[nodes_i] > vals,vals,attr[nodes_i])
+                else:
+                    raise Exception(
+                        "Not supported polygon type ({}) for polygon ({})".format(poly.type, name))
+            except:
+                self._logger.error("Error applying formula in polygon: {}".format(name))
+                raise
         # TODO: Not implemented debug messaged yet.
         # n_missed = sum(1 for i, a in enumerate(attr) if a == default)
         # if n_missed > 0:
@@ -780,7 +784,7 @@ class SchismSetup(object):
         nodes_in_polygon = [node_i for node_i in node_candidates
                             if polygon.contains(Point(mesh.nodes[node_i]))]
         globals['nodes_i'] = nodes_in_polygon
-        vals = eval(expr, globals)
+        vals = eval(expr, globals)       
         return nodes_in_polygon, vals
 
     def create_node_partitioning(self, gr3_fname, polygons, default, smooth):
@@ -833,7 +837,8 @@ class SchismSetup(object):
         """ Modify depth with the polygon information
         """
         polygons = polygon_data['polygons']
-        attr = self._partition_nodes_with_polygons(polygons, None)
+        #attr = self._partition_nodes_with_polygons(polygons, None)
+        attr = self.apply_polygons(polygons, None)
         self.mesh.nodes[:, 2] = attr
 
     def create_source_sink_in(self, source_sinks, out_fname='source_sink.in'):
