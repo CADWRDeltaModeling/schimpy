@@ -52,8 +52,10 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                 vertices:
                 ...
 
-        The variables "mesh" and "node_i" in the example above are
+        The variables "mesh" and "node_sel" in the example above are
         'magic words' that the pre-processor understands.
+        "mesh" and "node_sel" mean the SCHISM mesh and the selected node indices
+        by a polygon.
         The exmaple bins (or classifies) the raster values from 0.0001 to 0.3
         to 0. and so forth. The outside of the bins are binned to -999.
         Also raster points with the value of -10. will be switched to 0.2 first
@@ -128,7 +130,7 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                                                      if s['mean'] is not None else 0.
                                                      for s in zs]))
     elem_areas = mesh.areas()
-    sav_at_nodes = np.empty((len(nodes_sel),),dtype=float)
+    sav_at_nodes = np.empty((len(nodes_sel),), dtype=float)
     for i, node_i in enumerate(nodes_sel):
         ball = list(mesh.get_elems_i_from_node(node_i))
         sav_at_nodes[i] = np.average(

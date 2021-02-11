@@ -654,14 +654,17 @@ class SchismSetup(object):
                 if poly.type == "none":
                     attr[nodes_sel] = vals
                 elif poly.type == "min":
-                    attr[nodes_sel]=np.where(attr[nodes_sel] < vals,vals,attr[nodes_sel])
+                    attr[nodes_sel] = np.where(
+                        attr[nodes_sel] < vals, vals, attr[nodes_sel])
                 elif poly.type == "max":
-                    attr[nodes_sel]=np.where(attr[nodes_sel] > vals,vals,attr[nodes_sel])
+                    attr[nodes_sel] = np.where(
+                        attr[nodes_sel] > vals, vals, attr[nodes_sel])
                 else:
                     raise Exception(
                         "Not supported polygon type ({}) for polygon ({})".format(poly.type, name))
             except:
-                self._logger.error("Error applying formula in polygon: {}".format(name))
+                self._logger.error(
+                    "Error applying formula in polygon: {}".format(name))
                 raise
         # TODO: Not implemented debug messaged yet.
         # n_missed = sum(1 for i, a in enumerate(attr) if a == default)
@@ -695,7 +698,7 @@ class SchismSetup(object):
         nodes_in_polygon = [node_i for node_i in node_candidates
                             if polygon.contains(Point(mesh.nodes[node_i]))]
         globals['nodes_sel'] = nodes_in_polygon
-        vals = eval(expr, globals)       
+        vals = eval(expr, globals)
         return nodes_in_polygon, vals
 
     def create_node_partitioning(self, gr3_fname, polygons, default, smooth):
@@ -705,12 +708,6 @@ class SchismSetup(object):
             polygons = polygons
         """
         from schimpy.laplace_smooth_data import laplace_smooth_data2
-        # option_name = 'default'
-        # if option_name in polygon_data.keys():
-        #     default = polygon_data[option_name]
-        # else:
-        #     default = None
-        #attr = self._partition_nodes_with_polygons(polygons, default)
         attr = self.apply_polygons(polygons, default)
         if smooth is not None:
             self._logger.info("Smoothing data. This process can take several minutes")
