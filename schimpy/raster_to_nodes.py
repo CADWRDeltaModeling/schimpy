@@ -16,7 +16,7 @@ import rasterstats
 __all__ = ['raster_to_nodes', ]
 
 
-def raster_to_nodes(mesh, nodes_i, path_raster,
+def raster_to_nodes(mesh, nodes_sel, path_raster,
                     bins=None,
                     mapped_values=None,
                     mask_value=None,
@@ -46,7 +46,7 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
           sav_N.gr3:
             default: 0.
             polygons:
-              - attribute: raster_to_nodes.raster_to_nodes(mesh, nodes_i, 'NDVI.tif', bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)
+              - attribute: raster_to_nodes.raster_to_nodes(mesh, nodes_sel, 'NDVI.tif', bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)
                 imports: schimpy.raster_to_nodes
                 type: none
                 vertices:
@@ -63,7 +63,7 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
         ----------
         mesh: schimpy.SchismMesh
             The base mesh to work on
-        nodes_i: array-like
+        nodes_sel: array-like
             The array or list of the nodes to process
         path_raster: string-like
             File fath to the raster data
@@ -117,7 +117,7 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
 
     # Get the zonal data
     elements_in_balls = [list(mesh.get_elems_i_from_node(node_i))
-                         for node_i in nodes_i]
+                         for node_i in nodes_sel]
     elements_in_polygon = list(
         set(list(itertools.chain.from_iterable(elements_in_balls))))
     element_polygons = [Polygon(mesh.nodes[mesh.elem(elem_i), :2])
@@ -128,8 +128,8 @@ def raster_to_nodes(mesh, nodes_i, path_raster,
                                                      if s['mean'] is not None else 0.
                                                      for s in zs]))
     elem_areas = mesh.areas()
-    sav_at_nodes = np.empty((len(nodes_i),),dtype=float)
-    for i, node_i in enumerate(nodes_i):
+    sav_at_nodes = np.empty((len(nodes_sel),),dtype=float)
+    for i, node_i in enumerate(nodes_sel):
         ball = list(mesh.get_elems_i_from_node(node_i))
         sav_at_nodes[i] = np.average(
             [sav_in_elements[e_i] for e_i in ball], weights=elem_areas[ball])

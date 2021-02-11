@@ -515,9 +515,9 @@ class SchismSetup(object):
     def _parse_attribute(self, expr):
         """ Parse expression that can be understood by the tool
         """
-        expr = re.sub(r"(\b)x(\b)", "\g<1>mesh.nodes[nodes_i, 0]\g<2>", expr)
-        expr = re.sub(r"(\b)y(\b)", "\g<1>mesh.nodes[nodes_i, 1]\g<2>", expr)
-        expr = re.sub(r"(\b)z(\b)", "\g<1>mesh.nodes[nodes_i, 2]\g<2>", expr)
+        expr = re.sub(r"(\b)x(\b)", "\g<1>mesh.nodes[nodes_sel, 0]\g<2>", expr)
+        expr = re.sub(r"(\b)y(\b)", "\g<1>mesh.nodes[nodes_sel, 1]\g<2>", expr)
+        expr = re.sub(r"(\b)z(\b)", "\g<1>mesh.nodes[nodes_sel, 2]\g<2>", expr)
         expr = re.sub(r"(\b)min(\b)", "\g<1>numpy.minimum\g<2>", expr)
         expr = re.sub(r"(\b)max(\b)", "\g<1>numpy.maximum\g<2>", expr)
         return expr
@@ -583,95 +583,6 @@ class SchismSetup(object):
                     attr[inode]=valreplace
         return attr
 
-    def _partition_nodes_with_polygons(self, polygons, default):
-        """ Partition the grid with the given polygons.
-            Each node (not element) will be assigned with an integer ID
-            which is the index of the polygons.
-            If some polygons overlap, the latter one will trump the former one.
-            The area that are not covered by any of the given polygons
-            will have a default negative one attribute.
-
-            Parameters
-            ----------
-            polygons: list
-                a list of polygon dict (from YAML most of time)
-
-            Returns
-            -------
-            numpy.ndarray
-                attributes
-        """
-        import math
-        mesh = self.mesh
-        if default is None:
-            # Use depth
-            attr = np.copy(mesh.nodes[:, 2])
-        else:
-            # Fill default values
-            attr = np.empty(mesh.n_nodes())
-            attr.fill(float(default))
-        for polygon in polygons:
-            name = polygon.get('name')
-            vertices = np.array(polygon.get('vertices'))
-            if vertices.shape[1] != 2:
-                raise ValueError(
-                    'The number of coordinates in vertices are wrong.')
-            vertices = np.array(vertices)
-            poly_type = polygon['type'].lower() \
-                if 'type' in polygon else "none"
-            if poly_type == '': poly_type = 'none'
-            attribute = polygon['attribute']
-            prop = {'name': name, 'type': poly_type, 'attribute': attribute}
-            poly = SchismPolygon(shell=vertices,
-                                 prop=prop)
-            if isinstance(attribute, str):
-                is_eqn = True
-                expr = self._parse_attribute(attribute)
-            else:
-                expr = None
-                is_eqn = False
-            box = np.array(poly.bounds)[[0, 2, 1, 3]]
-            nodes = mesh.find_nodes_in_box(box)
-            empty = True
-            for node_i in nodes:
-                node = mesh.nodes[node_i]
-                flag = poly.contains(Point(node[:2]))
-                if flag:
-                    if is_eqn:
-                        try:
-                            value = eval(expr)
-                        except Exception as e:
-                            msg = "Egn: %s" % attribute
-                            self._logger.error(msg)
-                            raise ValueError(
-                                "The polygon equation does not seem to be well-formed for polygon: {} ".format(name))
-                    else:
-                        value = attribute
-                    empty = False
-                    if poly.type == "none":
-                        attr[node_i] = value
-                    elif poly.type == "min":
-                        if attr[node_i] < value:
-                            attr[node_i] = value
-                    elif poly.type == "max":
-                        if attr[node_i] > value:
-                            attr[node_i] = value
-                    else:
-                        raise Exception("Not supported polygon type ({}) for polygon ({})".format(poly.type,name))
-            if empty:
-                msg = "This polygon contains no nodes: %s" % poly.name
-                self._logger.error(poly)
-                self._logger.error(msg)
-
-        n_missed = sum(1 for i, a in enumerate(attr) if a == default)
-        if n_missed > 0:
-            msg = "There are %d nodes that do not belong " \
-                  "to any polygon." % n_missed
-            self._logger.warning(msg)
-            if default is not None:
-                msg = "Default value of %.f is used for them." % default
-                self._logger.warning(msg)
-        return attr
 
     def apply_polygons(self, polygons, default):
         """ Partition the grid with the given polygons.
@@ -732,20 +643,20 @@ class SchismSetup(object):
             newglobals['polygon'] = poly
 
             # Evaluate
-            nodes_i, vals = self._evaluate_in_polygon(expr, poly, newglobals)
+            nodes_sel, vals = self._evaluate_in_polygon(expr, poly, newglobals)
 
-            if nodes_i is None or not len(nodes_i):
+            if nodes_sel is None or not len(nodes_sel):
                 msg = "This polygon contains no nodes: %s" % poly.name
                 self._logger.error(poly)
                 self._logger.error(msg)
                 continue
             try:
                 if poly.type == "none":
-                    attr[nodes_i] = vals
+                    attr[nodes_sel] = vals
                 elif poly.type == "min":
-                    attr[nodes_i]=np.where(attr[nodes_i] < vals,vals,attr[nodes_i])
+                    attr[nodes_sel]=np.where(attr[nodes_sel] < vals,vals,attr[nodes_sel])
                 elif poly.type == "max":
-                    attr[nodes_i]=np.where(attr[nodes_i] > vals,vals,attr[nodes_i])
+                    attr[nodes_sel]=np.where(attr[nodes_sel] > vals,vals,attr[nodes_sel])
                 else:
                     raise Exception(
                         "Not supported polygon type ({}) for polygon ({})".format(poly.type, name))
@@ -783,7 +694,7 @@ class SchismSetup(object):
         node_candidates = mesh.find_nodes_in_box(box)
         nodes_in_polygon = [node_i for node_i in node_candidates
                             if polygon.contains(Point(mesh.nodes[node_i]))]
-        globals['nodes_i'] = nodes_in_polygon
+        globals['nodes_sel'] = nodes_in_polygon
         vals = eval(expr, globals)       
         return nodes_in_polygon, vals
 
