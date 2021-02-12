@@ -220,7 +220,7 @@ class SchismSetup(object):
         except:
             # In case that isn't available in earlier versions
             # but orders of magnitude slow for pyproj 2.1.0
-            project = partial(transform,proj_in,proj_out)
+            project = partial(pyproj.transform, proj_in, proj_out)
 
         #new_mesh = SchismMesh()
         new_mesh = copy.copy(self.mesh)
