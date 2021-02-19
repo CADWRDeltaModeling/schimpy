@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """ 
-Module for creating a schism hotstart file using an flexible battery of assumptions and interpolators
+Module for creating a schism hotstart file
+
 Options:
 1. Centering:
     * node2D: node (2D surface)

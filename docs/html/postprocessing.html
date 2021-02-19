@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Post-processing &#8212; schimpy 1.1.0+4.g9a8a1f7.dirty documentation</title>
+    <title>Post-processing &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -53,7 +53,7 @@
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Post-processing</a><ul>
-<li><a class="reference internal" href="#station-output-extractor">Station Output Extractor</a></li>
+<li><a class="reference internal" href="#station-output">Station Output</a></li>
 <li><a class="reference internal" href="#extracting-data-from-binary-outputs">Extracting Data from Binary outputs</a></li>
 </ul>
 </li>
@@ -92,14 +92,14 @@
             
   <div class="section" id="post-processing">
 <h1>Post-processing<a class="headerlink" href="#post-processing" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="station-output-extractor">
-<h2>Station Output Extractor<a class="headerlink" href="#station-output-extractor" title="Permalink to this headline">¶</a></h2>
-<p>SELFE can write outputs of certain model variables at given positions at every given time interval in a plain text format. The files of these outputs resides in ‘outputs’ directory under a study directory. File names of the outputs are named from ‘staout_1’ to ‘staout_9,’ and the files corresponds to surface elevation, air pressure, wind velocity in x- and y-direction, temperature, salinity, and velocity in x-, y-, and z-direction respectively. The positions of outputs are requested in ‘station.in’ in the study directory.</p>
+<div class="section" id="station-output">
+<h2>Station Output<a class="headerlink" href="#station-output" title="Permalink to this headline">¶</a></h2>
+<p>SCHISM can write outputs of certain model variables at given positions at every given time interval in a plain text format. The files of these outputs resides in ‘outputs’ directory under a study directory. File names of the outputs are named from ‘staout_1’ to ‘staout_9,’ and the files corresponds to surface elevation, air pressure, wind velocity in x- and y-direction, temperature, salinity, and velocity in x-, y-, and z-direction respectively. The positions of outputs are requested in ‘station.in’ in the study directory.</p>
 <p>The station output extractor makes it easy to read these standard output files. It returns Vtools time series objects, which can be analyzed and plotted with some simple recipes.</p>
 </div>
 <div class="section" id="extracting-data-from-binary-outputs">
 <h2>Extracting Data from Binary outputs<a class="headerlink" href="#extracting-data-from-binary-outputs" title="Permalink to this headline">¶</a></h2>
-<p>Another way to extract values out of SELFE runs is extracting values from raw binary outputs. The upside of this approach is that users can extract anywhere they want after a run is finished if binary outputs are written, combined, and stored. The downside is the binary files are huge and possibly time-consuming. Extracting data from binary files currently relies on SELFE’s own FORTRAN scripts.</p>
+<p>Another way to extract values out of SCHISM runs is extracting values from raw binary outputs. The upside of this approach is that users can extract anywhere they want after a run is finished if binary outputs are written, combined, and stored. The downside is the binary files are huge and possibly time-consuming. Extracting data from binary files currently relies on SCHISM’s own FORTRAN scripts.</p>
 </div>
 </div>
 

@@ -204,14 +204,6 @@ schimpy.hotstart\_generator module
    :undoc-members:
    :show-inheritance:
 
-schimpy.interpolate\_hotstart module
-------------------------------------
-
-.. automodule:: schimpy.interpolate_hotstart
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 schimpy.laplace\_smooth\_data module
 ------------------------------------
 

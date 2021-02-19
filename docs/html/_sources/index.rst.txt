@@ -30,7 +30,6 @@ Contents
 .. toctree::
    :maxdepth: 2
    
-   Introduction <introduction>
    Installation <installation>
    Spatial data in SCHISM <spatial>
    Pre-processing <preprocessing>
