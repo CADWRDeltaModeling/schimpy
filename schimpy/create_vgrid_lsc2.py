@@ -100,7 +100,7 @@ def main():
 
 
 def vgrid_gen(hgrid,vgrid_out,eta,
-              minmaxlayerfile,archive_nlayer=None,nlayer_gr3=None):
+              minmaxlayerfile,archive_nlayer='out',nlayer_gr3='nlayer.gr3'):
     
 
     meshfun = BilinearMeshDensity()

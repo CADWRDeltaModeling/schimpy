@@ -32,7 +32,7 @@ def shapely_to_geopandas(features,Proj4=None,shp_fn=None):
         print("%s generated"%shp_fn)
     return gdf
 
-def Contiguity_Check(mesh,poly_fn,centering='nodes'):
+def Contiguity_Check(mesh,poly_fn,centering='nodes',proj4=None):
     """
     Check if the schism mesh division by the polygon features in poly_fn is contiguous.
     The contiguity check is based on either node or element, and the function checks
@@ -41,12 +41,13 @@ def Contiguity_Check(mesh,poly_fn,centering='nodes'):
     """
     poly_gpd = gpd.read_file(poly_fn)
     if centering == 'elems':
-        mesh_gpd = mesh.to_geopandas(feature_type = 'polygon')
+        mesh_gpd = mesh.to_geopandas(feature_type = 'polygon',proj4=proj4)
         # if the centroid falls in a polygon, the mesh grid is in the polygon
         mesh_gpd['geometry'] = mesh_gpd['geometry'].centroid
     else:
-        mesh_gpd = mesh.to_geopandas(feature_type = 'point')
-
+        mesh_gpd = mesh.to_geopandas(feature_type = 'point',proj4=proj4)
+        
+    poly_gpd = poly_gpd.to_crs(mesh_gpd.crs) # project to the mesh crs. 
     poly_gpd.set_index('id',inplace=True)
     poly_gpd.sort_index(inplace=True)
     for id_n, poly in zip(poly_gpd.index,poly_gpd['geometry']):
@@ -57,14 +58,28 @@ def Contiguity_Check(mesh,poly_fn,centering='nodes'):
     ID_df = mesh_gpd[ID_keys]
     # check if there is at least one id that each cell belongs to
     orphaned_cells = np.where(~np.any(ID_df,axis=1))[0]
-    if len(orphaned_cells) >=1:
-        string = ",".join(orph_cells.astype(str))
-        raise Exception("Orphaned cells found at %s"%string)
+ 
+    if len(orphaned_cells) == len(mesh_gpd):
+        raise Exception("coordinate system mismatch: the default for the mesh \
+                        is lat lon")
+    elif len(orphaned_cells) >=1:
+        string = ",".join(orphaned_cells.astype(str))
+        raise Exception("Orphaned nodes or cells found at %s"%string)
     # check if there are cells that belong to multiple polygons
     multi_labeled_cells = np.where(np.count_nonzero(ID_df,axis=1)>1)[0]
     if len(multi_labeled_cells) >=1:
+        df_multi = ID_df.loc[multi_labeled_cells]
+        npoly = len(poly_gpd)
+        for i in range(len(df_multi)):
+            df = pd.array([False]*npoly)
+            id1 = np.where(df_multi.iloc[i])[0][0]
+            df[id1] = True
+            df_multi.iloc[i] = df
+        ID_df.loc[multi_labeled_cells] = df_multi
+
         string = ",".join(multi_labeled_cells.astype(str))
-        raise Exception("These cells belong to mulitple polygons %s"%string)
+        print('''These cells or nodes belong to mulitple polygons %s: 
+              categorize as the 1st True poly'''%string)
     # otherwise the domain is contiguous.
     logging.info("The domain divisino is contiguous!")
     mapping = np.where(ID_df.values)[1]+1 # change to one-based indices

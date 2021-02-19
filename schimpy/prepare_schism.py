@@ -103,7 +103,7 @@ def create_hgrid(s, inputs, logger):
         depth_enforce_params = section.get("depth_enforcement")
         if depth_enforce_params is not None:
             if "polygons" in depth_enforce_params:
-                s.mesh.nodes[:,2] = s._partition_nodes_with_polygons(default=None,polygons=depth_enforce_params['polygons'])
+                s.mesh.nodes[:,2] = s.apply_polygons(default=None,polygons=depth_enforce_params['polygons'])
             if "linestrings" in depth_enforce_params:
                 s.mesh.nodes[:,2] = s.apply_linestring_ops(default=None,linestrings=depth_enforce_params['linestrings'])
         
