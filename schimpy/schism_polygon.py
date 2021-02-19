@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module contains polygon data holders and related operations.
+Polygon data structure with preprocessor-related attributes and converters
 """
 from schimpy import schism_yaml
 from shapely.geometry.polygon import orient

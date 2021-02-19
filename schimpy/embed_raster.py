@@ -12,7 +12,7 @@ from scipy.integrate import odeint
 from nodepy import *
 import sys
 import os.path
-from contour_smooth import *
+from schimpy.contour_smooth import *
 
 
 try:

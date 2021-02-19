@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """ Create a mesh file with the number of vertical levels as nodal value
 """
-from schism_mesh import read_mesh, write_mesh
+from schimpy.schism_mesh import read_mesh, write_mesh
 import numpy as np
 
 

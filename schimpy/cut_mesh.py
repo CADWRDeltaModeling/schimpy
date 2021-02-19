@@ -2,7 +2,7 @@
 """
 ## Author: Kijin Nam, knam@water.ca.gov
 ## June, 2014
-from schism_mesh import read_mesh, write_mesh
+from schimpy.schism_mesh import read_mesh, write_mesh
 import numpy as np
 import os
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-""" Script to make model date conversion convenient, converting elapsed model seconds to/from dates"""
+""" Script to make model date conversion convenient, converting elapsed model seconds to or from dates"""
+
 import argparse
 import datetime
 import re
@@ -75,6 +76,7 @@ def create_arg_parser():
 
 
 def to_elapsed(args):
+    """ Convert dated inputs to elapsed times"""
     s = args.start
     inputfile = args.dated_input
     dt = args.step
@@ -109,6 +111,7 @@ def to_elapsed(args):
 
 
 def to_datetime(args):
+    """ Convert elapsed inputs to dated"""
     print(args.subcommand)
     s = args.start
     input = args.elapsed_input
@@ -148,6 +151,7 @@ def to_datetime(args):
 
 
 def clip(args):
+    """ Clip file to dates """
     infile = args.elapsed_input
     input = args.elapsed_input
 

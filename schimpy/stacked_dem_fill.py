@@ -1,18 +1,17 @@
 '''
 Module contains routines to fill elevation (or other scalar) values at points from a prioritized list of rasters
 
-Depends on GDAL for loading values. GDAL is easily installed with no tertiary dependencies.
+Depends on GDAL for loading values. 
 
-The module requires Python 2.7
 '''
 
 try:
-    from osgeo import gdal
-    from osgeo.gdalconst import *
-    gdal.TermProgress = gdal.TermProgress_nocb
+   from osgeo import gdal
+   from osgeo.gdalconst import *
+   gdal.TermProgress = gdal.TermProgress_nocb
 except ImportError:
-    import gdal
-    from gdalconst import *
+   import gdal
+   from gdalconst import *
 
 import numpy as np
 import sys
@@ -21,18 +20,31 @@ DEFAULT_NA_FILL = 2.0
 
 
 def stacked_dem_fill(files, points, values=None, negate=False, require_all=True, na_fill=None):
-    '''
-    Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
+    '''    Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
     This routine controls prioritization of the dems, gradually filling points that are still marked "nan"
 
-    files:  list of files. Existence is checked and ValueError for bad file
-    points: this is a numpy array of points, nrow = # points and ncol = 2 (x,y).
-    values: values at each point
-    negate:      if True, values will be inverted (from elevation to depth)
-    require_all: if True, a ValueError is raised if the list of DEMs does not cover all the points. In either case (True/False)
-                 a file is created or overwritten ("dem_misses.txt") that will show all the misses.
-    na_fill:     value to substitute at the end for values that are NA after all DEMs are processed.
-                If require_all = True na_fill must be None
+    Parameters
+    ----------
+    files:  list[str]
+        list of files. Existence is checked and ValueError for bad file
+    points: np.ndarray
+        this is a numpy array of points, nrow = # points and ncol = 2 (x,y).
+    values: np.ndarray
+        values at each point -- this is an output, but this gives an opportunity to use an existing data structure to receive
+    negate: bool 
+        if True, values will be inverted (from elevation to depth)
+    require_all: bool
+        if True, a ValueError is raised if the list of DEMs does not cover all the points. In either case (True/False)
+        a file is created or overwritten ("dem_misses.txt") that will show all the misses.
+    na_fill: float
+        value to substitute at the end for values that are NA after all DEMs are processed.
+        If require_all = True na_fill must be None
+        
+    Returns
+    -------
+    values : np.ndarray
+        Values at the nodes
+    
     '''
     if values is None:
         values = np.full(points.shape[0], np.nan)

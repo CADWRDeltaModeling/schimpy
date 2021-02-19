@@ -132,8 +132,8 @@ class SchismMesh(TriQuadMesh):
         """ Get the number of boundaries. If a boundary type is given,
             it counts only boundaries with the corresponding type.
 
-            Parameter
-            ---------
+            Parameters
+            ----------
             btype: integer, optional
                 Type of the boundary.
         """
@@ -146,8 +146,8 @@ class SchismMesh(TriQuadMesh):
     def n_total_boundary_nodes(self, btype):
         """ Get the total node boundary of a given type
 
-            Parameter
-            ---------
+            Parameters
+            ----------
             btype: integer
                 Type of the boundary.
         """
@@ -157,8 +157,8 @@ class SchismMesh(TriQuadMesh):
     def add_boundary(self, nodes, btype, comment=None):
         """ Add one boundary.
 
-            Parameter
-            ---------
+            Parameters
+            ----------
             nodes: an array of integer
                 array of inter node indexes in the boundary path
 
@@ -310,7 +310,7 @@ class SchismMesh(TriQuadMesh):
         line_segment: array-like
             two end points of the line segment, start_x, start_y, end_x, end_y
 
-        return
+        Returns
         ------
         up_path: array of int
             upstream side of node paths

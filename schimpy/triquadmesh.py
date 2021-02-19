@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This is a class to hold an unstructured triangular and quad mesh
-for SCHISM.
-
-Lots of the codes are copied and modified
+for SCHISM copied and modified
 from Rusty Chris Collerman's trigrid.
 
 Prerequisite: Numpy, rtree package, and libspatialindex for rtree

@@ -3,8 +3,8 @@
 """ Script to interpolate SCHISM hotstart.in from one grid to another
 """
 
-from .schism_mesh import read_mesh
-from .schism_hotstart import read_hotstart, SchismHotstart
+from schimpy.schism_mesh import read_mesh
+from schimpy.schism_hotstart import read_hotstart, SchismHotstart
 from scipy.interpolate import griddata
 import numpy as np
 import argparse

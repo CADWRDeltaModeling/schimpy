@@ -6,10 +6,18 @@ import numpy as np
 
 
 class GaussianQuadrature(object):
-    """ Base class of GaussianQuadrature
+    """ Abstract base class of GaussianQuadrature
     """
 
     def __init__(self, order):
+        """Constructor based on order of quadrature
+        
+        Parameters
+        ----------
+        order : int
+            Order of quadrature
+            
+        """    
         self.order = order
         self.quad_pts_1d, self.quad_wts_1d = list(map(
             np.array, np.polynomial.legendre.leggauss(order)))
@@ -19,16 +27,42 @@ class GaussianQuadrature(object):
 
     def shape(self, pts):
         """ Abstract shape function
+        
+        Parameters
+        ----------
+        
+        pts: np.ndarray
+            Coordinates of the nodes        
+        
         """
         raise NotImplementedError()
 
     def shape_derivative(self, pts):
         """ Abstract shape derivative function
+        
+        Parameters
+        ----------
+        
+        pts: np.ndarray
+            Coordinates of the nodes        
+        
         """
         raise NotImplementedError()
 
     def calculate_quadrature_points_and_weights(self):
-        """ Abstract method
+        """ Calculate quadrature points and weights
+        
+        Parameters
+        ----------
+        
+        pts: np.ndarray
+            Coordinates of the nodes    
+
+        Returns
+        -------
+        pts : real
+           quadrature points        
+        
         """
         raise NotImplementedError()
 
@@ -240,7 +274,7 @@ class GaussianQuadratureLine2(GaussianQuadrature):
 
             Returns
             -------
-            float
+            average : float
                 result of integration
         """
         wts = self.quad_wts
@@ -286,7 +320,7 @@ class GaussianQuadratureQuad4(GaussianQuadrature):
 
             Returns
             -------
-            float
+            ret_size: float
                 the length of the line
         """
         return 0.5 * np.abs(np.dot(vertices[:, 0], np.roll(vertices[:, 1], 1))

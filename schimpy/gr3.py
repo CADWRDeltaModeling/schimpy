@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-A package to read a mesh in GR3 format.
-@author: Kijin Nam, knam@water.ca.gov
+Package to read a mesh in GR3 format.
 """
 
-from schism_mesh import BoundaryType
-import schism_mesh
-import base_io
+from schimpy.schism_mesh import BoundaryType
+import schimpy.schism_mesh
+import schimpy.base_io
 import numpy as np
 import os
 
-class Gr3IO(base_io.BaseIO):
+class Gr3IO(schimpy.base_io.BaseIO):
     """ A class that manages I/O of GR3 files
     """
 

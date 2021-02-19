@@ -10,7 +10,7 @@ Prerequisite: Numpy, rtree package, and libspatialindex for rtree
 ## Author: Kijin Nam, knam@water.ca.gov
 ##
 
-import priority_queue as pq
+import schimpy.priority_queue as pq
 import rtree
 import numpy as np
 import types
@@ -420,7 +420,7 @@ class TriMesh(object):
             boundary_only = limit search to edges on the boundary (have
             a -1 for element2)
         """
-        queue = pq.priorityDictionary()
+        queue = priorityDictionary()
         queue[n1] = 0
 
         done = {}

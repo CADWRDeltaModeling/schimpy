@@ -3,13 +3,13 @@
 """ A script to create a hotstart.in for the Bay-Delta
 """
 
-from hotstart_generator import (HotstartGenerator,
+from schimpy.hotstart_generator import (HotstartGenerator,
                                 RegionalInitializer,
                                 NearestNeighborInitializer,
                                 init_logger,
                                 read_stations, read_station_data)
-from schism_mesh import read_mesh
-from schism_polygon import read_polygons
+from schimpy.schism_mesh import read_mesh
+from schimpy.schism_polygon import read_polygons
 import os
 
 

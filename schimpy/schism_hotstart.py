@@ -1,36 +1,28 @@
 # -*- coding: utf-8 -*-
-"""
-@author: zzhang
-To be implemented:
-1. provide options if called. 
+""" 
+Module for creating a schism hotstart file using an flexible battery of assumptions and interpolators
+Options:
+1. Centering:
+    * node2D: node (2D surface)
+    * node3D: node at whole level 
+    * edge: edge center at whole level (mainly for horizontal velocties)
+    * elem: element center at whole level (mainly for vertical velocity)
+    * prism: prism center (for tracers); three different variables tr_el, tr_nd,
+    * tr_el need to be generated for the hotstart.nc file. 
+        *  tr_nd = tr_nd0 (on nodes)
+        *  tr_el (on element at middle level)
+2. Initializer:
+    * text_init: 2D map input from either *.prop or *.ic files; require input text file. 
+    * simple_trend: can either be a number or an equation that depends on x (lat) and y(lon). e.g,: 0.97 + 1.e-5*x 
+    * patch_init: regional-based method. Polygon shapefile input required.
+    * extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects. 
+    * obs_points: interpolated from 1D (time series of) observational points.
 
-Options: 
-- Centering:
-    node2D: node (2D surface)
-    node3D: node at whole level 
-    edge: edge center at whole level (mainly for horizontal velocties)
-    elem: element center at whole level (mainly for vertical velocity)
-    prism: prism center (for tracers); three different variables tr_el, tr_nd,
-    tr_el need to be generated for the hotstart.nc file. 
-        tr_nd = tr_nd0 (on nodes)
-        tr_el (on element at middle level)
-- Initializer:
-    text_init: 2D map input from either *.prop or *.ic files; require input text file. 
-    simple_trend: can either be a number or an equation that depends on x (lat) and y(lon). e.g,: 0.97 + 1.e-5*x 
-    patch_init: regional-based method. Polygon shapefile input required.
-    extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects. 
-    obs_points: interpolated from 1D (time series of) observational points.
 Required data files:
-- param.in, hgrid.gr3, vgrid.in, hotstart.yaml and input files defined in the yaml file. 
-Prerequisit: 
-- schimpy
-- geopandas
-- numpy
-- pandas
-- yaml
-- scipy
-- matplotlib
-- shapely
+    * param.in
+    * hgrid.gr3
+    * vgrid.in
+    * hotstart.yaml and input files defined in the yaml file. 
 """
 
 import yaml
@@ -42,11 +34,17 @@ from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import os
 # import from schimpy
-from schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader
-import geo_tools
+from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader
+import schimpy.geo_tools
 
 # %%
-
+class SCHISMHotstart(object):
+    """ Mock object """
+    pass
+    
+def read_hotstart():
+    """Mock method to read existing hotstart"""
+    pass
 
 class hotstart(object):
     """
