@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schimpy.gr3 &#8212; schimpy 1.1.0+4.g9a8a1f7.dirty documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><img src="../../_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.gr3</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for schimpy.gr3</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Package to read a mesh in GR3 format.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">schimpy.schism_mesh</span> <span class="kn">import</span> <span class="n">BoundaryType</span>
+<span class="kn">import</span> <span class="nn">schimpy.schism_mesh</span>
+<span class="kn">import</span> <span class="nn">schimpy.base_io</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="Gr3IO"><a class="viewcode-back" href="../../schimpy.html#schimpy.gr3.Gr3IO">[docs]</a><span class="k">class</span> <span class="nc">Gr3IO</span><span class="p">(</span><span class="n">schimpy</span><span class="o">.</span><span class="n">base_io</span><span class="o">.</span><span class="n">BaseIO</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A class that manages I/O of GR3 files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Constructor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Gr3IO</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Gr3IO.read"><a class="viewcode-back" href="../../schimpy.html#schimpy.gr3.Gr3IO.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gr3_fname</span><span class="o">=</span><span class="s2">&quot;hgrid.gr3&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Read in a hgrid.gr3 file.</span>
+<span class="sd">            If mode is 1, it does not read in boundary information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading in a gr3 file: </span><span class="si">%s</span><span class="s2"> ...&quot;</span> <span class="o">%</span> <span class="n">gr3_fname</span><span class="p">)</span>
+        <span class="c1"># Create a new mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span> <span class="o">=</span> <span class="n">schism_mesh</span><span class="o">.</span><span class="n">SchismMesh</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">gr3_fname</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Grid file not found.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linecounter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Mesh info</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_header</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading in nodes...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_nodes</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading in elements...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_elems</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="c1"># Build grid</span>
+        <span class="c1"># if self._verbose &gt; 1:</span>
+        <span class="c1">#     print &quot;Building a mesh...&quot;</span>
+        <span class="c1"># self._mesh.build_edges_from_elems()</span>
+
+        <span class="c1"># Boundary info</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading in boundaries...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_boundaries</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="c1">## Close</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done reading a GR3 file.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="c1">## Header</span>
+        <span class="c1"># First line: ignored</span>
+        <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Second line: # of elements and # of nodes</span>
+        <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The Header information of GR3 file is corrupted.&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">n_elems</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">)</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">tokens</span><span class="p">[:</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">n_nodes</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n_elems</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The Header information of GR3 file is corrupted.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="o">.</span><span class="n">allocate</span><span class="p">(</span><span class="n">n_elems</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">)</span> <span class="c1"># Allocate memory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_elems</span> <span class="o">=</span> <span class="n">n_elems</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_nodes</span> <span class="o">=</span> <span class="n">n_nodes</span>
+
+    <span class="k">def</span> <span class="nf">_read_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="n">node_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_nodes</span><span class="p">):</span>
+            <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Node block is corrupt.&quot;</span><span class="p">)</span>
+            <span class="n">node_coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="o">.</span><span class="n">set_node</span><span class="p">(</span><span class="n">node_counter</span><span class="p">,</span> <span class="n">node_coords</span><span class="p">)</span>
+            <span class="n">node_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_read_elems</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">elem_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_elems</span><span class="p">):</span>
+            <span class="n">tkn</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tkn</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element block is corrupt.&quot;</span><span class="p">)</span>
+            <span class="n">type_elem</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tkn</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">type_elem</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">type_elem</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Currently only triangular and &quot;</span> \
+                                 <span class="s2">&quot;quadrilateral are supported.&quot;</span><span class="p">)</span>
+            <span class="c1"># Zero-based connectivities</span>
+            <span class="k">if</span> <span class="n">type_elem</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">connectivities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">tkn</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">]))),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">type_elem</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">connectivities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">tkn</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">6</span><span class="p">]))),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not allowed element type is encountered.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="o">.</span><span class="n">set_elem</span><span class="p">(</span><span class="n">elem_i</span><span class="p">,</span> <span class="n">connectivities</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_boundaries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Read boundary information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">## Assuming the order of the different boundary types are consitent</span>
+        <span class="c1">## Open boundaries</span>
+        <span class="c1"># # of open boundaries</span>
+        <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No boundary information is present?&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">n_open_boundaries</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># total # of open boundary nodes</span>
+        <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The number of total open boundary nodes is not&quot;</span>\
+                            <span class="s2">&quot; correctly provided.&quot;</span><span class="p">)</span>
+        <span class="n">n_open_boundary_nodes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># open boundaries</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_open_boundaries</span><span class="p">):</span>
+            <span class="c1"># # of nodes of this open boundary</span>
+            <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The number of nodes for a boundary is not&quot;</span>\
+                                <span class="s2">&quot; correctly provided.&quot;</span><span class="p">)</span>
+            <span class="c1"># Comment</span>
+            <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">comment</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">n_nodes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">):</span>
+                <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Node for boundary not&quot;</span>\
+                                     <span class="s2">&quot; correctly provided.&quot;</span><span class="p">)</span>
+
+                <span class="n">node</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># Zero based</span>
+                <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="o">.</span><span class="n">add_boundary</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span>
+                                    <span class="n">BoundaryType</span><span class="o">.</span><span class="n">OPEN</span><span class="p">,</span>
+                                    <span class="n">comment</span><span class="p">)</span>
+
+        <span class="c1"># land boundaries</span>
+        <span class="c1"># I found out that there is no distinction between</span>
+        <span class="c1"># land and island boundaries.</span>
+        <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No land boundary presented?&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">n_land_boundaries</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># total # of land boundary nodes</span>
+        <span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The number of total land boundary nodes is &quot;</span> \
+                            <span class="s2">&quot;not provided properly.&quot;</span><span class="p">)</span>
+        <span class="c1"># n_land_boundary_nodes = int(tokens[0])</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_land_boundaries</span><span class="p">):</span>
+            <span class="c1"># # of nodes of this open boundary</span>
+            <span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The number of nodes for a boundary is &quot;</span>\
+                                <span class="s2">&quot;not provided properly.&quot;</span><span class="p">)</span>
+            <span class="c1"># Comment</span>
+            <span class="n">comment</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">comment</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">n_nodes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">):</span>
+                <span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">ok</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_and_parse_line</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Line: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">linecounter</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Node for a boundary not correctly provided.&quot;</span><span class="p">)</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># Zero based</span>
+                <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mesh</span><span class="o">.</span><span class="n">add_boundary</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">LAND</span><span class="p">,</span> <span class="n">comment</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Gr3IO.write"><a class="viewcode-back" href="../../schimpy.html#schimpy.gr3.Gr3IO.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">node_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write a GR3 format grid.</span>
+<span class="sd">            mesh = SCHISM mesh (schism_mesh) instance</span>
+<span class="sd">            fname = output file name</span>
+<span class="sd">            node_attr = a list of node attribute</span>
+<span class="sd">            boundary = If true, boundary information will be added. Otherwise,</span>
+<span class="sd">            it will not be appended.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Writing an gr3 file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="c1"># Header</span>
+<span class="c1">#         if mesh.comment is None:</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             buf = &quot;%s !modified by the preprocessing tool\n&quot; \</span>
+<span class="c1">#                   % mesh.comment</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="n">n_elems</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">n_elems</span><span class="p">()</span>
+        <span class="n">n_nodes</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">()</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> ! # of elements and nodes </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n_elems</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="c1"># Nodes</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_nodes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">node_attr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%18.8f</span><span class="s2"> </span><span class="si">%18.8f</span><span class="s2"> </span><span class="si">%18.8f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> \
+                                     <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> \
+                                     <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> \
+                                     <span class="n">node_attr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%18.8f</span><span class="s2"> </span><span class="si">%18.8f</span><span class="s2"> </span><span class="si">%18.8f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> \
+                                     <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> \
+                                     <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> \
+                                     <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+
+        <span class="c1"># Elements</span>
+        <span class="k">for</span> <span class="n">elem_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_elems</span><span class="p">):</span>
+            <span class="n">elem</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">elem</span><span class="p">(</span><span class="n">elem_i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">n_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elem_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_nodes</span><span class="p">)</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="n">n_nodes</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">buf</span> <span class="o">+=</span> <span class="n">fmt</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+
+        <span class="c1"># Boundaries</span>
+        <span class="k">if</span> <span class="n">boundary</span><span class="p">:</span>
+            <span class="c1"># Open</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> = Number of open boundaries</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                  <span class="o">%</span> <span class="n">mesh</span><span class="o">.</span><span class="n">n_boundaries</span><span class="p">(</span><span class="n">BoundaryType</span><span class="o">.</span><span class="n">OPEN</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> = Total number of open boundary nodes</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                  <span class="o">%</span> <span class="n">mesh</span><span class="o">.</span><span class="n">n_boundary_nodes</span><span class="p">(</span><span class="n">BoundaryType</span><span class="o">.</span><span class="n">OPEN</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">openbound_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">boundaries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">boundary</span><span class="o">.</span><span class="n">btype</span> <span class="o">==</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
+                    <span class="n">openbound_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">boundary</span><span class="o">.</span><span class="n">comment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> = Number of nodes for open boundary </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> \
+                              <span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">(),</span> <span class="n">openbound_count</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">(),</span> <span class="n">boundary</span><span class="o">.</span><span class="n">comment</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                    <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="k">for</span> <span class="n">node_i</span> <span class="ow">in</span> <span class="n">boundary</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                        <span class="n">buf</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 raise Exception(&quot;Unsupported boundary type.&quot;)</span>
+
+            <span class="c1"># Land</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> = Number of land boundaries</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                  <span class="o">%</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_boundaries</span><span class="p">(</span><span class="n">BoundaryType</span><span class="o">.</span><span class="n">LAND</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> = Total number of land boundary nodes</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                  <span class="o">%</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_boundary_nodes</span><span class="p">(</span><span class="n">BoundaryType</span><span class="o">.</span><span class="n">LAND</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+            <span class="n">landbound_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">islandbound_count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">boundary</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">boundaries</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">boundary</span><span class="o">.</span><span class="n">btype</span> <span class="o">==</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">LAND</span><span class="p">:</span>
+                    <span class="n">landbound_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">boundary</span><span class="o">.</span><span class="n">comment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> = Number of nodes for land boundary </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> \
+                          <span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">(),</span> <span class="n">landbound_count</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boundary</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">(),</span> <span class="n">boundary</span><span class="o">.</span><span class="n">comment</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                    <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="k">for</span> <span class="n">node_i</span> <span class="ow">in</span> <span class="n">boundary</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                        <span class="n">buf</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                <span class="c1"># elif boundary.btype == BoundaryType.ISLAND:</span>
+                <span class="c1">#     islandbound_count += 1</span>
+                <span class="c1">#     if boundary.comment is None:</span>
+                <span class="c1">#         buf = &quot;%d = Number of nodes for island boundary %d\n&quot; \</span>
+                <span class="c1">#                % (boundary.n_nodes(), islandbound_count)</span>
+                <span class="c1">#     else:</span>
+                <span class="c1">#         buf = &quot;%d %s\n&quot; % (boundary.n_nodes(), boundary.comment)</span>
+                <span class="c1">#     f.write(buf)</span>
+                <span class="c1">#     buf = &quot;&quot;</span>
+                <span class="c1">#     for node_i in boundary.nodes:</span>
+                <span class="c1">#         buf += &quot;%d\n&quot; % (node_i + 1)</span>
+                <span class="c1">#     f.write(buf)</span>
+<span class="c1">#             else:</span>
+<span class="c1">#                 raise Exception(&quot;Unsupported boundary type.&quot;)</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done writing a gr3 file.&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.gr3</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

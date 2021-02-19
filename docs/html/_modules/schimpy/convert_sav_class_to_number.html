@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schimpy.convert_sav_class_to_number &#8212; schimpy 1.1.0+4.g9a8a1f7.dirty documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><img src="../../_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.convert_sav_class_to_number</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for schimpy.convert_sav_class_to_number</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">gdal</span>
+<span class="kn">import</span> <span class="nn">ogr</span>
+<span class="kn">from</span> <span class="nn">schimpy.schism_mesh</span> <span class="kn">import</span> <span class="n">read_mesh</span><span class="p">,</span> <span class="n">write_mesh</span>
+<span class="kn">from</span> <span class="nn">schimpy.schism_polygon</span> <span class="kn">import</span> <span class="n">read_polygons</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span> <span class="k">as</span> <span class="n">gfilt</span>
+
+<div class="viewcode-block" id="create_arg_parse"><a class="viewcode-back" href="../../schimpy.html#schimpy.convert_sav_class_to_number.create_arg_parse">[docs]</a><span class="k">def</span> <span class="nf">create_arg_parse</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; Create argument parser</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--mesh&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;hgrid.gr3&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;mesh file for the horizontal mesh&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--density&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;tiff file for density&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--target&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Target polygons to calculate density&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--output&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;sav_D.gr3&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;output file name&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="read_density_tiff"><a class="viewcode-back" href="../../schimpy.html#schimpy.convert_sav_class_to_number.read_density_tiff">[docs]</a><span class="k">def</span> <span class="nf">read_density_tiff</span><span class="p">(</span><span class="n">fpath_densitiy_tiff</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read geotiff values for density</span>
+<span class="sd">    It is assumed that the projected regular coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fpath_densitiy_tiff: str</span>
+<span class="sd">        filename for SAV desity diff</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        3D array containing x&#39;s, y&#39;s, and density. The shape is (n_x, n_y, 3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">fpath_densitiy_tiff</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">upper_left_x</span><span class="p">,</span> <span class="n">x_size</span><span class="p">,</span> <span class="n">x_rotation</span><span class="p">,</span> <span class="n">upper_left_y</span><span class="p">,</span>
+     <span class="n">y_rotation</span><span class="p">,</span> <span class="n">y_size</span><span class="p">)</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">GetGeoTransform</span><span class="p">()</span>
+    <span class="n">band</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">band</span><span class="o">.</span><span class="n">ReadAsArray</span><span class="p">()</span>
+    <span class="c1"># xv, yv = np.meshgrid(xrange(array.shape[1]), xrange(array.shape[0]))</span>
+    <span class="c1"># x = xv * x_size + upper_left_x + x_size / 2.</span>
+    <span class="c1"># y = yv * y_size + upper_left_y + y_size / 2.</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">upper_left_x</span><span class="p">,</span> <span class="n">x_size</span><span class="p">,</span> <span class="n">x_rotation</span><span class="p">,</span> <span class="n">upper_left_y</span><span class="p">,</span>
+            <span class="n">y_rotation</span><span class="p">,</span> <span class="n">y_size</span><span class="p">),</span> <span class="n">array</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../schimpy.html#schimpy.convert_sav_class_to_number.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">create_arg_parse</span><span class="p">()</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">tiff</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">upper_left_x</span><span class="p">,</span> <span class="n">x_size</span><span class="p">,</span> <span class="n">x_rotation</span><span class="p">,</span> <span class="n">upper_left_y</span><span class="p">,</span>
+     <span class="n">y_rotation</span><span class="p">,</span> <span class="n">y_size</span><span class="p">)</span> <span class="o">=</span> <span class="n">tiff</span><span class="o">.</span><span class="n">GetGeoTransform</span><span class="p">()</span>
+    <span class="n">proj</span> <span class="o">=</span> <span class="n">tiff</span><span class="o">.</span><span class="n">GetProjection</span><span class="p">()</span>
+    <span class="n">red</span> <span class="o">=</span> <span class="n">tiff</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">ReadAsArray</span><span class="p">()</span>
+    <span class="n">green</span> <span class="o">=</span> <span class="n">tiff</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">ReadAsArray</span><span class="p">()</span>
+    <span class="n">blue</span> <span class="o">=</span> <span class="n">tiff</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">ReadAsArray</span><span class="p">()</span>
+    <span class="n">allband</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">))</span>
+    <span class="n">ndvi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">red</span><span class="p">)</span>
+
+    <span class="n">classes</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">2.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">3.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">4.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">5.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">6.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">7.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">8.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">9.</span><span class="p">},</span>
+               <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="mf">10.</span><span class="p">},</span>
+               <span class="p">]</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;i4&#39;</span><span class="p">),(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;i4&#39;</span><span class="p">),(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;i4&#39;</span><span class="p">)])</span>
+    <span class="n">colarr</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+    <span class="n">classval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">order</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">))</span>    
+    <span class="n">refsort</span> <span class="o">=</span> <span class="n">colarr</span><span class="p">[</span><span class="n">order</span><span class="p">,:]</span>
+    <span class="n">valorder</span> <span class="o">=</span> <span class="n">classval</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">allband</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">ndvi</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;d&quot;</span><span class="p">)</span> 
+    <span class="n">nclass</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">refsort</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">iref</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nclass</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Class: </span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">iref</span><span class="p">,</span><span class="n">nclass</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">vo</span> <span class="o">=</span> <span class="n">valorder</span><span class="p">[</span><span class="n">iref</span><span class="p">]</span>
+        <span class="n">imatch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">vals</span> <span class="o">==</span> <span class="n">refsort</span><span class="p">[</span><span class="n">iref</span><span class="p">,:])</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">ndvi</span><span class="p">[</span><span class="n">imatch</span><span class="p">]</span> <span class="o">=</span> <span class="n">vo</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">ndvi</span><span class="o">&gt;-</span><span class="mf">1.</span><span class="p">)</span>
+    <span class="n">ndvi</span><span class="o">=</span><span class="n">ndvi</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">red</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">ndvi</span> <span class="o">=</span> <span class="n">gfilt</span><span class="p">(</span><span class="n">ndvi</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
+
+    <span class="n">gtiff_driver</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="s1">&#39;GTiff&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gtiff_driver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span>
+    <span class="n">fpath_out</span> <span class="o">=</span> <span class="s1">&#39;ndvi_adj2.tif&#39;</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">gtiff_driver</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="n">fpath_out</span><span class="p">,</span>
+                             <span class="n">ndvi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                             <span class="n">ndvi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                             <span class="mi">1</span><span class="p">,</span>
+                             <span class="n">gdal</span><span class="o">.</span><span class="n">GDT_Float32</span><span class="p">,)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">SetGeoTransform</span><span class="p">([</span><span class="n">upper_left_x</span><span class="p">,</span> <span class="n">x_size</span><span class="p">,</span> <span class="n">x_rotation</span><span class="p">,</span> <span class="n">upper_left_y</span><span class="p">,</span>
+                        <span class="n">y_rotation</span><span class="p">,</span> <span class="n">y_size</span><span class="p">])</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">SetProjection</span><span class="p">(</span><span class="n">proj</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">WriteArray</span><span class="p">(</span><span class="n">ndvi</span><span class="p">)</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">FlushCache</span><span class="p">()</span></div>
+
+    <span class="c1"># mesh = read_mesh(args.mesh)</span>
+    <span class="c1"># polygons = read_polygons(args.target)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;--density&quot;</span><span class="p">,</span> <span class="s2">&quot;delta_2016_20_28_mosaic_NDVI_tif.tif&quot;</span><span class="p">])</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--mesh&quot;</span><span class="p">,</span> <span class="s2">&quot;hgrid.gr3&quot;</span><span class="p">])</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--target&quot;</span><span class="p">,</span> <span class="s2">&quot;test/testdata/sav/frankstract.yaml&quot;</span><span class="p">])</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.convert_sav_class_to_number</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

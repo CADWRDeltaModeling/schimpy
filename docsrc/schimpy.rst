@@ -268,14 +268,6 @@ schimpy.polygons module
    :undoc-members:
    :show-inheritance:
 
-schimpy.prepare\_bayonly module
--------------------------------
-
-.. automodule:: schimpy.prepare_bayonly
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 schimpy.prepare\_schism module
 ------------------------------
 
@@ -288,6 +280,14 @@ schimpy.priority\_queue module
 ------------------------------
 
 .. automodule:: schimpy.priority_queue
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.raster\_to\_nodes module
+--------------------------------
+
+.. automodule:: schimpy.raster_to_nodes
    :members:
    :undoc-members:
    :show-inheritance:

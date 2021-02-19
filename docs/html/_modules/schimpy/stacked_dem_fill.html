@@ -1,11 +1,12 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>schimpy.stacked_dem_fill &#8212; schimpy 0.1.2+0.g5fc488f.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schimpy.stacked_dem_fill &#8212; schimpy 1.1.0+4.g9a8a1f7.dirty documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -13,40 +14,68 @@
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-  
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><img src="../../_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.stacked_dem_fill</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
   <h1>Source code for schimpy.stacked_dem_fill</h1><div class="highlight"><pre>
 <span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Module contains routines to fill elevation (or other scalar) values at points from a prioritized list of rasters</span>
 
-<span class="sd">Depends on GDAL for loading values. GDAL is easily installed with no tertiary dependencies.</span>
+<span class="sd">Depends on GDAL for loading values. </span>
 
-<span class="sd">The module requires Python 2.7</span>
 <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">osgeo</span> <span class="kn">import</span> <span class="n">gdal</span>
-    <span class="kn">from</span> <span class="nn">osgeo.gdalconst</span> <span class="kn">import</span> <span class="o">*</span>
-    <span class="n">gdal</span><span class="o">.</span><span class="n">TermProgress</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">TermProgress_nocb</span>
+   <span class="kn">from</span> <span class="nn">osgeo</span> <span class="kn">import</span> <span class="n">gdal</span>
+   <span class="kn">from</span> <span class="nn">osgeo.gdalconst</span> <span class="kn">import</span> <span class="o">*</span>
+   <span class="n">gdal</span><span class="o">.</span><span class="n">TermProgress</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">TermProgress_nocb</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">gdal</span>
-    <span class="kn">from</span> <span class="nn">gdalconst</span> <span class="kn">import</span> <span class="o">*</span>
+   <span class="kn">import</span> <span class="nn">gdal</span>
+   <span class="kn">from</span> <span class="nn">gdalconst</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -55,18 +84,31 @@
 
 
 <div class="viewcode-block" id="stacked_dem_fill"><a class="viewcode-back" href="../../schimpy.html#schimpy.stacked_dem_fill.stacked_dem_fill">[docs]</a><span class="k">def</span> <span class="nf">stacked_dem_fill</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">negate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">require_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">na_fill</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.</span>
+    <span class="sd">&#39;&#39;&#39;    Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.</span>
 <span class="sd">    This routine controls prioritization of the dems, gradually filling points that are still marked &quot;nan&quot;</span>
 
-<span class="sd">    files:  list of files. Existence is checked and ValueError for bad file</span>
-<span class="sd">    points: this is a numpy array of points, nrow = # points and ncol = 2 (x,y).</span>
-<span class="sd">    values: values at each point</span>
-<span class="sd">    negate:      if True, values will be inverted (from elevation to depth)</span>
-<span class="sd">    require_all: if True, a ValueError is raised if the list of DEMs does not cover all the points. In either case (True/False)</span>
-<span class="sd">                 a file is created or overwritten (&quot;dem_misses.txt&quot;) that will show all the misses.</span>
-<span class="sd">    na_fill:     value to substitute at the end for values that are NA after all DEMs are processed.</span>
-<span class="sd">                If require_all = True na_fill must be None</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    files:  list[str]</span>
+<span class="sd">        list of files. Existence is checked and ValueError for bad file</span>
+<span class="sd">    points: np.ndarray</span>
+<span class="sd">        this is a numpy array of points, nrow = # points and ncol = 2 (x,y).</span>
+<span class="sd">    values: np.ndarray</span>
+<span class="sd">        values at each point -- this is an output, but this gives an opportunity to use an existing data structure to receive</span>
+<span class="sd">    negate: bool </span>
+<span class="sd">        if True, values will be inverted (from elevation to depth)</span>
+<span class="sd">    require_all: bool</span>
+<span class="sd">        if True, a ValueError is raised if the list of DEMs does not cover all the points. In either case (True/False)</span>
+<span class="sd">        a file is created or overwritten (&quot;dem_misses.txt&quot;) that will show all the misses.</span>
+<span class="sd">    na_fill: float</span>
+<span class="sd">        value to substitute at the end for values that are NA after all DEMs are processed.</span>
+<span class="sd">        If require_all = True na_fill must be None</span>
+<span class="sd">        </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    values : np.ndarray</span>
+<span class="sd">        Values at the nodes</span>
+<span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
@@ -340,80 +382,31 @@
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../index.html">
-    <img class="logo" src="../../_static/dwrsmall.jpg" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">schimpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">schimpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2020, California Department of Water Resources.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.stacked_dem_fill</a></li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
   </body>
 </html>
