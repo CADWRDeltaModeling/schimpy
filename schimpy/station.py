@@ -269,8 +269,8 @@ def read_station_out(fpath_base,stationinfo,var=None,start=None):
     data = data.asfreq(f)
     return data
 
-def flux_names_from_yaml(inp):
-    """Retrieve names of fluxlines from yaml file or content"""
+def flux_stations_from_yaml(inp):
+    """Retrieve station id of fluxlines from yaml file or content"""
     import yaml
     if os.path.exists(inp):
         with open(inp) as f:
@@ -291,7 +291,7 @@ def flux_names_from_yaml(inp):
 def station_names_from_file(fpath):
     ext = os.path.splitext(fpath)[1]
     if ext in (".yml",".yaml"):
-        return flux_names_from_yaml(fpath)
+        return flux_stations_from_yaml(fpath)
     elif ext == ".prop":
         raise NotImplementedError("Not implemented for .prop")
 

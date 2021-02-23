@@ -273,12 +273,7 @@ class SchismSetup(object):
                 try: 
                     on_line,neighbors = mesh.find_neighbors_on_segment(line_segment)
                 except:
-                    raise ValueError("Neighbor set not found for linestring {}".format(name))                
-                #if not set(neighbors).isdisjoint(assigned): raise ValueError("Element assigned twice in fluxline:".format(name))
-                #if not set(neighbors).isdisjoint(assigned): raise ValueError("Element assigned twice in fluxline:".format(name))
-                #if not set(on_line).isdisjoint(assigned): raise ValueError("Element assigned twice in fluxline:".format(name))
-                # techinically we could (?) survive on_line  members 
-                # being assigned if it was assigned as online in previous group                
+                    raise ValueError("Neighbor set not found for linestring {}".format(name))               
                 flags[np.array(on_line,dtype='i')] = flagval + 1
                 flags[np.array(neighbors,dtype='i')] = flagval 
                 assigned.update(on_line + neighbors)
@@ -643,7 +638,11 @@ class SchismSetup(object):
             newglobals['polygon'] = poly
 
             # Evaluate
-            nodes_sel, vals = self._evaluate_in_polygon(expr, poly, newglobals)
+            try:
+                nodes_sel, vals = self._evaluate_in_polygon(expr, poly, newglobals)
+            except:
+                self._logger.error("Polygon failed to evaluate: {}".format(name))
+                raise
 
             if nodes_sel is None or not len(nodes_sel):
                 msg = "This polygon contains no nodes: %s" % poly.name
