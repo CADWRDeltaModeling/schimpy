@@ -54,24 +54,25 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, yaml_fn, modules=['TEM', 'SAL'], **kwargs):
+    def __init__(self, yaml_fn, modules=['TEM', 'SAL'],proj4=None, **kwargs):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
         # the modules to turn on.
         self.yaml_fn = yaml_fn
         self.nc_dataset = None
         self.modules = modules
-        if 'param_in' in kwargs:
-            self.param_in = kwargs['param_in']
+        if 'param_nml' in kwargs:
+            self.param_nml = kwargs['param_nml']
         else:
-            self.param_in = "param.in"
-        if 'proj4' in kwargs:
-            self.proj4 = kwargs['proj4']
+            self.param_nml = "param.nml"
+        if proj4 is None:
+            raise ValueError("proj4 must be specified")
         else:
-            self.proj4 = None
-            
+            print("proj4 is {}".format(proj4))
+            self.proj4 = proj4
+        
         self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
-            n_tracers(self.param_in, modules=self.modules)
+            n_tracers(self.param_nml, modules=self.modules)
 
     def read_yaml(self):
         """
@@ -114,7 +115,7 @@ class hotstart(object):
             if 'Nbed' not in self.__dict__.keys():
                 if os.path.isfile("sediment.in"):
                     self.sediment_fn = "sediment.in"
-                    params = read_param_in(self.sediment_fn)
+                    params = read_param_nml(self.sediment_fn)
                     self.Nbed = params['Nbed']
                 else:
                     raise FileNotFoundError(
@@ -230,9 +231,9 @@ class hotstart(object):
         map the hotstart variable to the variable names required by SCHISM 
         hotstart file. 
         """
-        param_in = self.param_in
+        param_nml = self.param_nml
         ntracers, ntrs, irange_tr, tr_mname = n_tracers(
-            param_in, modules=self.modules)
+            param_nml, modules=self.modules)
         tr_mname_el = ["%s_el" % n for n in tr_mname]
         tr_mname_nd = ["%s_nd" % n for n in tr_mname]
         tr_mname_nd0 = ["%s_nd0" % n for n in tr_mname]
@@ -467,7 +468,7 @@ class VariableField(object):
         else:
             text_fn = self.get_value(self.ini_meta)
         if text_fn.endswith('.ic'):
-            if self.centering == 'node':
+            if self.centering == 'node2D':
                 reader = SchismMeshGr3Reader()  # the ic file has the same format as the .gr3 file
                 reader.read(fpath_mesh=text_fn)
                 icmesh = reader.read(fpath_mesh=text_fn)
@@ -490,8 +491,8 @@ class VariableField(object):
                     content = f.read().splitlines()
                 vmap = [float(x.split()[1]) for x in content]
                 if len(vmap) != self.n_elems:
-                    raise(
-                        "The element of %s is incompatible with grid element in hgrid.gr3" % text_fn)
+                    raise ValueError(
+                        "The element of {} is incompatible with grid element in hgrid.gr3".format(text_fn))
                 # if the required input is on nodes, but values on elements are provided
                 if len(vmap) != self.n_hgrid:
                     vmap = self.elem2node_values(vmap)
@@ -541,6 +542,7 @@ class VariableField(object):
                 raise EOFError(
                     "regional polygon file is needed for pathch_ini implementation")
         if poly_fn.endswith('shp'):
+            print("proj4 outside",self.proj4)
             # perform contiguity check and return a mapping array if successful.
             mapping = geo_tools.Contiguity_Check(self.mesh, poly_fn,
                                                  proj4=self.proj4)
@@ -599,10 +601,11 @@ class VariableField(object):
                              (variable, data_fn))
 
         # find the corresponding station locations
-        stations = pd.read_csv(station_fn)[
-            ['Station', 'North_Lati', 'West_Longi']]
+        stations = pd.read_csv(station_fn,sep=",",header=0)[
+            ['Station', 'y', 'x']]
         stations.set_index('Station', inplace=True)
         polaris_cast = polaris_cast.join(stations, on='Station', how='left')
+        print(polaris_cast)
 
         if inpoly is not None:
             n_hgrid = len(inpoly)
@@ -613,11 +616,11 @@ class VariableField(object):
         # partition the grid domain by polaris stations based on horizontal distance
         grid_df = pd.DataFrame({})
         g_xy = self.hgrid[inpoly]
-        if self.proj4 == 'EPSG:32610': # utm 10N 
-            g_xy = geo_tools.utm2ll(g_xy.T).T  # conver to (lon, lat).  
+        #if self.proj4 == 'EPSG:32610': # utm 10N 
+        #    g_xy = geo_tools.utm2ll(g_xy.T).T  # conver to (lon, lat).  
 
         for s in polaris_cast.index.unique():
-            s_xy = [stations.loc[s].West_Longi, stations.loc[s].North_Lati]
+            s_xy = [stations.loc[s].x, stations.loc[s].y]
             grid_df[str(s)] = distance.cdist([s_xy], g_xy)[0]
         grid_df['nearest'] = grid_df.idxmin(axis=1).astype(int)
 
@@ -700,13 +703,21 @@ class VariableField(object):
             obs_file = self.ini_meta['data']
             variable = self.ini_meta['variable']
         obs_data = pd.read_csv(obs_file)
+        obs_data = obs_data.dropna(subset=[variable])
         obs_loc = obs_data[['Lon', 'Lat']].values
-        invdisttree = Interp2D.Invdisttree(obs_loc, obs_data[variable],
+        print(obs_loc)
+        print(type(obs_loc))
+        obs_loc = geo_tools.ll2utm([obs_loc[:,0],obs_loc[:,1]],self.proj4).T
+        print(obs_loc)
+        vals = obs_data[variable].values
+        print(vals)
+        invdisttree = Interp2D.Invdisttree(obs_loc, vals,
                                            leafsize=10, stat=1)
         if inpoly is not None:
             node_xy = self.hgrid[inpoly]
         else:
             node_xy = self.hgrid
+        print(node_xy)
         vmap = invdisttree(node_xy, nnear=4, p=2)
         if np.any(np.isnan(vmap)):
             raise ValueError("vmap has nan value in it.Check %s" % obs_file)
@@ -748,7 +759,7 @@ class VariableField(object):
         return ds
 
 
-def read_param_in(infile):
+def read_param_nml(infile):
     """
     read param.in file and generate a dict object with key, value pairs for all the parameters
     """
@@ -781,7 +792,7 @@ def num(s):
         return float(s)
 
 
-def n_tracers(param_in, modules=['TEM', 'SAL']):
+def n_tracers(param_nml, modules=['TEM', 'SAL']):
     """ return the number of tracers, the sequence of the tracers and a list 
     of tracer names based on the input list of modules and corresponding 
     input files. 
@@ -814,7 +825,7 @@ def n_tracers(param_in, modules=['TEM', 'SAL']):
     ntrs.append(1)  # T,S counted as separate model
     irange_tr_2.append(sum(ntrs))
 
-    param = read_param_in(param_in)
+    param = read_param_nml(param_nml)
 
     if "GEN" in modules and 'ntracer_gen' in param.keys():
         irange_tr_1.append(sum(ntrs))
@@ -938,8 +949,8 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
 
     # Change lat lon to utm-x, y (VisIt only accepts projected coordinates)
     for c in ['edge', 'face', 'node']:
-        utm_data = geo_tools.ll2utm(np.asarray([hgrid_nc['SCHISM_hgrid_%s_x' % c].values,
-                                                hgrid_nc['SCHISM_hgrid_%s_y' % c].values]))
+        utm_data = np.asarray([hgrid_nc['SCHISM_hgrid_%s_x' % c].values,
+                               hgrid_nc['SCHISM_hgrid_%s_y' % c].values])
         gx = xr.DataArray(
             utm_data[0], dims=hgrid_nc['SCHISM_hgrid_%s_x' % c].dims)
         gx.attrs = hgrid_nc['SCHISM_hgrid_%s_x' % c].attrs
@@ -1182,14 +1193,14 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
 
 
 if __name__ == '__main__':
-    h = hotstart('hotstart.yaml', modules=['TEM', 'SAL', 'SED'])
+    h = hotstart('hotstart.yaml', modules=['TEM', 'SAL'],proj4='EPSG:26910',param_nml="param.nml")
     #h = hotstart('hotstart_test.yaml')
     h.read_yaml()
     h.create_hotstart()
     v1 = h.nc_dataset
 
     # %% making plot
-    coll = h.mesh.plot_elems(v1['tr_el'].values[:, -1, 0], clim=(15, 22))
+    coll = h.mesh.plot_elems(v1['tr_el'].values[:, -1, 1])
     cb = plt.colorbar(coll)
     plt.axis('off')
     plt.title('Regional Temperature')
