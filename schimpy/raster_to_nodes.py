@@ -138,5 +138,6 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
 
     # Remove the temporary file if exists
     if bins is not None:
+        del outdata
         os.remove(path_temp)
     return sav_at_nodes
