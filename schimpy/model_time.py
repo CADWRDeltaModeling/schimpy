@@ -171,7 +171,7 @@ def clip(args):
         prev_use = False
         prev_outline = None
         for line in thfile:
-            if line and len(line) > 1 and not line.startswith("#"):
+            if line and len(line) > 1 and not (line.startswith("#") or line.startswith("date") or line.startswith("time")):
                 splitline = line.split()
                 timestr = splitline[0]
                 msec_orig = float(timestr)
@@ -232,7 +232,7 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
         prev_outline = None
         no_record = True
         for iline,line in enumerate(thfile):
-            if line and len(line) > 4 and not line.startswith("#"):
+            if line and len(line) > 1 and not (line.startswith("#") or line.startswith("date") or line.startswith("time")):
                 splitline = line.split()
                 if skip_nan and splitline[-1] == 'nan':
                     continue
