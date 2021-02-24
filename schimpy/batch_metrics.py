@@ -372,7 +372,10 @@ class BatchMetrics(object):
             if not station_id in db_stations.index:
                 self.logger.warning("Station id {} not found in station listings".format(station_id))
                 continue
-            alias = db_stations.loc[station_id,'alias']
+            if 'alias' in db_stations.columns:
+                alias = db_stations.loc[station_id,'alias']
+            else: 
+                alias = station_id
 
             if selected_stations is not None:
                 if station_id not in selected_stations:
