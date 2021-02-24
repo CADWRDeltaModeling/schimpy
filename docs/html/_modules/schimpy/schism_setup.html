@@ -1,11 +1,12 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>schimpy.schism_setup &#8212; schimpy 0.1.2+0.g5fc488f.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schimpy.schism_setup &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -13,22 +14,51 @@
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-  
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><img src="../../_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.schism_setup</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
   <h1>Source code for schimpy.schism_setup</h1><div class="highlight"><pre>
@@ -59,6 +89,7 @@
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
 
 
 <div class="viewcode-block" id="SchismSetup"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup">[docs]</a><span class="k">class</span> <span class="nc">SchismSetup</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -230,7 +261,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">schism_mesh</span><span class="o">.</span><span class="n">write_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">boundary</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SchismSetup.write_hgrid_ll"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.write_hgrid_ll">[docs]</a>    <span class="k">def</span> <span class="nf">write_hgrid_ll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">input_epsg</span><span class="o">=</span><span class="mi">26910</span><span class="p">,</span> <span class="n">output_epsg</span><span class="o">=</span><span class="mi">4269</span><span class="p">):</span>
+<div class="viewcode-block" id="SchismSetup.write_hgrid_ll"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.write_hgrid_ll">[docs]</a>    <span class="k">def</span> <span class="nf">write_hgrid_ll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">input_epsg</span><span class="o">=</span><span class="mi">26910</span><span class="p">,</span> <span class="n">output_epsg</span><span class="o">=</span><span class="mi">4269</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a hgrid.ll, lat-long mesh file, of the current mesh.</span>
 
 <span class="sd">            Parameters</span>
@@ -253,17 +284,24 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="c1"># In case that isn&#39;t available in earlier versions</span>
             <span class="c1"># but orders of magnitude slow for pyproj 2.1.0</span>
-            <span class="n">project</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span><span class="n">proj_in</span><span class="p">,</span><span class="n">proj_out</span><span class="p">)</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">proj_in</span><span class="p">,</span> <span class="n">proj_out</span><span class="p">)</span>
 
-        <span class="n">new_mesh</span> <span class="o">=</span> <span class="n">SchismMesh</span><span class="p">()</span>
-        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
-        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_elems</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">_elems</span><span class="p">)</span>
+        <span class="c1">#new_mesh = SchismMesh()</span>
+        <span class="n">new_mesh</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">new_mesh</span><span class="o">.</span><span class="n">_nodes</span><span class="p">)</span>
+        <span class="c1">#new_mesh._elems = np.copy(self.mesh._elems)</span>
+
+        <span class="c1">#new_mesh = SchismMesh()</span>
+        <span class="c1">#new_mesh._nodes = np.copy(self.mesh.nodes)</span>
+        <span class="c1">#new_mesh._elems = np.copy(self.mesh._elems)</span>
+        <span class="c1">#new_mesh._nodes = transform(project,self.mesh.nodes[:,0],self.mesh.nodes[:,1])</span>
+        
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">):</span>
             <span class="n">point</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">point</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
             <span class="n">new_mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">new_mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">write_mesh</span><span class="p">(</span><span class="n">new_mesh</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span></div>
+        <span class="n">write_mesh</span><span class="p">(</span><span class="n">new_mesh</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span><span class="n">write_boundary</span><span class="o">=</span><span class="n">boundary</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SchismSetup.elements_on_linestring"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.elements_on_linestring">[docs]</a>    <span class="k">def</span> <span class="nf">elements_on_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
@@ -296,7 +334,10 @@
             <span class="n">npoint</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npoint</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
                 <span class="n">line_segment</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">ip</span><span class="p">:</span><span class="n">ip</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-                <span class="n">on_line</span><span class="p">,</span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">find_neighbors_on_segment</span><span class="p">(</span><span class="n">line_segment</span><span class="p">)</span>  
+                <span class="k">try</span><span class="p">:</span> 
+                    <span class="n">on_line</span><span class="p">,</span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">find_neighbors_on_segment</span><span class="p">(</span><span class="n">line_segment</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Neighbor set not found for linestring </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>                
                 <span class="c1">#if not set(neighbors).isdisjoint(assigned): raise ValueError(&quot;Element assigned twice in fluxline:&quot;.format(name))</span>
                 <span class="c1">#if not set(neighbors).isdisjoint(assigned): raise ValueError(&quot;Element assigned twice in fluxline:&quot;.format(name))</span>
                 <span class="c1">#if not set(on_line).isdisjoint(assigned): raise ValueError(&quot;Element assigned twice in fluxline:&quot;.format(name))</span>
@@ -448,6 +489,7 @@
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">:</span>
             <span class="n">struct</span> <span class="o">=</span> <span class="n">SchismStructure</span><span class="p">()</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Processing structure: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
             <span class="n">end_points</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;end_points&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">end_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -537,12 +579,76 @@
     <span class="k">def</span> <span class="nf">_parse_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Parse expression that can be understood by the tool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\bx\b&quot;</span><span class="p">,</span> <span class="s2">&quot;node[0]&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
-        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\by\b&quot;</span><span class="p">,</span> <span class="s2">&quot;node[1]&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
-        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\bz\b&quot;</span><span class="p">,</span> <span class="s2">&quot;node[2]&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\b)x(\b)&quot;</span><span class="p">,</span> <span class="s2">&quot;\g&lt;1&gt;mesh.nodes[nodes_sel, 0]\g&lt;2&gt;&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\b)y(\b)&quot;</span><span class="p">,</span> <span class="s2">&quot;\g&lt;1&gt;mesh.nodes[nodes_sel, 1]\g&lt;2&gt;&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\b)z(\b)&quot;</span><span class="p">,</span> <span class="s2">&quot;\g&lt;1&gt;mesh.nodes[nodes_sel, 2]\g&lt;2&gt;&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\b)min(\b)&quot;</span><span class="p">,</span> <span class="s2">&quot;\g&lt;1&gt;numpy.minimum\g&lt;2&gt;&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\b)max(\b)&quot;</span><span class="p">,</span> <span class="s2">&quot;\g&lt;1&gt;numpy.maximum\g&lt;2&gt;&quot;</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">expr</span>
 
-    <span class="k">def</span> <span class="nf">_partition_nodes_with_polygons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
+<div class="viewcode-block" id="SchismSetup.apply_linestring_ops"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.apply_linestring_ops">[docs]</a>    <span class="k">def</span> <span class="nf">apply_linestring_ops</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">default</span><span class="p">,</span><span class="n">linestrings</span><span class="p">):</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span>             
+        <span class="n">attr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+        
+        <span class="k">for</span> <span class="n">istring</span><span class="p">,</span><span class="n">linestring</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">linestrings</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">linestring</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;coordinates&#39;</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">linestring</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="n">widen_left</span> <span class="o">=</span> <span class="n">linestring</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;widen_left&#39;</span><span class="p">)</span>
+            <span class="n">widen</span><span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">widen_left</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">widen_left</span>
+             
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">linestring</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+            <span class="n">npoint</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">attribute</span> <span class="o">=</span> <span class="n">linestring</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attribute&quot;</span><span class="p">)</span>
+            <span class="c1">#optype = linestring.get(&quot;type&quot;)</span>
+            <span class="k">if</span> <span class="n">attribute</span> <span class="o">==</span> <span class="s1">&#39;local_min&#39;</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span>
+            <span class="k">elif</span> <span class="n">attribute</span> <span class="o">==</span> <span class="s1">&#39;local_max&#39;</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span>
+            <span class="k">elif</span> <span class="n">attribute</span> <span class="o">==</span> <span class="s1">&#39;local_mean&#39;</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span>
+            <span class="k">elif</span> <span class="n">attribute</span> <span class="o">==</span> <span class="s1">&#39;local_median&#39;</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">opval</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+                    <span class="n">op</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">opval</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Linestring attribute was not a known value (e.g. local_min, local_med) or a float&quot;</span><span class="p">)</span>
+                     
+            
+            <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npoint</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>   <span class="c1"># loop through segments on linestring</span>
+                <span class="n">line_segment</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">ip</span><span class="p">:</span><span class="n">ip</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span> 
+                    <span class="n">on_line</span><span class="p">,</span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">find_neighbors_on_segment</span><span class="p">(</span><span class="n">line_segment</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">widen</span><span class="p">:</span>
+                        <span class="n">on_line</span> <span class="o">=</span> <span class="n">on_line</span> <span class="o">+</span> <span class="n">neighbors</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Elements or neighbors not found for linestring </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>  
+                
+  
+                <span class="n">node_local_nds</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">iel</span> <span class="ow">in</span> <span class="n">on_line</span><span class="p">:</span>
+                    <span class="n">elnodes</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">elem</span><span class="p">(</span><span class="n">iel</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">inode</span> <span class="ow">in</span> <span class="n">elnodes</span><span class="p">:</span>
+                        <span class="c1"># list all the nodes on the element as being local to one another</span>
+                        <span class="c1"># ultimately this list will include items pertinent to each node from</span>
+                        <span class="c1"># multiple elements</span>
+                        <span class="k">if</span> <span class="n">inode</span> <span class="ow">in</span> <span class="n">node_local_nds</span><span class="p">:</span>
+                            <span class="n">node_local_nds</span><span class="p">[</span><span class="n">inode</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">elnodes</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span> 
+                            <span class="n">node_local_nds</span><span class="p">[</span><span class="n">inode</span><span class="p">]</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">elnodes</span><span class="p">)</span>
+
+
+                <span class="k">for</span> <span class="n">inode</span> <span class="ow">in</span> <span class="n">node_local_nds</span><span class="p">:</span>
+                    <span class="n">support_nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">node_local_nds</span><span class="p">[</span><span class="n">inode</span><span class="p">])</span>
+                    <span class="n">orig</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">support_nodes</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="n">valreplace</span><span class="o">=</span><span class="n">op</span><span class="p">(</span><span class="n">orig</span><span class="p">)</span>
+                    <span class="n">attr</span><span class="p">[</span><span class="n">inode</span><span class="p">]</span><span class="o">=</span><span class="n">valreplace</span>
+        <span class="k">return</span> <span class="n">attr</span></div>
+
+
+<div class="viewcode-block" id="SchismSetup.apply_polygons"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.apply_polygons">[docs]</a>    <span class="k">def</span> <span class="nf">apply_polygons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Partition the grid with the given polygons.</span>
 <span class="sd">            Each node (not element) will be assigned with an integer ID</span>
 <span class="sd">            which is the index of the polygons.</span>
@@ -560,17 +666,22 @@
 <span class="sd">            numpy.ndarray</span>
 <span class="sd">                attributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">math</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span>
         <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Use depth</span>
             <span class="n">attr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Fill default values</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
             <span class="n">attr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">())</span>
-            <span class="n">attr</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">default</span><span class="p">))</span>
+            <span class="n">attr</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="n">polygons</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">polygon</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+            <span class="n">imports_str</span> <span class="o">=</span> <span class="n">polygon</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;imports&#39;</span><span class="p">)</span>
+            <span class="n">imports</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;numpy&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">imports_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">imports</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">imports_str</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
             <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -578,71 +689,93 @@
             <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
             <span class="n">poly_type</span> <span class="o">=</span> <span class="n">polygon</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> \
                 <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">polygon</span> <span class="k">else</span> <span class="s2">&quot;none&quot;</span>
+            <span class="k">if</span> <span class="n">poly_type</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">poly_type</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span>
             <span class="n">attribute</span> <span class="o">=</span> <span class="n">polygon</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">]</span>
             <span class="n">prop</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">poly_type</span><span class="p">,</span> <span class="s1">&#39;attribute&#39;</span><span class="p">:</span> <span class="n">attribute</span><span class="p">}</span>
-            <span class="n">poly</span> <span class="o">=</span> <span class="n">SchismPolygon</span><span class="p">(</span><span class="n">shell</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span>
-                                 <span class="n">prop</span><span class="o">=</span><span class="n">prop</span><span class="p">)</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="n">SchismPolygon</span><span class="p">(</span><span class="n">shell</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="n">prop</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">is_eqn</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_attribute</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+                <span class="n">expr_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_attribute</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">expr_str</span><span class="p">,</span> <span class="s2">&quot;fail.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;eval&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">expr</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">is_eqn</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">bounds</span><span class="p">)[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
-            <span class="n">nodes</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">find_nodes_in_box</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
-            <span class="n">empty</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">for</span> <span class="n">node_i</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
-                <span class="n">node</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_i</span><span class="p">]</span>
-                <span class="n">flag</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">node</span><span class="p">[:</span><span class="mi">2</span><span class="p">]))</span>
-                <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">is_eqn</span><span class="p">:</span>
-                        <span class="k">try</span><span class="p">:</span>
-                            <span class="n">value</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
-                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Egn: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">attribute</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                                <span class="s2">&quot;The polygon equation does not seem to be well-formed for polygon: </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">value</span> <span class="o">=</span> <span class="n">attribute</span>
-                    <span class="n">empty</span> <span class="o">=</span> <span class="kc">False</span>
-                    <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
-                        <span class="n">attr</span><span class="p">[</span><span class="n">node_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-                    <span class="k">elif</span> <span class="n">poly</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">attr</span><span class="p">[</span><span class="n">node_i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">value</span><span class="p">:</span>
-                            <span class="n">attr</span><span class="p">[</span><span class="n">node_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-                    <span class="k">elif</span> <span class="n">poly</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">attr</span><span class="p">[</span><span class="n">node_i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">value</span><span class="p">:</span>
-                            <span class="n">attr</span><span class="p">[</span><span class="n">node_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not supported polygon type (</span><span class="si">{}</span><span class="s2">) for polygon (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">type</span><span class="p">,</span><span class="n">name</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">empty</span><span class="p">:</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">attribute</span><span class="p">),</span> <span class="s2">&quot;fail.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;eval&quot;</span><span class="p">)</span>
+
+            <span class="c1">## Add global variables</span>
+            <span class="n">newglobals</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">newglobals</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">imports</span>
+            <span class="n">newglobals</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh</span>
+            <span class="n">newglobals</span><span class="p">[</span><span class="s1">&#39;polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">poly</span>
+
+            <span class="c1"># Evaluate</span>
+            <span class="n">nodes_sel</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_in_polygon</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">poly</span><span class="p">,</span> <span class="n">newglobals</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">nodes_sel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes_sel</span><span class="p">):</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;This polygon contains no nodes: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">poly</span><span class="o">.</span><span class="n">name</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+                    <span class="n">attr</span><span class="p">[</span><span class="n">nodes_sel</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+                <span class="k">elif</span> <span class="n">poly</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span><span class="p">:</span>
+                    <span class="n">attr</span><span class="p">[</span><span class="n">nodes_sel</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                        <span class="n">attr</span><span class="p">[</span><span class="n">nodes_sel</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">vals</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">attr</span><span class="p">[</span><span class="n">nodes_sel</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">poly</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+                    <span class="n">attr</span><span class="p">[</span><span class="n">nodes_sel</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                        <span class="n">attr</span><span class="p">[</span><span class="n">nodes_sel</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">vals</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">attr</span><span class="p">[</span><span class="n">nodes_sel</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="s2">&quot;Not supported polygon type (</span><span class="si">{}</span><span class="s2">) for polygon (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Error applying formula in polygon: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">raise</span>
+        <span class="c1"># TODO: Not implemented debug messaged yet.</span>
+        <span class="c1"># n_missed = sum(1 for i, a in enumerate(attr) if a == default)</span>
+        <span class="c1"># if n_missed &gt; 0:</span>
+        <span class="c1">#     msg = &quot;There are %d nodes that do not belong &quot; \</span>
+        <span class="c1">#           &quot;to any polygon.&quot; % n_missed</span>
+        <span class="c1">#     self._logger.warning(msg)</span>
+        <span class="c1">#     if default is not None:</span>
+        <span class="c1">#         msg = &quot;Default value of %.f is used for them.&quot; % default</span>
+        <span class="c1">#         self._logger.warning(msg)</span>
+        <span class="k">return</span> <span class="n">attr</span></div>
 
-        <span class="n">n_missed</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">default</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">n_missed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;There are </span><span class="si">%d</span><span class="s2"> nodes that do not belong &quot;</span> \
-                  <span class="s2">&quot;to any polygon.&quot;</span> <span class="o">%</span> <span class="n">n_missed</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Default value of %.f is used for them.&quot;</span> <span class="o">%</span> <span class="n">default</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">attr</span>
+    <span class="k">def</span> <span class="nf">_evaluate_in_polygon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">polygon</span><span class="p">,</span> <span class="nb">globals</span><span class="p">):</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">[</span><span class="s1">&#39;mesh&#39;</span><span class="p">]</span>
+        <span class="n">imports</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">[</span><span class="s1">&#39;imports&#39;</span><span class="p">]</span>
+        <span class="n">mod_names</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># if imports is not None:</span>
+        <span class="k">for</span> <span class="n">imp</span> <span class="ow">in</span> <span class="n">imports</span><span class="p">:</span>
+            <span class="n">iname</span> <span class="o">=</span> <span class="n">imp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># ipack = &#39;.&#39;.join(imp.split(&#39;.&#39;)[0:-1])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># if len(ipack) &gt; 0 else importlib.import_module(iname)</span>
+                <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">imp</span><span class="p">)</span>
+                <span class="n">mod_names</span><span class="p">[</span><span class="n">iname</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to import </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">imp</span><span class="p">))</span>
+        <span class="nb">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mod_names</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SchismSetup.create_node_partitioning"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.create_node_partitioning">[docs]</a>    <span class="k">def</span> <span class="nf">create_node_partitioning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gr3_fname</span><span class="p">,</span> <span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">):</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">bounds</span><span class="p">)[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]</span>
+        <span class="n">node_candidates</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">find_nodes_in_box</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
+        <span class="n">nodes_in_polygon</span> <span class="o">=</span> <span class="p">[</span><span class="n">node_i</span> <span class="k">for</span> <span class="n">node_i</span> <span class="ow">in</span> <span class="n">node_candidates</span>
+                            <span class="k">if</span> <span class="n">polygon</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_i</span><span class="p">]))]</span>
+        <span class="nb">globals</span><span class="p">[</span><span class="s1">&#39;nodes_sel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodes_in_polygon</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="nb">globals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nodes_in_polygon</span><span class="p">,</span> <span class="n">vals</span>
+
+<div class="viewcode-block" id="SchismSetup.create_node_partitioning"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.create_node_partitioning">[docs]</a>    <span class="k">def</span> <span class="nf">create_node_partitioning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gr3_fname</span><span class="p">,</span> <span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">,</span> <span class="n">smooth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create a gr3 file with node partitioning using</span>
 <span class="sd">            polygons in the polygon file.</span>
 <span class="sd">            gr3_fname = output gr3 file name</span>
 <span class="sd">            polygons = polygons</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># option_name = &#39;default&#39;</span>
-        <span class="c1"># if option_name in polygon_data.keys():</span>
-        <span class="c1">#     default = polygon_data[option_name]</span>
-        <span class="c1"># else:</span>
-        <span class="c1">#     default = None</span>
-        <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_nodes_with_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">schimpy.laplace_smooth_data</span> <span class="kn">import</span> <span class="n">laplace_smooth_data2</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">smooth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Smoothing data. This process can take several minutes&quot;</span><span class="p">)</span>
+            <span class="n">attr</span><span class="o">=</span><span class="n">laplace_smooth_data2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">attr</span><span class="p">,</span><span class="o">**</span><span class="n">smooth</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">gr3_fname</span> <span class="o">!=</span> <span class="s1">&#39;hgrid.gr3&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">write_hgrid</span><span class="p">(</span><span class="n">gr3_fname</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -657,7 +790,8 @@
         <span class="c1"># option_name = &#39;default&#39;</span>
         <span class="c1"># # default = polygon_data[option_name]</span>
         <span class="c1"># polygons = polygon_data[&#39;polygons&#39;]</span>
-        <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_nodes_with_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+        <span class="c1"># attr = self._partition_nodes_with_polygons(polygons, default)</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span>
         <span class="n">elementflags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_elems</span><span class="p">(),</span> <span class="mi">1</span><span class="p">))</span>
         <span class="n">elementflags</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span>
@@ -675,7 +809,8 @@
         <span class="sd">&quot;&quot;&quot; Modify depth with the polygon information</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">polygons</span> <span class="o">=</span> <span class="n">polygon_data</span><span class="p">[</span><span class="s1">&#39;polygons&#39;</span><span class="p">]</span>
-        <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_partition_nodes_with_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1">#attr = self._partition_nodes_with_polygons(polygons, None)</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_polygons</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr</span></div>
 
 <div class="viewcode-block" id="SchismSetup.create_source_sink_in"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_setup.SchismSetup.create_source_sink_in">[docs]</a>    <span class="k">def</span> <span class="nf">create_source_sink_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_sinks</span><span class="p">,</span> <span class="n">out_fname</span><span class="o">=</span><span class="s1">&#39;source_sink.in&#39;</span><span class="p">):</span>
@@ -998,83 +1133,34 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognizable item&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognizable item (see log for details): &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">keyword</span><span class="p">))</span></div>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../index.html">
-    <img class="logo" src="../../_static/dwrsmall.jpg" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">schimpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">schimpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2020, California Department of Water Resources.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.schism_setup</a></li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
   </body>
 </html>

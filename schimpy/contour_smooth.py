@@ -13,7 +13,6 @@ import numpy.ma as ma
 import matplotlib.pyplot as plt
 import scipy.ndimage as cv
 from scipy.integrate import odeint
-from nodepy import *
 import sys
 import os.path
 

@@ -1,11 +1,12 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>schimpy &#8212; schimpy 0.1.2+0.g5fc488f.dirty documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schimpy &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
@@ -13,155 +14,55 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="schimpy package" href="schimpy.html" />
-    <link rel="prev" title="Usage" href="usage.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Using Python Pre-processing Tools Directly" href="direct_use.html" /> 
   </head><body>
-  
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
-  <div class="section" id="schimpy">
-<h1>schimpy<a class="headerlink" href="#schimpy" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="schimpy.html">schimpy package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.InputParser">schimpy.InputParser module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.Interp2D">schimpy.Interp2D module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.base_io">schimpy.base_io module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-batch-metrics-module">schimpy.batch_metrics module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-bay-delta-hotstart-module">schimpy.bay_delta_hotstart module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-cencoos-download-module">schimpy.cencoos_download module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-check-mesh-skewness-module">schimpy.check_mesh_skewness module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.cli">schimpy.cli module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.clip_dems">schimpy.clip_dems module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.combine_consume">schimpy.combine_consume module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.combine_flux">schimpy.combine_flux module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-contour-smooth-module">schimpy.contour_smooth module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-convert-linestrings-module">schimpy.convert_linestrings module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-convert-mesh-module">schimpy.convert_mesh module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-convert-polygons-module">schimpy.convert_polygons module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-convert-sav-class-to-number-module">schimpy.convert_sav_class_to_number module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-create-mesh-n-levels-module">schimpy.create_mesh_n_levels module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-create-vgrid-lsc2-module">schimpy.create_vgrid_lsc2 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-cut-mesh-module">schimpy.cut_mesh module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-dicu-schism-module">schimpy.dicu_schism module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-embed-raster-module">schimpy.embed_raster module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.error_detect">schimpy.error_detect module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-error-detect2-module">schimpy.error_detect2 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.expand_th">schimpy.expand_th module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.gaussian_quadrature">schimpy.gaussian_quadrature module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-gen-elev2d-module">schimpy.gen_elev2D module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-gen-nu-in-module">schimpy.gen_nu_in module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.geo_tools">schimpy.geo_tools module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-gr3-module">schimpy.gr3 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.grid_opt">schimpy.grid_opt module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.hotstart_generator">schimpy.hotstart_generator module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-interpolate-hotstart-module">schimpy.interpolate_hotstart module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.laplace_smooth_data">schimpy.laplace_smooth_data module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-lsc2-module">schimpy.lsc2 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.material_poly">schimpy.material_poly module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-metricsplot-module">schimpy.metricsplot module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.model_time">schimpy.model_time module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.obs_links">schimpy.obs_links module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-plot-default-formats-module">schimpy.plot_default_formats module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.polygons">schimpy.polygons module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-prepare-bayonly-module">schimpy.prepare_bayonly module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.prepare_schism">schimpy.prepare_schism module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.priority_queue">schimpy.priority_queue module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-read-output-xyt-module">schimpy.read_output_xyt module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-read-scalar-module">schimpy.read_scalar module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-read-ts-module">schimpy.read_ts module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-remove-bad-tvd-cells-module">schimpy.remove_bad_tvd_cells module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schimpy">schimpy.schimpy module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-schism-hotstart-module">schimpy.schism_hotstart module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_input">schimpy.schism_input module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_linestring">schimpy.schism_linestring module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_mesh">schimpy.schism_mesh module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_polygon">schimpy.schism_polygon module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_setup">schimpy.schism_setup module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_source">schimpy.schism_source module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_structure">schimpy.schism_structure module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_vertical_mesh">schimpy.schism_vertical_mesh module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_yaml">schimpy.schism_yaml module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-separate-species-module">schimpy.separate_species module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.simulation_timing">schimpy.simulation_timing module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.sms2gr3">schimpy.sms2gr3 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.split_quad">schimpy.split_quad module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.stacked_dem_fill">schimpy.stacked_dem_fill module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-station-module">schimpy.station module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.station_db">schimpy.station_db module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-station-extractor-module">schimpy.station_extractor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-trimesh-module">schimpy.trimesh module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.triquadmesh">schimpy.triquadmesh module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.unit_conversions">schimpy.unit_conversions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-vgrid-opt2-module">schimpy.vgrid_opt2 module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.write_ts">schimpy.write_ts module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</div>
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
 </div>
 
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="schimpy.html" title="schimpy package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="direct_use.html" title="Using Python Pre-processing Tools Directly"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
 
-          </div>
-          
-        </div>
-      </div>
+        <li class="nav-item nav-item-this"><a href="">schimpy</a></li> 
+      </ul>
+    </div>
+
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="index.html">
-    <img class="logo" src="_static/dwrsmall.jpg" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="readme.html">schimpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">schimpy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html">schimpy package</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="usage.html" title="previous chapter">Usage</a></li>
-      <li>Next: <a href="schimpy.html" title="next chapter">schimpy package</a></li>
-  </ul></li>
-</ul>
-</div>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="direct_use.html"
+                        title="previous chapter">Using Python Pre-processing Tools Directly</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="schimpy.html"
+                        title="next chapter">schimpy package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modules.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -172,32 +73,117 @@
     </div>
 </div>
 <script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="schimpy">
+<h1>schimpy<a class="headerlink" href="#schimpy" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="schimpy.html">schimpy package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.Interp2D">schimpy.Interp2D module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.base_io">schimpy.base_io module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.batch_metrics">schimpy.batch_metrics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.bay_delta_hotstart">schimpy.bay_delta_hotstart module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.bound_linear">schimpy.bound_linear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.cencoos_download">schimpy.cencoos_download module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.check_mesh_skewness">schimpy.check_mesh_skewness module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.clip_dems">schimpy.clip_dems module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.combine_consume">schimpy.combine_consume module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.combine_flux">schimpy.combine_flux module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.contour_smooth">schimpy.contour_smooth module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.convert_linestrings">schimpy.convert_linestrings module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.convert_mesh">schimpy.convert_mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.convert_polygons">schimpy.convert_polygons module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.convert_sav_class_to_number">schimpy.convert_sav_class_to_number module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.create_mesh_n_levels">schimpy.create_mesh_n_levels module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.create_vgrid_lsc2">schimpy.create_vgrid_lsc2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.cut_mesh">schimpy.cut_mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.embed_raster">schimpy.embed_raster module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.gaussian_quadrature">schimpy.gaussian_quadrature module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.gen_elev2D">schimpy.gen_elev2D module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.geo_tools">schimpy.geo_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.gr3">schimpy.gr3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.grid_opt">schimpy.grid_opt module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.hotstart_generator">schimpy.hotstart_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.laplace_smooth_data">schimpy.laplace_smooth_data module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.lsc2">schimpy.lsc2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.material_poly">schimpy.material_poly module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.metricsplot">schimpy.metricsplot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.model_time">schimpy.model_time module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.plot_default_formats">schimpy.plot_default_formats module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.polygons">schimpy.polygons module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.prepare_schism">schimpy.prepare_schism module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.priority_queue">schimpy.priority_queue module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-raster-to-nodes-module">schimpy.raster_to_nodes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.read_output_xyt">schimpy.read_output_xyt module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schimpy">schimpy.schimpy module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_hotstart">schimpy.schism_hotstart module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_input">schimpy.schism_input module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_linestring">schimpy.schism_linestring module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_mesh">schimpy.schism_mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_polygon">schimpy.schism_polygon module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_setup">schimpy.schism_setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_source">schimpy.schism_source module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_structure">schimpy.schism_structure module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_vertical_mesh">schimpy.schism_vertical_mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.schism_yaml">schimpy.schism_yaml module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.separate_species">schimpy.separate_species module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.simulation_timing">schimpy.simulation_timing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.small_areas">schimpy.small_areas module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.sms2gr3">schimpy.sms2gr3 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.split_quad">schimpy.split_quad module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.stacked_dem_fill">schimpy.stacked_dem_fill module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.station">schimpy.station module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.trimesh">schimpy.trimesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.triquadmesh">schimpy.triquadmesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.unit_conversions">schimpy.unit_conversions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.vgrid_opt2">schimpy.vgrid_opt2 module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.write_ts">schimpy.write_ts module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 
 
-
-
-
-
-
-
+            <div class="clearer"></div>
+          </div>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2020, California Department of Water Resources.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/modules.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="schimpy.html" title="schimpy package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="direct_use.html" title="Using Python Pre-processing Tools Directly"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+
+        <li class="nav-item nav-item-this"><a href="">schimpy</a></li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
   </body>
 </html>

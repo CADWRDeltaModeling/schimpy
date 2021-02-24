@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 19 15:50:34 2019
-@author: zzhang
 if "no arguments in initialization list" runtime error is seen for pyproj,
 it is because that proj_def.dat file is missing.
 Solution: find datadir for pyproj.

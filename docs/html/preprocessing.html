@@ -1,0 +1,523 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preprocessing &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Working with SMS" href="sms.html" />
+    <link rel="prev" title="SCHISM Spatial Data" href="spatial.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sms.html" title="Working with SMS"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spatial.html" title="SCHISM Spatial Data"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Preprocessing</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Preprocessing</a><ul>
+<li><a class="reference internal" href="#invoking-the-preprocessor">Invoking the preprocessor</a><ul>
+<li><a class="reference internal" href="#prepare-schism-py">prepare_SCHISM.py</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#input-files">Input Files</a><ul>
+<li><a class="reference internal" href="#main-input-file">Main Input File</a><ul>
+<li><a class="reference internal" href="#mesh">Mesh</a></li>
+<li><a class="reference internal" href="#variable-substitution">Variable Substitution</a></li>
+<li><a class="reference internal" href="#generate-gr3-with-constant">Generate gr3 with Constant</a></li>
+<li><a class="reference internal" href="#generate-gr3-from-polygons">Generate gr3 from polygons</a></li>
+<li><a class="reference internal" href="#generate-prop-with-polygons">Generate prop with Polygons</a></li>
+<li><a class="reference internal" href="#hydraulic-structures">Hydraulic Structures</a></li>
+<li><a class="reference internal" href="#source-sink">Source/Sink</a></li>
+<li><a class="reference internal" href="#flow-output-requests">Flow Output Requests</a></li>
+<li><a class="reference internal" href="#complete-example">Complete Example</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dem-list-file">DEM List File</a></li>
+<li><a class="reference internal" href="#depth-optimization-parameter-file">Depth Optimization Parameter File</a></li>
+<li><a class="reference internal" href="#open-boundary-input">Open Boundary Input</a></li>
+<li><a class="reference internal" href="#polygon-input">Polygon Input</a><ul>
+<li><a class="reference internal" href="#attribute">Attribute</a></li>
+<li><a class="reference internal" href="#type">Type</a></li>
+<li><a class="reference internal" href="#vertices">Vertices</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hydraulic-structures-input">Hydraulic Structures Input</a></li>
+<li><a class="reference internal" href="#source-sink-input">Source/Sink Input</a></li>
+<li><a class="reference internal" href="#flow-output-input">Flow Output Input</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spatial.html"
+                        title="previous chapter">SCHISM Spatial Data</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sms.html"
+                        title="next chapter">Working with SMS</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/preprocessing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <p>_preprocessor:</p>
+<div class="section" id="preprocessing">
+<h1>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="invoking-the-preprocessor">
+<h2>Invoking the preprocessor<a class="headerlink" href="#invoking-the-preprocessor" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="prepare-schism-py">
+<h3>prepare_SCHISM.py<a class="headerlink" href="#prepare-schism-py" title="Permalink to this headline">¶</a></h3>
+<p><p>Prepare SCHISM input files.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">prepare_schism</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="n">main_inputfile</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>main_inputfile</kbd></dt>
+<dd><p>main input file name</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="input-files">
+<h2>Input Files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h2>
+<p>Information in the input files of the pre-processor are provided in geophysical coordinates.  This information will be translated into SCHISM native input, which are based on node and element indices.</p>
+<p>The pre-processing input uses the human-readable YAML format.  See the <a class="reference external" href="http://en.wikipedia.org/wiki/YAML">YAML</a> Wikipedia page for an introduction.
+YAML format is intuitive and you probably can learn it from copying and and modifying sample inputs.
+A few key things about YAML syntex include:</p>
+<ul class="simple">
+<li><p>Indentation by whitespace is used to denote structure. Tabs are not allowed – many text editors such as notepad++ have a “replace tabs with spaces” type of option. As with Python itself, the amount of indentation is important to the correctness of the data hierarchy.</p></li>
+<li><p>Comments begins with #. It can start anywhere on a line and comments out the rest of the line.</p></li>
+<li><p>Associative arrays are denoted using the colon space (: ) and forms key: vaule, which is a hash table/dictionary/mapping in effect.</p></li>
+</ul>
+<div class="section" id="main-input-file">
+<h3>Main Input File<a class="headerlink" href="#main-input-file" title="Permalink to this headline">¶</a></h3>
+<p>The main input contains multiple blocks each of which either points to subordinate input files or
+explicitly assigns values. We typically use the file name <em>input.yaml</em>. There are many potential
+functions you can list in the main input file, but most of these other than an input mesh are optional
+– it is perfectly acceptable to use the preprocessor as a way to launch an individual task.</p>
+<div class="section" id="mesh">
+<h4>Mesh<a class="headerlink" href="#mesh" title="Permalink to this headline">¶</a></h4>
+<p>This section guides the conversion of a mesh from SMS format and the assignment and optimization
+of depths. The section can have five items as shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mesh</span><span class="p">:</span>
+  <span class="nt">mesh input file</span><span class="p">:</span>         <span class="l l-Scalar l-Scalar-Plain">baydelta71.2dm</span>
+  <span class="nt">dem list file</span><span class="p">:</span>           <span class="l l-Scalar l-Scalar-Plain">dem_71.txt</span>
+  <span class="nt">depth optimization file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">depth_opt_params.yaml</span>
+  <span class="nt">open boundary file</span><span class="p">:</span>      <span class="l l-Scalar l-Scalar-Plain">open_boundary.yaml</span>
+  <span class="nt">gr3 output file</span><span class="p">:</span>         <span class="l l-Scalar l-Scalar-Plain">baydelta71opt.gr3</span>
+  <span class="nt">ll output file</span><span class="p">:</span>          <span class="l l-Scalar l-Scalar-Plain">hgrid.ll</span>
+</pre></div>
+</div>
+<p>The items in this section are as follows:</p>
+<dl class="simple">
+<dt>mesh input file</dt><dd><p>an original mesh input file either in ‘gr3’ or SMS ‘2dm’ file format. If the file name has the extension of ‘.2dm,’ it will be converted into a ‘gr3’ format file with the same file name, e.g. ‘baydelta71.gr3’ in the example above, and the gr3 file will be read in for further processing.</p>
+</dd>
+<dt>dem list file</dt><dd><p>If ‘dem list file’ is provided, elevation information from the DEM files in the list will be used to populate elevation at the nodes of the mesh. See <a class="reference internal" href="#dem-list-file"><span class="std std-ref">DEM List File</span></a> for more on the format.</p>
+</dd>
+<dt>open boundary file</dt><dd><p>lists open boundary locations. See <a class="reference internal" href="#openboundary-input"><span class="std std-ref">Open Boundary Input</span></a> for more.</p>
+</dd>
+<dt>depth optimization file</dt><dd><p>lists parameters for depth optimization of the mesh. See <a class="reference internal" href="#depth-optimization-parameter-file"><span class="std std-ref">Depth Optimization Parameter File</span></a> for more.</p>
+</dd>
+<dt>gr3 output file</dt><dd><p>is an output file name of the mesh after pre-processing</p>
+</dd>
+<dt>ll output file</dt><dd><p>The ll (lower case LL) is an output file name of the mesh in longitude and latitude coordinates.</p>
+</dd>
+</dl>
+<p>The item, ‘mesh input file’, must be provided, but the others are optional. If an item is missing, a corresponding job is not conducted, e.g. ‘depth optimization file’ is not given, the optimization will not run.</p>
+</div>
+<div class="section" id="variable-substitution">
+<h4>Variable Substitution<a class="headerlink" href="#variable-substitution" title="Permalink to this headline">¶</a></h4>
+<p>The main input supports substitution of variables. Variables defined in the env section will be substituted in any variables in the other sections. In an example shown below,</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">env</span><span class="p">:</span>
+  <span class="nt">input_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">../run71</span>
+<span class="nt">mesh</span><span class="p">:</span>
+  <span class="nt">mesh input file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${input_dir}/bay_delta.gr3</span>
+</pre></div>
+</div>
+<p>the value of ‘mesh input file’ becomes <em>../run71/bay_delta.gr3</em> after substitution. The
+variable name for replacement should be denoted with $ sign and curly braces as shown in the example.</p>
+</div>
+<div class="section" id="generate-gr3-with-constant">
+<h4>Generate gr3 with Constant<a class="headerlink" href="#generate-gr3-with-constant" title="Permalink to this headline">¶</a></h4>
+<p>SCHISM uses the gr3 format for spatial input specified at nodes. The main horizontal grid file <em>hgrid.gr3</em>
+is in a slightly extended form of this format that includes boundary specifications. For other spatial data,
+the z or value column could specify roughness, diffusivity or other spatial parameters.</p>
+<p>The section ‘gr3 with constant’ creates these file by assigning :</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">gr3 with constant</span><span class="p">:</span>
+  <span class="nt">xlsc.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+  <span class="nt">diffmax.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+  <span class="nt">windrot_geo2proj.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+  <span class="nt">manning.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.025</span>
+  <span class="nt">rough.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.007</span>
+</pre></div>
+</div>
+<p>This section creates gr3 files that have the same mesh structure and coordinates as the final output mesh, but the original depth values will be replaced with constants given in this section as properties assigned at nodes. For example, ‘xlsc.gr3: 0.1’ will create a gr3 file name ‘xlsc.gr3’ that has the same mesh information but the z-values of all nodes will be set to 0.1.</p>
+</div>
+<div class="section" id="generate-gr3-from-polygons">
+<h4>Generate gr3 from polygons<a class="headerlink" href="#generate-gr3-from-polygons" title="Permalink to this headline">¶</a></h4>
+<p>It is also possible to create a gr3 format file using polygons, assigning values using a formula or constant within
+each region.:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">gr3 with polygons</span><span class="p">:</span>
+  <span class="nt">hgrid.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">deepening_72.yaml</span>
+  <span class="nt">estuary.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">estuary.yaml</span>
+  <span class="nt">elev.ic</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">elev.yaml</span>
+  <span class="nt">s_nudge.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">nudge.yaml</span>
+  <span class="nt">t_nudge.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">nudge.yaml</span>
+  <span class="nt">diffmin.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">diffmin.yaml</span>
+</pre></div>
+</div>
+<p>Similar to the previous section ‘gr3 with constant,’ this section creates gr3 files that have the same mesh structure and horizontal coordinates as the final output mesh but with modified depth values specified in polygon files. A polygon file can have multiple polygons with constants or equations. See the format of the <a class="reference internal" href="#polygon-input"><span class="std std-ref">Polygon Input</span></a> for further information.</p>
+</div>
+<div class="section" id="generate-prop-with-polygons">
+<h4>Generate prop with Polygons<a class="headerlink" href="#generate-prop-with-polygons" title="Permalink to this headline">¶</a></h4>
+<p>The *.prop file differs from the <a href="#id1"><span class="problematic" id="id2">*</span></a>.gr3 file in that it is element centered. The ‘prop with polygons’ section
+generates these files from regions delineated by polygons:</p>
+<p>When any of nodes of an element falls in a polygon, the element will get the attribute of the polygon. The output file format, ‘prop’ contains properties of elements of the mesh without mesh information whereas ‘gr3’ format can have only nodal properties (usually depth) with mesh information. A typical prop input is ‘tvd.prop’ designating where TVD will be applied.</p>
+</div>
+<div class="section" id="hydraulic-structures">
+<h4>Hydraulic Structures<a class="headerlink" href="#hydraulic-structures" title="Permalink to this headline">¶</a></h4>
+<p>The next section in the main input is ‘hydraulics’. It has two sets of items: ‘input file’ and ‘output file’ as shown below. The scripts reads structure locations and configuration from the input file, and creates SCHISM native hydraulics structure input file. See the detail of the hydraulic structure input file at <a class="reference internal" href="#structure-input"><span class="std std-ref">Hydraulic Structures Input</span></a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">hydraulics</span><span class="p">:</span>
+  <span class="nt">input file</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">hydraulics.yaml</span>
+  <span class="nt">output file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hydraulics.in</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="source-sink">
+<h4>Source/Sink<a class="headerlink" href="#source-sink" title="Permalink to this headline">¶</a></h4>
+<p>The next section is ‘source/sink.’ It has two sets of items similarly to ‘hydraulics’: ‘input file’ and ‘output file’ as shown below. See the detail of source/sink input file at <a class="reference internal" href="#sourcesink-input"><span class="std std-ref">Source/Sink Input</span></a>.</p>
+</div>
+<div class="section" id="flow-output-requests">
+<h4>Flow Output Requests<a class="headerlink" href="#flow-output-requests" title="Permalink to this headline">¶</a></h4>
+<p>The last section is ‘flow output.’ It has two sets of items similarly to the previous block: ‘input file’ and ‘output file’ as shown below. See the details of the format of the input at <a class="reference internal" href="#flowoutput-input"><span class="std std-ref">Flow Output Input</span></a>.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">flow output</span><span class="p">:</span>
+  <span class="nt">input file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">flowlines.yaml</span>
+  <span class="nt">output file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fluxflag.prop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="complete-example">
+<h4>Complete Example<a class="headerlink" href="#complete-example" title="Permalink to this headline">¶</a></h4>
+<p>An example of a whole main input is shown below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Input intended for year 2009 run with mesh ver 71.</span>
+<span class="nt">env</span><span class="p">:</span>
+  <span class="nt">input_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">../run71</span>
+<span class="nt">mesh</span><span class="p">:</span>
+  <span class="nt">mesh input file</span><span class="p">:</span>         <span class="l l-Scalar l-Scalar-Plain">${input_dir}/baydelta71.2dm</span>
+  <span class="nt">dem list file</span><span class="p">:</span>           <span class="l l-Scalar l-Scalar-Plain">dem_71.txt</span>
+  <span class="nt">open boundary file</span><span class="p">:</span>      <span class="l l-Scalar l-Scalar-Plain">open_boundary_71.yaml</span>
+  <span class="nt">depth optimization file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">depth_opt_params.yaml</span>
+  <span class="nt">gr3 output file</span><span class="p">:</span>         <span class="l l-Scalar l-Scalar-Plain">baydelta71opt.gr3</span>
+  <span class="nt">ll output file</span><span class="p">:</span>          <span class="l l-Scalar l-Scalar-Plain">hgrid.ll</span>
+<span class="nt">gr3 with constant</span><span class="p">:</span>
+  <span class="nt">hgrid.gr3</span><span class="p">:</span>   <span class="l l-Scalar l-Scalar-Plain">deepening_71.yaml</span>
+  <span class="nt">elev.ic</span><span class="p">:</span>     <span class="l l-Scalar l-Scalar-Plain">elev.yaml</span>
+  <span class="nt">estuary.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">estuary.yaml</span>
+  <span class="nt">s_nudge.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">nudge.yaml</span>
+  <span class="nt">t_nudge.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">nudge.yaml</span>
+  <span class="nt">diffmin.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">diffmin.yaml</span>
+<span class="nt">gr3 with polygons</span><span class="p">:</span>
+  <span class="nt">estuary.gr3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${input_dir}/estuary.yaml</span>
+  <span class="nt">elev.ic</span><span class="p">:</span>     <span class="l l-Scalar l-Scalar-Plain">${input_dir}/elev.yaml</span>
+<span class="nt">prop with polygons</span><span class="p">:</span>
+  <span class="nt">tvd.prop</span><span class="p">:</span>    <span class="l l-Scalar l-Scalar-Plain">${input_dir}/tvd.yaml</span>
+<span class="nt">hydraulics</span><span class="p">:</span>
+  <span class="nt">input file</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">hydraulics.yaml</span>
+  <span class="nt">output file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">hydraulics.in</span>
+<span class="nt">source/sink</span><span class="p">:</span>
+  <span class="nt">input file</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">${input_dir}/source_sink_mod.yaml</span>
+  <span class="nt">output file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">source_sink.in</span>
+<span class="nt">flow output</span><span class="p">:</span>
+  <span class="nt">input file</span><span class="p">:</span>  <span class="l l-Scalar l-Scalar-Plain">${input_dir}/flowlines.yaml</span>
+  <span class="nt">output file</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">fluxflag.prop</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="dem-list-file">
+<span id="id3"></span><h3>DEM List File<a class="headerlink" href="#dem-list-file" title="Permalink to this headline">¶</a></h3>
+<p>This file is a simple text file containing a list of DEM files in tiff format. Each line is one file name with path information. See the example below.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>../bathymetry/dem_false_river_2m_20140322.tif</p></li>
+<li><p>../bathymetry/dem_fishermans_cut_2m_20140322.tif</p></li>
+<li><p>../bathymetry/dem_sutter_slough_2m_20140322.tif</p></li>
+<li><p>../bathymetry/dem_steamboat_2m_20140322.tif</p></li>
+<li><p>../bathymetry/dem_columbia_cut_2m.tif</p></li>
+<li><p>../bathymetry/dem_georgiana_slough_2m.tif</p></li>
+<li><p>../bathymetry/dem_miner_slough_2m.tif</p></li>
+<li><p>../bathymetry/dem_mokelumne_river_2m.tif</p></li>
+</ul>
+<p>The DEM list is used to retrieve elevation at nodes or quadrature points of the mesh processing and grid optimization. The ordering of the DEM files matters because upper ones in the list will be used first and lower ones will fill area where the upper ones do not cover consecutively.</p>
+</div>
+<div class="section" id="depth-optimization-parameter-file">
+<span id="id4"></span><h3>Depth Optimization Parameter File<a class="headerlink" href="#depth-optimization-parameter-file" title="Permalink to this headline">¶</a></h3>
+<p>This file contains for parameters for depth optimization. See the depth optimization documentation for details.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">damp</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<span class="nt">damp_shoreline</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10.0</span>
+<span class="nt">face_coeff</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="nt">volume_coeff</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="open-boundary-input">
+<span id="openboundary-input"></span><h3>Open Boundary Input<a class="headerlink" href="#open-boundary-input" title="Permalink to this headline">¶</a></h3>
+<p>Typically a domain of a open water body has multiple open boundaries such as oceans or rivers. SCHISM needs to know the locations of those open boundaries in the list of node indices. This tool generates a string of boundary nodes from two sets of coordinates, which represent both ends of an open boundary.</p>
+<p>Each section name in the file is a name of an open boundary, and the four following values represents two pairs of x and y coordinates for the ends of the open boundary. They do not needs to be in one line or two. It is recommended to write the ordering of the open boundaries and two pairs of each open boundary in counter-clockwise fashion.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open Boundary input sample</span>
+<span class="nt">ocean</span><span class="p">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">503363 4204253</span>
+  <span class="l l-Scalar l-Scalar-Plain">550710 4139854</span>
+<span class="nt">coyote</span><span class="p">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">591817 4146720 591796 4146806</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="polygon-input">
+<span id="id5"></span><h3>Polygon Input<a class="headerlink" href="#polygon-input" title="Permalink to this headline">¶</a></h3>
+<p>The polygon input format is used to specify certain values at regions covered by polygons. The use cases are: deepening or imposing minimum depth in some regions, setting up initial values, setting nudging factors, and etc.</p>
+<p>The format can start with a default value. If the default value is given, the value is filled in the area that is not covered by any of the polygons in the polygon file. If the default value is not given, the original value from the mesh, which is typically depth, is kept.</p>
+<p>Each polygon entry starts with a name of a polygon in ‘polygons’ section and can have three key-value pairs: attribute, type, and vertices.</p>
+<div class="section" id="attribute">
+<h4>Attribute<a class="headerlink" href="#attribute" title="Permalink to this headline">¶</a></h4>
+<p>The item, ‘attribute’ is a constant value or an equation associated with the polygon. The equation follows Python syntax. In equation, you can use three variables, x, y, and z, which are coordinates of nodes. See an example of the equation use below.</p>
+</div>
+<div class="section" id="type">
+<h4>Type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h4>
+<p>The item, ‘type’ is optional. Possible values for ‘type’ are ‘max,’ ‘min,’ and ‘none.’ If the value is not given, it is assumed ‘none.’ When ‘type’ is ‘min,’ the given value is compared with current values (depth) at nodes in the polygon in the mesh, and the given value will be used when the depth value is smaller that the given value in order to impose minimum depth (or value.) When ‘type’ is ‘max,’ vice versa. When ‘type’ in ‘none,’ the given value will be used.</p>
+</div>
+<div class="section" id="vertices">
+<h4>Vertices<a class="headerlink" href="#vertices" title="Permalink to this headline">¶</a></h4>
+<p>The item, ‘vertices’ are a list of pairs of x and y coordinates of vertices of the polygon. See an example below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">polygons</span><span class="p">:</span>
+  <span class="nt">coyote</span><span class="p">:</span>
+    <span class="nt">attribute</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">min</span>
+    <span class="nt">vertices</span><span class="p">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">588675 4147370</span>
+      <span class="l l-Scalar l-Scalar-Plain">588601 4146687</span>
+      <span class="l l-Scalar l-Scalar-Plain">590432 4145967</span>
+      <span class="l l-Scalar l-Scalar-Plain">592217 4146521</span>
+      <span class="l l-Scalar l-Scalar-Plain">592120 4147029</span>
+  <span class="nt">confluence</span><span class="p">:</span>
+    <span class="nt">attribute</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">min(1, 1. + 178e3 * (x - 597183) * (614983 - x))</span>
+    <span class="nt">vertices</span><span class="p">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">600027 4217705</span>
+      <span class="l l-Scalar l-Scalar-Plain">599456 4215990</span>
+      <span class="l l-Scalar l-Scalar-Plain">599265 4214179</span>
+      <span class="l l-Scalar l-Scalar-Plain">598598 4213178</span>
+</pre></div>
+</div>
+<p>In this example, nodes in the area that are not covered by the two polygons will be filled with the default value of one. The first polygon, ‘coyote,’ uses a constant value of three to give minimum value in the polygon area. The second polygon, ‘confluence,’ uses an equation.</p>
+</div>
+</div>
+<div class="section" id="hydraulic-structures-input">
+<span id="structure-input"></span><h3>Hydraulic Structures Input<a class="headerlink" href="#hydraulic-structures-input" title="Permalink to this headline">¶</a></h3>
+<p>The hydraulic structures module allows structures to be superimposed on the mesh, effectively substituting a coupled boundary condition based on a flow equation for a weir, gate or culvert.
+See an example below, as well as the pdf guide to hydraulic structures in SCHISM which contains detailed information on the structure types that
+are supported.</p>
+<p>The preprocessor can assign data to hydraulic structures based on geophysical coordinates.
+The first value in the output file is the global ‘nudging,’ and it is a relaxation constant that determines how fast calculated flow of a structure is imposed. The next section, ‘structures,’ lists input data for each hydraulic structure in ‘blocks’. Each structure block starts with the name of the structure. You should use a structure name without white spaces because this name will be used to link to a time series file name.</p>
+<p>The subsequent lines describe the type, configurations, location (line segment), and the reference nodes of the structure. The last item, reference, is optional; it refers to the location that is used
+to assess water levels for purposes of calculating structure flow.</p>
+<p>SCHISM supports six types of hydraulic structures: ‘radial’ for radial gates, ‘radial_relheight’ for radial gates with linear coefficient, ‘culvert’ for fully submerged pipes/culverts/orifices, ‘weir’ for weirs or submerged barriers, ‘orifice’ for rectangular orifices, and ‘transfer’ for water transfer. Each structure comes with a line segment in ‘line’ and physical configurations of it. The two end points of the line segment must be outside of the mesh to block a cross-section of a channel completely. Otherwise, the structure will be leaky and will not work properly.</p>
+<p>Different structure type requires slightly different physical configuration parameters.  Common parameters for all structure types except ‘transfer’ are ‘n duplicates’, ‘elevation,’ ‘width,’ ‘coefficient’, ‘op downstream,’ ‘op upstream,’ and ‘use time series.’ For ‘radial’ and ‘orifice’, ‘height’ is required. For ‘radial_relheight’, additional ‘coefficient height’ is required on top of values for ‘radial.’ For ‘culvert’, ‘radius’ is required. Structure ‘transfer’ needs only two parameters: ‘flow’ and ‘use time series.’</p>
+<p>The item, ‘reference’ in a structure describes where up/downstream elevation is assessed for calculating the structure flow using a weir/culvert/gate equation. The parameter is optional; if it is omitted, the default is ‘self.’  If this value is ‘self,’ a pair of reference nodes will be selected on each side of the current structure will be used for calculation of structure flows. If a name of another structure is given for the reference, the reference nodes of that structure are used. For example below, ‘grantline_culvert’ uses the surface elevation from the reference node pairs of ‘grantline_weir.’</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Hydraulic Structure Sample</span>
+<span class="nt">nudging</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nt">structures</span><span class="p">:</span>
+  <span class="nt">ccfb_gate</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">radial_relheight</span>
+    <span class="nt">line</span><span class="p">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">626980 4187907</span>
+      <span class="l l-Scalar l-Scalar-Plain">627006 4187944</span>
+    <span class="nt">configuration</span><span class="p">:</span>
+      <span class="nt">n duplicates</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+      <span class="nt">elevation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">-10.0</span>
+      <span class="nt">width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10.0</span>
+      <span class="nt">height</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10.0</span>
+      <span class="nt">coefficient</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">coefficient height</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+      <span class="nt">op downstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">op upstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">use time series</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+    <span class="nt">reference</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">self</span>
+
+  <span class="nt">montezuma_radial</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">radial</span>
+    <span class="nt">line</span><span class="p">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">597636 4216735</span>
+      <span class="l l-Scalar l-Scalar-Plain">597664 4216756</span>
+    <span class="nt">configuration</span><span class="p">:</span>
+      <span class="nt">n duplicates</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3</span>
+      <span class="nt">elevation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">-6.86</span>
+      <span class="nt">width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10.97</span>
+      <span class="nt">height</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">10.0</span>
+      <span class="nt">coefficient</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">op downstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">op upstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">use time series</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+    <span class="nt">reference</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">self</span>
+
+  <span class="nt">grantline_weir</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">weir</span>
+    <span class="nt">line</span><span class="p">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">636576 4186940</span>
+      <span class="l l-Scalar l-Scalar-Plain">636575 4187000</span>
+    <span class="nt">configuration</span><span class="p">:</span>
+      <span class="nt">n duplicates</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+      <span class="nt">elevation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.00</span>
+      <span class="nt">width</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">54.9</span>
+      <span class="nt">coefficient</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.8</span>
+      <span class="nt">op downstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">op upstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+      <span class="nt">use time series</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+    <span class="nt">reference</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">self</span>
+
+  <span class="nt">grantline_culvert</span><span class="p">:</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">culvert</span>
+    <span class="nt">line</span><span class="p">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">636576 4186918</span>
+      <span class="l l-Scalar l-Scalar-Plain">636576 4186940</span>
+    <span class="nt">configuration</span><span class="p">:</span>
+    <span class="nt">n duplicates</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">6</span>
+    <span class="nt">elevation</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">-1.28</span>
+    <span class="nt">radius</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.61</span>
+    <span class="nt">coefficient</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.6</span>
+    <span class="nt">op downstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.0</span>
+    <span class="nt">op upstream</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1.0</span>
+    <span class="nt">use time series</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+  <span class="nt">reference</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">grantline_weir</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="source-sink-input">
+<span id="sourcesink-input"></span><h3>Source/Sink Input<a class="headerlink" href="#source-sink-input" title="Permalink to this headline">¶</a></h3>
+<p>The source/sink input for the pre-processing has two sections, ‘sinks’ and ‘sources,’ and each section simply has list of name and location pairs. Each location of source/sink will be translated into an element index. If a source or sink location does not fall in the mesh, the script automatically finds the nearest element from it and assign the source or sink to the element.</p>
+<p>Users must provide time series files, ‘vsource.th’ and ‘vsink.th’ for the amount of the source and sink flow in the same ordering that is presented in this input. For source flows, salinity and temperature of the flows need to be provided in ‘msource.th’ in the same ordering of sources in this input.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Source/sink sample</span>
+<span class="nt">sinks</span><span class="p">:</span>
+  <span class="nt">dicu_div_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">653567.0902   4172012.544</span>
+  <span class="nt">dicu_div_3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">652136.6707   4176150.845</span>
+<span class="nt">sources</span><span class="p">:</span>
+  <span class="nt">dicu_drain_1</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">653567.0902 4172012.544</span>
+  <span class="nt">dicu_drain_3</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">652136.6707 4176150.845</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="flow-output-input">
+<span id="flowoutput-input"></span><h3>Flow Output Input<a class="headerlink" href="#flow-output-input" title="Permalink to this headline">¶</a></h3>
+<p>The flow output input simply comprises a list of line segments paired with the names of output locations as shown below. The ordering of the end points of the line segment decides the orientation of the flow output. As you face the nominal downstream
+direction of the flow output, the starting coordinate is on your left and the ending on your right. Two end points of a line segment should be outside of the mesh to make sure the flow line segment is not leaky.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Flow output location sample</span>
+<span class="nt">Steamboat Slough</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">624472.3676 4240454.635 624427.4511 4240509.007</span>
+<span class="nt">Threemile Slough</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">614040.1649 4218203.329 614108.8814 4218393.771</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sms.html" title="Working with SMS"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spatial.html" title="SCHISM Spatial Data"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Preprocessing</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

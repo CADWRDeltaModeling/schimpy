@@ -3,8 +3,8 @@
 """ Calculate skewness of elements form gr3 file
 """
 
-import schism_mesh
-import sms2gr3
+import schimpy.schism_mesh
+import schimpy.sms2gr3
 import argparse
 import os
 import numpy as np

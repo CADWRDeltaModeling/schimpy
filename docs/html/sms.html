@@ -1,0 +1,329 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Working with SMS &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Model time conversion" href="model_time.html" />
+    <link rel="prev" title="Preprocessing" href="preprocessing.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="model_time.html" title="Model time conversion"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="preprocessing.html" title="Preprocessing"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Working with SMS</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Working with SMS</a><ul>
+<li><a class="reference internal" href="#converting-an-sms-mesh-2dm-file-to-gr3">Converting an SMS mesh (2dm) file to gr3</a><ul>
+<li><a class="reference internal" href="#convert-mesh">convert_mesh</a><ul>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#getting-sms-polygons-for-preprocessor">Getting SMS Polygons for Preprocessor</a><ul>
+<li><a class="reference internal" href="#material-poly">material_poly</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#visualizing-detailed-bathymetry-inside-sms">Visualizing detailed bathymetry inside SMS</a><ul>
+<li><a class="reference internal" href="#clip-dems">clip_dems</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="preprocessing.html"
+                        title="previous chapter">Preprocessing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="model_time.html"
+                        title="next chapter">Model time conversion</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sms.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="working-with-sms">
+<h1>Working with SMS<a class="headerlink" href="#working-with-sms" title="Permalink to this headline">¶</a></h1>
+<p>The preprocessing toolkit has some utilities that can help when working with
+Aquaveo SMS, the main form of mesh generation we use until we are
+able to distrubute a sufficient open source mesh generator.</p>
+<div class="section" id="converting-an-sms-mesh-2dm-file-to-gr3">
+<h2>Converting an SMS mesh (2dm) file to gr3<a class="headerlink" href="#converting-an-sms-mesh-2dm-file-to-gr3" title="Permalink to this headline">¶</a></h2>
+<p>The script that converts SMS mesh to SCHISM gr3 format is available as a standalone script.</p>
+<div class="section" id="convert-mesh">
+<h3>convert_mesh<a class="headerlink" href="#convert-mesh" title="Permalink to this headline">¶</a></h3>
+<p>schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files</p>
+<p><p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">proj4</span> <span class="n">PROJ4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Named Arguments">
+<h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>--input</kbd></dt>
+<dd><p>Input mesh file</p>
+</dd>
+<dt><kbd>--output</kbd></dt>
+<dd><p>Output mesh file</p>
+</dd>
+<dt><kbd>--proj4</kbd></dt>
+<dd><p>Proj4 string for the projection</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="getting-sms-polygons-for-preprocessor">
+<h2>Getting SMS Polygons for Preprocessor<a class="headerlink" href="#getting-sms-polygons-for-preprocessor" title="Permalink to this headline">¶</a></h2>
+<p>SMS is able to create mesh coverages that are not mesh generation hints, including
+spatial properties maps whose polygons have “material properties”. If you save the
+coverage as a polygon shapefile, the script <em>material_poly.py</em> can help convert the
+resulting shapefile to the preprocessor yaml format. At the time of writing we do
+not have a tutorial example of this process.</p>
+<div class="section" id="material-poly">
+<h3>material_poly<a class="headerlink" href="#material-poly" title="Permalink to this headline">¶</a></h3>
+<p><p>Convert shapefile from SMS into polygon format for preprocessor</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">material_poly</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">keyfile</span> <span class="n">KEYFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">type</span> <span class="n">TYPE</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">default</span> <span class="n">DEFAULT</span><span class="p">]</span>
+                     <span class="n">shapefile</span> <span class="n">dset</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>shapefile</kbd></dt>
+<dd><p>name of shapefile</p>
+</dd>
+<dt><kbd>dset</kbd></dt>
+<dd><p>name of dataset inside shapefile</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>--keyfile</kbd></dt>
+<dd><p>file mapping material property names to numerical values (space separated).</p>
+</dd>
+<dt><kbd>--out</kbd></dt>
+<dd><p>Output polygon file.</p>
+</dd>
+<dt><kbd>--type</kbd></dt>
+<dd><p>Polygon attribute type (min/max)</p>
+<p>Default: “min”</p>
+</dd>
+<dt><kbd>--default</kbd></dt>
+<dd><p>Global default in polygon specs</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="visualizing-detailed-bathymetry-inside-sms">
+<h2>Visualizing detailed bathymetry inside SMS<a class="headerlink" href="#visualizing-detailed-bathymetry-inside-sms" title="Permalink to this headline">¶</a></h2>
+<p>Earlier versions (before 11.2) of SMS had bugs causing incorrect georefercing of DEMs
+and very poor memory management. It was – and probably still is – impossible
+to efficiently assign elevations within the software for a large mesh. We have two scripts
+that were designed to help with this problem: <em>clip_dems.py</em> and <em>stacked_dem_fill.py</em>.</p>
+<div class="section" id="clip-dems">
+<h3>clip_dems<a class="headerlink" href="#clip-dems" title="Permalink to this headline">¶</a></h3>
+<p><p>Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">clip_dems</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">coords</span> <span class="n">ul_x</span> <span class="n">ul_y</span> <span class="n">lr_x</span> <span class="n">lr_y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">image</span> <span class="n">INFILE</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">prefix</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outformat</span> <span class="n">OUTFORMAT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">hshift</span><span class="p">]</span>
+                 <span class="n">demlist</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>demlist</kbd></dt>
+<dd><p>file containing prioritized (high to low) list of dems.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>--coords</kbd></dt>
+<dd><p>bounding coordinates to which DEMs will be clipped (upper left, lower right)</p>
+<p>Default: (None, None, None, None)</p>
+</dd>
+<dt><kbd>--image</kbd></dt>
+<dd><p>image or DEM used to infer bounding coordinates for clipping. Use jpeg for the image. This argument is mutually exclusive with –coords. If a sample is provided its upper left and lower right corner will be used.</p>
+</dd>
+<dt><kbd>--prefix</kbd></dt>
+<dd><p>prefix used for output file names</p>
+<p>Default: “clipped”</p>
+</dd>
+<dt><kbd>--outformat</kbd></dt>
+<dd><p>output format, default is AAIGrid (ArcInfo ascii.</p>
+<p>Default: “AAIGrid”</p>
+</dd>
+<dt><kbd>--verbose</kbd></dt>
+<dd><p>more verbose output.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--hshift</kbd></dt>
+<dd><p>(deprecated) shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS &lt; 11.1</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</div>
+<p>The script clip_dems.py is used to create mini-DEMs on the fly that are small
+enough to be brought into the SMS environment as rasters without slowing it down too much.
+The same The:ref:<cite>dem_list_file</cite> is used here as elsewhere in the pre-processor.</p>
+<p>The normal pattern of work is to zoom into the area of interst in SMS, save the
+work area as a jpeg image and use it as the -image argument to <em>clip_dems.py</em>.
+One cut DEM will be produced for each DEM on the <em>dem_list</em> file that intersects the
+work area, using file names in order of priority (0 highest). The cut DEMs would then
+be imported and visualized in SMS, ideally using “contours” as the viewing choice and a carefully crafted color map designed to focus on the elevations that are locally most important.</p>
+</div>
+<div class="section" id="stacked-dem-fill">
+<h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Permalink to this headline">¶</a></h3>
+<p><p>Fill node elevations in a <a href="#id1"><span class="problematic" id="id2">*</span></a>.2dm SMS mesh or gr3 file using a prioritized list of DEMs.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>filename</kbd></dt>
+<dd><p>name of 2dm or gr3 file</p>
+</dd>
+<dt><kbd>demfile</kbd></dt>
+<dd><p>file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h4>
+<dl class="option-list">
+<dt><kbd>--elev2depth</kbd></dt>
+<dd><p>Convert elevation to depth by flipping sign. This is typical when using gr3 format, less so with 2dm.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--fill</kbd></dt>
+<dd><p>Fill value for areas not covered by supplied rasters.</p>
+<p>Default: 2.0</p>
+</dd>
+</dl>
+</div>
+<p>The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.
+It can be used on a 2dm file in which case the</p>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="model_time.html" title="Model time conversion"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="preprocessing.html" title="Preprocessing"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Working with SMS</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

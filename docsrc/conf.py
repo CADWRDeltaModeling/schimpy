@@ -23,11 +23,19 @@ sys.path.insert(0, os.path.abspath('..'))
 
 import schimpy
 
+# using mock to avoid nodepy documentation which is hard to import
+import mock
+MOCK_MODULES = ['nodepy']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
+
 # -- General configuration ---------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
+ 
+
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -35,14 +43,19 @@ extensions = ['nbsphinx', 'sphinx.ext.mathjax',
           'sphinx.ext.autodoc', 'sphinx.ext.viewcode',
           'matplotlib.sphinxext.mathmpl',
           'matplotlib.sphinxext.plot_directive',
+          'IPython.sphinxext.ipython_directive',
+          'IPython.sphinxext.ipython_console_highlighting',
           'sphinx.ext.intersphinx',
-          'sphinx.ext.autodoc',
           'sphinxarg.ext',
           'sphinx.ext.doctest',
           'numpydoc']
 
+autosummary_generate = False
 autodoc_member_order = 'alphabetical'
-  
+autodoc_mock_imports = ["numpy","nodepy"]
+autosummary_mock_imports = ["numpy","nodepy"]
+numpydoc_show_class_members = True 
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -60,6 +73,8 @@ source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
+
+
 
 # General information about the project.
 project = 'schimpy'
@@ -84,6 +99,7 @@ language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
+exclude_patterns = ['*test*']
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
     '*test*','_build','**.ipynb_checkpoints']
@@ -100,9 +116,10 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
-html_theme_options = {
-    'logo': 'dwrsmall.jpg'}
+#html_theme = 'alabaster'
+#html_theme_options = {
+#    'logo': 'dwrsmall.jpg'}
+html_theme = 'sphinxdoc'
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
@@ -157,7 +174,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'schimpy',
-     'schimpy Documentation',
+     'schimpy',
      [author], 1)
 ]
 

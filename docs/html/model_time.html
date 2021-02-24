@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Model time conversion &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Assigning Bathymetry" href="depth.html" />
+    <link rel="prev" title="Working with SMS" href="sms.html" /> 
+  </head><body>
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="index.html"><img src="_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="depth.html" title="Assigning Bathymetry"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="sms.html" title="Working with SMS"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Model time conversion</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Model time conversion</a><ul>
+<li><a class="reference internal" href="#model-time-py">model_time.py</a><ul>
+<li><a class="reference internal" href="#subcommands">subcommands</a></li>
+<li><a class="reference internal" href="#Sub-commands:">Sub-commands:</a><ul>
+<li><a class="reference internal" href="#to_elapsed">to_elapsed</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#to_date">to_date</a><ul>
+<li><a class="reference internal" href="#Positional Arguments_repeat1">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments_repeat1">Named Arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#clip">clip</a><ul>
+<li><a class="reference internal" href="#Positional Arguments_repeat2">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments_repeat2">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sms.html"
+                        title="previous chapter">Working with SMS</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="depth.html"
+                        title="next chapter">Assigning Bathymetry</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/model_time.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="model-time-conversion">
+<h1>Model time conversion<a class="headerlink" href="#model-time-conversion" title="Permalink to this headline">¶</a></h1>
+<p>The SCHISM *.th file has two flavors, binary and text. Both are multicolumn formats,
+with elapsed time in seconds in the left column since the start of the simulation
+and the other columns representing values.
+There is no datum within the file to link elapsed time to calendar or geophysical time,
+and it is hard to search for events, re-use the *.th file with a different
+start date or make sense of orphaned files.</p>
+<p>The model_time script utility performs conversions between geophysical
+and elapsed times on flat files. This is a pretty easy task on simple files using
+just pandas, but this utility preserves formatting and floating precision of the source,
+copies over comments and can clip the file to a new start date.</p>
+<div class="section" id="model-time-py">
+<h2>model_time.py<a class="headerlink" href="#model-time-py" title="Permalink to this headline">¶</a></h2>
+<p><p>Interpret model times in elapsed seconds and translate 
+between calendar time and elapsed. The script requires
+a subcommand like: $ model_time.py to_elapsed. You can also 
+get subject-specific help on a subcommand by typing
+$ model_time.py subcommand –help</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">model_time</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="n">to_elapsed</span><span class="p">,</span><span class="n">to_date</span><span class="p">,</span><span class="n">clip</span><span class="p">}</span> <span class="o">...</span>
+</pre></div>
+</div>
+<div class="section" id="subcommands">
+<h3>subcommands<a class="headerlink" href="#subcommands" title="Permalink to this headline">¶</a></h3>
+<dl class="option-list">
+<dt><kbd>subcommand</kbd></dt>
+<dd><p>Possible choices: to_elapsed, to_date, clip</p>
+<p>sub-commands indicating the particular action required.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Sub-commands:">
+<h3>Sub-commands:<a class="headerlink" href="#Sub-commands:" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="to_elapsed">
+<h4>to_elapsed<a class="headerlink" href="#to_elapsed" title="Permalink to this headline">¶</a></h4>
+<p>Convert input datetime string or <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with datetime column to equivalent output in elapsed seconds.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">to_elapsed</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">start</span> <span class="n">START</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">annotate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">step</span> <span class="p">[</span><span class="n">STEP</span><span class="p">]]</span>
+                      <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_nan</span> <span class="n">SKIP_NAN</span><span class="p">]</span>
+                      <span class="n">dated_input</span> <span class="p">[</span><span class="n">dated_input</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>dated_input</kbd></dt>
+<dd><p>One or more dates to be converted in ISO-like format 2009-03-12T00:00:00 (time can be ommitted) or the name of a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with the time column in this format.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--start</kbd></dt>
+<dd><p>Starting date and time basis for output if the input is a file. Allows a larger database with readable times to be clipped</p>
+</dd>
+<dt><kbd>--annotate</kbd></dt>
+<dd><p>Default: False</p>
+</dd>
+<dt><kbd>--step</kbd></dt>
+<dd><p>Model time step. If given, answer will be the integer time step.</p>
+</dd>
+<dt><kbd>--out</kbd></dt>
+<dd><p>Name of output file. If input is a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file the file will be converted and output to this file, otherwise printed to screen</p>
+</dd>
+<dt><kbd>--skip_nan</kbd></dt>
+<dd><p>Skip a record with nan if True</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="to_date">
+<h4>to_date<a class="headerlink" href="#to_date" title="Permalink to this headline">¶</a></h4>
+<p>Convert input elapsed seconds or <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with elapsed seconds as the time column to equivalent output with a datetime or annotated with datetimes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">to_date</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">--</span><span class="n">start</span> <span class="n">START</span> <span class="p">[</span><span class="o">--</span><span class="n">step</span> <span class="p">[</span><span class="n">STEP</span><span class="p">]]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">elapsed_unit</span> <span class="n">ELAPSED_UNIT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">time_format</span> <span class="n">TIME_FORMAT</span><span class="p">]</span>
+                   <span class="p">[</span><span class="o">--</span><span class="n">annotate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span>
+                   <span class="n">elapsed_input</span> <span class="p">[</span><span class="n">elapsed_input</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments_repeat1">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat1" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>elapsed_input</kbd></dt>
+<dd><p>One or more numbers representing elapsed seconds since the start argument or the name of a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with the time column in elapsed seconds.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments_repeat1">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat1" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--start</kbd></dt>
+<dd><p>Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.</p>
+</dd>
+<dt><kbd>--step</kbd></dt>
+<dd><p>Model time step in seconds. If given, answer will be the integer time step.</p>
+</dd>
+<dt><kbd>--elapsed_unit</kbd></dt>
+<dd><p>Time unit of input file. Must be either ‘s’ for seconds or ‘d’ for days. Only used for files</p>
+<p>Default: “s”</p>
+</dd>
+<dt><kbd>--time_format</kbd></dt>
+<dd><p>Time format for output, e.g. the default is %Y-%m-%dT%H:%M:%S for 2009-03-14T22:40:00. Only used when converting fields.</p>
+<p>Default: “%Y-%m-%dT%H:%M”</p>
+</dd>
+<dt><kbd>--annotate</kbd></dt>
+<dd><p>Default: False</p>
+</dd>
+<dt><kbd>--out</kbd></dt>
+<dd><p>Name of output file. If input is a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file the file will be converted and output to this file, otherwise printed to screen</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="clip">
+<h4>clip<a class="headerlink" href="#clip" title="Permalink to this headline">¶</a></h4>
+<p>Clip (subset) an input file in elapsed time to a new, later, start date</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">clip</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">--</span><span class="n">start</span> <span class="n">START</span> <span class="o">--</span><span class="n">clip_start</span> <span class="n">CLIP_START</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span>
+                <span class="n">elapsed_input</span> <span class="p">[</span><span class="n">elapsed_input</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments_repeat2">
+<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat2" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>elapsed_input</kbd></dt>
+<dd><p>One or more numbers representing elapsed seconds since the start argument or the name of a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with the time column in elapsed seconds.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="Named Arguments_repeat2">
+<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat2" title="Permalink to this headline">¶</a></h5>
+<dl class="option-list">
+<dt><kbd>--start</kbd></dt>
+<dd><p>Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.</p>
+</dd>
+<dt><kbd>--clip_start</kbd></dt>
+<dd><p>Starting date for output.</p>
+</dd>
+<dt><kbd>--out</kbd></dt>
+<dd><p>Name of output file. If input is a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file the file will be converted and output to this file, otherwise printed to screen</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="depth.html" title="Assigning Bathymetry"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="sms.html" title="Working with SMS"
+             >previous</a> |</li>
+        <li><a href="index.html">home</a>|&nbsp;</li>
+        <li><a href="search.html">search</a>|&nbsp;</li>
+
+        <li class="nav-item nav-item-this"><a href="">Model time conversion</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
+  </body>
+</html>

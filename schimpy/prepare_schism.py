@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Driver module to prepares input files for a SCHISM run.
-Example jobs in this pre-processing are:
-  1. Fill up missing land/island boundaries in `hgrid.gr3'.
-  2. Re-order the open boundaries.
-  3. Create source_sink.in and hydraulics.in
-  4. Create spatial information such as elev.ic, rough.gr3 and xlsc.gr3.
-  5. Dredge up some part of the domain.
-  6. Create an ocean boundary file, elev2D.th
+
+""" Driver module to prepares input files for a SCHISM run.
+    Example jobs in this pre-processing are:
+    1. Fill up missing land/island boundaries in `hgrid.gr3'.
+    2. Re-order the open boundaries.
+    3. Create source_sink.in and hydraulics.in
+    4. Create spatial information such as elev.ic, rough.gr3 and xlsc.gr3.
+    5. Dredge up some part of the domain.
+    6. Create an ocean boundary file, elev2D.th
 """
 
 from schimpy.schism_setup import create_schism_setup, check_and_suggest

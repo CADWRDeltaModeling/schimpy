@@ -1,10 +1,13 @@
 """ Read outputs from read_output*_xyt and create a neat list of
-    Vtools time series
+    Vtools time series. This module depends on deprecated vtools code and is 
+    scheduled for removal
 """
+
+
 # Kijin Nam, knam@water.ca.gov
 
-from vtools.data.timeseries import its
-from vtools.data.vtime import time_interval
+#from vtools.data.timeseries import its
+#from vtools.data.vtime import time_interval
 import matplotlib.pyplot as plt
 import numpy
 import scipy.integrate

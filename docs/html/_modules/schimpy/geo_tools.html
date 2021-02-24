@@ -1,11 +1,12 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>schimpy.geo_tools &#8212; schimpy 0.1.2+0.g5fc488f.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schimpy.geo_tools &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -13,29 +14,56 @@
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
-  
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../index.html"><img src="../../_static/logo6.png" border="0" alt="Bay-Delta SELFE Tools"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.geo_tools</a></li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
   <h1>Source code for schimpy.geo_tools</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on Tue Nov 19 15:50:34 2019</span>
-<span class="sd">@author: zzhang</span>
 <span class="sd">if &quot;no arguments in initialization list&quot; runtime error is seen for pyproj,</span>
 <span class="sd">it is because that proj_def.dat file is missing.</span>
 <span class="sd">Solution: find datadir for pyproj.</span>
@@ -68,7 +96,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> generated&quot;</span><span class="o">%</span><span class="n">shp_fn</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span></div>
 
-<div class="viewcode-block" id="Contiguity_Check"><a class="viewcode-back" href="../../schimpy.html#schimpy.geo_tools.Contiguity_Check">[docs]</a><span class="k">def</span> <span class="nf">Contiguity_Check</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span><span class="n">poly_fn</span><span class="p">,</span><span class="n">centering</span><span class="o">=</span><span class="s1">&#39;nodes&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Contiguity_Check"><a class="viewcode-back" href="../../schimpy.html#schimpy.geo_tools.Contiguity_Check">[docs]</a><span class="k">def</span> <span class="nf">Contiguity_Check</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span><span class="n">poly_fn</span><span class="p">,</span><span class="n">centering</span><span class="o">=</span><span class="s1">&#39;nodes&#39;</span><span class="p">,</span><span class="n">proj4</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if the schism mesh division by the polygon features in poly_fn is contiguous.</span>
 <span class="sd">    The contiguity check is based on either node or element, and the function checks</span>
@@ -77,12 +105,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">poly_gpd</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">poly_fn</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;elems&#39;</span><span class="p">:</span>
-        <span class="n">mesh_gpd</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">to_geopandas</span><span class="p">(</span><span class="n">feature_type</span> <span class="o">=</span> <span class="s1">&#39;polygon&#39;</span><span class="p">)</span>
+        <span class="n">mesh_gpd</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">to_geopandas</span><span class="p">(</span><span class="n">feature_type</span> <span class="o">=</span> <span class="s1">&#39;polygon&#39;</span><span class="p">,</span><span class="n">proj4</span><span class="o">=</span><span class="n">proj4</span><span class="p">)</span>
         <span class="c1"># if the centroid falls in a polygon, the mesh grid is in the polygon</span>
         <span class="n">mesh_gpd</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_gpd</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">centroid</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">mesh_gpd</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">to_geopandas</span><span class="p">(</span><span class="n">feature_type</span> <span class="o">=</span> <span class="s1">&#39;point&#39;</span><span class="p">)</span>
-
+        <span class="n">mesh_gpd</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">to_geopandas</span><span class="p">(</span><span class="n">feature_type</span> <span class="o">=</span> <span class="s1">&#39;point&#39;</span><span class="p">,</span><span class="n">proj4</span><span class="o">=</span><span class="n">proj4</span><span class="p">)</span>
+        
+    <span class="n">poly_gpd</span> <span class="o">=</span> <span class="n">poly_gpd</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">mesh_gpd</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span> <span class="c1"># project to the mesh crs. </span>
     <span class="n">poly_gpd</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">poly_gpd</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">id_n</span><span class="p">,</span> <span class="n">poly</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">poly_gpd</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="n">poly_gpd</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]):</span>
@@ -93,14 +122,28 @@
     <span class="n">ID_df</span> <span class="o">=</span> <span class="n">mesh_gpd</span><span class="p">[</span><span class="n">ID_keys</span><span class="p">]</span>
     <span class="c1"># check if there is at least one id that each cell belongs to</span>
     <span class="n">orphaned_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">ID_df</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">orphaned_cells</span><span class="p">)</span> <span class="o">&gt;=</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">orph_cells</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Orphaned cells found at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">string</span><span class="p">)</span>
+ 
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">orphaned_cells</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mesh_gpd</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;coordinate system mismatch: the default for the mesh </span><span class="se">\</span>
+<span class="s2">                        is lat lon&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">orphaned_cells</span><span class="p">)</span> <span class="o">&gt;=</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">orphaned_cells</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Orphaned nodes or cells found at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">string</span><span class="p">)</span>
     <span class="c1"># check if there are cells that belong to multiple polygons</span>
     <span class="n">multi_labeled_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">ID_df</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">multi_labeled_cells</span><span class="p">)</span> <span class="o">&gt;=</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">df_multi</span> <span class="o">=</span> <span class="n">ID_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">multi_labeled_cells</span><span class="p">]</span>
+        <span class="n">npoly</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">poly_gpd</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_multi</span><span class="p">)):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="n">npoly</span><span class="p">)</span>
+            <span class="n">id1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">df_multi</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">id1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">df_multi</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="n">ID_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">multi_labeled_cells</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_multi</span>
+
         <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">multi_labeled_cells</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;These cells belong to mulitple polygons </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">string</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;These cells or nodes belong to mulitple polygons </span><span class="si">%s</span><span class="s1">: </span>
+<span class="s1">              categorize as the 1st True poly&#39;&#39;&#39;</span><span class="o">%</span><span class="n">string</span><span class="p">)</span>
     <span class="c1"># otherwise the domain is contiguous.</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The domain divisino is contiguous!&quot;</span><span class="p">)</span>
     <span class="n">mapping</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ID_df</span><span class="o">.</span><span class="n">values</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="c1"># change to one-based indices</span>
@@ -151,80 +194,31 @@
 
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../index.html">
-    <img class="logo" src="../../_static/dwrsmall.jpg" alt="Logo"/>
-    
-  </a>
-</p>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../readme.html">schimpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">schimpy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2020, California Department of Water Resources.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">home</a>|&nbsp;</li>
+        <li><a href="../../search.html">search</a>|&nbsp;</li>
+
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">schimpy.geo_tools</a></li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, California Department of Water Resources.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+    </div>
   </body>
 </html>
