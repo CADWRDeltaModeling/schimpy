@@ -212,8 +212,15 @@ def read_station_dbase(fpath):
          DataFrame with hierarchical index (id,subloc) and columns x,y,z,name
 
     """
-    print(fpath)
-    return  pd.read_csv(fpath,sep=",",header=0,index_col="id",comment="#")
+    
+    db =  pd.read_csv(fpath,sep=",",header=0,index_col="id",comment="#")
+    dup = db.index.duplicated()
+    if dup.sum(axis=0)> 0:
+        print("Duplicates")
+        print(dup)
+        raise ValueError("Station database has duplicate id keys. See above")
+    return db
+    
 
 def merge_station_subloc(station_dbase,station_subloc,default_z):
     """Merge BayDeltaSCHISM station database with subloc file, producing the union of all stations and sublocs including a default entry for stations with no subloc entry
