@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+Created on Tue Nov 19 15:50:34 2019
+@author: zzhang
 if "no arguments in initialization list" runtime error is seen for pyproj,
 it is because that proj_def.dat file is missing.
 Solution: find datadir for pyproj.
@@ -32,7 +34,7 @@ def shapely_to_geopandas(features,Proj4=None,shp_fn=None):
         print("%s generated"%shp_fn)
     return gdf
 
-def Contiguity_Check(mesh,poly_fn,centering='nodes',proj4=None):
+def contiguity_check(mesh,poly_fn,centering='nodes',proj4=None):
     """
     Check if the schism mesh division by the polygon features in poly_fn is contiguous.
     The contiguity check is based on either node or element, and the function checks
@@ -83,6 +85,7 @@ def Contiguity_Check(mesh,poly_fn,centering='nodes',proj4=None):
     # otherwise the domain is contiguous.
     logging.info("The domain divisino is contiguous!")
     mapping = np.where(ID_df.values)[1]+1 # change to one-based indices
+    mapping = poly_gpd.loc[mapping].region.values
     return mapping
 
 def Polylen(poly):

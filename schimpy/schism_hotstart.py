@@ -535,7 +535,7 @@ class VariableField(object):
 
     def patch_init(self, poly_fn=None):  # regional based initializer
         try:
-            poly_fn = self.ini_meta['regions_fn']
+            poly_fn = self.ini_meta['regions_filename']
         except KeyError:
             if not poly_fn:
                 raise EOFError(
@@ -543,7 +543,7 @@ class VariableField(object):
         if poly_fn.endswith('shp'):
             print("proj4 outside",self.proj4)
             # perform contiguity check and return a mapping array if successful.
-            mapping = geo_tools.Contiguity_Check(self.mesh, poly_fn,
+            mapping = geo_tools.contiguity_check(self.mesh, poly_fn,
                                                  proj4=self.proj4)
         else:
             raise NotImplementedError("Poly_fn can only be shapefile")
@@ -557,13 +557,14 @@ class VariableField(object):
             initializer_key = self.get_key(ini_meta)
             initializer = self.patch_initializer_options(initializer_key)
             ini_meta = self.get_value(ini_meta)
-            inpoly = np.where(mapping == i+1)[0]  # mapping is one-based.
+            #inpoly = np.where(mapping == i+1)[0]  # mapping is one-based.
+            inpoly = np.where(mapping==r['region'])[0]
             v = initializer(ini_meta, inpoly)
             if np.any(np.isnan(v)):
                 raise ValueError("region %f has nan in %s field" %
                                  (r, self.variable_name))
             v_merge[inpoly, :] = v
-            print(i, r)
+            #print(i, r)
         return v_merge
 
     # USGS cast (2D observational points)
@@ -604,7 +605,7 @@ class VariableField(object):
             ['Station', 'y', 'x']]
         stations.set_index('Station', inplace=True)
         polaris_cast = polaris_cast.join(stations, on='Station', how='left')
-        print(polaris_cast)
+        #print(polaris_cast)
 
         if inpoly is not None:
             n_hgrid = len(inpoly)
@@ -704,19 +705,19 @@ class VariableField(object):
         obs_data = pd.read_csv(obs_file)
         obs_data = obs_data.dropna(subset=[variable])
         obs_loc = obs_data[['Lon', 'Lat']].values
-        print(obs_loc)
-        print(type(obs_loc))
+        #print(obs_loc)
+        #print(type(obs_loc))
         obs_loc = geo_tools.ll2utm([obs_loc[:,0],obs_loc[:,1]],self.proj4).T
-        print(obs_loc)
+        #print(obs_loc)
         vals = obs_data[variable].values
-        print(vals)
+        #print(vals)
         invdisttree = Interp2D.Invdisttree(obs_loc, vals,
                                            leafsize=10, stat=1)
         if inpoly is not None:
             node_xy = self.hgrid[inpoly]
         else:
             node_xy = self.hgrid
-        print(node_xy)
+        #print(node_xy)
         vmap = invdisttree(node_xy, nnear=4, p=2)
         if np.any(np.isnan(vmap)):
             raise ValueError("vmap has nan value in it.Check %s" % obs_file)
@@ -946,7 +947,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
     hgrid_nc = xr.open_dataset("hgrid.nc")
     hgrid_nc = hgrid_nc.rename(grid_newname)
 
-    # Change lat lon to utm-x, y (VisIt only accepts projected coordinates)
+    # VisIt only accepts projected coordinates
     for c in ['edge', 'face', 'node']:
         utm_data = np.asarray([hgrid_nc['SCHISM_hgrid_%s_x' % c].values,
                                hgrid_nc['SCHISM_hgrid_%s_y' % c].values])
