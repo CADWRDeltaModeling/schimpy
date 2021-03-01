@@ -212,8 +212,15 @@ def read_station_dbase(fpath):
          DataFrame with hierarchical index (id,subloc) and columns x,y,z,name
 
     """
-    print(fpath)
-    return  pd.read_csv(fpath,sep=",",header=0,index_col="id",comment="#")
+    
+    db =  pd.read_csv(fpath,sep=",",header=0,index_col="id",comment="#")
+    dup = db.index.duplicated()
+    if dup.sum(axis=0)> 0:
+        print("Duplicates")
+        print(dup)
+        raise ValueError("Station database has duplicate id keys. See above")
+    return db
+    
 
 def merge_station_subloc(station_dbase,station_subloc,default_z):
     """Merge BayDeltaSCHISM station database with subloc file, producing the union of all stations and sublocs including a default entry for stations with no subloc entry
@@ -250,6 +257,12 @@ def read_obs_links(fpath):
     df.index.set_levels(df.index.levels[0].astype(str),
                         level=0,
                         inplace=True)
+    dups = df.index.duplicated(keep='last')
+    ndup = dups.sum(axis=0)
+    if ndup > 0:
+        print("{} duplicate index rows:".format(ndup))
+        print(df.loc[dups,:])
+        raise ValueError("Duplicates not allowed in observation links file, see above list.")
     return df
 
 def read_station_out(fpath_base,stationinfo,var=None,start=None):
@@ -281,9 +294,10 @@ def flux_stations_from_yaml(inp):
     names =[]
     linestrings = content["linestrings"]
     for ls in linestrings:
+        if ls.get("Name") is not None: raise ValueError("YAML file is case sensitive. Do not use Name as attribute label")
         name = ls.get("name")
-        if name is None:
-            name = ls.get("Name")
+        if name in names: 
+            print("Duplicate name: {}".format(name))
         names.append(name)
     return names
 
@@ -291,13 +305,26 @@ def flux_stations_from_yaml(inp):
 def station_names_from_file(fpath):
     ext = os.path.splitext(fpath)[1]
     if ext in (".yml",".yaml"):
-        return flux_stations_from_yaml(fpath)
+        station_names = flux_stations_from_yaml(fpath)
     elif ext == ".prop":
         raise NotImplementedError("Not implemented for .prop")
+    
+    return station_names
 
 def read_flux_out(fpath,names,reftime):
     if isinstance(names,str):
         names = station_names_from_file(names)
+        
+    # Check uniqueness of names
+    seen = set()
+    uniq = []
+    for x in names:
+        if x not in seen:
+            uniq.append(x)
+            seen.add(x)    
+    if len(uniq) != len(names):
+         raise ValueError("Duplicate station names.")        
+    # 
     data = pd.read_csv(fpath,sep="\s+",index_col=0,
                            header=None,names = names,dtype='d')
     if reftime is not None:
@@ -305,6 +332,7 @@ def read_flux_out(fpath,names,reftime):
         data.index = data.index.round(freq='s')
         f = pd.infer_freq(data.index)
         data = data.asfreq(f)
+
     # todo: freq when start is none?
     return data
 

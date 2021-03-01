@@ -372,7 +372,10 @@ class BatchMetrics(object):
             if not station_id in db_stations.index:
                 self.logger.warning("Station id {} not found in station listings".format(station_id))
                 continue
-            alias = db_stations.loc[station_id,'alias']
+            if 'alias' in db_stations.columns:
+                alias = db_stations.loc[station_id,'alias']
+            else: 
+                alias = station_id
 
             if selected_stations is not None:
                 if station_id not in selected_stations:
@@ -437,9 +440,12 @@ class BatchMetrics(object):
                 tss_sim = []
                 try:
                     for simout in sim_outputs:
-                        s = simout.loc[:,(station_id,subloc)]
-                        if isinstance(s,pd.DataFrame):
-                            raise("Station,Sublocation pair ({},{}) not unique".format((station_id,subloc)))
+                        if(station_id,subloc) in simout.columns:
+                            s = simout.loc[:,(station_id,subloc)]
+                            if isinstance(s,pd.DataFrame):
+                                raise("Station,Sublocation pair ({},{}) not unique or some other uniqueness problem in station files".format((station_id,subloc)))
+                        else:
+                            s=None
                         tss_sim.append(s)
                 except:
                     self.logger.warning("Problem reading time series for station {},{}".format(station_id,subloc))         
