@@ -107,6 +107,14 @@ def ec_psu_25c(ts_ec,hill_correction=True):
     except:
         ec = ts_ec
     R = np.divide(ec,ec_sea)
+    R_is_neg = np.less(R,0.)
+    try:
+        R[R_is_neg] = 0.0001
+    except:
+        if R_is_neg:
+            return np.nan
+        else:
+            R_is_neg = None
     sqrtR = np.sqrt(R)
     Rsq = R * R
     s = K1 + K2*sqrtR + K3*R + K4*R*sqrtR + K5*Rsq + K6*Rsq*sqrtR
@@ -124,6 +132,8 @@ def ec_psu_25c(ts_ec,hill_correction=True):
         ts_ec.data = s
         return ts_ec
     except:
+        if R_is_neg is not None: 
+            s[R_is_neg]=np.nan
         return s
 
 
