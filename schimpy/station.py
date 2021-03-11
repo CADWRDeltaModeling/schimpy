@@ -68,9 +68,14 @@ def read_staout(fname,station_infile,reftime,ret_station_in = False,multi=False,
 
 
     if isinstance(station_infile,str):
-        station_in = read_station_in(station_infile)
-    else: station_in = station_infile
+        station_in = read_station_in(station_infile)    
+    else: 
+        station_in = station_infile
+
     station_index = station_in.index.copy()
+    if station_index.duplicated().any():
+        print(station_index[station_index.duplicated()])
+        raise ValueError("Duplicate id/subloc pair in station.in file {}".format(station_infile))
     staout = pd.read_csv(fname,index_col=0,sep="\s+",header=None)
     # todo: hardwire
     staout.mask(staout<=-999.,inplace=True)
@@ -83,7 +88,13 @@ def read_staout(fname,station_infile,reftime,ret_station_in = False,multi=False,
         else:
             staout.columns = [f'{loc}_{subloc}' for loc,subloc in staout.columns]
     f = pd.infer_freq(staout.index)
-    staout = staout.resample(f).asfreq(f)    
+    if f is None:
+        #raise ValueError("Could not determine the time frequency of staoutfile")
+        f2 = pd.infer_freq(staout.iloc[0:10,0].index)
+        newindex = pd.date_range(staout.index[0],freq=f2,periods=len(staout.index))
+        staout.index=newindex
+    else:
+        staout = staout.resample(f).asfreq(f)    
     return (staout, station_infile) if ret_station_in else staout
 
 
