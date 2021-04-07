@@ -336,8 +336,9 @@ def read_flux_out(fpath,names,reftime):
     if len(uniq) != len(names):
          raise ValueError("Duplicate station names.")        
     # 
-    data = pd.read_csv(fpath,sep="\s+",index_col=0,
-                           header=None,names = names,dtype='d')
+    data = pd.read_csv(fpath,sep="\s+", index_col=0,
+                       header=None, names=['time'] + names,
+                       dtype='d')
     if reftime is not None:
         data = elapsed_datetime(data,reftime=reftime,time_unit='d')
         data.index = data.index.round(freq='s')
