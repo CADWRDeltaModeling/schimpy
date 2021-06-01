@@ -105,17 +105,57 @@ class SchismLocalVerticalMesh(SchismVerticalMesh):
                 
             todo: behavior with dry locations not described
         """
-        if self.sigma is None:
-            raise ValueError("Sigma values are not provided")
+        # if self.sigma is None:
+        #     raise ValueError("Sigma values are not provided")
+        # if type(elev) == float:
+        #     elev = np.ones((mesh.n_nodes(), ))*elev
+        # n_vert = self.n_vert_levels()
+        # self._z = np.empty((mesh.n_nodes(), n_vert))
+        # for i, (node, eta) in enumerate(zip(mesh.nodes, elev)):
+        #     self._z[i] = -node[2]
+        #     self._z[i, self.kbps[i]:] = (
+        #         eta+(eta + node[2]) * self.sigma[i, :n_vert - self.kbps[i]])
+        # return self._z    
+        vert_grid = mesh.vmesh
+        nvrt = vert_grid.param['nvrt']
+        depths = np.full([mesh.n_nodes(), nvrt], np.finfo(np.float32).min)
         if type(elev) == float:
             elev = np.ones((mesh.n_nodes(), ))*elev
-        n_vert = self.n_vert_levels()
-        self._z = np.empty((mesh.n_nodes(), n_vert))
-        for i, (node, eta) in enumerate(zip(mesh.nodes, elev)):
-            self._z[i] = -node[2]
-            self._z[i, self.kbps[i]:] = (
-                eta+(eta + node[2]) * self.sigma[i, :n_vert - self.kbps[i]])
-        return self._z
+            
+        if vert_grid.ivcor == 1:
+            if nvrt < 3:
+                raise ValueError()
+
+            for i, node in enumerate(mesh.nodes):
+                hmod2 = max(0.1, node[2]+elev[i])
+                kbps = vert_grid.kbps[i]
+                depths[i, kbps:] = hmod2 * vert_grid.sigma[i, :nvrt-kbps]
+                depths[i, :kbps] = depths[i, kbps]
+            self._z = depths
+            return self._z
+        elif vert_grid.ivcor == 2:
+            h_s = vert_grid.param['h_s']
+            h_c = vert_grid.param['h_c']
+            kz = vert_grid.param['kz']
+            c_s = vert_grid.c_s
+            for i, node in enumerate(mesh.nodes):
+                depth = node[2]+elev[i]                
+                # S-level
+                hmod2 = max(0.1, min(depth, h_s))
+                for k, s in enumerate(vert_grid.sigma):
+                    k_a = kz + k - 1
+                    if hmod2 <= h_c:
+                        depths[i, k_a] = s * hmod2
+                    else:
+                        depths[i, k_a] = h_c * s + (hmod2 - h_c) * c_s[k]
+                # Z-level
+                for k, d in enumerate(vert_grid.ztot[:-1]):
+                    depths[i, k] = d
+            depths = np.array(depths)
+            self._z = depths
+            return self._z
+        else:
+            raise ValueError("Not supported ivcor")
 
 
 class SchismVerticalMeshIoFactory(object):

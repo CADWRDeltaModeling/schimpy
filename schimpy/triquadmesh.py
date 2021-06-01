@@ -80,6 +80,10 @@ class TriQuadMesh(object):
             :type: Numpy float array.
         """
         return self._nodes
+    
+    @nodes.setter
+    def nodes(self, newnodes):
+        self._nodes = newnodes
 
     @property
     def elems(self):
