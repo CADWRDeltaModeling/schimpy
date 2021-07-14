@@ -676,7 +676,10 @@ class SchismMesh(TriQuadMesh):
         if len(xy) != len(var):
             raise ValueError("input var has different len compared to input elem")
         if inpoly is not None:
-            xy = np.asarry(xy)[inpoly]
+            xy = np.asarray(xy)[inpoly]      
+            if var is not None:
+                vpoly = np.isnan(var) # do not plot nan data
+                inpoly = np.logical_and(inpoly, ~vpoly) 
             coll = PolyCollection(xy,array=var[inpoly],**kwargs)
         else:
             coll = PolyCollection(xy,array=var,**kwargs)
@@ -691,6 +694,8 @@ class SchismMesh(TriQuadMesh):
         if len(self.nodes) != len(var):
             raise ValueError("input var has different len compared to input node")             
         velem = np.asarray([var[el].mean(axis=0) for el in self.elems]) 
+        if inpoly is not None:
+            inpoly = np.asarray([np.all(inpoly[el]) for el in self.elems])
         coll = self.plot_elems(var=velem,ax=ax,inpoly=inpoly,**kwargs)
         return coll
     

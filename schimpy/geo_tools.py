@@ -12,11 +12,12 @@ to ...\\Anaconda3\\Library\\share (where proj_def.dat is).
 """
 
 import yaml
-import geopandas as gpd
-import pandas as pd
+import json
 import numpy as np
+import pandas as pd
 import logging
-from shapely.geometry import Polygon, MultiPolygon
+import geopandas as gpd
+from shapely.geometry import Point, Polygon, LineString, mapping, MultiPolygon
 from pyproj import Proj
 
 def shapely_to_geopandas(features,Proj4=None,shp_fn=None):
@@ -165,3 +166,57 @@ def utm2ll(utm_xy,proj4=None):
     projection = project_fun(proj4)
     lon, lat = projection(utm_xy[0],utm_xy[1],inverse=True)
     return np.asarray([lon,lat])
+
+def geometry2coords(geo_obj):
+    coords = list(mapping(geo_obj['geometry'])['coordinates'])
+    coords = json.loads(json.dumps(coords))  #nestted tuper to list    
+    return coords
+
+def geometry2coords_points(geo_obj):
+    return list(mapping(geo_obj['geometry'])['coordinates'][0:2])
+
+def shp2yaml(shp_fn, yaml_fn, proj4=None):  
+    """
+    Convert a shapefile to yaml file
+    Parameters
+    ----------
+    shp_fn : STRING
+        Input shape filename
+    yaml_fn : STRING
+        Output yaml filename
+    proj4 : STRING, optional
+        Output projection. The default is None.
+        
+    Returns
+    -------
+    None.
+
+    """
+    gdf = gpd.read_file(shp_fn)
+    gdf = gdf.dropna()
+    if proj4:
+        gdf = gdf.to_crs(proj4)
+    gdf.reset_index(drop=True,inplace=True)
+    stype = gdf.geometry.type[0]    
+    if stype == 'LineString':
+        stype = 'linestrings'
+        gdf['coordinates'] = gdf.apply(geometry2coords,axis=1)
+        df = gdf.drop(columns='geometry')
+        df_yaml = df.to_dict('records')
+        df_yaml = {stype: df_yaml}
+    elif stype == 'Polygon':
+        stype = 'polygons'
+        gdf['vertices'] = gdf.apply(geometry2coords,axis=1)
+        df = gdf.drop(columns='geometry')
+        df_yaml = df.to_dict('records')
+        df_yaml = {stype: df_yaml}
+    else:  # if points, no stype needs to be specified in the yaml file. 
+        stype = shp_fns[sf]
+        gdf['coordinates'] = gdf.apply(geometry2coords,axis=1)
+        df = gdf.drop(columns='geometry')
+        df.set_index('name',inplace=True) 
+        df_yaml = df.T.to_dict('records')
+        df_yaml = {stype: df_yaml}    
+    
+    with open(yaml_fn, 'w') as file:                      
+        yaml_data = yaml.safe_dump(df_yaml, file) 

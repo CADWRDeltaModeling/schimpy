@@ -19,7 +19,7 @@ Options:
     * extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects. 
     * obs_points: interpolated from 1D (time series of) observational points.
     * hotstart_nc: initialize with a previous hotstart output from the same or a different mesh.
-    * schout_nc: initialize with a schism output snapshot: not implemented.
+    * schout_nc: initialize with a schism output snapshot.
 
 Required data files:
     * param.in
@@ -958,7 +958,7 @@ class VariableField(object):
             diff_points = np.where(dist>dist_th)[0]
             if self.mesh.n_vert_levels != mesh1.n_vert_levels:
                 raise("distance threshold should only be defined when the two grids have the same vertical layer numbers")
-            if type(vin) is xr.core.dataset.Dataset:
+            if isinstance(vin, xr.core.dataset.Dataset):
                 vout = np.zeros( (len(vin),np.shape(vgrid2)[0],
                                   np.shape(vgrid2)[1]))
                 if method == 'nearest':
@@ -1007,7 +1007,7 @@ class VariableField(object):
                 (self.mesh.n_vert_levels == mesh1.n_vert_levels and \
                  ('vinterp' not in self.ini_meta or 
                   self.ini_meta['vinterp'] is False)): 
-                if type(vin) is xr.core.dataset.Dataset:
+                if isinstance(vin, xr.core.dataset.Dataset):
                     for j,v in enumerate(list(vin.keys())):
                         vout[j,:] = vin[v][indices]
                 else:
@@ -1015,7 +1015,7 @@ class VariableField(object):
             else:   
                 print("interpolating vertical grid from %s"%(
                     vgrid_fn))
-                if type(vin) is xr.core.dataset.Dataset:
+                if isinstance(vin, xr.core.dataset.Dataset):
                     vout = np.zeros( (len(vin),np.shape(vgrid2)[0],
                                       np.shape(vgrid2)[1]))
                 else:
@@ -1023,7 +1023,7 @@ class VariableField(object):
                 for i, n2 in enumerate(hgrid2):  
                     z1 = vgrid1[indices[i]]
                     z2 = vgrid2[i]
-                    if type(vin) is xr.core.dataset.Dataset:
+                    if isinstance(vin, xr.core.dataset.Dataset):
                         for j,v in enumerate(list(vin.keys())):
                             f = interpolate.interp1d(
                             z1, vin[v][indices[i]], fill_value='extrapolate', 
