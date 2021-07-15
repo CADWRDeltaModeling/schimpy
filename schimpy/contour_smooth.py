@@ -300,9 +300,11 @@ def create_arg_parser():
     parser_save.set_defaults(func = save_smooth)
     return parser
     
-
-if __name__ == '__main__':
+def main():
     parser = create_arg_parser()
     args = parser.parse_args()
     func = args.func
     func(**vars(args))
+
+if __name__ == '__main__':
+    main()
