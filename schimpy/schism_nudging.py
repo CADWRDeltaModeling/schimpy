@@ -443,8 +443,9 @@ class nudging(object):
                     wetj = wetij[1] 
                     
                     for i, j in zip(dryi,dryj):
-                        distij = np.abs((weti-i)) + np.abs(wetj-j)                        
-                        m = np.where(distij==min(distij))[0][0]
+                        distij = np.abs(weti-i) + np.abs(wetj-j)                        
+                        #m = np.where(distij==min(distij))[0][0]
+                        m = np.argmin(distij)    
                     # salt[dryi,dryj,:] = salt[weti[m],wetj[m],:]
                     # temp[dryi,dryj,:] = temp[weti[m],wetj[m],:]
                         salt[i,j,:]=salt[weti[m],wetj[m],:]
@@ -656,13 +657,23 @@ class nudging(object):
                                           zm)
                         kbp = kbp.astype(int)
                         lev = lev.T.astype(int)
-                        vrat = vrat.T       
+                        vrat = vrat.T   
+                        
+                        wild2 = np.zeros((self.nvrt, npout, 4,2))   #initialize interpolation coefficients 
+                        ix = np.broadcast_to(ix,(self.nvrt, npout)) 
+                        iy = np.broadcast_to(iy,(self.nvrt, npout))
+                        intri1 = np.where(intri==1)[0]
+                        intri2 = np.where(intri==2)[0]
+                        i_in_1 = i_in[intri1]
+                        i_in_2 = i_in[intri2]
                         print("time=%f"%(timer.time() - start))
                     
-                    tempout=-999*np.ones((self.nvrt, self.nnode))
-                    saltout=-999*np.ones((self.nvrt, self.nnode))    
-                    tempout[:,i_out] = tem_outside
-                    saltout[:,i_out] = sal_outside   
+                        #tempout=-999*np.ones((self.nvrt, self.nnode))
+                        #saltout=-999*np.ones((self.nvrt, self.nnode)) 
+                        tempout=np.empty((self.nvrt, self.nnode))
+                        saltout=np.empty((self.nvrt, self.nnode)) 
+                        tempout[:,i_out] = tem_outside
+                        saltout[:,i_out] = sal_outside   
                     
                     id_dry = np.where(kbp[ix,iy]==-1)[0] #ROMS dry cell
                     lev[:,id_dry] = int(ilen-1-1)
@@ -674,9 +685,6 @@ class nudging(object):
                     # lev[id_shallower] = ilen-1-1
                     # vrat[id_shallower] = 1 
                     
-                    wild2 = np.zeros((self.nvrt, npout, 4,2))
-                    ix = np.broadcast_to(ix,(self.nvrt, npout))
-                    iy = np.broadcast_to(iy,(self.nvrt, npout))
                     wild2[:,:,0,0]=temp[ix,iy,lev]*(1-vrat)+temp[ix,iy,lev+1]*vrat
                     wild2[:,:,0,1]=salt[ix,iy,lev]*(1-vrat)+salt[ix,iy,lev+1]*vrat
                     wild2[:,:,1,0]=temp[ix+1,iy,lev]*(1-vrat)+temp[ix+1,iy,lev+1]*vrat
@@ -685,15 +693,14 @@ class nudging(object):
                     wild2[:,:,2,1]=salt[ix+1,iy+1,lev]*(1-vrat)+salt[ix+1,iy+1,lev+1]*vrat
                     wild2[:,:,3,0]=temp[ix,iy+1,lev]*(1-vrat)+temp[ix,iy+1,lev+1]*vrat
                     wild2[:,:,3,1]=salt[ix,iy+1,lev]*(1-vrat)+salt[ix,iy+1,lev+1]*vrat
+                                        
+                    tempout[:,i_in[intri1]] = wild2[:,intri1,0,0]*arco[0,i_in_1] + \
+                        wild2[:,intri1,1,0]*arco[1,i_in_1] + \
+                        wild2[:,intri1,2,0]*arco[2,i_in_1]
                     
-                    intri1 = np.where(intri==1)[0]
-                    tempout[:,i_in[intri1]] = wild2[:,intri1,0,0]*arco[0,i_in[intri1]] + \
-                        wild2[:,intri1,1,0]*arco[1,i_in[intri1]] + \
-                        wild2[:,intri1,2,0]*arco[2,i_in[intri1]]
-                    
-                    saltout[:,i_in[intri1]] = wild2[:,intri1,0,1]*arco[0,i_in[intri1]] + \
-                        wild2[:,intri1,1,1]*arco[1,i_in[intri1]] + \
-                        wild2[:,intri1,2,1]*arco[2,i_in[intri1]]
+                    saltout[:,i_in[intri1]] = wild2[:,intri1,0,1]*arco[0,i_in_1] + \
+                        wild2[:,intri1,1,1]*arco[1,i_in_1] + \
+                        wild2[:,intri1,2,1]*arco[2,i_in_1]
                         
                                     #             if intri==1:
                     #                 tempout[k,i] = wild2[0,0]*arco[0,i] + \
@@ -708,25 +715,21 @@ class nudging(object):
                     #                               wild2[3,0]*arco[2,i]
                     #                 saltout[k,i] = wild2[0,1]*arco[0,i] + \
                     #                               wild2[2,1]*arco[1,i] + \
-                    #                               wild2[3,1]*arco[2,i]
-                        
-                    intri2 = np.where(intri==2)[0]
-                    tempout[:,i_in[intri2]] = wild2[:,intri2,0,0]*arco[0,i_in[intri2]] + \
-                        wild2[:,intri2,2,0]*arco[1,i_in[intri2]] + \
-                        wild2[:,intri2,3,0]*arco[2,i_in[intri2]]
+                    #                               wild2[3,1]*arco[2,i]                        
+                   
+                    tempout[:,i_in[intri2]] = wild2[:,intri2,0,0]*arco[0,i_in_2] + \
+                        wild2[:,intri2,2,0]*arco[1,i_in_2] + \
+                        wild2[:,intri2,3,0]*arco[2,i_in_2]
                     
-                    saltout[:,i_in[intri2]] = wild2[:,intri2,0,1]*arco[0,i_in[intri2]] + \
-                        wild2[:,intri2,2,1]*arco[1,i_in[intri2]] + \
-                        wild2[:,intri2,3,1]*arco[2,i_in[intri2]]   
+                    saltout[:,i_in[intri2]] = wild2[:,intri2,0,1]*arco[0,i_in_2] + \
+                        wild2[:,intri2,2,1]*arco[1,i_in_2] + \
+                        wild2[:,intri2,3,1]*arco[2,i_in_2]   
                     
                     print("time4=%f"%(timer.time() - start))
                     
                     #Correct near surface T bias
                     idST = np.where( (kbp[ix,iy]!=-1) & (self.z[i_in,:].T>-10))
                     tempout[idST[0],i_in[idST[1]]]=tempout[idST[0],i_in[idST[1]]]-1
-
-                    #Enforce lower bound for temp. for eqstate
-                    tempout[tempout<0]== 0 
     
                     #if i==23293 and k == self.nvrt-1:
                     # if npout==0 and k == self.nvrt-1 and irecout2==100:
@@ -829,7 +832,9 @@ class nudging(object):
         temperature = np.array(temperature)
         salinity = np.array(salinity)
         temperature = np.transpose(temperature,(0,2,1)) # [var,time,node_map, nvrt]
-        salinity = np.transpose(salinity,(0,2,1))
+        salinity = np.transpose(salinity,(0,2,1))        
+        #Enforce lower bound for temp. for eqstate
+        temperature[temperature<0]== 0 
         print("reorganizing matrix!")  
         print("time=%f"%(timer.time() - start))
         return weights, [temperature, salinity], \
