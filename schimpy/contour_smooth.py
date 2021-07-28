@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """ This module contains tools for a smoother for DEMs (currently tiff format) based on curvature flow
     The algorithm is based on one by Malladi and Sethian, and results in a simplification of contours while allowing
     sharp gradients as long as they are persistent. So it is *not* a cure for pressure gradient errors a la Hannah.
