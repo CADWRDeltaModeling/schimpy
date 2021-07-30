@@ -11,14 +11,13 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-install_requires = ['vtools>=3.4','pandas','geopandas>=0.6',
+install_requires = ['vtools3>=3.4','pandas','geopandas>=0.6',
                     'xarray>=0.15', 'netcdf4>=1.4', 'scipy>=1.4',
                     'matplotlib>=3.1', 'statsmodels>=0.11',
                     'palettable>=3.3', 'pyyaml>=5.3',
-                    'pytest-runner','unittest','scikit-learn','statsmodels',
+                    'scikit-learn','statsmodels',
                     'urllib','beautifulsoup4','pyproj','gdal','nodepy',
-                    'shapely','rasterstats>=0.14',
-                    'sphinx','nbsphinx','sphinx-argparse','numpydoc']
+                    'shapely','rasterstats>=0.14']
 
 requirements = install_requires
 
