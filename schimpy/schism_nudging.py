@@ -147,7 +147,7 @@ class nudging(object):
         values_comb = []
         imap_comb = []
         for p in self.info['polygons']:
-            print("creating nuding for polygon %s"%p['name'])
+            print("creating nudging for polygon %s"%p['name'])
             weights, values, imap = self.create_region_nudging(p)
             weights_comb.append(weights)
             values_comb.append(values)
@@ -191,7 +191,12 @@ class nudging(object):
                          values_var[i][r][:,int(idx_list[im,r]),:])
                      weights_sum.append(w)
                      weights_sum2.append(w**2)
-                values_merged[:,im,:] = np.sum(values_sum,axis=0)/sum(weights_sum)
+                values_temp = np.sum(values_sum,axis=0)/sum(weights_sum)
+                if np.shape(values_temp)[0]>len(self.time):
+                    values_merged[:,im,:] = values_temp[:len(self.time),:]
+                else:
+                    values_merged[:,im,:] = values_temp
+                #values_merged[:,im,:] = np.sum(values_sum,axis=0)/sum(weights_sum)
                 weights_merged[imap_merged[im]] = sum(weights_sum2)/sum(weights_sum)
             
             if v== 'temperature':
@@ -229,7 +234,7 @@ class nudging(object):
     def create_region_nudging(self, region_info):
         if region_info['type'] == 'roms':
             weights, values_list, imap, time = self.gen_nudge_roms(region_info)
-            values_list =  [vl[:,imap,:] for vl in values_list]
+            #values_list =  [vl[:,imap,:] for vl in values_list]
             nvar = len(region_info['interpolant']['variable'])
             weights_list = np.broadcast_to(weights,[nvar,len(weights)])
             imap_list = np.broadcast_to(imap,[nvar,len(imap)])
@@ -823,8 +828,11 @@ class nudging(object):
                     print("applying spatial interpolation!")          
                     print("outputting at day ",dt.total_seconds()/86400, npout) 
                     
-                    temperature.append(tempout)
-                    salinity.append(saltout)
+                    # only save the nodes with valid values. 
+                    tempout_in = [temp_t[imap[:npout]] for temp_t in tempout]
+                    saltout_in = [salt_t[imap[:npout]] for salt_t in saltout]
+                    temperature.append(tempout_in)
+                    salinity.append(saltout_in)
                     output_day.append(dt.total_seconds()/86400)
                     print("time5=%f"%(timer.time() - start))
         # return weights, output_day, [temperature, salinity], \
@@ -918,8 +926,8 @@ class nudging(object):
                         for nx, ny in zip(self.node_x[imap_v],
                                           self.node_y[imap_v]):
                             dist = (nx-obs_x)**2 + (ny-obs_y)**2
-                            nn_id.append(np.where(dist==dist.max())[0][0])                        
-                        values_v = vdata.isel(site=nn_id).values       
+                            nn_id.append(np.where(dist==dist.min())[0][0])
+                        values_v = vdata.isel(site=nn_id).values    
                     elif method == 'inverse_distance':
                         obs_loc = np.array([obs_x,obs_y]).T
                         values_v = []
