@@ -1158,14 +1158,14 @@ def n_tracers(param_nml, modules=['TEM', 'SAL']):
         irange_tr_1.append(sum(ntrs))
         ntrs.append(param['ntracer_gen'])
         for t in range(ntrs[-1]):
-            tr_mname.append('GEN_%d' % t)
+            tr_mname.append('GEN_%d' % (t+1))
         irange_tr_2.append(sum(ntrs))
 
     if "AGE" in modules and 'ntracer_age' in param.keys():
         irange_tr_1.append(sum(ntrs))
         ntrs.append(param['ntracer_age'])
         for t in range(ntrs[-1]):
-            tr_mname.append('AGE_%d' % t)
+            tr_mname.append('AGE_%d' % (t+1))
         irange_tr_2.append(sum(ntrs))
 
     if "SED" in modules and 'sed_class' in param.keys():
