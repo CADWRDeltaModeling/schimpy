@@ -6,7 +6,7 @@ Options:
 1. Centering:
     * node2D: node (2D surface)
     * node3D: node at whole level 
-    * edge: edge center at whole level (mainly for horizontal velocties)
+    * edge: edge center at whole level (mainly for horizontal velocty)
     * elem: element center at whole level (mainly for vertical velocity)
     * prism: prism center (for tracers); three different variables tr_el, tr_nd,
     * tr_el need to be generated for the hotstart.nc file. 
@@ -326,7 +326,7 @@ class VariableField(object):
     """
 
     def __init__(self, v_meta, vname, mesh, depths, date, proj4, tr_mname,
-                 hotstart_ini, **kwargs):
+                 hotstart_ini=None, **kwargs):
         self.centering = v_meta['centering']
         self.variable_name = vname
         self.mesh = mesh
@@ -544,10 +544,12 @@ class VariableField(object):
         elif isinstance(value, str):
             if inpoly is not None:
                 xy = self.hgrid[inpoly]
-                z = self.vgrid[inpoly,0]
+                if not isinstance(self.vgrid, (float,int)):
+                    z = self.vgrid[inpoly,0]
             else:
                 xy = self.hgrid
-                z = self.vgrid[:,0]
+                if not isinstance(self.vgrid, (float,int)):
+                    z = self.vgrid[:,0]
             x = xy[:, 0]
             y = xy[:, 1]            
             if self.variable_name in ['SED3D_bed', 'SED3D_bedfrac']:
@@ -559,6 +561,8 @@ class VariableField(object):
             else:
                 # x and y based function where x and y are lat and lon.
                 vmap = eval(value)
+                if isinstance(vmap,(int,float)):
+                    vmap = np.ones_like(x)*vmap
                 if '2D' in self.centering:
                     return vmap
                 else:
@@ -698,7 +702,7 @@ class VariableField(object):
         cast_date = polaris_date[np.argmin(abs(polaris_date-date))]
         if 'Station' in polaris_data.columns:
             polaris_cast = polaris_data[polaris_data.datetime == cast_date][[
-                'Station', variable, 'Depth']]
+                'Station', variable, 'Depth (m)']]
         else:
             polaris_cast = polaris_data[polaris_data.datetime == cast_date][[
                 'Station Number', variable, 'Depth']]
@@ -720,7 +724,6 @@ class VariableField(object):
             ['Station', 'y', 'x']]
         stations.set_index('Station', inplace=True)
         polaris_cast = polaris_cast.join(stations, on='Station', how='left')
-        #print(polaris_cast)
 
         if inpoly is not None:
             n_hgrid = len(inpoly)
@@ -737,8 +740,11 @@ class VariableField(object):
         for s in polaris_cast.index.unique():
             s_xy = [stations.loc[s].x, stations.loc[s].y]
             grid_df[str(s)] = distance.cdist([s_xy], g_xy)[0]
-        grid_df['nearest'] = grid_df.idxmin(axis=1).astype(int)
+        grid_df['nearest'] = grid_df.idxmin(axis=1).astype(float).astype(int)
 
+        if 'depth' not in polaris_cast.columns:
+            polaris_cast = polaris_cast.rename(columns={'depth (m)':'depth'})
+            
         # loop through each station and perform vertical interpolations for the nearest grid
         # the depths computed are negative but polaris depths are positive
         grid_depths = self.vgrid[inpoly, :]*-1.0
@@ -746,11 +752,11 @@ class VariableField(object):
             grid_nearest = np.where(grid_df.nearest == s)[0]
             zc = polaris_cast.loc[s]
             f = interpolate.interp1d(
-                zc.depth, zc[variable.lower()], fill_value='extrapolate', kind='previous')
+                zc['depth'], zc[variable.lower()], fill_value='extrapolate', kind='previous')
             for g in grid_nearest:
                 depth = grid_depths[g]
                 v[g, :] = f(depth)
-
+            
         if np.any(np.isnan(v)):
             raise ValueError(
                 "The interpolated %s field has nan in it" % variable)
@@ -814,9 +820,21 @@ class VariableField(object):
         if ini_meta:
             obs_file = ini_meta['data']
             variable = ini_meta['variable']
+            if 'ratio' in ini_meta.keys():
+                ratio = ini_meta['ratio']
+                if isinstance(ratio, str):
+                    ratio = eval(ratio)
+            else:
+                ratio = 1.0
         else:
             obs_file = self.ini_meta['data']
             variable = self.ini_meta['variable']
+            if 'ratio' in self.ini_meta.keys():
+                ratio = self.ini_meta['ratio']
+                if isinstance(ratio, str):
+                    ratio = eval(ratio)
+            else:
+                ratio = 1.0
         obs_data = pd.read_csv(obs_file)
         obs_data = obs_data.dropna(subset=[variable])
         obs_loc = obs_data[['Lon', 'Lat']].values
@@ -1008,6 +1026,8 @@ class VariableField(object):
                  ('vinterp' not in self.ini_meta or 
                   self.ini_meta['vinterp'] is False)): 
                 if isinstance(vin, xr.core.dataset.Dataset):
+                    vout = np.zeros( ((len(vin.keys())),len(indices),
+                                      len(vin.nVert)))
                     for j,v in enumerate(list(vin.keys())):
                         vout[j,:] = vin[v][indices]
                 else:
@@ -1131,7 +1151,7 @@ def n_tracers(param_nml, modules=['TEM', 'SAL']):
 !     5: SED3D: SED
 !     6: EcoSim: ECO
 !     7: ICM: ICM and/or ICM_PH
-!     8: CoSINE: COSINE
+!     8: CoSiNE: COSINE
 !     9: Feco: FIB
 !    10: TIMOR
 !    11: FABM    
@@ -1165,7 +1185,7 @@ def n_tracers(param_nml, modules=['TEM', 'SAL']):
         irange_tr_1.append(sum(ntrs))
         ntrs.append(param['ntracer_age'])
         for t in range(ntrs[-1]):
-            tr_mname.append('AGE_%d' % (t+1))
+            tr_mname.append('AGE_%d' % int(t+1))
         irange_tr_2.append(sum(ntrs))
 
     if "SED" in modules and 'sed_class' in param.keys():
@@ -1191,12 +1211,12 @@ def n_tracers(param_nml, modules=['TEM', 'SAL']):
                     'SAT', 'COD', 'DOO', 'TIC', 'ALK', 'CA', 'CACO3']
         if "ICM_PH" in modules:
             ntrs.append(25)
-            for name in ICM_name:
-                tr_mname.append('ICM_%f' % name)
+            for i in range(25):
+                tr_mname.append('ICM_%d' % (i+1))
         else:
             ntrs.append(21)
-            for name in ICM_name[:21]:
-                tr_mname.append('ICM_%f' % name)
+            for i in range(21):
+                tr_mname.append('ICM_%d' % (i+1))
         # The notation for the names can be found in icm.F90.
         irange_tr_2.append(sum(ntrs))
 
@@ -1205,8 +1225,8 @@ def n_tracers(param_nml, modules=['TEM', 'SAL']):
         ntrs.append(13)
         COS_name = ['NO3', 'SiO4', 'NH4', 'S1', 'S2', 'Z1',
                     'Z2', 'DN', 'DSi', 'PO4', 'DOX', 'CO2', 'ALK']
-        for name in COS_name:
-            tr_mname.append('COS_%f' % name)
+        for t in range(13):
+            tr_mname.append('COS_%d' % int(t+1))
         irange_tr_2.append(sum(ntrs))
 
     if "FIB" in modules:  # Fecal Indicator Bacteria model

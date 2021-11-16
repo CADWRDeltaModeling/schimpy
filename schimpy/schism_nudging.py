@@ -129,7 +129,7 @@ class nudging(object):
                         values_v.append(values_comb[pi][pos])
                         imap_v.append(imap_comb[pi][pos])  
                         var_v.append(v)
-            if np.any(weights_comb[vi][pos]):
+            if np.any(weights_v):
                 weights_list.append(weights_v)
                 values_list.append(values_v)
                 imap_list.append(imap_v)
@@ -261,7 +261,7 @@ class nudging(object):
         tem_outside =  float(lines[0].split()[0]) #T,S values for pts outside bg grid in nc
         sal_outside = float(lines[0].split()[1])
         dtout = float(lines[1].split()[0]) #time step in .nc [sec]
-        nt_out = float(lines[1].split()[1]) #output stride
+        nt_out = int(lines[1].split()[1]) #output stride
         istart_year = int(lines[2].split()[0])
         istart_mon = int(lines[2].split()[1])
         istart_day = int(lines[2].split()[2])
@@ -321,7 +321,7 @@ class nudging(object):
                     'elevation':'ssh'}
         var_list = [var_name[v] for v in region_info['interpolant']['variable']]
         
-        start = timer.time()
+        #start = timer.time()
         for d in range(nndays+1): 
             date = datetime.date(istart_year,istart_mon,istart_day) + \
                 datetime.timedelta(d)
@@ -332,7 +332,7 @@ class nudging(object):
                 ncfile = "%s%4d%02d%02d%s.nc"%(ncfile1,date.year,date.month,
                                             date.day,hr)                
                 ncdata = xr.open_dataset(ncfile)
-                print("time1=%f"%(timer.time() - start))
+                #print("time1=%f"%(timer.time() - start))
                 
                 if d ==0 and hr == hr_char[0]:                    
                     # lon, lat = np.meshgrid(ncdata['lon'].values,
@@ -405,7 +405,7 @@ class nudging(object):
                     klev0 = [np.where(~np.isnan(salt[ix,iy,:]))[0][0] for 
                              (ix,iy) in zip(wet_xy[0],wet_xy[1])]
                     
-                    print("time2=%f"%(timer.time() - start))
+                    #print("time2=%f"%(timer.time() - start))
                     for wi in range(len(klev0)): 
                         salt[wet_xy[0][wi],wet_xy[1][wi],:klev0[wi]] = \
                             salt[wet_xy[0][wi],wet_xy[1][wi],klev0[wi]]
@@ -447,65 +447,70 @@ class nudging(object):
                     weti = wetij[0]
                     wetj = wetij[1] 
                     
-                    for i, j in zip(dryi,dryj):
-                        distij = np.abs(weti-i) + np.abs(wetj-j)                        
-                        #m = np.where(distij==min(distij))[0][0]
-                        m = np.argmin(distij)    
-                    # salt[dryi,dryj,:] = salt[weti[m],wetj[m],:]
-                    # temp[dryi,dryj,:] = temp[weti[m],wetj[m],:]
-                        salt[i,j,:]=salt[weti[m],wetj[m],:]
-                        temp[i,j,:]=temp[weti[m],wetj[m],:]    
-                        #uvel(i,j,:ilen)=uvel(weti[m],wetj[m],:ilen)
-                        #vvel(i,j,:ilen)=vvel(weti[m],wetj[m],:ilen)
-                        #ssh(i,j)=ssh(weti[m],wetj[m])
-                    
-                    # for i in range(ixlen):
-                    #     for j in range(iylen):
-                    #         if kbp[i,j]==-1:   # invalid pts (dry) 
-                    #             #Compute max possible tier # for neighborhood
-                    #             mmax=max(i,ixlen-i-1,j,iylen-j-1)
-                                
-                    #             m = 0 
-                    #             i3 = np.nan
-                    #             j3 = np.nan
-                    #             #while True: #starting from (i,j) and search on both sides  
-                    #             for m in range(0,mmax+1):                                  
-                    #                 for ii in range(max(-m,-i),
-                    #                                 min(m,ixlen-i-1)):
-                    #                     i3 = max(0,min(ixlen-1,i+ii))
-                    #                     for jj in range(max(-m,-j),
-                    #                                     min(m,iylen-j-1)):
-                    #                         j3=max(0,min(iylen-1,j+jj))
-                    #                         if kbp[i3,j3]==1:
-                    #                             i1=i3
-                    #                             j1=j3
-                    #                             break 
-                    #                     if kbp[i3,j3]==1:
-                    #                          break
-                    #                 if ~np.isnan(i3) and ~np.isnan(j3): 
-                    #                     if kbp[i3,j3]==1:
-                    #                          break
-                    #                 if m == mmax:
-                    #                     print("Max. exhausted:%d,%d,%d"%(
-                    #                         i,j,mmax))
-                    #                     print('kbp')
-                    #                     for ii in range(ixlen):
-                    #                         for jj in range(iylen):
-                    #                             print(ii,jj,kbp(ii,jj))
-                    #                     raise("Max. exhausted!")
-                    #                 #m += 1 
-                                  
-                    #             salt[i,j,:ilen]=salt[i1,j1,:ilen]
-                    #             temp[i,j,:ilen]=temp[i1,j1,:ilen]
-                                # double check to make sure there are no out of bound values
-                                # if any(salt[i,j,:]<saltmin) or \
-                                #     any(salt[i,j,:]>saltmax) or \
-                                #     any(temp[i,j,:]<tempmin) or \
-                                #     any(temp[i,j,:]>tempmax):
-                                #     print("Fatal: no valid values:%s,%d,%d for salt or temp at"
-                                #           (ncfile,i,j))  
-                    print("dealing with horizontal nan values!") 
-                    print("time3=%f"%(timer.time() - start))
+                    if wetij[0].size==0:
+                        print("no ROMS data available for: %s"%str(ctime))
+                        salt = -9999.0*np.ones_like(salt)
+                        temp = -9999.0*np.ones_like(temp)
+                    else: 
+                        for i, j in zip(dryi,dryj):
+                            distij = np.abs(weti-i) + np.abs(wetj-j)                        
+                            #m = np.where(distij==min(distij))[0][0]
+                            m = np.argmin(distij)    
+                        # salt[dryi,dryj,:] = salt[weti[m],wetj[m],:]
+                        # temp[dryi,dryj,:] = temp[weti[m],wetj[m],:]
+                            salt[i,j,:]=salt[weti[m],wetj[m],:]
+                            temp[i,j,:]=temp[weti[m],wetj[m],:]    
+                            #uvel(i,j,:ilen)=uvel(weti[m],wetj[m],:ilen)
+                            #vvel(i,j,:ilen)=vvel(weti[m],wetj[m],:ilen)
+                            #ssh(i,j)=ssh(weti[m],wetj[m])
+                        
+                        # for i in range(ixlen):
+                        #     for j in range(iylen):
+                        #         if kbp[i,j]==-1:   # invalid pts (dry) 
+                        #             #Compute max possible tier # for neighborhood
+                        #             mmax=max(i,ixlen-i-1,j,iylen-j-1)
+                                    
+                        #             m = 0 
+                        #             i3 = np.nan
+                        #             j3 = np.nan
+                        #             #while True: #starting from (i,j) and search on both sides  
+                        #             for m in range(0,mmax+1):                                  
+                        #                 for ii in range(max(-m,-i),
+                        #                                 min(m,ixlen-i-1)):
+                        #                     i3 = max(0,min(ixlen-1,i+ii))
+                        #                     for jj in range(max(-m,-j),
+                        #                                     min(m,iylen-j-1)):
+                        #                         j3=max(0,min(iylen-1,j+jj))
+                        #                         if kbp[i3,j3]==1:
+                        #                             i1=i3
+                        #                             j1=j3
+                        #                             break 
+                        #                     if kbp[i3,j3]==1:
+                        #                          break
+                        #                 if ~np.isnan(i3) and ~np.isnan(j3): 
+                        #                     if kbp[i3,j3]==1:
+                        #                          break
+                        #                 if m == mmax:
+                        #                     print("Max. exhausted:%d,%d,%d"%(
+                        #                         i,j,mmax))
+                        #                     print('kbp')
+                        #                     for ii in range(ixlen):
+                        #                         for jj in range(iylen):
+                        #                             print(ii,jj,kbp(ii,jj))
+                        #                     raise("Max. exhausted!")
+                        #                 #m += 1 
+                                      
+                        #             salt[i,j,:ilen]=salt[i1,j1,:ilen]
+                        #             temp[i,j,:ilen]=temp[i1,j1,:ilen]
+                                    # double check to make sure there are no out of bound values
+                                    # if any(salt[i,j,:]<saltmin) or \
+                                    #     any(salt[i,j,:]>saltmax) or \
+                                    #     any(temp[i,j,:]<tempmin) or \
+                                    #     any(temp[i,j,:]>tempmax):
+                                    #     print("Fatal: no valid values:%s,%d,%d for salt or temp at"
+                                    #           (ncfile,i,j))  
+                        print("dealing with horizontal nan values!") 
+                        #print("time3=%f"%(timer.time() - start))
                     
                     if d ==0 and hr == hr_char[0] and t==time[ilo]:
                         ixy=np.zeros((self.nnode,3))*np.nan
@@ -671,7 +676,7 @@ class nudging(object):
                         intri2 = np.where(intri==2)[0]
                         i_in_1 = i_in[intri1]
                         i_in_2 = i_in[intri2]
-                        print("time=%f"%(timer.time() - start))
+                        #print("time=%f"%(timer.time() - start))
                     
                         #tempout=-999*np.ones((self.nvrt, self.nnode))
                         #saltout=-999*np.ones((self.nvrt, self.nnode)) 
@@ -730,7 +735,7 @@ class nudging(object):
                         wild2[:,intri2,2,1]*arco[1,i_in_2] + \
                         wild2[:,intri2,3,1]*arco[2,i_in_2]   
                     
-                    print("time4=%f"%(timer.time() - start))
+                    #print("time4=%f"%(timer.time() - start))
                     
                     #Correct near surface T bias
                     idST = np.where( (kbp[ix,iy]!=-1) & (self.z[i_in,:].T>-10))
@@ -834,7 +839,13 @@ class nudging(object):
                     temperature.append(tempout_in)
                     salinity.append(saltout_in)
                     output_day.append(dt.total_seconds()/86400)
-                    print("time5=%f"%(timer.time() - start))
+                    # if output_day[-1] == 350.625:
+                    #     import pdb
+                    #     pdb.set_trace()
+                    if len(output_day)>1:
+                        if output_day[-1]-output_day[-2]>1.1/24:
+                            raise Exception('The difference between current and previous time step is greater than assigned stride')
+                    #print("time5=%f"%(timer.time() - start))
         # return weights, output_day, [temperature, salinity], \
         #     imap[:npout].astype(int)+1   #schism is one-based  
         temperature = np.array(temperature)
@@ -844,7 +855,7 @@ class nudging(object):
         #Enforce lower bound for temp. for eqstate
         temperature[temperature<0]== 0 
         print("reorganizing matrix!")  
-        print("time=%f"%(timer.time() - start))
+        #print("time=%f"%(timer.time() - start))
         return weights, [temperature, salinity], \
             imap[:npout].astype(int), output_day   #schism is one-based 
 
@@ -1054,3 +1065,36 @@ class nudging(object):
         p = Polygon(vertices)        
         inpoly = np.where(self.mesh_gpd.within(p))[0]
         return inpoly  
+
+
+def roms_nc_list(gen_nu_fn):
+    """    
+    Parameters
+    ----------
+    gen_nu_fn : STR
+        gen_nu.in file
+    Returns
+    -------
+    roms_nc_fns: LIST
+        a list of roms netcdf files required for the nuding task
+    """
+    
+    # read gen_nu.in
+    with open(gen_nu_fn,'r') as reader:
+        lines = reader.readlines()    
+    istart_year = int(lines[2].split()[0])
+    istart_mon = int(lines[2].split()[1])
+    istart_day = int(lines[2].split()[2])
+    nndays = int(lines[3].split()[0])
+    ncfile1 = lines[4].split()[0]    
+    ncfile1 = ncfile1.replace("'","")  # remove the quotation marks 
+    hr_char = ['03','09','15','21'] #each day has 4 starting hours in ROMS  
+    roms_nc_fns = []           
+    for d in range(nndays+1): 
+        date = datetime.date(istart_year,istart_mon,istart_day) + \
+            datetime.timedelta(d) 
+        for hr in hr_char:
+            ncfile = "%s%4d%02d%02d%s.nc"%(ncfile1,date.year,date.month,
+                                            date.day,hr)  
+            roms_nc_fns.append(ncfile)
+    return roms_nc_fns

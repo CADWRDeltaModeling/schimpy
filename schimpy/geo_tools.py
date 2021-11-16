@@ -2,15 +2,9 @@
 """
 Created on Tue Nov 19 15:50:34 2019
 @author: zzhang
-if "no arguments in initialization list" runtime error is seen for pyproj,
-it is because that proj_def.dat file is missing.
-Solution: find datadir for pyproj.
-for example in C:\\Users\\YourUserName\\AppData\\Local\\Continuum\\anaconda3\\Lib\\site-packages\\pyproj\\datadir
-Open the file ‘datadir’.
-changed ...\\Anaconda3\\share\proj
-to ...\\Anaconda3\\Library\\share (where proj_def.dat is).
 """
 
+import os
 import yaml
 import json
 import numpy as np
@@ -18,7 +12,7 @@ import pandas as pd
 import logging
 import geopandas as gpd
 from shapely.geometry import Point, Polygon, LineString, mapping, MultiPolygon
-from pyproj import Proj
+from pyproj import Proj, CRS
 
 def shapely_to_geopandas(features,Proj4=None,shp_fn=None):
     """
@@ -79,11 +73,14 @@ def contiguity_check(mesh,poly_fn,centering='node',proj4=None):
         mesh_gpd = mesh.to_geopandas(feature_type = 'edge',proj4=proj4)
     else:
         mesh_gpd = mesh.to_geopandas(feature_type = 'point',proj4=proj4)
-        
-    poly_gpd = poly_gpd.to_crs(mesh_gpd.crs) # project to the mesh crs. 
-    poly_gpd.set_index('id',inplace=True)
-    poly_gpd.sort_index(inplace=True)
-    for id_n, poly in zip(poly_gpd.index,poly_gpd['geometry']):
+    
+    poly_gpd_crs = CRS.from_user_input(poly_gpd.crs)
+    mesh_gpd_crs = CRS.from_user_input(mesh_gpd.crs)
+    if not poly_gpd_crs.is_exact_same(mesh_gpd_crs):
+        poly_gpd = poly_gpd.to_crs(mesh_gpd.crs) # project to the mesh crs. 
+    #poly_gpd.set_index('id',inplace=True)
+    #poly_gpd.sort_index(inplace=True)
+    for id_n, poly in enumerate(poly_gpd['geometry']):
         id_name = "id_%s"%str(id_n) # make it one-based.
         mesh_gpd[id_name] = mesh_gpd.within(poly)
     other_id = "id_%s"%str(id_n+1)
@@ -95,7 +92,7 @@ def contiguity_check(mesh,poly_fn,centering='node',proj4=None):
  
     if len(orphaned_cells) == len(mesh_gpd):
         raise Exception("coordinate system mismatch: the default for the mesh \
-                        is lat lon")
+                        is utm-xy")
     elif len(orphaned_cells) >= len(mesh_gpd)/2:
         ID_df[other_id] = False
         ID_df[other_id].loc[orphaned_cells] = True
@@ -116,7 +113,7 @@ def contiguity_check(mesh,poly_fn,centering='node',proj4=None):
 
         string = ",".join(multi_labeled_cells.astype(str))
         print('''These cells or nodes belong to mulitple polygons %s: 
-              categorize as the last True poly'''%string)
+              categorized as the last True poly'''%string)
     # otherwise the domain is contiguous.
     logging.info("The domain divisino is contiguous!")
     mapping = np.where(ID_df.values)[1]+1 # change to one-based indices
@@ -175,7 +172,7 @@ def geometry2coords(geo_obj):
 def geometry2coords_points(geo_obj):
     return list(mapping(geo_obj['geometry'])['coordinates'][0:2])
 
-def shp2yaml(shp_fn, yaml_fn, proj4=None):  
+def shp2yaml(shp_fn, yaml_fn=None, proj4=None):  
     """
     Convert a shapefile to yaml file
     Parameters
@@ -217,6 +214,40 @@ def shp2yaml(shp_fn, yaml_fn, proj4=None):
         df.set_index('name',inplace=True) 
         df_yaml = df.T.to_dict('records')
         df_yaml = {stype: df_yaml}    
-    
+    if not yaml_fn:
+        yaml_fn = '%s.yaml'%os.path.splitext(shp_fn)[0]        
     with open(yaml_fn, 'w') as file:                      
         yaml_data = yaml.safe_dump(df_yaml, file) 
+
+def yaml2shp(fn,shp_fn=None, crs=None):
+    with open(fn,'r') as f:
+        yaml_data = yaml.load(f)
+    stype = list(set(['polygons','linestrings','points']).intersection(
+        yaml_data.keys()))[0]
+    yaml_df = pd.DataFrame(yaml_data[stype])
+    if stype == 'linestrings':            
+        features = [LineString(yc) for yc in yaml_df['coordinates']]
+        yaml_df['geometry'] = features              
+        gdf = gpd.GeoDataFrame(yaml_df,geometry='geometry')
+        gdf = gdf.drop('coordinates',axis=1)
+    elif stype == 'polygons':
+        features = [Polygon(np.squeeze(yc)) for yc in yaml_df['vertices']]
+        yaml_df['geometry'] = features              
+        gdf = gpd.GeoDataFrame(yaml_df,geometry='geometry')    
+        gdf = gdf.drop('vertices',axis=1)
+    elif stype == 'points': # this only applies dicu
+        yaml_df = yaml_df.T
+        features = [Point(yc) for yc in yaml_df.values]
+        yaml_df['geometry'] = features              
+        gdf = gpd.GeoDataFrame(yaml_df,geometry='geometry')    
+        gdf = gdf.drop([0,1],axis=1) 
+        gdf['name'] = gdf.index
+    if not crs: 
+        gdf.crs = "EPSG:32610"
+    else:
+        gdf.crs = crs
+    gdf = gdf.rename(columns={'name':'region'})
+    if not shp_fn:
+        #try to infer shapefile name from the yaml file
+        shp_fn = '%s.shp'%os.path.splitext(fn)[0]
+    gdf.to_file(shp_fn)
