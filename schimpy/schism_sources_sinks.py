@@ -152,6 +152,7 @@ def concat_msource_csv(csv_fn1,csv_fn2,merged_source_sink_in,
     
     cols = np.append(['datetime'],cols)
     th_merged = th_merged[cols] #rearrange the array to have the same order as defined in merged_source_sink_in
+    th_merged['datetime'] = np.datetime_as_string(th_merged.index.values,'h')
     write_source_sink_csv(th_merged,csv_merged)    
 
 def concat_vsource_sink_csv(csv_fn1,csv_fn2,merged_source_sink_in,
@@ -211,6 +212,7 @@ def concat_vsource_sink_csv(csv_fn1,csv_fn2,merged_source_sink_in,
     th_merged = th_merged.fillna(-9999.0)
     cols = np.append(['datetime'],sites)
     th_merged = th_merged[cols] #rearrange the array to have the same order as defined in merged_source_sink_in
+    th_merged['datetime'] = np.datetime_as_string(th_merged.index.values,'h')
     write_source_sink_csv(th_merged,csv_merged)   
     
 def read_source_sink_th(th_fn, source_or_sink_df):
