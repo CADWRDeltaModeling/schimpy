@@ -135,6 +135,30 @@ class hotstart(object):
                 else:
                     self.initialize_netcdf()
             self.nc_dataset = self.nc_dataset.merge(var)
+        #  cumsum_eta is required by the most recent version of schism.
+        self.nc_dataset = self.nc_dataset.assign(
+            cumsum_eta = self.nc_dataset.elevation)
+        if 'COSINE' in self.modules: #COS_mS2=COS_5, COS_mDN=COS_8, COS_mZ1 = COS_6, COS_mZ2 = COS_7
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mS2 = self.nc_dataset.COS_5_el)     
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mDN = self.nc_dataset.COS_8_el) 
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mZ1 = self.nc_dataset.COS_6_el) 
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mZ2 = self.nc_dataset.COS_7_el) 
+            # for COS_sxx, these means the sum values and will be set to zero
+            # 'COS_sS2  ','COS_sDN  ','COS_sZ1  ','COS_sZ2  ','COS_nstep'
+            self.nc_dataset['COS_sS2']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sDN']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sZ1']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sZ2']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_nstep']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
         # correct wet/dry cells depending on water level (eta2 value):mostly not needed.
         self.depth = self.mesh.build_z(elev=self.nc_dataset['elevation'].values) # compute depth again for the updated elevation.        
         self.wet_dry_check()
@@ -176,7 +200,8 @@ class hotstart(object):
                              'ifile': ('one', [1]),
                              'idry_e': ('elem', idry_e),
                              'idry_s': ('side', idry_s),
-                             'idry': ('node', idry)})
+                             'idry': ('node', idry),
+                             'nsteps_from_cold':('one',[0])})})
             # coords={'one':range(1),
             # 'elem':range(self.mesh.n_elems()),
             # 'node':range(self.mesh.n_nodes()),
