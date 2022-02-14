@@ -279,6 +279,8 @@ def read_source_sink_in(source_sink_in):
                 source_from.append('dicu')
             elif 'potw' in source_name[-1]:
                 source_from.append('potw')
+            else:
+                source_from.append('unknown')
         elif nsink>0 and len(sink_ele)<nsink:
             sink_ele.append(int(l.split()[0]))
             sink_name.append(l.split()[2])
@@ -296,8 +298,9 @@ def read_source_sink_in(source_sink_in):
     sink_df = pd.DataFrame({'element': sink_ele,
                              'name': sink_name,
                              'source': sink_from})
-    source_df = source_df.set_index('name')
-    sink_df = sink_df.set_index('name')
+    # setting index will reorder the df, so this should not be implemented
+    #source_df = source_df.set_index('name')
+    #sink_df = sink_df.set_index('name')
     return source_df, sink_df             
 
     
