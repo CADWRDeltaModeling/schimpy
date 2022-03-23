@@ -74,7 +74,7 @@ class hotstart(object):
             self.proj4 = proj4
         
         self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
-            n_tracers(self.param_nml, modules=self.modules)
+            describe_tracers(self.param_nml, modules=self.modules)
 
     def read_yaml(self):
         """
@@ -190,7 +190,7 @@ class hotstart(object):
 
     def initialize_netcdf(self, default_turbulence=True):
         if not self.nc_dataset:  # if the dataset is empty, initialize the nc file
-            #self.n_tracers = [h.info[k]['centering'] for k in h.variables].count('prism_c')
+            #self.describe_tracers = [h.info[k]['centering'] for k in h.variables].count('prism_c')
             idry_e = np.zeros(self.mesh.n_elems()).astype(int)
             idry = np.zeros(self.mesh.n_nodes()).astype(int)
             idry_s = np.zeros(self.mesh.n_edges()).astype(int)
@@ -298,7 +298,7 @@ class hotstart(object):
         hotstart file. 
         """
         param_nml = self.param_nml
-        ntracers, ntrs, irange_tr, tr_mname = n_tracers(
+        ntracers, ntrs, irange_tr, tr_mname = describe_tracers(
             param_nml, modules=self.modules)
         tr_mname_el = ["%s_el" % n for n in tr_mname]
         tr_mname_nd = ["%s_nd" % n for n in tr_mname]
@@ -1131,12 +1131,12 @@ class VariableField(object):
         return ds
 
 
-def read_param_nml(infile):
+def read_param_nml(nml_fn):
     """
     read param.in file and generate a dict object with key, value pairs for all the parameters
     """
     param = {}
-    with open(infile, 'r') as f:
+    with open(nml_fn, 'r') as f:
         for line in f:
             line = line.rstrip('\n')
             # only take the portion of the arguement before the comment
@@ -1164,7 +1164,7 @@ def num(s):
         return float(s)
 
 
-def n_tracers(param_nml, modules=['TEM', 'SAL']):
+def describe_tracers(param_nml, modules=['TEM', 'SAL']):
     """ return the number of tracers, the sequence of the tracers and a list 
     of tracer names based on the input list of modules and corresponding 
     input files. 
