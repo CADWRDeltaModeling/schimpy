@@ -74,7 +74,7 @@ class hotstart(object):
             self.proj4 = proj4
         
         self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
-            n_tracers(self.param_nml, modules=self.modules)
+            describe_tracers(self.param_nml, modules=self.modules)
 
     def read_yaml(self):
         """
@@ -135,6 +135,30 @@ class hotstart(object):
                 else:
                     self.initialize_netcdf()
             self.nc_dataset = self.nc_dataset.merge(var)
+        #  cumsum_eta is required by the most recent version of schism.
+        self.nc_dataset = self.nc_dataset.assign(
+            cumsum_eta = self.nc_dataset.elevation)
+        if 'COSINE' in self.modules: #COS_mS2=COS_5, COS_mDN=COS_8, COS_mZ1 = COS_6, COS_mZ2 = COS_7
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mS2 = self.nc_dataset.COS_5_el)     
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mDN = self.nc_dataset.COS_8_el) 
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mZ1 = self.nc_dataset.COS_6_el) 
+            self.nc_dataset = self.nc_dataset.assign(
+                COS_mZ2 = self.nc_dataset.COS_7_el) 
+            # for COS_sxx, these means the sum values and will be set to zero
+            # 'COS_sS2  ','COS_sDN  ','COS_sZ1  ','COS_sZ2  ','COS_nstep'
+            self.nc_dataset['COS_sS2']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sDN']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sZ1']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sZ2']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_nstep']=(
+                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
         # correct wet/dry cells depending on water level (eta2 value):mostly not needed.
         self.depth = self.mesh.build_z(elev=self.nc_dataset['elevation'].values) # compute depth again for the updated elevation.        
         self.wet_dry_check()
@@ -166,7 +190,7 @@ class hotstart(object):
 
     def initialize_netcdf(self, default_turbulence=True):
         if not self.nc_dataset:  # if the dataset is empty, initialize the nc file
-            #self.n_tracers = [h.info[k]['centering'] for k in h.variables].count('prism_c')
+            #self.describe_tracers = [h.info[k]['centering'] for k in h.variables].count('prism_c')
             idry_e = np.zeros(self.mesh.n_elems()).astype(int)
             idry = np.zeros(self.mesh.n_nodes()).astype(int)
             idry_s = np.zeros(self.mesh.n_edges()).astype(int)
@@ -176,7 +200,8 @@ class hotstart(object):
                              'ifile': ('one', [1]),
                              'idry_e': ('elem', idry_e),
                              'idry_s': ('side', idry_s),
-                             'idry': ('node', idry)})
+                             'idry': ('node', idry),
+                             'nsteps_from_cold':('one',[0])})})
             # coords={'one':range(1),
             # 'elem':range(self.mesh.n_elems()),
             # 'node':range(self.mesh.n_nodes()),
@@ -273,7 +298,7 @@ class hotstart(object):
         hotstart file. 
         """
         param_nml = self.param_nml
-        ntracers, ntrs, irange_tr, tr_mname = n_tracers(
+        ntracers, ntrs, irange_tr, tr_mname = describe_tracers(
             param_nml, modules=self.modules)
         tr_mname_el = ["%s_el" % n for n in tr_mname]
         tr_mname_nd = ["%s_nd" % n for n in tr_mname]
@@ -1106,12 +1131,12 @@ class VariableField(object):
         return ds
 
 
-def read_param_nml(infile):
+def read_param_nml(nml_fn):
     """
     read param.in file and generate a dict object with key, value pairs for all the parameters
     """
     param = {}
-    with open(infile, 'r') as f:
+    with open(nml_fn, 'r') as f:
         for line in f:
             line = line.rstrip('\n')
             # only take the portion of the arguement before the comment
@@ -1139,7 +1164,7 @@ def num(s):
         return float(s)
 
 
-def n_tracers(param_nml, modules=['TEM', 'SAL']):
+def describe_tracers(param_nml, modules=['TEM', 'SAL']):
     """ return the number of tracers, the sequence of the tracers and a list 
     of tracer names based on the input list of modules and corresponding 
     input files. 

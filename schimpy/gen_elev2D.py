@@ -11,7 +11,6 @@ import sys
 import pandas as pd
 
 from netCDF4 import Dataset
-import gdal
 from schimpy.separate_species import separate_species
 from schimpy.schism_mesh import read_mesh
 from vtools.data.vtime import hours, days, seconds

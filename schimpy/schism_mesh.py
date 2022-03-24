@@ -631,7 +631,7 @@ class SchismMesh(TriQuadMesh):
             self._merged_mesh = cascaded_union(self._polygons)
         return self._merged_mesh        
     
-    def to_geopandas(self,feature_type='polygon',proj4=None,Shp_fn=None,
+    def to_geopandas(self,feature_type='polygon',proj4=None,shp_fn=None,
                      node_values=None,elem_values=None,edge_values=None,
                      value_name=None,create_gdf=True):
         """
@@ -662,8 +662,8 @@ class SchismMesh(TriQuadMesh):
             gdf.crs = proj4  
         else: 
             gdf.crs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_def"
-        if Shp_fn:
-            gdf.to_file(Shp_fn)
+        if shp_fn:
+            gdf.to_file(shp_fn)
         if create_gdf:
             return gdf
     

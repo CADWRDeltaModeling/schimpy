@@ -1,0 +1,146 @@
+hotstart: 
+    date: 2015-01-22
+    hgrid_input_file: hgrid.gr3
+    vgrid_input_file: vgrid.in.3d        
+    elevation:         # show off use of different initializer
+        centering: node2D  # node, edge, elem, prism, benthic
+        initializer: 
+            simple_trend: 
+                value: 0.96      #x- and y- coordinate based equation (x and y are lat lon)
+    temperature:
+        centering: prism
+        initializer: 
+            patch_init: 
+                smoothing: False
+                regions_filename: ../shapefile/DomainPolygons3.shp #salt_regions.gr3  # deliberately being off-center     
+                regions: 
+                  - region: ocean
+                    initializer: 
+                        simple_trend:
+                            value: 14
+                  - region: estuary
+                    initializer: 
+                        extrude_casts: 
+                            station: ../data_in/USGS_polaris_station_locations_xy.csv
+                            data: ../data_in/polaris_wqdata_2015.csv
+                            variable: Temperature (Degrees Celsius)
+                  - region: delta
+                    initializer: 
+                        obs_points:
+                            data: ../data_in/all_stations_temperature.csv  
+                            variable: 'temperature'
+    salinity:
+        centering: prism
+        initializer: 
+            patch_init: 
+                smoothing: False
+                regions_filename: ../shapefile/DomainPolygons3.shp #salt_regions.gr3  # deliberately being off-center     
+                regions: 
+                  - region: ocean
+                    initializer: 
+                        simple_trend:
+                            value: 33.5
+                  - region: estuary
+                    initializer: 
+                        extrude_casts: 
+                            station: ../data_in/USGS_polaris_station_locations_xy.csv
+                            data: ../data_in/polaris_wqdata_2015.csv
+                            variable: Salinity
+                  - region: delta
+                    initializer: 
+                        obs_points:
+                            data: ../data_in/all_stations_salinity.csv  
+                            variable: 'salinity'                              
+    velocity_u:
+        centering: edge
+        initializer: 
+            simple_trend:
+                value: 0.0
+    velocity_v:
+        centering: edge # node, edge, elem, prism, benthic 
+        initializer: 
+            simple_trend:
+                values: 0.0  
+    velocity_w:
+        centering: elem  # node, edge, elem, prism, benthic 
+        initializer: 
+            simple_trend:
+                values: 0.0 
+    COS_1:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'nox'      
+    COS_2:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'sio2'     
+    COS_3:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'nh4'   
+    COS_4:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'chla'
+                ratio: 0.1
+    COS_5:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'chla'
+                ratio: 0.9
+    COS_6:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'chla'
+                ratio: 0.9*0.1  
+    COS_7:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'chla'
+                ratio: 0.9*0.01  
+    COS_8:
+        centering: prism    
+        initializer: 
+            simple_trend: 
+                value: 37
+    COS_9:
+        centering: prism    
+        initializer: 
+            simple_trend: 
+                value: 37*1.2
+    COS_10:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'po4'
+    COS_11:
+        centering: prism    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_cosine.csv  
+                variable: 'do'                
+    COS_12:
+        centering: prism    
+        initializer: 
+            simple_trend: 
+                value: 2030
+    COS_13:
+        centering: prism    
+        initializer: 
+            simple_trend: 
+                value: 2145    

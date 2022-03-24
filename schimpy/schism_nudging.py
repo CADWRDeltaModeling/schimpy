@@ -929,8 +929,8 @@ class nudging(object):
                     else:
                         weights_v = weights
                     imap_v = np.where(weights_v>0)[0]                
-                    obs_x = obs.x.sel(site=vdata.site).values
-                    obs_y = obs.y.sel(site=vdata.site).values  
+                    obs_x = obs.x.sel(site=vdata.site).values.astype(float)
+                    obs_y = obs.y.sel(site=vdata.site).values.astype(float)
                                      
                     if method =='nearest':
                         nn_id = []
@@ -995,8 +995,8 @@ class nudging(object):
         else:
             if isinstance(attribute['x'],str): # multiple points
                 if attribute['x'].endswith('nc'):
-                    x0 = xr.open_dataset(attribute['x'])['x'].values
-                    y0 = xr.open_dataset(attribute['y'])['y'].values
+                    x0 = xr.open_dataset(attribute['x'])['x'].values.astype(float)
+                    y0 = xr.open_dataset(attribute['y'])['y'].values.astype(float)
                 elif attribute(['x']).endswith('csv'):
                     x0 = pd.read_csv(attribute['x'])['x'].values
                     y0 = pd.read_csv(attribute['y'])['y'].values 

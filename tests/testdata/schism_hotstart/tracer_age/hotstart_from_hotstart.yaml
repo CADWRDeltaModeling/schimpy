@@ -1,0 +1,98 @@
+hotstart: 
+    date: 2020-04-20
+    hgrid_input_file: ../data_in/hgrid.gr3                     # hgrid needs to be in utm coordinates. 
+    vgrid_input_file: ../data_in/vgrid.in.3d 
+    elevation:
+        centering: node2D  # node, edge, elem, prism, benthic 
+        initializer: 
+            patch_init: 
+                smoothing: False
+                regions_filename: ../data_in/elev.ic #the attribute 'region' in the shapefile needs to match with the region values below.     
+                regions: 
+                  - region: slr_or_below_bed
+                    initializer: 
+                        simple_trend: 
+                            values: np.maximum(0.96,-z-0.01)
+                  - region: ccfb
+                    initializer:
+                        simple_trend:
+                            values: 0.525
+                  - region: other
+                    initializer: 
+                        simple_trend:
+                            values: 0.96
+    tke:
+        centering: node3D
+        initializer: 
+            hotstart_nc:
+                data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc  
+                hgrid: ../data_in/hotstart_interpolation/hgrid.gr3 
+                vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d  
+                distance_threshold: 10
+                method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid   
+    velocity_w:
+        centering: elem # node, edge, elem, prism, benthic 
+        initializer: 
+            hotstart_nc:
+                data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc  
+                hgrid: ../data_in/hotstart_interpolation/hgrid.gr3 
+                vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d
+                vinterp: True       # if vertical layers are the same between the two meshes, the default is not to perform vertical interpolation.    
+    velocity_u:
+        centering: edge
+        initializer: 
+            hotstart_nc:
+                data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc  
+                hgrid: ../data_in/hotstart_interpolation/hgrid.gr3 
+                vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d     
+                distance_threshold: 10
+                method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid    
+    velocity_v:
+        centering: edge # node, edge, elem, prism, benthic 
+        initializer: 
+            hotstart_nc:
+                data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc  
+                hgrid: ../data_in/hotstart_interpolation/hgrid.gr3 
+                vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d
+                distance_threshold: 10
+                method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid
+    salinity:
+        centering: prism
+        initializer: 
+            patch_init: 
+                smoothing: False
+                regions_filename: ./qgis/edb_polygon.shp #the attribute 'region' in the shapefile needs to match with the region values below.     
+                regions: 
+                  - region: edb
+                    initializer: 
+                        hotstart_nc:
+                            data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc                
+                            hgrid: ../data_in/hotstart_interpolation/hgrid.gr3   #if the hgrid is different
+                            vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d    #if the vgrid is different
+                            vinterp: True
+                  - region: other
+                    initializer: 
+                        hotstart_nc:
+                            data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc                
+                            hgrid: ../data_in/hotstart_interpolation/hgrid.gr3   #if the hgrid is different
+                            vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d    #if the vgrid is different
+                            vinterp: False 
+    temperature:
+        centering: prism
+        initializer: 
+            hotstart_nc:
+                data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc
+                #tracer_id: 0                #if different from existing setting. I think T is always 1 and S is always 2; otherwise infer a tracer_id based on existing tracer_id. 
+                hgrid: ../data_in/hotstart_interpolation/hgrid.gr3   #if the hgrid is different
+                vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d    #if the vgrid is different
+                distance_threshold: 10
+                method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid                             
+    #elevation:
+    #    centering: node2D  # node, edge, elem, prism, benthic 
+    #    initializer: 
+    #        hotstart_nc:
+    #            data_source: ../data_in/hotstart_interpolation/hotstart_it=2688000.nc  
+    #            hgrid: ../data_in/hotstart_interpolation/hgrid.gr3 
+    #            vgrid: ../data_in/hotstart_interpolation/vgrid.in.3d  
+    #            distance_threshold: 10
+    #            method: np.maximum( -(z+0.1), 0.97)                
