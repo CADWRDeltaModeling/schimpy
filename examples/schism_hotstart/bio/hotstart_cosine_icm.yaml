@@ -2,17 +2,15 @@ hotstart:
     date: 2015-01-22
     hgrid_input_file: hgrid.gr3
     vgrid_input_file: vgrid.in.3d        
-    elevation:         # show off use of different initializer
-        centering: node2D  # node, edge, elem, prism, benthic
+    elevation:           
         initializer: 
             simple_trend: 
-                value: 0.96      #x- and y- coordinate based equation (x and y are lat lon)
+                value: 0.96      
     temperature:
-        centering: prism
         initializer: 
             patch_init: 
                 smoothing: False
-                regions_filename: ../shapefile/DomainPolygons3.shp #salt_regions.gr3  # deliberately being off-center     
+                regions_filename: ../shapefile/DomainPolygons.shp   
                 regions: 
                   - region: ocean
                     initializer: 
@@ -30,11 +28,10 @@ hotstart:
                             data: ../data_in/all_stations_temperature.csv  
                             variable: 'temperature'
     salinity:
-        centering: prism
         initializer: 
             patch_init: 
                 smoothing: False
-                regions_filename: ../shapefile/DomainPolygons3.shp #salt_regions.gr3  # deliberately being off-center     
+                regions_filename: ../shapefile/DomainPolygons.shp     
                 regions: 
                   - region: ocean
                     initializer: 
@@ -52,95 +49,130 @@ hotstart:
                             data: ../data_in/all_stations_salinity.csv  
                             variable: 'salinity'                              
     velocity_u:
-        centering: edge
         initializer: 
             simple_trend:
                 value: 0.0
     velocity_v:
-        centering: edge # node, edge, elem, prism, benthic 
         initializer: 
             simple_trend:
                 values: 0.0  
-    velocity_w:
-        centering: elem  # node, edge, elem, prism, benthic 
+    velocity_w:  
         initializer: 
             simple_trend:
                 values: 0.0 
-    COS_1:
-        centering: prism    
+    ICM_1:
         initializer: 
             obs_points:
                 data: ../data_in/merged_data_cosine.csv  
-                variable: 'nox'      
-    COS_2:
-        centering: prism    
+                variable: 'chla'
+                ratio: 0.9*0.1
+    ICM_2:
         initializer: 
             obs_points:
-                data: ../data_in/merged_data_cosine.csv  
-                variable: 'sio2'     
-    COS_3:
-        centering: prism    
+                data: ../data_in/merged_data_icm.csv  
+                variable: 'chla'
+                ratio: 0.9*0.01
+    ICM_3:  
         initializer: 
             obs_points:
-                data: ../data_in/merged_data_cosine.csv  
-                variable: 'nh4'   
-    COS_4:
-        centering: prism    
+                data: ../data_in/merged_data_icm.csv  
+                variable: 'chla'
+                ratio: 0.8
+    ICM_4:  
         initializer: 
             obs_points:
-                data: ../data_in/merged_data_cosine.csv  
+                data: ../data_in/merged_data_icm.csv  
                 variable: 'chla'
                 ratio: 0.1
-    COS_5:
-        centering: prism    
+    ICM_5: 
         initializer: 
             obs_points:
-                data: ../data_in/merged_data_cosine.csv  
+                data: ../data_in/merged_data_icm.csv  
                 variable: 'chla'
-                ratio: 0.9
-    COS_6:
-        centering: prism    
+                ratio: 0.1*0.01  
+    ICM_6:   
         initializer: 
-            obs_points:
-                data: ../data_in/merged_data_cosine.csv  
-                variable: 'chla'
-                ratio: 0.9*0.1  
-    COS_7:
-        centering: prism    
+            simple_trend: 
+                value: 0.0              
+    ICM_7:   
         initializer: 
-            obs_points:
-                data: ../data_in/merged_data_cosine.csv  
-                variable: 'chla'
-                ratio: 0.9*0.01  
-    COS_8:
+            simple_trend: 
+                value: 37*3.1
+    ICM_8: 
+        initializer: 
+            simple_trend: 
+                value: 37*3.1
+    ICM_9:
         centering: prism    
         initializer: 
             simple_trend: 
-                value: 37
-    COS_9:
-        centering: prism    
+                value: 0.0  
+    ICM_10:   
         initializer: 
             simple_trend: 
-                value: 37*1.2
-    COS_10:
-        centering: prism    
+                value: 37*0.5             
+    ICM_11:
+        initializer: 
+            simple_trend: 
+                value: 37*0.5
+    ICM_12: 
         initializer: 
             obs_points:
-                data: ../data_in/merged_data_cosine.csv  
-                variable: 'po4'
-    COS_11:
-        centering: prism    
+                data: ../data_in/merged_data_icm.csv  
+                variable: 'nh4'   
+    ICM_13:   
         initializer: 
             obs_points:
-                data: ../data_in/merged_data_cosine.csv  
-                variable: 'do'                
-    COS_12:
-        centering: prism    
+                data: ../data_in/merged_data_icm.csv  
+                variable: 'nox'   
+    ICM_14:  
         initializer: 
             simple_trend: 
-                value: 2030
-    COS_13:
-        centering: prism    
+                value: 0.0    
+    ICM_15:   
         initializer: 
             simple_trend: 
-                value: 2145    
+                value: 37*0.0625/14*31
+    ICM_16:   
+        initializer: 
+            simple_trend: 
+                value: 37*0.0625/14*31 
+    ICM_17:   
+        initializer: 
+            simple_trend: 
+                value: 37*0.0625/14*31 
+    ICM_18:   
+        initializer: 
+            simple_trend: 
+                value: 0.0   
+    ICM_19:   
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_icm.csv  
+                variable: 'sio2' 
+    ICM_20:  
+        initializer: 
+            simple_trend: 
+                value: 0.0 
+    ICM_21:    
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_icm.csv  
+                variable: 'do' 
+    ICM_22:   
+        initializer: 
+            simple_trend: 
+                value: 0.0  
+    ICM_23:   
+        initializer: 
+            obs_points:
+                data: ../data_in/merged_data_icm.csv  
+                variable: 'ta'   
+    ICM_24:   
+        initializer: 
+            simple_trend: 
+                value: 100.0  
+    ICM_25:    
+        initializer: 
+            simple_trend: 
+                value: 100.0                  

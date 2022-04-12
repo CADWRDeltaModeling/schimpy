@@ -314,7 +314,7 @@ class SchismLocalVerticalMeshReader(object):
         if theta_f <= 0.:
             raise ValueError("Wrong theta_f: theta_f <= 0.")
 
-    def read(self, fpath='vgrid.in'):
+    def read(self, fpath='vgrid.in',old_vgrid=True):
         """ Read vgrid.in
         """
         vgrid = SchismLocalVerticalMesh()
@@ -325,17 +325,32 @@ class SchismLocalVerticalMeshReader(object):
             vgrid.param['nvrt'] = nvrt
             sigmas = list()
             kbps = list()
-            while True:
-                tkns = fin.readline().strip().split()
-                if len(tkns) < 1:
-                    break
-                kbp = int(tkns[1]) - 1
-                kbps.append(kbp)
-                sigma = np.full((nvrt,), np.nan)
-                sigma[:nvrt - kbp] = list(map(float, tkns[2:nvrt - kbp + 2]))
-                sigmas.append(sigma)
-            vgrid.sigma = np.array(sigmas)
-            vgrid.kbps = np.array(kbps)
+            if old_vgrid: # this is the old style of vgrid input           
+                while True:
+                    tkns = fin.readline().strip().split()
+                    if len(tkns) < 1:
+                        break
+                    kbp = int(tkns[1]) - 1
+                    kbps.append(kbp)
+                    sigma = np.full((nvrt,), np.nan)
+                    sigma[:nvrt - kbp] = list(map(float, tkns[2:nvrt - kbp + 2]))
+                    sigmas.append(sigma)
+                vgrid.sigma = np.array(sigmas)
+                vgrid.kbps = np.array(kbps)
+            else: # this is the new style of vgrid input (from Dec 2021)
+                kbps = fin.readline().strip().split()
+                for k in range(nvrt):
+                    tkns = fin.readline().strip().split()
+                    sigma = np.array(tkns[1:]).astype(float)
+                    sigma[sigma==-9.0] = np.nan
+                    sigmas.append(sigma)
+                sigmas = np.array(sigmas).T
+                kbps = np.array(kbps).astype(int) -1 # to conform to the old style  
+                sigma_sort = np.ones_like(sigmas)*np.nan
+                for k,s in enumerate(sigmas):
+                    sigma_sort[k,:nvrt - kbps[k]] = s[kbps[k]:]
+                vgrid.sigma = np.array(sigma_sort)
+                vgrid.kbps = kbps
         return vgrid
 
 
@@ -363,7 +378,7 @@ class SchismLocalVerticalMeshWriter(object):
                 f.write(buf)
 
 
-def read_vmesh(fpath_vmesh):
+def read_vmesh(fpath_vmesh,old_vgrid=True):
     """ Read a vgrid file
     """
     if fpath_vmesh is None:
@@ -375,7 +390,7 @@ def read_vmesh(fpath_vmesh):
 
     if ivcor == 1:
         reader = SchismVerticalMeshIoFactory().get_reader('local')
-        return reader.read(fpath_vmesh)
+        return reader.read(fpath_vmesh,old_vgrid)
     elif ivcor == 2:
         reader = SchismVerticalMeshIoFactory().get_reader('sz')
         return reader.read(fpath_vmesh)
@@ -389,3 +404,74 @@ def write_vmesh(vmesh, fpath_vmesh='vgrid.in'):
         writer.write(vmesh, fpath_vmesh)
     else:
         raise ValueError('Unsupported vgrid type')
+def convert_vmesh(vmesh_in, vmesh_out, oldstyle_vmeshin=True, 
+                  newstyle_vmeshout=True):
+    """conversion between old and new style of vgrid.in
+    """
+    if oldstyle_vmeshin:
+        vgrid = read_vmesh(vmesh_in) 
+    else:
+        vgrid = read_vmesh(vmesh_in,old_vgrid=False) 
+    
+    if newstyle_vmeshout:        
+        nmesh = len(vgrid.sigma)
+        kbps = vgrid.kbps
+        nvrt = vgrid.param['nvrt']
+        with open(vmesh_out, 'w') as f:
+            buf = "{}\n".format(vgrid.ivcor)
+            f.write(buf)
+            n_max_levels = vgrid.n_vert_levels()
+            buf = "{}\n".format(n_max_levels)
+            f.write(buf)
+            buf =" ".join(["%10d"%(i+1) for i in kbps])
+            buf += '\n'
+            f.write(buf)            
+            sigma = vgrid.sigma
+            sigma_sort = np.ones_like(sigma)             
+            for k,s in enumerate(sigma):
+                sigma_sort[k,kbps[k]:] = s[:nvrt - kbps[k]] 
+            # transpose the matrix for output
+            sigma_sort = sigma_sort.T 
+            sigma_sort[np.isnan(sigma_sort)]=-9.0
+            for k in range(nvrt):
+                buf = "%10d "%k + " ".join(["%14.6f"%s for s in sigma_sort[k]]) 
+                buf += '\n'
+                f.write(buf)
+    else:        
+        # the vgrid output from this function is in the old style regardless of
+        # the input is in old or new styel
+        write_vmesh(vgrid,vmesh_out)
+        
+def compare_vmesh(v1,v2):
+    """
+    Comparing two vertical meshes and check if the values are equal in the two meshes
+    Parameters
+    ----------
+    v1 : vgrid
+        First mesh, created by read_vmesh
+    v2 : vgrid
+        Second mesh, created by read_vmesh
+
+    Returns
+    -------
+    equal=True or False
+
+    """
+    equal = True
+    if v1.param['nvrt']!=v2.param['nvrt']:
+        equal = False
+        print("The number of vertical layers are not equal between the two meshes")
+        return equal
+    
+    if (np.abs((v1.kbps - v2.kbps)>0)).any():
+        equal = False
+        print("kbps are not equal between the two meshes")
+        return equal
+        
+    if (np.abs((v1.sigma - v2.sigma)>0)).any():
+        equal = False
+        print("sigma are not equal between the two meshes")
+        return equal
+    
+    print("the two meshes are equal")
+    return equal

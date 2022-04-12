@@ -56,25 +56,35 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, yaml_fn, modules=['TEM', 'SAL'],proj4=None, **kwargs):
+    def __init__(self, yaml_fn, modules=['HYDRO'],proj4=None, **kwargs):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
         # the modules to turn on.
         self.yaml_fn = yaml_fn
         self.nc_dataset = None
-        self.modules = modules
+        if 'HYDRO' in modules:
+            modules.remove('HYDRO')
+            modules+=['TEM', 'SAL']
+        self.modules = modules # modules can be none for barotropic runs.       
         if 'param_nml' in kwargs:
             self.param_nml = kwargs['param_nml']
         else:
-            self.param_nml = "param.nml"
+            if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in modules]): # these modules require param.nml 
+                raise ValueError('param_nml needs to be defined in %s'%yaml_fn)
+            else: # for all other modules, param.nml will not be used. 
+                self.param_nml = "param.nml"
         if proj4 is None:
             raise ValueError("proj4 must be specified")
         else:
             print("proj4 is {}".format(proj4))
             self.proj4 = proj4
         
-        self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
-            describe_tracers(self.param_nml, modules=self.modules)
+        if self.modules:  # if modules is None for barotropic run, this step is not required. 
+            self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
+                describe_tracers(self.param_nml, modules=self.modules)
+        else:
+            self.ntracers = 0
+            self.tr_mname = []
 
     def read_yaml(self):
         """
@@ -89,13 +99,21 @@ class hotstart(object):
         self.vgrid_fn = hotstart_info['vgrid_input_file']
         variables = list(hotstart_info.keys())
         # remove these items from the list.
-        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date']
+        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date','vgrid_style']
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
+        if 'vgrid_style' in hotstart_info.keys():
+            self.vgrid_style = hotstart_info['vgrid_style']
+        else:
+            self.vgrid_style = 'old' #the default style for vgrid is old. 
 
     def create_hotstart(self):
         self.read_yaml()
-        mesh = read_mesh(self.hgrid_fn, self.vgrid_fn)
+        if self.vgrid_style == 'old':
+            old_vgrid = True
+        else:
+            old_vgrid = False
+        mesh = read_mesh(self.hgrid_fn, self.vgrid_fn, old_vgrid)
         self.mesh = mesh
         self.depths = self.mesh.build_z() # this is required to get depths for elevation
         #v = self.variables[1]
@@ -107,9 +125,9 @@ class hotstart(object):
             if ('hotstart_nc' in initializer) and \
                 (not self.hotstart_ini) :                
                 self.hotstart_ini['hotstart_nc_hfn'] = initializer[
-                    'hotstart_nc']['hgrid']
+                    'hotstart_nc']['source_hgrid']
                 self.hotstart_ini['hotstart_nc_vfn'] = initializer[
-                    'hotstart_nc']['vgrid']
+                    'hotstart_nc']['source_vgrid']
             elif 'patch_init' in initializer and \
                 (not self.hotstart_ini) :
                 patch_init =  [list(ini['initializer'].keys())[0] 
@@ -120,10 +138,22 @@ class hotstart(object):
                         'regions'][0]['initializer']['hotstart_nc']
                     self.hotstart_ini['hotstart_nc_hfn'] = sub_init['hgrid']
                     self.hotstart_ini['hotstart_nc_vfn'] = sub_init['vgrid']
-
+                    if 'source_vgrid_style' in sub_init.keys():
+                        self.hotstart_ini['source_vgrid_style'] = sub_init[
+                            'source_vgrid_style']
+                    else:
+                        self.hotstart_ini['source_vgrid_style'] = 'old'
+                        
             if self.hotstart_ini:                    
+                old_vgrid = True
+                if 'source_vgrid_style' in self.hotstart_ini:
+                    if self.hotstart_ini['source_vgrid_style'] == 'old':
+                        old_vgrid = True
+                    else:
+                        old_vgrid = False
                 hotstart_mesh = read_mesh(self.hotstart_ini['hotstart_nc_hfn'],
-                                          self.hotstart_ini['hotstart_nc_vfn'])
+                                          self.hotstart_ini['hotstart_nc_vfn'],
+                                          old_vgrid)
                 indices, dist = compare_mesh(hotstart_mesh,self.mesh)
                 self.hotstart_ini['hotstart_nc_indices'] = indices
                 self.hotstart_ini['hotstart_nc_dist'] = dist
@@ -201,7 +231,7 @@ class hotstart(object):
                              'idry_e': ('elem', idry_e),
                              'idry_s': ('side', idry_s),
                              'idry': ('node', idry),
-                             'nsteps_from_cold':('one',[0])})})
+                             'nsteps_from_cold':('one',[0])})
             # coords={'one':range(1),
             # 'elem':range(self.mesh.n_elems()),
             # 'node':range(self.mesh.n_nodes()),
@@ -298,28 +328,31 @@ class hotstart(object):
         hotstart file. 
         """
         param_nml = self.param_nml
-        ntracers, ntrs, irange_tr, tr_mname = describe_tracers(
-            param_nml, modules=self.modules)
-        tr_mname_el = ["%s_el" % n for n in tr_mname]
-        tr_mname_nd = ["%s_nd" % n for n in tr_mname]
-        tr_mname_nd0 = ["%s_nd0" % n for n in tr_mname]
         schism_hotstart_var = {'eta2': 'elevation',
                                'we': 'velocity_w',
                                'su2': 'velocity_u',
-                               'sv2': 'velocity_v',
-                               'tr_el': tr_mname_el,
-                               'tr_nd': tr_mname_nd,
-                               'tr_nd0': tr_mname_nd0}
+                               'sv2': 'velocity_v'}
+        if self.modules:
+            ntracers, ntrs, irange_tr, tr_mname = describe_tracers(
+                 param_nml, modules=self.modules)
+            tr_mname_el = ["%s_el" % n for n in tr_mname]
+            tr_mname_nd = ["%s_nd" % n for n in tr_mname]
+            tr_mname_nd0 = ["%s_nd0" % n for n in tr_mname]
+            schism_hotstart_var['tr_el'] = tr_mname_el
+            schism_hotstart_var['tr_nd'] = tr_mname_nd
+            schism_hotstart_var['tr_nd0'] = tr_mname_nd0
+            
         nc_dataset = self.nc_dataset
         #v_keys =list(nc_dataset.data_vars)
-        mapping_dict = {'temperature_nd': 'TEM_nd',
-                        'temperature_nd0': 'TEM_nd0',
-                        'temperature_el': 'TEM_el',
-                        'salinity_nd': 'SAL_nd',
-                        'salinity_nd0': 'SAL_nd0',
-                        'salinity_el': 'SAL_el'}
+        if any([v in ['HYDRO','TEM','SAL'] for v in self.modules]):
+            mapping_dict = {'temperature_nd': 'TEM_nd',
+                            'temperature_nd0': 'TEM_nd0',
+                            'temperature_el': 'TEM_el',
+                            'salinity_nd': 'SAL_nd',
+                            'salinity_nd0': 'SAL_nd0',
+                            'salinity_el': 'SAL_el'}
 
-        nc_dataset = nc_dataset.rename(mapping_dict)
+            nc_dataset = nc_dataset.rename(mapping_dict)
 
         for key, var_values in zip(schism_hotstart_var.keys(), 
                                    schism_hotstart_var.values()):
@@ -341,7 +374,8 @@ class hotstart(object):
                 nc_dataset = nc_dataset.merge(v1_sub)
                 nc_dataset = nc_dataset.drop(var_values)
 
-        nc_dataset['tracer_list'] = tr_mname
+        if self.modules:
+            nc_dataset['tracer_list'] = tr_mname
         self.nc_dataset = nc_dataset     
         
  
@@ -352,8 +386,9 @@ class VariableField(object):
 
     def __init__(self, v_meta, vname, mesh, depths, date, proj4, tr_mname,
                  hotstart_ini=None, **kwargs):
-        self.centering = v_meta['centering']
+        #self.centering = v_meta['centering']
         self.variable_name = vname
+        self.centering = self.var_centering() # the centering option is dependent on the varialbe name. 
         self.mesh = mesh
         self.depths = depths
         if self.centering == 'edge':
@@ -395,6 +430,29 @@ class VariableField(object):
             self.n_sdim = list(self.grid.values())[2][0]  # sediment dimension
             self.sdim_name = list(self.grid.keys())[2]
 
+    def var_centering(self):
+        # built-in centering options for model input variables. 
+        tr_key_list = ['tem','sal','age_','gen_','icm','sed_','cos_']
+        if any([t in self.variable_name.lower() for t in tr_key_list]):
+            variable_type = 'tracer'
+        else:
+            variable_type = self.variable_name
+        
+        vc_mapping = {'elevation':'node2D',
+                      'velocity_u':'edge',
+                      'velocity_v':'edge',
+                      'velocity_w':'elem',
+                      'SED3D_dp':'node2D',
+                      'SED3D_rough':'node2D',
+                      'SED3D_bed':'bed',
+                      'SED3D_bedfrac':'bedfrac',  
+                      'tracer':'prism',
+                      'tke':'node3D'
+                      }
+        if variable_type in vc_mapping.keys():
+            return vc_mapping[variable_type]
+        else:
+            raise ValueError("variable %s does not have a valid input centering option"%self.variable_name)
     def get_grid(self):
         """Getting the number and coordinates of horizontal nodes/elems/edges for 
         different centering options and return them as grid.   
@@ -567,6 +625,10 @@ class VariableField(object):
             v_ini = np.zeros((n_hgrid, self.n_vgrid))
             return v_ini + value
         elif isinstance(value, str):
+            if ('max' in value) & ('np.maximumm' not in value):
+                value = value.replace('max','np.maximum')
+            if ('min' in value) & ('np.minimum' not in value):
+                value = value.replace('min','np.minimum') 
             if inpoly is not None:
                 xy = self.hgrid[inpoly]
                 if not isinstance(self.vgrid, (float,int)):
@@ -680,11 +742,11 @@ class VariableField(object):
                     "regional polygon file is needed for pathch_ini implementation")
         if poly_fn.endswith('shp') or poly_fn.endswith('ic'):
             # perform contiguity check and return a mapping array if successful.
-            mapping = geo_tools.contiguity_check(self.mesh, poly_fn,
-                                                 self.centering,
-                                                 proj4=self.proj4)            
+            mapping = geo_tools.partition_check(self.mesh, poly_fn,
+                                                self.centering,
+                                                proj4=self.proj4)            
         else:
-            raise NotImplementedError("Poly_fn can only be shapefile")
+            raise NotImplementedError("Poly_fn can only be shapefile or ic file")
 
         if self.ini_meta['smoothing']:
             raise NotImplementedError("Smoothing not implemented yet")
@@ -909,35 +971,44 @@ class VariableField(object):
             self.tr_index = np.where(np.array(self.tr_mname)==var)[0][0]                
                 
         hotstart_data = xr.open_dataset(data_source)
-        if 'hgrid' not in ini_meta.keys(): #if the grids are exactly the same
+        if 'source_vgrid_style' in ini_meta.keys():
+            if ini_meta['source_vgrid_style'] == 'old':
+                old_vgrid = True
+            else:
+                old_vgrid = False
+        else:
+            old_vgrid = True 
+        if 'source_hgrid' not in ini_meta.keys(): #if the grids are exactly the same
             if self.tr_index is not None:
                 v = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
             else:
                 v = hotstart_data[yaml_var[var]]
-        elif ('hgrid' in ini_meta.keys()) and ('vgrid' not in ini_meta.keys()):
+        elif ('source_hgrid' in ini_meta.keys()) and ('source_vgrid' not in ini_meta.keys()):
             if self.tr_index is not None:
                 vin = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
             else:
                 vin = hotstart_data[yaml_var[var]]  
             if 'distance_threshold' in ini_meta.keys():
-                v = self.interp_from_mesh(ini_meta['hgrid'], vin, inpoly,
+                v = self.interp_from_mesh(ini_meta['source_hgrid'], vin, inpoly,
                                           dist=ini_meta['distance_threshold'],
                                           method=ini_meta['method'])
             else:
-                v = self.interp_from_mesh(ini_meta['hgrid'], vin, inpoly)
-        elif ('hgrid' in ini_meta.keys()) and ('vgrid' in ini_meta.keys()):
+                v = self.interp_from_mesh(ini_meta['source_hgrid'], vin, inpoly)
+        elif ('source_hgrid' in ini_meta.keys()) and ('source_vgrid' in ini_meta.keys()):
             if self.tr_index is not None:
                 vin = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
             else:
                 vin = hotstart_data[yaml_var[var]]  
             if 'distance_threshold' in ini_meta.keys():
-                 v = self.interp_from_mesh(ini_meta['hgrid'], vin, 
-                                          ini_meta['vgrid'], inpoly,
+                 v = self.interp_from_mesh(ini_meta['source_hgrid'], vin, 
+                                          ini_meta['source_vgrid'], 
+                                          inpoly=inpoly,
                                           dist_th=ini_meta['distance_threshold'],
                                           method=ini_meta['method'])                 
             else:
-                v = self.interp_from_mesh(ini_meta['hgrid'], vin, 
-                                          ini_meta['vgrid'], inpoly)          
+                v = self.interp_from_mesh(ini_meta['source_hgrid'], vin, 
+                                          ini_meta['source_vgrid'], old_vgrid,
+                                          inpoly)          
         # if type(yaml_var[var]) is list: 
         #     ds = xr.Dataset()
         #     for j, name in enumerate(yaml_var[var]):
@@ -950,10 +1021,10 @@ class VariableField(object):
         #     ds = v
         return v            
     
-    def interp_from_mesh(self, hgrid_fn, vin,vgrid_fn=None, inpoly=None,
-                         dist_th=None, method=None):
+    def interp_from_mesh(self, hgrid_fn, vin,vgrid_fn=None, old_vgrid=True,
+                         inpoly=None, dist_th=None, method=None):
         import rtree.index
-        mesh1 = read_mesh(hgrid_fn,vgrid_fn)
+        mesh1 = read_mesh(hgrid_fn,vgrid_fn,old_vgrid)
             
         grid1 = self.define_new_grid(mesh1)
         hgrid1 = list(grid1.values())[0][1]
@@ -1164,7 +1235,7 @@ def num(s):
         return float(s)
 
 
-def describe_tracers(param_nml, modules=['TEM', 'SAL']):
+def describe_tracers(param_nml, modules=['HYDRO']):
     """ return the number of tracers, the sequence of the tracers and a list 
     of tracer names based on the input list of modules and corresponding 
     input files. 
@@ -1197,7 +1268,8 @@ def describe_tracers(param_nml, modules=['TEM', 'SAL']):
     ntrs.append(1)  # T,S counted as separate model
     irange_tr_2.append(sum(ntrs))
 
-    param = read_param_nml(param_nml)
+    if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in modules]):
+            param = read_param_nml(param_nml)
 
     if "GEN" in modules and 'ntracer_gen' in param.keys():
         irange_tr_1.append(sum(ntrs))
@@ -1208,7 +1280,7 @@ def describe_tracers(param_nml, modules=['TEM', 'SAL']):
 
     if "AGE" in modules and 'ntracer_age' in param.keys():
         irange_tr_1.append(sum(ntrs))
-        ntrs.append(param['ntracer_age'])
+        ntrs.append(int(param['ntracer_age']/2))
         for t in range(ntrs[-1]):
             tr_mname.append('AGE_%d' % int(t+1))
         irange_tr_2.append(sum(ntrs))
@@ -1283,7 +1355,8 @@ def describe_tracers(param_nml, modules=['TEM', 'SAL']):
 
 
 def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3', 
-                         vgrid_fn='vgrid.in', outname="hotstart_out.nc"):
+                         vgrid_fn='vgrid.in', vgrid_style = 'old',
+                         outname="hotstart_out.nc"):
     """
     convert hotstart.nc to schism output nc file format that can be read by VisIt. 
     """
@@ -1314,7 +1387,11 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
     # 'n_vgrid_layers':'nSCHISM_vgrid_layers'}
 
     if not os.path.exists("hgrid.nc"):
-        mesh = read_mesh(hgrid_fn, vgrid_fn)
+        if vgrid_style == 'old':
+            old_vgrid = True
+        else:
+            old_vgrid = False
+        mesh = read_mesh(hgrid_fn, vgrid_fn, old_vgrid)
         write_mesh(mesh, 'hgrid.nc')
     hgrid_nc = xr.open_dataset("hgrid.nc")
     hgrid_nc = hgrid_nc.rename(grid_newname)
