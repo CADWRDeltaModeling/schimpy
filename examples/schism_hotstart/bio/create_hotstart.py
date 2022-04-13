@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import xarray as xr
 
 
-yaml_fn = "./hotstart.yaml"
-modules = ['TEM','SAL','COSINE','ICM']
+yaml_fn = "./hotstart_cosine.yaml"
+modules = ['TEM','SAL','COSINE']
 hotstart_fn = "hotstart_cosine.nc" # output hotstart file
 ini_date = '2015-01-22' 
 

@@ -1,0 +1,21 @@
+hotstart: 
+    date: 2020-04-20
+    hgrid_input_file: ./data_in/hgrid.gr3
+    vgrid_input_file: ./data_in/vgrid.in.new 
+    vgrid_style: new
+    elevation:         
+        initializer: 
+            simple_trend: 
+                value: 0.96      #x, y, and z coordinate based equation (x and y are utm based)
+    velocity_u:
+        initializer: 
+            simple_trend:
+                value: 0.0
+    velocity_v:
+        initializer: 
+            simple_trend:
+                values: 0.0  
+    velocity_w:
+         initializer: 
+            simple_trend:
+                values: 0.0  

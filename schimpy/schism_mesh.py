@@ -1541,7 +1541,7 @@ class SchismMeshIoFactory(object):
             raise ValueError('Not in SchismMeshIoFactory')
 
 
-def read_mesh(fpath_mesh, fpath_vmesh=None, **kwargs):
+def read_mesh(fpath_mesh, fpath_vmesh=None, old_vgrid=True,**kwargs):
     """ Read a mesh data
 
         Returns
@@ -1553,7 +1553,7 @@ def read_mesh(fpath_mesh, fpath_vmesh=None, **kwargs):
         reader = SchismMeshIoFactory().get_reader('gr3')
         mesh = reader.read(fpath_mesh)
         if fpath_vmesh is not None:
-            vmesh = read_vmesh(fpath_vmesh)
+            vmesh = read_vmesh(fpath_vmesh,old_vgrid)
         else:
             vmesh = None
         mesh._vmesh = vmesh

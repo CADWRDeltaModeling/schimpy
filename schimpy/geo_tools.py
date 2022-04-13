@@ -53,10 +53,10 @@ def ic_to_gpd(fn,proj4=None):
     gdf.crs = proj4
     return gdf
 
-def contiguity_check(mesh,poly_fn,centering='node',proj4=None):
+def partition_check(mesh,poly_fn,centering='node',proj4=None):
     """
-    Check if the schism mesh division by the polygon features in poly_fn is contiguous.
-    The contiguity check is based on either node or element, and the function checks
+    Check if the schism mesh division by the polygon features in poly_fn is unique and complete.
+    The partition check is based on either node or element, and the function checks
     1) if there are any orphaned nodes, and
     2) if any nodes/elems were assigned to multiple polygons.
     """

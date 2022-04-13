@@ -50,7 +50,15 @@ class nudging(object):
         self.hgrid_fn = nudging_info['hgrid_input_file']
         self.vgrid_fn = nudging_info['vgrid_input_file']
         self.default_value = nudging_info['default']
-        self.mesh = read_mesh(self.hgrid_fn,self.vgrid_fn)
+        if 'vgrid_style' in nudging_info.keys():
+            self.vgrid_style = nudging_info['vgrid_style']
+        else:
+            self.vgrid_style = 'old'
+        if self.vgrid_style == 'old':
+            old_vgrid = True
+        else:
+            old_vgrid = False
+        self.mesh = read_mesh(self.hgrid_fn,self.vgrid_fn, old_vgrid)
         self.node_x = self.mesh.nodes[:,0]
         self.node_y = self.mesh.nodes[:,1]
         self.node_z = self.mesh.nodes[:,2] 
@@ -95,21 +103,17 @@ class nudging(object):
                 imap_var,
                 var_v,
                 suffix,
-                create_file=True) 
+                create_file=True)    
     
-    def organize_nudging(self, weights_comb, values_comb, imap_comb):
-        var_list = np.array([])
-        for p in self.info['polygons']:
-            var_list = np.append(var_list, p['interpolant']['variable'])
-        var_list = np.unique(var_list)
-        
+    def organize_nudging(self, weights_comb, values_comb, imap_comb):   
         weights_list = [] #dimension [region, var, node]
         values_list = [] # dimensino [region, var, time, map_node, nlevel]
         imap_list = [] # dimension [region, var, map_node] 
         # get a list of variables
         var_list = np.array([])
         for p in self.info['polygons']:
-            var_list = np.append(var_list, p['interpolant']['variable'])
+            var_list = np.append(var_list, 
+                                 [v['name'] for v in p['interpolant']['variables']])
         var_list = np.unique(var_list)
                 
         # eliminate variables that don't exist in records
@@ -121,25 +125,52 @@ class nudging(object):
             values_v = []
             imap_v = []
             var_v = []
+            var_info = p['interpolant']['variables']
+            var_name = np.array([v['name'] for v in var_info])
+             
             for vi, v in enumerate(var_list):
-                if v in p['interpolant']['variable']:
-                    pos = np.where(np.array(p['interpolant']['variable'])==v)[0][0]
+                # reorder according to ['temperature','salinity']
+                if v in var_name:
+                    pos = np.where(var_name==v)[0][0]
                     if len(imap_comb[pi][pos])>0:
                         weights_v.append(weights_comb[pi][pos])
                         values_v.append(values_comb[pi][pos])
                         imap_v.append(imap_comb[pi][pos])  
                         var_v.append(v)
-            if np.any(weights_v):
-                weights_list.append(weights_v)
-                values_list.append(values_v)
-                imap_list.append(imap_v)
+                    else:
+                        weights_v.append([])
+                        values_v.append([])
+                        imap_v.append([])
+                        var_v.append([])
+                else:
+                    weights_v.append([])
+                    values_v.append([])
+                    imap_v.append([])
+                    var_v.append([])                    
+            #if np.any(weights_v):
+            weights_list.append(weights_v)
+            values_list.append(values_v)
+            imap_list.append(imap_v)        
         
         values_var = []  #rearrange to dim [var, region, time, map_node, nlevel]
         imap_var = [] # rearrange to dim [var, region, map_node]
-        weights_var = np.array(weights_list).transpose([1,0,2])#rearrange to dim [var, region,node]
-        for i, v in enumerate(var_v):
+        weights_var = []        
+        
+        #weights_var = np.array(weights_list).transpose([1,0,2])#rearrange to dim [var, region,node]
+        for i, v in enumerate(var_list):
                 values_var.append([vl[i] for vl in values_list])
-                imap_var.append([im[i] for im in imap_list]) 
+                imap_var.append([im[i] for im in imap_list])
+                weights_var.append([wv[i] for wv in weights_list])
+        var_v = []
+        vi = []
+        for i, v in enumerate(var_list):
+            if np.any(weights_var[i]):
+                vi.append(i)
+                var_v.append(v)
+
+        weights_var = [np.array(weights_var[i]) for i in vi]
+        values_var = [values_var[i] for i in vi]
+        imap_var = [imap_var[i] for i in vi]                           
         return weights_var, values_var, imap_var, var_v
 
     def get_nudging_comb(self):
@@ -235,7 +266,8 @@ class nudging(object):
         if region_info['type'] == 'roms':
             weights, values_list, imap, time = self.gen_nudge_roms(region_info)
             #values_list =  [vl[:,imap,:] for vl in values_list]
-            nvar = len(region_info['interpolant']['variable'])
+            nvar = len(set([v['name'] for v in 
+                                region_info['interpolant']['variables']]))
             weights_list = np.broadcast_to(weights,[nvar,len(weights)])
             imap_list = np.broadcast_to(imap,[nvar,len(imap)])
         elif 'obs' in region_info['type']:  # this is 2D interpolation
@@ -253,22 +285,25 @@ class nudging(object):
         rjunk = 9998 #!Define junk value for sid; the test is abs()>rjunk
         hr_char = ['03','09','15','21'] #each day has 4 starting hours in ROMS
         small1 = 1.e-2 #used to check area ratios
-        weights = self.gen_region_weight(region_info['attribute'],
-                                         region_info['vertices'])
-        # read gen_nu.in
-        with open(region_info['interpolant']['data'],'r') as reader:
-            lines = reader.readlines()
-        tem_outside =  float(lines[0].split()[0]) #T,S values for pts outside bg grid in nc
-        sal_outside = float(lines[0].split()[1])
-        dtout = float(lines[1].split()[0]) #time step in .nc [sec]
-        nt_out = int(lines[1].split()[1]) #output stride
-        istart_year = int(lines[2].split()[0])
-        istart_mon = int(lines[2].split()[1])
-        istart_day = int(lines[2].split()[2])
-        #nndays = int(lines[3].split()[0])
-        nndays = (self.end_date - self.start_date).days
-        ncfile1 = lines[4].split()[0]    
-        ncfile1 = ncfile1.replace("'","")  # remove the quotation marks
+        weights, obs_df = self.gen_region_weight(region_info['attribute'],
+                                                 region_info['vertices'])
+        istart = pd.to_datetime(self.start_date)
+        istart_year = istart.year
+        istart_mon = istart.month
+        istart_day = istart.day
+        nndays = (self.end_date - self.start_date).days    
+        dtout = region_info['interpolant']['dt'] #time step in .nc 
+        nt_out = int(pd.Timedelta(self.nudge_step)/pd.Timedelta(dtout)) #output stride
+        variable_info = region_info['interpolant']['variables']
+        for vi in variable_info:
+            if vi['name'] == 'temperature':
+                tem_outside = float(vi['none_values'])
+                if 'offset' in vi.keys():
+                    tem_offset = float(vi['offset'])
+            if vi['name'] == 'salinity':
+                sal_outside = float(vi['none_values'])        
+        ncfile1 = region_info['interpolant']['data']   
+        ncfile1 = ncfile1.replace("'","")  # remove the quotation marks if they exist
         irecout = 0
         irecout2 = 0
         #Define limits for variables for sanity checks
@@ -279,12 +314,8 @@ class nudging(object):
         vmag_max=10 #max. |u| or |v|
         ssh_max=8   #max. of |SSH|
         imap = np.nan*np.zeros(self.nnode)
-        nodes = np.where(weights>0)[0]
-        
-        if nt_out*dtout!=pd.Timedelta(self.nudge_step).total_seconds():
-            raise("The output nudging time step in gen_nu.in does not match \
-                  the step_nu_tr defined in nudge.yaml!")
-        
+        nodes = np.where(weights>0)[0]      
+       
         # # instead of reading lat, lon from hgrid.ll, I can also convert 
         # # hgrid.gr3 to lat, lon.
         # with open('hgrid.ll','r') as reader:
@@ -319,7 +350,7 @@ class nudging(object):
                     'velocity_u':'uvel',
                     'velocity_v':'vvel',
                     'elevation':'ssh'}
-        var_list = [var_name[v] for v in region_info['interpolant']['variable']]
+        #var_list = [var_name[v] for v in region_info['interpolant']['variable']]
         
         #start = timer.time()
         for d in range(nndays+1): 
@@ -842,8 +873,9 @@ class nudging(object):
                     # if output_day[-1] == 350.625:
                     #     import pdb
                     #     pdb.set_trace()
+                    nudge_step = int(pd.Timedelta(self.nudge_step).total_seconds()/3600)
                     if len(output_day)>1:
-                        if output_day[-1]-output_day[-2]>1.1/24:
+                        if output_day[-1]-output_day[-2]>(nudge_step+0.1)/24:
                             raise Exception('The difference between current and previous time step is greater than assigned stride')
                     #print("time5=%f"%(timer.time() - start))
         # return weights, output_day, [temperature, salinity], \
@@ -863,102 +895,201 @@ class nudging(object):
     @staticmethod
     def signa(x1,x2,x3,y1,y2,y3):
         signa=((x1-x3)*(y2-y3)-(x2-x3)*(y1-y3))/2
-        return signa   
-        
+        return signa
+    
+    @staticmethod
+    def reorder_variables(var_info,var_ordered_list):
+        #reorder observed variables according to [temperature,salinity]
+        #var_ordered_list = np.array(['temperature','salinity','elevation'])  # this list can be extended if new nudging variables are required.
+        idx = [np.where(var_ordered_list == v['name'])[0][0] for v in var_info]
+        return [var_info[i] for i in idx]
+       
     def gen_nudge_obs(self, region_info):
-        """
-        # if no data corresponds to a (x,y), the corresponding weights should 
-        be set to zero. 
-        """
-        # first evaluate which are the variables and find data for each variable 
-        # what if there is nan value for the time period??
-        # adjust the weights
         cutoff = 1e3  #when weights are less than cutoff, they will be set to zero
-        weights = self.gen_region_weight(region_info['attribute'],
-                                 region_info['vertices'])
+        weights, obs_df = self.gen_region_weight(region_info['attribute'],
+                                                 region_info['vertices'])
+        if len(obs_df)>1:
+            obs_sites = obs_df.index.values
         weights[weights<weights.max()/cutoff] = 0
-        method = region_info['interpolant']['method']
-        data = region_info['interpolant']['data']
-        variable = region_info['interpolant']['variable']
-        none_values = region_info['interpolant']['none_values']
-        obs = self.read_data(data)                     
+        method = region_info['interpolant']['method']        
+        variable_info = region_info['interpolant']['variables'] 
         weights_list = []
         imap_list = []
         values_list = []
-        for v in variable:
-            if v in obs.keys():
-                vdata = obs[v]  
-                if region_info['type'] == 'single_obs':                               
-                    if np.any(np.isnan(vdata)):  
-                        if none_values == 'interpolate': #other fillna options possible.                        
-                            if isinstance(vdata, pd.core.series.Series): # pandas array
-                                vdata = vdata.interpolate()
-                            elif isinstance(vdata, xr.core.dataarray.DataArray): #xarray
-                                vdata = vdata.interpolate_na(dim='time')
-                            weights_v = weights
-                            imap_v = np.where(weights_v>0)[0]
-                            values_v = np.broadcast_to(vdata.values,
-                                                       (len(imap_v),
-                                                        len(vdata))).T
-                        elif none_values == 'ignore': #ignore the entire series when there is any none
-                            weights_v = np.zeros(weights)
-                            imap_v = np.array([]) # empty array
-                            values_v = np.array([])
-                    else:
-                        weights_v = weights
-                        imap_v = np.where(weights_v>0)[0]
-                        values_v = np.broadcast_to(vdata.values,
-                                                   (len(imap_v),
-                                                    len(vdata))).T  
-                elif region_info['type'] == 'multi_obs':  #multiple observational points
-                    # multiple input should be stored in netcdf format only. 
-                    if np.any(np.isnan(vdata)): 
-                        vdata = vdata.dropna(dim='site',how='all')
-                        if none_values == 'interpolate':
-                            vdata = vdata.interpolate_na(dim='time')
-                        elif none_values == 'ignore':
-                            vdata = vdata.dropna(dim='site',how='any')
-                            
-                        inc_site = []
-                        for s in obs.site.values:
-                            if s in vdata.site.values:
-                                inc_site.append(True)
-                            else:
-                                inc_site.append(False)
-                        weights_v = weights[inc_site,:].sum(axis=0)
-                    else:
-                        weights_v = weights
-                    imap_v = np.where(weights_v>0)[0]                
-                    obs_x = obs.x.sel(site=vdata.site).values.astype(float)
-                    obs_y = obs.y.sel(site=vdata.site).values.astype(float)
+        for v in variable_info:
+            empty_data = False
+            none_values = v['none_values']
+            obs = self.read_data(v['data'])
+            name = v['name']                                     
+            if name in obs.keys(): # this is in case there are multiple variables listed in the datafile
+                vdata = obs[name]
+            else: # only one variable listed in the file (but can be at multiple locations)
+                vdata = obs            
+            
+            if np.any(np.isnan(vdata)):  
+                if isinstance(vdata, pd.core.series.Series): # pandas array
+                    if none_values == 'interpolate': #other fillna options possible.                        
+                        vdata = vdata.interpolate()                        
+                    elif none_values == 'ignore': #ignore the entire series when there is any none
+                        empty_data = True                        
+                if isinstance(vdata,pd.core.frame.DataFrame): # multiple obs data,typically multiple stations
+                    vdata = vdata.dropna(axis=1,how='all')
+                    if none_values == 'interpolate':
+                        vdata = vdata.interpolate(axis=1)
+                    elif non_values == 'ignore':
+                        vdata = vdata.dropna(axis=1,how='any') 
+                    if len(vdata.column)==0:
+                        empty_data = True
+                if isinstance(vdata, xr.core.dataarray.DataArray): #xarray
+                    vdata = vdata.dropna(dim='site',how='all')
+                    if none_values == 'interpolate':
+                        vdata = vdata.interpolate_na(dim='time')
+                    elif none_values == 'ignore':
+                        vdata = vdata.dropna(dim='site',how='any') 
+                    if len(vdata.site)==0:
+                        empty_data = True
+                elif isinstance(vdata,xr.core.dataarray.Dataset): # the only possibility this happens is that the variable is not in the dataset
+                    empty_data = True
+            
+            if empty_data:
+                weights_v = np.zeros(self.nnode)
+                imap_v = np.array([]) # empty array
+                values_v = np.array([])
+                weights_list.append(weights_v)
+                values_list.append(values_v)
+                imap_list.append(imap_v) 
+                continue     
+            
+            if isinstance(vdata,xr.core.dataarray.DataArray):
+                vdata_sites = vdata.site
+                # the weights is ordered accodring to obs_sites;
+                # and it will need to be reordered according to vdata.site
+                w_list = []
+                for s in vdata.site.values:
+                    idx = np.where(obs_sites==s)[0]
+                    w_list.append(weights[idx,:])                        
+                weights_v = np.squeeze(np.array(w_list).sum(axis=0)) 
+            elif isinstance(vdata,pd.core.frame.DataFrame):
+                vdata_sites = vdata.columns
+                # the weights is ordered accodring to obs_sites;
+                # and it will need to be reordered according to vdata.site
+                w_list = []
+                for s in vdata.columns:
+                    idx = np.where(obs_sites==s)[0]
+                    w_list.append(weights[idx,:])
+                weights_v = np.squeeze(np.array(w_list).sum(axis=0)) 
+            else: # no adjustment for weights for a single obs site
+                vdata_sites = ['single_site']
+                weights_v = weights
+            
+            imap_v = np.where(weights_v>0)[0]            
+            if (len(obs_df)>1) & (len(vdata_sites)>1): # multiple sites            
+                obs_x = obs_df.loc[vdata_sites].x.values.astype(float)
+                obs_y = obs_df.loc[vdata_sites].y.values.astype(float)                
                                      
-                    if method =='nearest':
-                        nn_id = []
-                        for nx, ny in zip(self.node_x[imap_v],
-                                          self.node_y[imap_v]):
-                            dist = (nx-obs_x)**2 + (ny-obs_y)**2
-                            nn_id.append(np.where(dist==dist.min())[0][0])
-                        values_v = vdata.isel(site=nn_id).values    
-                    elif method == 'inverse_distance':
-                        obs_loc = np.array([obs_x,obs_y]).T
-                        values_v = []
-                        for t in vdata.time:
-                            vals = vdata.sel(time=t).values
-                            invdisttree = Interp2D.Invdisttree(obs_loc, vals,
-                                           leafsize=10, stat=1)
-                            node_xy = np.array([self.node_x[imap_v],
-                                                self.node_y[imap_v]]).T
-                            values_v.append(invdisttree(node_xy, nnear=4, p=2))
-                    else:
-                         raise NotImplementedError   
-            else:
-                weights_v = []
-                values_v = []
-                imap_v = []
+                if method =='nearest':
+                    nn_id = []
+                    for nx, ny in zip(self.node_x[imap_v],
+                                      self.node_y[imap_v]):
+                        dist = (nx-obs_x)**2 + (ny-obs_y)**2
+                        nn_id.append(np.where(dist==dist.min())[0][0])
+                    values_v = vdata.isel(site=nn_id).values    
+                elif method == 'inverse_distance':
+                    obs_loc = np.array([obs_x,obs_y]).T
+                    values_v = []
+                    for t in vdata.time:
+                        vals = vdata.sel(time=t).values
+                        invdisttree = Interp2D.Invdisttree(obs_loc, vals,
+                                       leafsize=10, stat=1)
+                        node_xy = np.array([self.node_x[imap_v],
+                                            self.node_y[imap_v]]).T
+                        values_v.append(invdisttree(node_xy, nnear=4, p=2))
+                else:
+                     raise NotImplementedError                  
+            else: # single site
+                imap_v = np.where(weights_v>0)[0]
+                values_v = np.broadcast_to(vdata.values,
+                           (len(imap_v),
+                            len(vdata))).T                 
+                
             weights_list.append(weights_v)
             values_list.append(values_v)
-            imap_list.append(imap_v) 
-        
+            imap_list.append(imap_v)          
+                
+        # for v in variable_info:
+        #     if v in obs.keys():
+        #         vdata = obs[v]  
+        #         if region_info['type'] == 'single_obs':                               
+        #             if np.any(np.isnan(vdata)):  
+        #                 if none_values == 'interpolate': #other fillna options possible.                        
+        #                     if isinstance(vdata, pd.core.series.Series): # pandas array
+        #                         vdata = vdata.interpolate()
+        #                     elif isinstance(vdata, xr.core.dataarray.DataArray): #xarray
+        #                         vdata = vdata.interpolate_na(dim='time')
+        #                     weights_v = weights
+        #                     imap_v = np.where(weights_v>0)[0]
+        #                     values_v = np.broadcast_to(vdata.values,
+        #                                                (len(imap_v),
+        #                                                 len(vdata))).T
+        #                 elif none_values == 'ignore': #ignore the entire series when there is any none
+        #                     weights_v = np.zeros(weights)
+        #                     imap_v = np.array([]) # empty array
+        #                     values_v = np.array([])
+        #             else:
+        #                 weights_v = weights
+        #                 imap_v = np.where(weights_v>0)[0]
+        #                 values_v = np.broadcast_to(vdata.values,
+        #                                            (len(imap_v),
+        #                                             len(vdata))).T  
+        #         elif region_info['type'] == 'multi_obs':  #multiple observational points
+        #             # multiple input should be stored in netcdf format only. 
+        #             if np.any(np.isnan(vdata)): 
+        #                 vdata = vdata.dropna(dim='site',how='all')
+        #                 if none_values == 'interpolate':
+        #                     vdata = vdata.interpolate_na(dim='time')
+        #                 elif none_values == 'ignore':
+        #                     vdata = vdata.dropna(dim='site',how='any')
+                            
+        #                 inc_site = []
+        #                 for s in obs.site.values:
+        #                     if s in vdata.site.values:
+        #                         inc_site.append(True)
+        #                     else:
+        #                         inc_site.append(False)
+        #                 weights_v = weights[inc_site,:].sum(axis=0)
+        #             else:
+        #                 weights_v = weights
+        #             imap_v = np.where(weights_v>0)[0]                
+        #             obs_x = obs.x.sel(site=vdata.site).values.astype(float)
+        #             obs_y = obs.y.sel(site=vdata.site).values.astype(float)
+                                     
+        #             if method =='nearest':
+        #                 nn_id = []
+        #                 for nx, ny in zip(self.node_x[imap_v],
+        #                                   self.node_y[imap_v]):
+        #                     dist = (nx-obs_x)**2 + (ny-obs_y)**2
+        #                     nn_id.append(np.where(dist==dist.min())[0][0])
+        #                 values_v = vdata.isel(site=nn_id).values    
+        #             elif method == 'inverse_distance':
+        #                 obs_loc = np.array([obs_x,obs_y]).T
+        #                 values_v = []
+        #                 for t in vdata.time:
+        #                     vals = vdata.sel(time=t).values
+        #                     invdisttree = Interp2D.Invdisttree(obs_loc, vals,
+        #                                    leafsize=10, stat=1)
+        #                     node_xy = np.array([self.node_x[imap_v],
+        #                                         self.node_y[imap_v]]).T
+        #                     values_v.append(invdisttree(node_xy, nnear=4, p=2))
+        #             else:
+        #                  raise NotImplementedError   
+        #     else:
+        #         weights_v = []
+        #         values_v = []
+        #         imap_v = []
+        #     weights_list.append(weights_v)
+        #     values_list.append(values_v)
+        #     imap_list.append(imap_v) 
+     
         return weights_list, values_list, imap_list          
 
     def read_data(self, data):
@@ -992,17 +1123,27 @@ class nudging(object):
             for i, (x, y) in enumerate(zip(self.node_x[inpoly], 
                                            self.node_y[inpoly])):
                 weights[inpoly[i]] = eval(attribute)
+            obs_df = []
         else:
-            if isinstance(attribute['x'],str): # multiple points
-                if attribute['x'].endswith('nc'):
-                    x0 = xr.open_dataset(attribute['x'])['x'].values.astype(float)
-                    y0 = xr.open_dataset(attribute['y'])['y'].values.astype(float)
-                elif attribute(['x']).endswith('csv'):
-                    x0 = pd.read_csv(attribute['x'])['x'].values
-                    y0 = pd.read_csv(attribute['y'])['y'].values 
+            if isinstance(attribute['xy'],str): # multiple points
+                if attribute['xy'].endswith('nc'):
+                    dataset = xr.open_dataset(attribute['xy'])
+                    x0 = dataset['x'].values.astype(float)
+                    y0 = dataset['y'].values.astype(float)
+                    obs_sites = dataset['site'].values
+                elif (attribute['xy']).endswith('csv'):
+                    dataset = pd.read_csv(attribute['xy'])
+                    x0 = dataset['x'].values
+                    y0 = dataset['y'].values
+                    obs_sites = dataset['site'].values
+                obs_df = pd.DataFrame({'site':obs_sites,
+                                       'x':x0,
+                                       'y':y0})
+                obs_df = obs_df.set_index('site')
             else:
-                x0 = attribute['x']
-                y0 = attribute['y']
+                x0,y0 = attribute['xy']
+                obs_df = []
+                
             if isinstance(x0,np.ndarray):
                 weights = np.zeros([len(x0),len(self.node_x)])
                 norm_factor = np.ones_like(x0)
@@ -1024,8 +1165,9 @@ class nudging(object):
                 for i, (x, y) in enumerate(zip(self.node_x, 
                                                self.node_y)):
                     weights[:,i] = self.construct_weights(attribute,x,y,x0,y0,
-                                                          norm_factor)                
-        return weights
+                                                          norm_factor)    
+        
+        return weights, obs_df
 
     def construct_weights(self, attribute,x,y,x0,y0,norm_factor):
         if isinstance(attribute, str):
@@ -1065,36 +1207,3 @@ class nudging(object):
         p = Polygon(vertices)        
         inpoly = np.where(self.mesh_gpd.within(p))[0]
         return inpoly  
-
-
-def roms_nc_list(gen_nu_fn):
-    """    
-    Parameters
-    ----------
-    gen_nu_fn : STR
-        gen_nu.in file
-    Returns
-    -------
-    roms_nc_fns: LIST
-        a list of roms netcdf files required for the nuding task
-    """
-    
-    # read gen_nu.in
-    with open(gen_nu_fn,'r') as reader:
-        lines = reader.readlines()    
-    istart_year = int(lines[2].split()[0])
-    istart_mon = int(lines[2].split()[1])
-    istart_day = int(lines[2].split()[2])
-    nndays = int(lines[3].split()[0])
-    ncfile1 = lines[4].split()[0]    
-    ncfile1 = ncfile1.replace("'","")  # remove the quotation marks 
-    hr_char = ['03','09','15','21'] #each day has 4 starting hours in ROMS  
-    roms_nc_fns = []           
-    for d in range(nndays+1): 
-        date = datetime.date(istart_year,istart_mon,istart_day) + \
-            datetime.timedelta(d) 
-        for hr in hr_char:
-            ncfile = "%s%4d%02d%02d%s.nc"%(ncfile1,date.year,date.month,
-                                            date.day,hr)  
-            roms_nc_fns.append(ncfile)
-    return roms_nc_fns

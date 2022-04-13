@@ -1,32 +1,28 @@
 hotstart: 
     date: 2020-06-09
-    hgrid_input_file: ../data_in/hgrid.gr3                     # hgrid needs to be in utm coordinates. 
-    vgrid_input_file: ../data_in/vgrid.in.3d  
-    elevation:
-        centering: node2D  
+    hgrid_input_file: ./data_in/hgrid.gr3                     # hgrid needs to be in utm coordinates. 
+    vgrid_input_file: ./data_in/vgrid.in.3d  
+    elevation: 
         initializer: 
             hotstart_nc:
                 data_source: hotstart.48000.20210609.nc  
-                hgrid: ../data_in/hgrid.gr3 
-                vgrid: ../data_in/vgrid.in.3d 
+                source_hgrid: ./data_in/hgrid.gr3 
+                source_vgrid: ./data_in/vgrid.in.3d 
     temperature:
-        centering: prism
         initializer: 
             hotstart_nc:
                 data_source: hotstart.48000.20210609.nc
                 #tracer_id: 0                #if different from existing setting. I think T is always 1 and S is always 2; otherwise infer a tracer_id based on existing tracer_id. 
-                hgrid: ../data_in/hgrid.gr3   #if the hgrid is different
-                vgrid: ../data_in/vgrid.in.3d    #if the vgrid is different
+                source_hgrid: ./data_in/hgrid.gr3   #if the hgrid is different
+                source_vgrid: ./data_in/vgrid.in.3d    #if the vgrid is different
                 #method: interpolate or assign a simple function (for flooded island case) in case hgrid 
     salinity:
-        centering: prism
         initializer: 
             hotstart_nc:
                 data_source: hotstart.48000.20210609.nc  
-                hgrid: ../data_in/hgrid.gr3 
-                vgrid: ../data_in/vgrid.in.3d                 
+                source_hgrid: ./data_in/hgrid.gr3 
+                source_vgrid: ./data_in/vgrid.in.3d                 
     GEN_1:
-        centering: prism
         initializer:    
             patch_init:
                 smoothing: False
@@ -45,22 +41,18 @@ hotstart:
                         simple_trend:
                             value: 0.0                          
     AGE_1:
-        centering: prism
         initializer:     
             simple_trend: 
                 value: 0.0
     velocity_u:
-        centering: edge
         initializer: 
             simple_trend:
                 value: 0.0
     velocity_v:
-        centering: edge # node, edge, elem, prism, benthic 
         initializer: 
             simple_trend:
                 values: 0.0  
     velocity_w:
-        centering: elem  # node, edge, elem, prism, benthic 
         initializer: 
             simple_trend:
                 values: 0.0  
