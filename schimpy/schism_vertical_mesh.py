@@ -359,23 +359,48 @@ class SchismLocalVerticalMeshWriter(object):
     def __init__(self, logger=None):
         self.logger = logger
 
-    def write(self, vmesh, fpath='vgrid.in'):
+    def write(self, vmesh, fpath='vgrid.in',old_vgrid=True):
         """ Write vgrid.in
         """
-        with open(fpath, 'w') as f:
-            buf = "{}\n".format(vmesh.ivcor)
-            f.write(buf)
-            n_max_levels = vmesh.n_vert_levels()
-            buf = "{}\n".format(n_max_levels)
-            f.write(buf)
-            for i in range(len(vmesh.sigma)):
-                kbps = vmesh.kbps[i]
-                n_levels = n_max_levels - kbps
-                buf = "{}\t{}\t".format(i + 1, kbps + 1)
-                buf += '\t'.join(['{:.6f}'.format(d)
-                                  for d in vmesh.sigma[i][:n_levels]])
-                buf += '\n'
+        if old_vgrid:
+            with open(fpath, 'w') as f:
+                buf = "{}\n".format(vmesh.ivcor)
                 f.write(buf)
+                n_max_levels = vmesh.n_vert_levels()
+                buf = "{}\n".format(n_max_levels)
+                f.write(buf)
+                for i in range(len(vmesh.sigma)):
+                    kbps = vmesh.kbps[i]
+                    n_levels = n_max_levels - kbps
+                    buf = "{}\t{}\t".format(i + 1, kbps + 1)
+                    buf += '\t'.join(['{:.6f}'.format(d)
+                                      for d in vmesh.sigma[i][:n_levels]])
+                    buf += '\n'
+                    f.write(buf)
+        else:
+            nmesh = len(vmesh.sigma)
+            kbps = vmesh.kbps
+            nvrt = vmesh.param['nvrt']
+            with open(fpath, 'w') as f:
+                buf = "{}\n".format(vmesh.ivcor)
+                f.write(buf)
+                n_max_levels = vmesh.n_vert_levels()
+                buf = "{}\n".format(n_max_levels)
+                f.write(buf)
+                buf =" ".join(["%10d"%(i+1) for i in kbps])
+                buf += '\n'
+                f.write(buf)            
+                sigma = vmesh.sigma
+                sigma_sort = np.ones_like(sigma)             
+                for k,s in enumerate(sigma):
+                    sigma_sort[k,kbps[k]:] = s[:nvrt - kbps[k]] 
+                # transpose the matrix for output
+                sigma_sort = sigma_sort.T 
+                sigma_sort[np.isnan(sigma_sort)]=-9.0
+                for k in range(nvrt):
+                    buf = "%10d "%k + " ".join(["%14.6f"%s for s in sigma_sort[k]]) 
+                    buf += '\n'
+                    f.write(buf)
 
 
 def read_vmesh(fpath_vmesh,old_vgrid=True):
@@ -398,49 +423,31 @@ def read_vmesh(fpath_vmesh,old_vgrid=True):
         raise ValueError('Unsupported vgrid type')
 
 
-def write_vmesh(vmesh, fpath_vmesh='vgrid.in'):
+def write_vmesh(vmesh, fpath_vmesh='vgrid.in',old_vgrid=True):
     if vmesh.ivcor == 1:
         writer = SchismVerticalMeshIoFactory().get_writer('local')
-        writer.write(vmesh, fpath_vmesh)
+        writer.write(vmesh, fpath_vmesh,old_vgrid)
     else:
         raise ValueError('Unsupported vgrid type')
-def convert_vmesh(vmesh_in, vmesh_out, oldstyle_vmeshin=True, 
-                  newstyle_vmeshout=True):
+def convert_vmesh(vmesh_in, vmesh_out, input_vgrid='old', 
+                  output_vgrid='new'):
     """conversion between old and new style of vgrid.in
     """
-    if oldstyle_vmeshin:
+    if input_vgrid=='old':
         vgrid = read_vmesh(vmesh_in) 
-    else:
+    elif input_vgrid=='new':
         vgrid = read_vmesh(vmesh_in,old_vgrid=False) 
+    else:
+        raise ValueError("The value for input_vgrid can only be new or old. ")
     
-    if newstyle_vmeshout:        
-        nmesh = len(vgrid.sigma)
-        kbps = vgrid.kbps
-        nvrt = vgrid.param['nvrt']
-        with open(vmesh_out, 'w') as f:
-            buf = "{}\n".format(vgrid.ivcor)
-            f.write(buf)
-            n_max_levels = vgrid.n_vert_levels()
-            buf = "{}\n".format(n_max_levels)
-            f.write(buf)
-            buf =" ".join(["%10d"%(i+1) for i in kbps])
-            buf += '\n'
-            f.write(buf)            
-            sigma = vgrid.sigma
-            sigma_sort = np.ones_like(sigma)             
-            for k,s in enumerate(sigma):
-                sigma_sort[k,kbps[k]:] = s[:nvrt - kbps[k]] 
-            # transpose the matrix for output
-            sigma_sort = sigma_sort.T 
-            sigma_sort[np.isnan(sigma_sort)]=-9.0
-            for k in range(nvrt):
-                buf = "%10d "%k + " ".join(["%14.6f"%s for s in sigma_sort[k]]) 
-                buf += '\n'
-                f.write(buf)
-    else:        
+    if  output_vgrid=='new':    
+        write_vmesh(vgrid,vmesh_out,old_vgrid=False)
+    elif  output_vgrid=='old':      
         # the vgrid output from this function is in the old style regardless of
         # the input is in old or new styel
         write_vmesh(vgrid,vmesh_out)
+    else:
+        raise ValueError("The value for output_vgrid can only be new or old. ")
         
 def compare_vmesh(v1,v2):
     """
