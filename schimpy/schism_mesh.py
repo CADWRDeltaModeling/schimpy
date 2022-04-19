@@ -667,7 +667,7 @@ class SchismMesh(TriQuadMesh):
         if create_gdf:
             return gdf
     
-    def plot_elems(self,var=None,ax=None,inpoly=None,**kwargs):
+    def plot_elems(self,var=None,ax=None,inpoly=None,plot_nan=False, **kwargs):
         """
         Plot variables (1D array on element) based on SCHISM mesh grid. 
         if var is None,just plot the grid. 
@@ -678,25 +678,31 @@ class SchismMesh(TriQuadMesh):
         if inpoly is not None:
             xy = np.asarray(xy)[inpoly]      
             if var is not None:
-                vpoly = np.isnan(var) # do not plot nan data
-                inpoly = np.logical_and(inpoly, ~vpoly) 
+                if not plot_nan:
+                    vpoly = np.isnan(var) # do not plot nan data
+                    inpoly = np.logical_and(inpoly, ~vpoly) 
             coll = PolyCollection(xy,array=var[inpoly],**kwargs)
         else:
-            coll = PolyCollection(xy,array=var,**kwargs)
-        
+            if plot_nan:
+                coll = PolyCollection(xy,array=var,**kwargs)
+            else:
+                inpoly = ~np.isnan(var)
+                xy = np.asarray(xy)[inpoly]
+                coll = PolyCollection(xy,array=var[inpoly],**kwargs)
         if not ax:
             fig, ax = plt.subplots()
         ax.add_collection(coll)
         ax.axis('equal')
         return coll
     
-    def plot_nodes(self,var,ax=None,inpoly=None,**kwargs):   
+    def plot_nodes(self,var,ax=None,inpoly=None,plot_nan=False,**kwargs):   
         if len(self.nodes) != len(var):
             raise ValueError("input var has different len compared to input node")             
         velem = np.asarray([var[el].mean(axis=0) for el in self.elems]) 
         if inpoly is not None:
             inpoly = np.asarray([np.all(inpoly[el]) for el in self.elems])
-        coll = self.plot_elems(var=velem,ax=ax,inpoly=inpoly,**kwargs)
+        coll = self.plot_elems(var=velem,ax=ax,inpoly=inpoly,plot_nan=plot_nan,
+                               **kwargs)
         return coll
     
     def plot_edges(self,var,ax=None, size=500,inpoly=None,**kwargs):    
