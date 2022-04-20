@@ -2,6 +2,7 @@ hotstart:
     date: 2020-04-20
     hgrid_input_file: ./data_in/hgrid.gr3                     # hgrid needs to be in utm coordinates. 
     vgrid_input_file: ./data_in/vgrid.in.3d 
+    vgrid_version: 5.8
     elevation:
         initializer: 
             patch_init: 
@@ -26,6 +27,7 @@ hotstart:
                 data_source: ./data_in/hotstart_interpolation/hotstart_it=2688000.nc  
                 source_hgrid: ./data_in/hotstart_interpolation/hgrid.gr3 
                 source_vgrid: ./data_in/hotstart_interpolation/vgrid.in.3d  
+                source_vgrid_version: 5.8
                 distance_threshold: 10
                 method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid   
     velocity_w:
@@ -34,6 +36,7 @@ hotstart:
                 data_source: ./data_in/hotstart_interpolation/hotstart_it=2688000.nc  
                 source_hgrid: ./data_in/hotstart_interpolation/hgrid.gr3 
                 source_vgrid: ./data_in/hotstart_interpolation/vgrid.in.3d
+                source_vgrid_version: 5.8
                 vinterp: True       # if vertical layers are the same between the two meshes, the default is not to perform vertical interpolation.    
     velocity_u:
         initializer: 
@@ -41,6 +44,7 @@ hotstart:
                 data_source: ./data_in/hotstart_interpolation/hotstart_it=2688000.nc  
                 source_hgrid: ./data_in/hotstart_interpolation/hgrid.gr3 
                 source_vgrid: ./data_in/hotstart_interpolation/vgrid.in.3d     
+                source_vgrid_version: 5.8
                 distance_threshold: 10
                 method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid    
     velocity_v:
@@ -50,6 +54,7 @@ hotstart:
                 data_source: ./data_in/hotstart_interpolation/hotstart_it=2688000.nc  
                 source_hgrid: ./data_in/hotstart_interpolation/hgrid.gr3 
                 source_vgrid: ./data_in/hotstart_interpolation/vgrid.in.3d
+                source_vgrid_version: 5.8
                 distance_threshold: 10
                 method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid
     salinity:
@@ -64,6 +69,7 @@ hotstart:
                             data_source: ./data_in/hotstart_interpolation/hotstart_it=2688000.nc                
                             source_hgrid: ./data_in/hotstart_interpolation/hgrid.gr3   #if the hgrid is different
                             source_vgrid: ./data_in/hotstart_interpolation/vgrid.in.3d    #if the vgrid is different
+                            source_vgrid_version: 5.8
                             vinterp: True
                   - region: other
                     initializer: 
@@ -71,6 +77,7 @@ hotstart:
                             data_source: ./data_in/hotstart_interpolation/hotstart_it=2688000.nc                
                             source_hgrid: ./data_in/hotstart_interpolation/hgrid.gr3   #if the hgrid is different
                             source_vgrid: ./data_in/hotstart_interpolation/vgrid.in.3d    #if the vgrid is different
+                            source_vgrid_version: 5.8
                             vinterp: False 
     temperature:
         initializer: 
@@ -79,6 +86,7 @@ hotstart:
                 #tracer_id: 0                #if different from existing setting. I think T is always 1 and S is always 2; otherwise infer a tracer_id based on existing tracer_id. 
                 source_hgrid: ./data_in/hotstart_interpolation/hgrid.gr3   #if the hgrid is different
                 source_vgrid: ./data_in/hotstart_interpolation/vgrid.in.3d    #if the vgrid is different
+                source_vgrid_version: 5.8
                 distance_threshold: 10
                 method: nearest            #method: interpolate vertically or assign a simple function (for flooded island case) in case hgrid                             
     #elevation:

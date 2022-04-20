@@ -4,7 +4,7 @@ nudging:
     step_nu_tr: 3H
     hgrid_input_file: ./schism_inputs/hgrid.gr3
     vgrid_input_file: ./schism_inputs/vgrid.in.new
-    vgrid_style: new
+    vgrid_version: 5.9
     default: 0.
     polygons:
       - name: ocean

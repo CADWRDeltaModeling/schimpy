@@ -50,15 +50,8 @@ class nudging(object):
         self.hgrid_fn = nudging_info['hgrid_input_file']
         self.vgrid_fn = nudging_info['vgrid_input_file']
         self.default_value = nudging_info['default']
-        if 'vgrid_style' in nudging_info.keys():
-            self.vgrid_style = nudging_info['vgrid_style']
-        else:
-            self.vgrid_style = 'old'
-        if self.vgrid_style == 'old':
-            old_vgrid = True
-        else:
-            old_vgrid = False
-        self.mesh = read_mesh(self.hgrid_fn,self.vgrid_fn, old_vgrid)
+        self.vgrid_version = nudging_info['vgrid_version']
+        self.mesh = read_mesh(self.hgrid_fn,self.vgrid_fn, self.vgrid_version)
         self.node_x = self.mesh.nodes[:,0]
         self.node_y = self.mesh.nodes[:,1]
         self.node_z = self.mesh.nodes[:,2] 

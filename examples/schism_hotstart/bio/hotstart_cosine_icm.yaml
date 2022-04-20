@@ -1,7 +1,8 @@
 hotstart: 
     date: 2015-01-22
     hgrid_input_file: hgrid.gr3
-    vgrid_input_file: vgrid.in.3d        
+    vgrid_input_file: vgrid.in.3d  
+    vgrid_version:5.8    
     elevation:           
         initializer: 
             simple_trend: 

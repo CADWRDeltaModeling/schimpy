@@ -314,18 +314,20 @@ class SchismLocalVerticalMeshReader(object):
         if theta_f <= 0.:
             raise ValueError("Wrong theta_f: theta_f <= 0.")
 
-    def read(self, fpath='vgrid.in',old_vgrid=True):
+    def read(self, fpath='vgrid.in',vgrid_version=None):
         """ Read vgrid.in
         """
         vgrid = SchismLocalVerticalMesh()
         self._vgrid = vgrid
+        if vgrid_version is None:
+            raise ValueError("vgrid_version input is required!")
         with open(fpath, 'r') as fin:
             ivcor = int(fin.readline().split()[0])
             nvrt = int(fin.readline().strip().split()[0])
             vgrid.param['nvrt'] = nvrt
             sigmas = list()
             kbps = list()
-            if old_vgrid: # this is the old style of vgrid input           
+            if vgrid_version<=5.8: # this is the old style of vgrid input            
                 while True:
                     tkns = fin.readline().strip().split()
                     if len(tkns) < 1:
@@ -359,10 +361,12 @@ class SchismLocalVerticalMeshWriter(object):
     def __init__(self, logger=None):
         self.logger = logger
 
-    def write(self, vmesh, fpath='vgrid.in',old_vgrid=True):
+    def write(self, vmesh, fpath='vgrid.in',vgrid_version=None):
         """ Write vgrid.in
         """
-        if old_vgrid:
+        if vgrid_version is None:
+            raise ValueError("vgrid_version input is required!")
+        if vgrid_version<=5.8:
             with open(fpath, 'w') as f:
                 buf = "{}\n".format(vmesh.ivcor)
                 f.write(buf)
@@ -403,7 +407,7 @@ class SchismLocalVerticalMeshWriter(object):
                     f.write(buf)
 
 
-def read_vmesh(fpath_vmesh,old_vgrid=True):
+def read_vmesh(fpath_vmesh,vgrid_version):
     """ Read a vgrid file
     """
     if fpath_vmesh is None:
@@ -415,7 +419,7 @@ def read_vmesh(fpath_vmesh,old_vgrid=True):
 
     if ivcor == 1:
         reader = SchismVerticalMeshIoFactory().get_reader('local')
-        return reader.read(fpath_vmesh,old_vgrid)
+        return reader.read(fpath_vmesh,vgrid_version)
     elif ivcor == 2:
         reader = SchismVerticalMeshIoFactory().get_reader('sz')
         return reader.read(fpath_vmesh)
@@ -423,31 +427,20 @@ def read_vmesh(fpath_vmesh,old_vgrid=True):
         raise ValueError('Unsupported vgrid type')
 
 
-def write_vmesh(vmesh, fpath_vmesh='vgrid.in',old_vgrid=True):
+def write_vmesh(vmesh, fpath_vmesh='vgrid.in',vgrid_version=None):
+    if vgrid_version is None:
+        raise ValueErorr("vgrid_version is a required input!") 
     if vmesh.ivcor == 1:
         writer = SchismVerticalMeshIoFactory().get_writer('local')
-        writer.write(vmesh, fpath_vmesh,old_vgrid)
+        writer.write(vmesh, fpath_vmesh,vgrid_version)
     else:
         raise ValueError('Unsupported vgrid type')
-def convert_vmesh(vmesh_in, vmesh_out, input_vgrid='old', 
-                  output_vgrid='new'):
+def convert_vmesh(vmesh_in, vmesh_out, input_vgrid=5.8, 
+                  output_vgrid=5.9):
     """conversion between old and new style of vgrid.in
     """
-    if input_vgrid=='old':
-        vgrid = read_vmesh(vmesh_in) 
-    elif input_vgrid=='new':
-        vgrid = read_vmesh(vmesh_in,old_vgrid=False) 
-    else:
-        raise ValueError("The value for input_vgrid can only be new or old. ")
-    
-    if  output_vgrid=='new':    
-        write_vmesh(vgrid,vmesh_out,old_vgrid=False)
-    elif  output_vgrid=='old':      
-        # the vgrid output from this function is in the old style regardless of
-        # the input is in old or new styel
-        write_vmesh(vgrid,vmesh_out)
-    else:
-        raise ValueError("The value for output_vgrid can only be new or old. ")
+    vgrid = read_vmesh(vmesh_in,input_vgrid) 
+    write_vmesh(vgrid,vmesh_out,output_vgrid) 
         
 def compare_vmesh(v1,v2):
     """
@@ -468,17 +461,16 @@ def compare_vmesh(v1,v2):
     if v1.param['nvrt']!=v2.param['nvrt']:
         equal = False
         print("The number of vertical layers are not equal between the two meshes")
-        return equal
     
     if (np.abs((v1.kbps - v2.kbps)>0)).any():
         equal = False
         print("kbps are not equal between the two meshes")
-        return equal
         
     if (np.abs((v1.sigma - v2.sigma)>0)).any():
         equal = False
         print("sigma are not equal between the two meshes")
-        return equal
     
-    print("the two meshes are equal")
-    return equal
+    if equal:
+        print("the two meshes are equal")
+    
+    
