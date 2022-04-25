@@ -726,7 +726,10 @@ class SchismMesh(TriQuadMesh):
         """
         boundary_mesh = self.merged_mesh()
         patch = []     
-        multi_poly = list(boundary_mesh)        
+        if isinstance(boundary_mesh, Polygon):
+            multi_poly = [boundary_mesh]
+        else:
+            multi_poly = list(boundary_mesh)    
         for pi in multi_poly:
             if isinstance(pi.boundary, MultiLineString):
                 boundary = list(pi.boundary)
@@ -742,6 +745,9 @@ class SchismMesh(TriQuadMesh):
         p = PatchCollection(patch,facecolor='none',edgecolor=edgecolor,**kwargs)           
         if not ax:
             fig, ax = plt.subplots()            
+            bounds = boundary_mesh.bounds
+            ax.set_xlim((bounds[0],bounds[2]))
+            ax.set_ylim((bounds[1],bounds[3]))
         ax.add_collection(p)
         plt.axis('equal')   
         return p
