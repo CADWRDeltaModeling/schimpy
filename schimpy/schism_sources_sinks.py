@@ -146,7 +146,7 @@ def concat_msource_csv(csv_fn1,csv_fn2,merged_source_sink_in,
     # if an item of cols is not in the columns of th. 
     colm = np.asarray(list(set(cols) - set(th_merged.columns.values)))
     colm = [str(s) for s in colm]    
-    th_merged[colm] = pd.DataFrame(np.ones([len(th_merged),len(colm)])*-999.0)   
+    th_merged[colm] = pd.DataFrame(np.ones([len(th_merged),len(colm)])*-9999.0)   
     
     th_merged = th_merged.fillna(-9999.0)
     
@@ -231,11 +231,19 @@ def read_source_sink_th(th_fn, source_or_sink_df):
     """
     th = pd.read_csv(th_fn,header=None, delimiter=r"\s+") 
     if len(th.columns) == len(source_or_sink_df) +1:
-        col_names = ['minutes'] + list(source_or_sink_df.name.values)         
+        col_names = ['seconds'] + list(source_or_sink_df.name.values)         
     elif len(th.columns) == len(source_or_sink_df)*2 +1:  # T and S
         T_col = ['T_%s'%s for s in source_or_sink_df.name.values]
         S_col = ['S_%s'%s for s in source_or_sink_df.name.values]
-        col_names = ['minutes'] + T_col + S_col
+        col_names = ['seconds'] + T_col + S_col
+    else: # if more sources are involved
+        nsources = int((len(th.columns)-1)/len(source_or_sink_df))-2
+        T_col = ['T_%s'%s for s in source_or_sink_df.name.values]
+        S_col = ['S_%s'%s for s in source_or_sink_df.name.values]     
+        B_col = []
+        for n in range(nsources):
+            B_col +=['B%d_%s'%(n+1,s) for s in source_or_sink_df.name.values]
+        col_names = ['seconds'] + T_col + S_col + B_col
     th.columns = col_names
     return th  
 
