@@ -263,7 +263,7 @@ hgrid.gr3
 53
 2 !Number of land boundaries
 45 !Number of land boundary nodes (including islands)
-31 !Number of nodes for land boundary 1 ('0' means exterior land boundary)
+31 0 !Number of nodes for land boundary 1 ('0' means exterior land boundary)
 53
 61
 69
@@ -295,7 +295,7 @@ hgrid.gr3
 6
 3
 1
-17 !Number of nodes for land boundary 2 ('0' means exterior land boundary)
+17 1 !Number of nodes for land boundary 2 ('0' means exterior land boundary)
 25
 33
 41
