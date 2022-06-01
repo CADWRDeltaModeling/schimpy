@@ -337,6 +337,57 @@ def write_source_sink_in(source_sink_yaml, hgrid_fn,
     s = create_schism_setup(hgrid_fn)
     s.create_source_sink_in(source_sink,source_sink_in)
 
+def yaml2csv(source_yaml,source_csv): 
+    """
+    Converting from source yaml file to source csv file
+    Parameters
+    ----------
+    source_yaml :YAML FILENAME 
+        DESCRIPTION.
+    source_csv : CSV FILENAME
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    with open(source_yaml, 'r') as file:
+        source_sink = yaml.safe_load(file)
+    potw = source_sink['sources']
+    sites = potw.keys()
+    sites = list(sites)
+    a = [potw[k] for k in sites]
+    a = np.array(a)
+    x = a[:,0]
+    y = a[:,1]
+    df =  pd.DataFrame({'sites': sites,'x':x,'y':y})
+    df.to_csv(source_csv)
+
+def csv2yaml(source_csv,source_yaml):
+    """
+    Converting from source csv to source yaml file
+    Parameters
+    ----------
+    source_csv : CSV FILENAME
+        DESCRIPTION.
+    source_yaml : YAML FILENAME
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    csv_data = pd.read_csv(source_csv)
+    csv_data = csv_data[['site','utm_x','utm_y']]
+    
+    dict_file = {}
+    for r in csv_data.iterrows():
+        dict_file[r[1].site] = [float(r[1].utm_x),float(r[1].utm_y)]
+    dict_file = {'sources':dict_file}
+    with open(source_yaml, 'w') as file:
+        documents = yaml.dump(dict_file, file)
 if __name__ == "__main__":
     yaml_fn1 = 'source_sink.yaml'
     yaml_fn2 = 'potw_sources.yaml'
