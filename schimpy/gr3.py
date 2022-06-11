@@ -276,32 +276,22 @@ class Gr3IO(schimpy.base_io.BaseIO):
             landbound_count = 0
             islandbound_count = 0
             for boundary in mesh.boundaries:
-                if boundary.btype == BoundaryType.LAND:
+                if (boundary.btype == BoundaryType.LAND or
+                    boundary.btype== BoundaryType.ISLAND):
                     landbound_count += 1
+                    island_flag = 1 if BoundaryType.ISLAND else 0
                     if boundary.comment is None:
-                        buf = "%d = Number of nodes for land boundary %d\n" % \
-                          (boundary.n_nodes(), landbound_count)
+                        buf = "%d %d = Number of nodes for land boundary %d\n" % \
+                          (boundary.n_nodes(), island_flag, landbound_count)
                     else:
-                        buf = "%d %s\n" % (boundary.n_nodes(), boundary.comment)
+                        buf = "%d %d %s\n" % (boundary.n_nodes(), island_flag, boundary.comment)
                     f.write(buf)
                     buf = ""
                     for node_i in boundary.nodes:
                         buf += "%d\n" % (node_i + 1)
                     f.write(buf)
-                # elif boundary.btype == BoundaryType.ISLAND:
-                #     islandbound_count += 1
-                #     if boundary.comment is None:
-                #         buf = "%d = Number of nodes for island boundary %d\n" \
-                #                % (boundary.n_nodes(), islandbound_count)
-                #     else:
-                #         buf = "%d %s\n" % (boundary.n_nodes(), boundary.comment)
-                #     f.write(buf)
-                #     buf = ""
-                #     for node_i in boundary.nodes:
-                #         buf += "%d\n" % (node_i + 1)
-                #     f.write(buf)
-#             else:
-#                 raise Exception("Unsupported boundary type.")
+                else:
+                    raise Exception("Unsupported boundary type.")
 
         f.flush()
         f.close()

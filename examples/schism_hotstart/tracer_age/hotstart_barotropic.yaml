@@ -2,7 +2,7 @@ hotstart:
     date: 2020-04-20
     hgrid_input_file: ./data_in/hgrid.gr3
     vgrid_input_file: ./data_in/vgrid.in.new 
-    vgrid_style: new
+    vgrid_version: 5.9
     elevation:         
         initializer: 
             simple_trend: 

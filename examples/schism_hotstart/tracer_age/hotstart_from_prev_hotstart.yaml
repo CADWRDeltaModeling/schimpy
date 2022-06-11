@@ -1,15 +1,15 @@
 hotstart: 
     date: 2020-06-09
     hgrid_input_file: ./data_in/hgrid.gr3                     # hgrid needs to be in utm coordinates. 
-    vgrid_input_file: ./data_in/vgrid.in.3d
-    vgrid_version: 5.8    
+    vgrid_input_file: ./data_in/vgrid.in.3d  
+    vgrid_version:5.8
     elevation: 
         initializer: 
             hotstart_nc:
                 data_source: hotstart.48000.20210609.nc  
                 source_hgrid: ./data_in/hgrid.gr3 
-                source_vgrid: ./data_in/vgrid.in.3d 
-                source_vgrid_version: 5.8
+                source_vgrid: ./data_in/vgrid.in.3d
+                source_vgrid_version: 5.8                
     temperature:
         initializer: 
             hotstart_nc:
@@ -17,15 +17,15 @@ hotstart:
                 #tracer_id: 0                #if different from existing setting. I think T is always 1 and S is always 2; otherwise infer a tracer_id based on existing tracer_id. 
                 source_hgrid: ./data_in/hgrid.gr3   #if the hgrid is different
                 source_vgrid: ./data_in/vgrid.in.3d    #if the vgrid is different
-                #method: interpolate or assign a simple function (for flooded island case) in case hgrid 
                 source_vgrid_version: 5.8
+                #method: interpolate or assign a simple function (for flooded island case) in case hgrid 
     salinity:
         initializer: 
             hotstart_nc:
                 data_source: hotstart.48000.20210609.nc  
                 source_hgrid: ./data_in/hgrid.gr3 
-                source_vgrid: ./data_in/vgrid.in.3d      
-                source_vgrid_version: 5.8                
+                source_vgrid: ./data_in/vgrid.in.3d 
+                source_vgrid_version: 5.8               
     GEN_1:
         initializer:    
             patch_init:

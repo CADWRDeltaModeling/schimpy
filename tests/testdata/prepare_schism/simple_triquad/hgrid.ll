@@ -1,4 +1,4 @@
-hgrid.ll
+default coverage
 135 112 ! # of elements and nodes
 1        -127.48874388        0.00090194     -100.00000000
 2        -127.48874388        0.00081174     -100.00000000
@@ -247,3 +247,69 @@ hgrid.ll
 133 3 68 59 67
 134 3 69 77 70
 135 3 76 67 75
+1 = Number of open boundaries
+11 = Total number of open boundary nodes
+11 ! Open boundary "ocean"
+1
+2
+4
+7
+11
+16
+22
+29
+37
+45
+53
+1 = Number of land boundaries
+31 = Total number of land boundary nodes
+31 0 = Number of nodes for land boundary 1
+53
+61
+69
+77
+85
+92
+98
+103
+107
+110
+112
+111
+109
+106
+102
+97
+91
+84
+76
+68
+60
+52
+44
+36
+28
+21
+15
+10
+6
+3
+1
+17 1 = Number of nodes for land boundary 2
+32
+25
+33
+41
+49
+57
+65
+73
+81
+88
+80
+72
+64
+56
+48
+40
+32

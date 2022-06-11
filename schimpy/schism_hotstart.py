@@ -99,21 +99,14 @@ class hotstart(object):
         self.vgrid_fn = hotstart_info['vgrid_input_file']
         variables = list(hotstart_info.keys())
         # remove these items from the list.
-        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date','vgrid_style']
+        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date','vgrid_version']
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
-        if 'vgrid_style' in hotstart_info.keys():
-            self.vgrid_style = hotstart_info['vgrid_style']
-        else:
-            self.vgrid_style = 'old' #the default style for vgrid is old. 
+        self.vgrid_version = hotstart_info['vgrid_version']  # 5.8 and below is the old version
 
     def create_hotstart(self):
         self.read_yaml()
-        if self.vgrid_style == 'old':
-            old_vgrid = True
-        else:
-            old_vgrid = False
-        mesh = read_mesh(self.hgrid_fn, self.vgrid_fn, old_vgrid)
+        mesh = read_mesh(self.hgrid_fn, self.vgrid_fn, self.vgrid_version)
         self.mesh = mesh
         self.depths = self.mesh.build_z() # this is required to get depths for elevation
         #v = self.variables[1]
@@ -128,6 +121,8 @@ class hotstart(object):
                     'hotstart_nc']['source_hgrid']
                 self.hotstart_ini['hotstart_nc_vfn'] = initializer[
                     'hotstart_nc']['source_vgrid']
+                self.hotstart_ini['source_vgrid_version'] = initializer[
+                    'hotstart_nc']['source_vgrid_version']  
             elif 'patch_init' in initializer and \
                 (not self.hotstart_ini) :
                 patch_init =  [list(ini['initializer'].keys())[0] 
@@ -138,22 +133,13 @@ class hotstart(object):
                         'regions'][0]['initializer']['hotstart_nc']
                     self.hotstart_ini['hotstart_nc_hfn'] = sub_init['hgrid']
                     self.hotstart_ini['hotstart_nc_vfn'] = sub_init['vgrid']
-                    if 'source_vgrid_style' in sub_init.keys():
-                        self.hotstart_ini['source_vgrid_style'] = sub_init[
-                            'source_vgrid_style']
-                    else:
-                        self.hotstart_ini['source_vgrid_style'] = 'old'
+                    self.hotstart_ini['source_vgrid_version'] = sub_init[
+                        'source_vgrid_version']
                         
-            if self.hotstart_ini:                    
-                old_vgrid = True
-                if 'source_vgrid_style' in self.hotstart_ini:
-                    if self.hotstart_ini['source_vgrid_style'] == 'old':
-                        old_vgrid = True
-                    else:
-                        old_vgrid = False
+            if self.hotstart_ini:
                 hotstart_mesh = read_mesh(self.hotstart_ini['hotstart_nc_hfn'],
                                           self.hotstart_ini['hotstart_nc_vfn'],
-                                          old_vgrid)
+                                          self.hotstart_ini['source_vgrid_version'])
                 indices, dist = compare_mesh(hotstart_mesh,self.mesh)
                 self.hotstart_ini['hotstart_nc_indices'] = indices
                 self.hotstart_ini['hotstart_nc_dist'] = dist
@@ -971,13 +957,7 @@ class VariableField(object):
             self.tr_index = np.where(np.array(self.tr_mname)==var)[0][0]                
                 
         hotstart_data = xr.open_dataset(data_source)
-        if 'source_vgrid_style' in ini_meta.keys():
-            if ini_meta['source_vgrid_style'] == 'old':
-                old_vgrid = True
-            else:
-                old_vgrid = False
-        else:
-            old_vgrid = True 
+
         if 'source_hgrid' not in ini_meta.keys(): #if the grids are exactly the same
             if self.tr_index is not None:
                 v = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
@@ -1007,7 +987,8 @@ class VariableField(object):
                                           method=ini_meta['method'])                 
             else:
                 v = self.interp_from_mesh(ini_meta['source_hgrid'], vin, 
-                                          ini_meta['source_vgrid'], old_vgrid,
+                                          ini_meta['source_vgrid'], 
+                                          ini_meta['source_vgrid_version'],
                                           inpoly)          
         # if type(yaml_var[var]) is list: 
         #     ds = xr.Dataset()
@@ -1021,10 +1002,10 @@ class VariableField(object):
         #     ds = v
         return v            
     
-    def interp_from_mesh(self, hgrid_fn, vin,vgrid_fn=None, old_vgrid=True,
+    def interp_from_mesh(self, hgrid_fn, vin,vgrid_fn=None, vgrid_version=5.8,
                          inpoly=None, dist_th=None, method=None):
         import rtree.index
-        mesh1 = read_mesh(hgrid_fn,vgrid_fn,old_vgrid)
+        mesh1 = read_mesh(hgrid_fn,vgrid_fn,vgrid_version)
             
         grid1 = self.define_new_grid(mesh1)
         hgrid1 = list(grid1.values())[0][1]
@@ -1355,7 +1336,7 @@ def describe_tracers(param_nml, modules=['HYDRO']):
 
 
 def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3', 
-                         vgrid_fn='vgrid.in', vgrid_style = 'old',
+                         vgrid_fn='vgrid.in', vgrid_version = 5.8,
                          outname="hotstart_out.nc"):
     """
     convert hotstart.nc to schism output nc file format that can be read by VisIt. 
@@ -1387,11 +1368,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
     # 'n_vgrid_layers':'nSCHISM_vgrid_layers'}
 
     if not os.path.exists("hgrid.nc"):
-        if vgrid_style == 'old':
-            old_vgrid = True
-        else:
-            old_vgrid = False
-        mesh = read_mesh(hgrid_fn, vgrid_fn, old_vgrid)
+        mesh = read_mesh(hgrid_fn, vgrid_fn, vgrid_version)
         write_mesh(mesh, 'hgrid.nc')
     hgrid_nc = xr.open_dataset("hgrid.nc")
     hgrid_nc = hgrid_nc.rename(grid_newname)

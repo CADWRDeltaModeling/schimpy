@@ -146,7 +146,7 @@ def concat_msource_csv(csv_fn1,csv_fn2,merged_source_sink_in,
     # if an item of cols is not in the columns of th. 
     colm = np.asarray(list(set(cols) - set(th_merged.columns.values)))
     colm = [str(s) for s in colm]    
-    th_merged[colm] = pd.DataFrame(np.ones([len(th_merged),len(colm)])*-999.0)   
+    th_merged[colm] = pd.DataFrame(np.ones([len(th_merged),len(colm)])*-9999.0)   
     
     th_merged = th_merged.fillna(-9999.0)
     
@@ -231,11 +231,19 @@ def read_source_sink_th(th_fn, source_or_sink_df):
     """
     th = pd.read_csv(th_fn,header=None, delimiter=r"\s+") 
     if len(th.columns) == len(source_or_sink_df) +1:
-        col_names = ['minutes'] + list(source_or_sink_df.name.values)         
+        col_names = ['seconds'] + list(source_or_sink_df.name.values)         
     elif len(th.columns) == len(source_or_sink_df)*2 +1:  # T and S
         T_col = ['T_%s'%s for s in source_or_sink_df.name.values]
         S_col = ['S_%s'%s for s in source_or_sink_df.name.values]
-        col_names = ['minutes'] + T_col + S_col
+        col_names = ['seconds'] + T_col + S_col
+    else: # if more sources are involved
+        nsources = int((len(th.columns)-1)/len(source_or_sink_df))-2
+        T_col = ['T_%s'%s for s in source_or_sink_df.name.values]
+        S_col = ['S_%s'%s for s in source_or_sink_df.name.values]     
+        B_col = []
+        for n in range(nsources):
+            B_col +=['B%d_%s'%(n+1,s) for s in source_or_sink_df.name.values]
+        col_names = ['seconds'] + T_col + S_col + B_col
     th.columns = col_names
     return th  
 
@@ -329,6 +337,57 @@ def write_source_sink_in(source_sink_yaml, hgrid_fn,
     s = create_schism_setup(hgrid_fn)
     s.create_source_sink_in(source_sink,source_sink_in)
 
+def yaml2csv(source_yaml,source_csv): 
+    """
+    Converting from source yaml file to source csv file
+    Parameters
+    ----------
+    source_yaml :YAML FILENAME 
+        DESCRIPTION.
+    source_csv : CSV FILENAME
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    with open(source_yaml, 'r') as file:
+        source_sink = yaml.safe_load(file)
+    potw = source_sink['sources']
+    sites = potw.keys()
+    sites = list(sites)
+    a = [potw[k] for k in sites]
+    a = np.array(a)
+    x = a[:,0]
+    y = a[:,1]
+    df =  pd.DataFrame({'sites': sites,'x':x,'y':y})
+    df.to_csv(source_csv)
+
+def csv2yaml(source_csv,source_yaml):
+    """
+    Converting from source csv to source yaml file
+    Parameters
+    ----------
+    source_csv : CSV FILENAME
+        DESCRIPTION.
+    source_yaml : YAML FILENAME
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    csv_data = pd.read_csv(source_csv)
+    csv_data = csv_data[['site','utm_x','utm_y']]
+    
+    dict_file = {}
+    for r in csv_data.iterrows():
+        dict_file[r[1].site] = [float(r[1].utm_x),float(r[1].utm_y)]
+    dict_file = {'sources':dict_file}
+    with open(source_yaml, 'w') as file:
+        documents = yaml.dump(dict_file, file)
 if __name__ == "__main__":
     yaml_fn1 = 'source_sink.yaml'
     yaml_fn2 = 'potw_sources.yaml'

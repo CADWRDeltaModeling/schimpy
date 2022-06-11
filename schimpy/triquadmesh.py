@@ -33,6 +33,7 @@ EdgeType = enum(INTERNAL=0,
                 BOUNDARY=1,
                 OPEN=2,
                 LAND=3,
+                ISLAND=4,
                 CUT=-1)
 
 # Boundary type
@@ -44,7 +45,8 @@ EdgeType = enum(INTERNAL=0,
 BoundaryType = enum(INVALID=-1,
                     NO_TYPE=0,
                     OPEN=1,
-                    LAND=2)
+                    LAND=2,
+                    ISLAND=3)
 
 NodeType = enum(INVALID=-1,)
 
