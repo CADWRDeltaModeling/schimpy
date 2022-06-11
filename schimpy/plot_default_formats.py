@@ -4,7 +4,7 @@
 
 
 import vtools.data.timeseries
-from schimpy.unit_conversions import m_to_ft, cms_to_cfs, celcius_to_fahrenheit,\
+from schimpy.unit_conversions import m_to_ft, cms_to_cfs, celsius_to_fahrenheit,\
                                     psu_ec_25c, psu_ec_25c_scalar, ec_sea
 import palettable
 from matplotlib.ticker import AutoLocator, ScalarFormatter
@@ -183,7 +183,7 @@ def set_dual_axes(ax, ts, cell_method = 'inst'):
                 ax2.set_ylabel(FTPS_LABEL)
             return ax2
         elif unit == 'deg C' or unit == 'degC':
-            ax2 = create_second_axis(ax, celcius_to_fahrenheit)
+            ax2 = create_second_axis(ax, celsius_to_fahrenheit)
             if filtered:
                 ax.set_ylabel(FILTERED_DEG_C_LABEL)
                 ax2.set_ylabel(FILTERED_DEG_F_LABEL)
@@ -241,7 +241,7 @@ def set_dual_axes_temp(ax1, filtered=False):
 
         ax: matplotlib axes
     """
-    ax2 = create_second_axis(ax1, celcius_to_fahrenheit)
+    ax2 = create_second_axis(ax1, celsius_to_fahrenheit)
     if filtered:
         ax1.set_ylabel(FILTERED_DEG_C_LABEL)
         ax2.set_ylabel(FILTERED_DEG_F_LABEL)
