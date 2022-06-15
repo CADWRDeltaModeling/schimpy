@@ -869,7 +869,8 @@ class nudging(object):
                     nudge_step = int(pd.Timedelta(self.nudge_step).total_seconds()/3600)
                     if len(output_day)>1:
                         if output_day[-1]-output_day[-2]>(nudge_step+0.1)/24:
-                            raise Exception('The difference between current and previous time step is greater than assigned stride')
+                            print(f"Current time step {output_day[-1]} and previous {output_day[-2]} file{ncfile}")
+                            raise ValueError('The difference between current and previous time step is greater than assigned stride')
                     #print("time5=%f"%(timer.time() - start))
         # return weights, output_day, [temperature, salinity], \
         #     imap[:npout].astype(int)+1   #schism is one-based  
@@ -919,7 +920,8 @@ class nudging(object):
             else: # only one variable listed in the file (but can be at multiple locations)
                 vdata = obs            
             
-            if np.any(np.isnan(vdata)):  
+            #if np.any(np.isnan(vdata)):  
+            if vdata.isnull().any(axis=None):
                 if isinstance(vdata, pd.core.series.Series): # pandas array
                     if none_values == 'interpolate': #other fillna options possible.                        
                         vdata = vdata.interpolate()                        
@@ -928,7 +930,7 @@ class nudging(object):
                 if isinstance(vdata,pd.core.frame.DataFrame): # multiple obs data,typically multiple stations
                     vdata = vdata.dropna(axis=1,how='all')
                     if none_values == 'interpolate':
-                        vdata = vdata.interpolate(axis=1)
+                        vdata = vdata.interpolate(axis=0)
                     elif non_values == 'ignore':
                         vdata = vdata.dropna(axis=1,how='any') 
                     if len(vdata.column)==0:
@@ -976,7 +978,9 @@ class nudging(object):
                 weights_v = weights
             
             imap_v = np.where(weights_v>0)[0]            
-            if (len(obs_df)>1) & (len(vdata_sites)>1): # multiple sites            
+            if (len(obs_df)>1) & (len(vdata_sites)>1): # multiple sites    
+                print(vdata_sites)
+                print(obs_df)                
                 obs_x = obs_df.loc[vdata_sites].x.values.astype(float)
                 obs_y = obs_df.loc[vdata_sites].y.values.astype(float)                
                                      
@@ -990,8 +994,8 @@ class nudging(object):
                 elif method == 'inverse_distance':
                     obs_loc = np.array([obs_x,obs_y]).T
                     values_v = []
-                    for t in vdata.time:
-                        vals = vdata.sel(time=t).values
+                    for t in vdata.index:
+                        vals = vdata.loc[t].values
                         invdisttree = Interp2D.Invdisttree(obs_loc, vals,
                                        leafsize=10, stat=1)
                         node_xy = np.array([self.node_x[imap_v],
@@ -1087,11 +1091,8 @@ class nudging(object):
 
     def read_data(self, data):
         if data.endswith('csv'):
-            obs = pd.read_csv(data)
-            datetime = pd.to_datetime(obs['datetime'])
-            obs['time'] = datetime
-            obs.set_index('time',inplace=True)
-            
+            obs = pd.read_csv(data,index_col='datetime',parse_dates=['datetime'])
+            obs.index.name = 'time'   
             obs = obs[(obs.index>=
                        pd.to_datetime(self.start_date)) &
                       (obs.index<=

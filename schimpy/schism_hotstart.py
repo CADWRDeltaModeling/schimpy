@@ -910,10 +910,10 @@ class VariableField(object):
                 ratio = 1.0
         obs_data = pd.read_csv(obs_file)
         obs_data = obs_data.dropna(subset=[variable])
-        obs_loc = obs_data[['Lon', 'Lat']].values
+        obs_loc = obs_data[['x', 'y']].values
         #print(obs_loc)
         #print(type(obs_loc))
-        obs_loc = geo_tools.ll2utm([obs_loc[:,0],obs_loc[:,1]],self.proj4).T
+        #obs_loc = geo_tools.ll2utm([obs_loc[:,0],obs_loc[:,1]],self.proj4).T
         #print(obs_loc)
         vals = obs_data[variable].values
         #print(vals)
