@@ -382,7 +382,7 @@ class SchismLocalVerticalMeshWriter(object):
         else:
             nmesh = len(vmesh.sigma)
             kbps = vmesh.kbps
-            nvrt = vmesh.param['nvrt']
+            nvrt = vmesh.n_vert_levels()
             with open(fpath, 'w') as f:
                 buf = "{}\n".format(vmesh.ivcor)
                 f.write(buf)
