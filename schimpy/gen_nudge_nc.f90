@@ -48,7 +48,7 @@
 !      integer, parameter :: debug=1
       integer, parameter :: mnp=300000
       integer, parameter :: mne=400000
-      integer, parameter :: mns=600000
+      integer, parameter :: mns=800000
       integer, parameter :: mnv=50
       integer, parameter :: mnope=50 !max # of open bnd segments
       integer, parameter :: mnond=1000 !max # of open bnd nodes in each segment
@@ -84,6 +84,7 @@
       character(len=1) :: char1,char2
       character(len=2) :: char3,char4
       character(len=2) :: hr_char(4)
+      character(len=256) :: archive_path
 !     external function for number of command line arguments
       integer :: iargc
 
@@ -113,11 +114,13 @@
       hr_char=(/'03','09','15','21'/) !each day has 4 starting hours in ROMS
 
       open(10,file='gen_nu.in',status='old')
-      read(10,*) tem_outside,sal_outside !T,S values for pts outside bg grid in nc
+      read(10,*) tem_outside,sal_outside,tem_correct !T,S values for pts outside bg grid in nc, T bias correction
       read(10,*) dtout,nt_out !time step in .nc [sec], output stride
 !      read(10,*) nob,iob(1:nob) !# of open bnds that need *3D.th; list of IDs
       read(10,*) istart_year,istart_mon,istart_day !in PST
       read(10,*) nndays !# of days to process
+      read(10,*) archive_path
+      print*,"nndays is",nndays,"archive is: ",archive_path
       close(10)
 !      if(tem_es<0.or.sal_es<0.or.tem_outside<0.or.sal_outside<0) &
 !     &stop 'Invalid T,S constants'
@@ -134,6 +137,8 @@
         write(*,*)'Increase mnp/mne'
         stop
       endif
+      print*,"Temperature correction is ",tem_correct
+
       read(15,*); read(15,*)
       read(16,*)
       read(16,*)
@@ -144,6 +149,9 @@
         read(16,*)j,xl(i),yl(i) !,dp(i)
         read(15,*)j,xtmp,ytmp,tmp
         include2(i)=ceiling(tmp)
+        !if (include2(i) /= 0.)then
+        !  print*,i,"include: ",tmp,ceiling(tmp),include2(i)
+        !end if
       enddo !i
       do i=1,ne
         read(14,*)j,i34(i),(elnode(l,i),l=1,i34(i))
@@ -338,7 +346,8 @@
 !--------------------------------------------------------------------
 !     Open nc file 
       !ncfile1='~yinglong/vims20/CA_DWR/ROMS/ca_subSFB_fcst_'//iyear_char//char3//char4//hr_char(isub)//'.nc'
-      ncfile1='/sanstore/schism_archive/roms/ca_subSFB_fcst_'//iyear_char//char3//char4//hr_char(isub)//'.nc'
+      print*,"archive path is: "//trim(archive_path)
+      ncfile1=trim(archive_path)//iyear_char//char3//char4//hr_char(isub)//'.nc'
       print*, 'doing ',trim(ncfile1)
       status = nf90_open(trim(ncfile1),nf90_nowrite, sid)
       !Define junk value for sid; the test is abs()>rjunk
@@ -555,6 +564,7 @@
               do iy=1,iylen-1 
                 x1=lon(ix,iy); x2=lon(ix+1,iy); x3=lon(ix+1,iy+1); x4=lon(ix,iy+1)
                 y1=lat(ix,iy); y2=lat(ix+1,iy); y3=lat(ix+1,iy+1); y4=lat(ix,iy+1)
+                !print*,x1,xl(i),y1,yl(i)
                 a1=abs(signa(xl(i),x1,x2,yl(i),y1,y2))
                 a2=abs(signa(xl(i),x2,x3,yl(i),y2,y3))
                 a3=abs(signa(xl(i),x3,x4,yl(i),y3,y4))
@@ -623,7 +633,7 @@
               saltout(:,i)=sal_outside
             ! endif
             if (include2(i)/=0.) then
-                print*,'This node is not covered by the data', i
+                print*,'This node is not covered by the data', i, include2(i)
             endif
           else !found parent
             npout=npout+1
@@ -687,7 +697,7 @@
               endif
 
               !Correct near surface T bias
-              if(kbp(ix,iy)/=-1.and.z(i,k)>-10) tempout(k,i)=tempout(k,i)-1
+              if(kbp(ix,iy)/=-1.and.z(i,k)>-10) tempout(k,i)=tempout(k,i)+tem_correct
 
 !             Enforce lower bound for temp. for eqstate
               tempout(k,i)=max(0.,tempout(k,i))
@@ -780,4 +790,3 @@
 
       return
       end
-

@@ -46,6 +46,8 @@ def create_arg_parser():
                         help='Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc')
     parser.add_argument('--nlayer_gr3',default='nlayer.gr3',
                         help='Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc')
+    parser.add_argument('--vgrid_version', required=True,
+                        help='SCHISM version number (e.g. 5.8 and below for old style vgrid, 5.9 and above for the new style vgrid')  
 
     return parser
 
@@ -65,6 +67,7 @@ def main():
     maxiter=200
     ngen=args.ngen
     transect = args.plot_transects
+    vgrid_version = args.vgrid_version
     from os import getcwd
     import os.path
     import glob
@@ -78,7 +81,7 @@ def main():
                 if not os.path.exists(fname): raise ValueError("Requested output transect file does not exist: {}".format(fname))
 
 
-    vgrid_gen(hgrid,vgrid_out,eta,minmax_region,archive_nlayer,nlayer_gr3)
+    vgrid_gen(hgrid,vgrid_out,vgrid_version,eta,minmax_region,archive_nlayer,nlayer_gr3)
 
     transect_mallard = ["mallard_1.csv","mallard_2.csv"]
     transect_gg = ["transect_gg1.csv","transect_gg2.csv"]
@@ -95,11 +98,11 @@ def main():
     if transect is not None:
         vgrid_out = "vgrid.in"
         vgrid0_out = "vgrid.in"
-        plot_vgrid(hgrid,vgrid_out,vgrid0_out,eta,transectfiles)
+        plot_vgrid(hgrid,vgrid_out,vgrid0_out,vgrid_version,eta,transectfiles)
 
 
 
-def vgrid_gen(hgrid,vgrid_out,eta,
+def vgrid_gen(hgrid,vgrid_out,vgrid_version, eta,
               minmaxlayerfile,archive_nlayer='out',nlayer_gr3='nlayer.gr3'):
     
 
@@ -187,11 +190,11 @@ def vgrid_gen(hgrid,vgrid_out,eta,
     #write_vmesh(vmesh, vgrid0)
     #vmesh1 = SchismLocalVerticalMesh(flip_sigma(sigma1))
     print("Writing vgrid.in output file...")
-    write_vmesh(vmesh, vgrid_out)
+    write_vmesh(vmesh, vgrid_out, vgrid_version)
     print("Done")
 
 
-def plot_vgrid(hgrid_file,vgrid0_file,vgrid_file,eta,transectfiles):
+def plot_vgrid(hgrid_file,vgrid0_file,vgrid_file,vgrid_version, eta,transectfiles):
     from schimpy.lsc2 import default_num_layers,plot_mesh
     from schimpy.schism_vertical_mesh import read_vmesh
     import matplotlib.pylab as plt
@@ -199,7 +202,7 @@ def plot_vgrid(hgrid_file,vgrid0_file,vgrid_file,eta,transectfiles):
 
     mesh = read_mesh(hgrid_file)
     x=mesh.nodes[:,0:2]
-    vmesh0 = read_vmesh(vgrid0_file)
+    vmesh0 = read_vmesh(vgrid0_file,vgrid_version)
     vmesh1 = read_vmesh(vgrid_file)
     h0 = mesh.nodes[:, 2]
     depth = eta+h0

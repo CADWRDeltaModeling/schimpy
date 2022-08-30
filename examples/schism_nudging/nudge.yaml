@@ -1,0 +1,72 @@
+nudging:
+    start_date: 2018-05-07
+    rnday: 4  #24 total run time in days
+    step_nu_tr: 3H
+    hgrid_input_file: ./schism_inputs/hgrid.gr3
+    vgrid_input_file: ./schism_inputs/vgrid.in.new
+    vgrid_version: 5.9
+    default: 0.
+    polygons:
+      - name: ocean
+        type: roms
+        attribute: max(0., min(1. / 2. / 86400., 1. / 2. / 86400. * (((x - 542699.) ** 2 / 32.3e3 / 32.3e3 + (y - 4183642.) **2 / 32.3e3 / 32.3e3) - 1.) / ((41.e3 / 32.3e3) ** 2 - 1.)))
+        vertices:
+            - [497085, 4213519]
+            - [531756, 4214317]
+            - [550885, 4170246]
+            - [552280, 4136745]
+            - [496487, 4137742]
+        interpolant: 
+            method: nearest
+            data: schism_inputs/roms/cencoos_ca_roms_das_  #this should only be a path for ROMS data.
+            dt: 1H  #time step in the input nc file.
+            variables: 
+                - name: temperature
+                  none_values: 10 # values for pts outside bg grid in nc
+                  offset: 0.0 #only for temperature (optional).
+                - name: salinity
+                  none_values: 33.5           
+      - name: GZL  #define a single point observation
+        type: obs  # single observational point
+        vertices:   # we can add additional polygon for outer wrapping.
+            - [583538.7996459592, 4221440.018476804]
+            - [585910.4686095809, 4221684.108266152]
+            - [586279.4702471322, 4219201.43027075]
+            - [584108.2278126011, 4218447.207742566]
+            - [582279.2188670159, 4220135.200684646]
+            - [583538.7996459592, 4221440.018476804]
+        attribute: 
+            kernel: gaussian
+            xy: [584309.0232, 4220037.891]
+            length_scale: 1000 
+            time_scale: 1D
+        interpolant: 
+            method: nearest  #or inverse_distance            
+            variables: 
+              - name: temperature
+                data: ./schism_inputs/GZL2.csv
+                none_values: interpolate
+              - name:  salinity
+                data: ./schism_inputs/GZL2.csv
+                none_values: interpolate #interpolate in time or ignore: meaning that the entire time series for the variable will be ignored.
+      - name: obs_region_2  #define multiple points of observation at the same time . 
+        type: obs  # mutliple observational points
+        vertices: None
+        attribute: 
+            kernel: gaussian
+            xy: ./schism_inputs/obs_xy.csv     #or obs.nc; must include ['site','x','y'] in the key.             
+            length_scale: 1000
+            time_scale: 3H
+        interpolant: 
+            method: inverse_distance #interpolate using inverse distance weighing from obs of multiple points; nearest can also be used here.            
+            data: 
+            variables: 
+                - name: temperature
+                  data: ./schism_inputs/obs.nc  #this could be a csv file or a netcdf file (time series required). 
+                  none_values: interpolate
+                - name: salinity
+                  data: ./schism_inputs/obs.nc
+                  none_values: ignore
+                - name: elevation            # if a variable listed here does not exist in the data file, it will be ignored. 
+                  data: ./schism_inputs/obs.nc
+                  none_values: ignore #interpolate in time or ignore: meaning that the entire time series for the variable will be ignored.

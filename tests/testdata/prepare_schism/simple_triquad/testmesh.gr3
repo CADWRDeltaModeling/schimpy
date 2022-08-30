@@ -261,9 +261,9 @@ default coverage
 37
 45
 53
-2 = Number of land boundaries
-48 = Total number of land boundary nodes
-31 = Number of nodes for land boundary 1
+1 = Number of land boundaries
+31 = Total number of land boundary nodes
+31 0 = Number of nodes for land boundary 1
 53
 61
 69
@@ -295,7 +295,7 @@ default coverage
 6
 3
 1
-17 = Number of nodes for land boundary 2
+17 1 = Number of nodes for land boundary 2
 32
 25
 33

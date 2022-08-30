@@ -15,7 +15,7 @@ from schimpy.metricsplot import plot_metrics, plot_comparison, get_common_window
                                 safe_window, check_if_all_tss_are_bad, fill_gaps
 
 import matplotlib.pyplot as plt
-from schimpy.unit_conversions import cfs_to_cms,ft_to_m,ec_psu_25c,fahrenheit_to_celcius
+from schimpy.unit_conversions import cfs_to_cms,ft_to_m,ec_psu_25c,fahrenheit_to_celsius
 import schimpy.schism_yaml as schism_yaml
 from vtools.data.vtime import days, hours
 from vtools.functions.error_detect import med_outliers
@@ -248,7 +248,7 @@ class BatchMetrics(object):
             ts.unit = 'PSU'
         elif unit in ('deg F', 'degF'):
             self.logger.info("Converting deg F to deg C")
-            ts = fahrenheit_to_celcius(ts)
+            ts = fahrenheit_to_celsius(ts)
             ts.unit = 'deg C'
         elif unit in ('degC','deg C'):
             ts.unit = 'deg C'

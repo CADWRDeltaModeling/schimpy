@@ -68,7 +68,7 @@ def cfs_to_cms(x):
         return x * CFS2CMS
 
 
-def fahrenheit_to_celcius(x):
+def fahrenheit_to_celsius(x):
     """ Convert cfs to cms
     """
     try:
@@ -80,7 +80,7 @@ def fahrenheit_to_celcius(x):
         return (x - 32.) * 5. / 9.
 
 
-def celcius_to_fahrenheit(x):
+def celsius_to_fahrenheit(x):
     """ Convert cfs to cms
     """
     try:

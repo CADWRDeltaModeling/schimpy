@@ -250,7 +250,7 @@ class SchismMesh(TriQuadMesh):
             ns.append(next_node)
             if next_node == first_node_i:
                 done = True
-                self.add_boundary(ns, BoundaryType.LAND)
+                self.add_boundary(ns, BoundaryType.ISLAND)
             else:
                 last_node_i = next_node
 
@@ -627,117 +627,129 @@ class SchismMesh(TriQuadMesh):
         """
         if self._merged_mesh is None:
             from shapely.ops import cascaded_union
-            self._create_2d_polygons()            
+            self._create_2d_polygons()
             self._merged_mesh = cascaded_union(self._polygons)
-        return self._merged_mesh        
-    
-    def to_geopandas(self,feature_type='polygon',proj4=None,Shp_fn=None,
+        return self._merged_mesh
+
+    def to_geopandas(self,feature_type='polygon',proj4=None,shp_fn=None,
                      node_values=None,elem_values=None,edge_values=None,
                      value_name=None,create_gdf=True):
         """
         Create mesh polygon and points as geopandas dataframe and shapefiles if
-        Shap_fn file name is supplied. 
-        """   
+        Shap_fn file name is supplied.
+        """
         import geopandas as gpd
         import pandas as pd
         df = pd.DataFrame()
         if feature_type == 'polygon':
             self._create_2d_polygons()
-            features = self._polygons  
+            features = self._polygons
             if elem_values is not None:
-                df[value_name] = elem_values    
-        elif feature_type == 'point': 
+                df[value_name] = elem_values
+        elif feature_type == 'point':
             self._create_2d_points()
-            features = self._points  
+            features = self._points
             if node_values is not None:
-                df[value_name] = node_values   
+                df[value_name] = node_values
         elif feature_type == 'edge':
             features = self.get_centers_of_sides()[:, :2]
             if edge_values is not None:
                 df[value_name] = edge_values
-        df['geometry'] = features              
+        df['geometry'] = features
         gdf = gpd.GeoDataFrame(df,geometry='geometry')
-        
+
         if proj4:
-            gdf.crs = proj4  
-        else: 
+            gdf.crs = proj4
+        else:
             gdf.crs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_def"
-        if Shp_fn:
-            gdf.to_file(Shp_fn)
+        if shp_fn:
+            gdf.to_file(shp_fn)
         if create_gdf:
             return gdf
-    
-    def plot_elems(self,var=None,ax=None,inpoly=None,**kwargs):
+
+    def plot_elems(self,var=None,ax=None,inpoly=None,plot_nan=False, **kwargs):
         """
-        Plot variables (1D array on element) based on SCHISM mesh grid. 
-        if var is None,just plot the grid. 
+        Plot variables (1D array on element) based on SCHISM mesh grid.
+        if var is None,just plot the grid.
         """
         xy = [self._nodes[e, :2] for e in self.elems]
         if len(xy) != len(var):
             raise ValueError("input var has different len compared to input elem")
         if inpoly is not None:
-            xy = np.asarray(xy)[inpoly]      
+            xy = np.asarray(xy)[inpoly]
             if var is not None:
-                vpoly = np.isnan(var) # do not plot nan data
-                inpoly = np.logical_and(inpoly, ~vpoly) 
+                if not plot_nan:
+                    vpoly = np.isnan(var) # do not plot nan data
+                    inpoly = np.logical_and(inpoly, ~vpoly)
             coll = PolyCollection(xy,array=var[inpoly],**kwargs)
         else:
-            coll = PolyCollection(xy,array=var,**kwargs)
-        
+            if plot_nan:
+                coll = PolyCollection(xy,array=var,**kwargs)
+            else:
+                inpoly = ~np.isnan(var)
+                xy = np.asarray(xy)[inpoly]
+                coll = PolyCollection(xy,array=var[inpoly],**kwargs)
         if not ax:
             fig, ax = plt.subplots()
         ax.add_collection(coll)
         ax.axis('equal')
         return coll
-    
-    def plot_nodes(self,var,ax=None,inpoly=None,**kwargs):   
+
+    def plot_nodes(self,var,ax=None,inpoly=None,plot_nan=False,**kwargs):
         if len(self.nodes) != len(var):
-            raise ValueError("input var has different len compared to input node")             
-        velem = np.asarray([var[el].mean(axis=0) for el in self.elems]) 
+            raise ValueError("input var has different len compared to input node")
+        velem = np.asarray([var[el].mean(axis=0) for el in self.elems])
         if inpoly is not None:
             inpoly = np.asarray([np.all(inpoly[el]) for el in self.elems])
-        coll = self.plot_elems(var=velem,ax=ax,inpoly=inpoly,**kwargs)
+        coll = self.plot_elems(var=velem,ax=ax,inpoly=inpoly,plot_nan=plot_nan,
+                               **kwargs)
         return coll
-    
-    def plot_edges(self,var,ax=None, size=500,inpoly=None,**kwargs):    
+
+    def plot_edges(self,var,ax=None, size=500,inpoly=None,**kwargs):
         xy = np.array(self.get_centers_of_sides())
         if len(xy) != len(var):
-            raise ValueError("input var has different len compared to input edge")   
+            raise ValueError("input var has different len compared to input edge")
         if not ax:
             fig, ax = plt.subplots()
         if inpoly is not None:
             xy = self.get_centers_of_sides()[inpoly][:2]
             sca_plt = ax.scatter(xy[:,0], xy[:,1], c=var[inpoly], s=size,
-                                 **kwargs)            
+                                 **kwargs)
         else:
             xy = xy[:,:2]
-            sca_plt = ax.scatter(xy[:,0], xy[:,1], c=var, s=size,**kwargs)   
+            sca_plt = ax.scatter(xy[:,0], xy[:,1], c=var, s=size,**kwargs)
         return sca_plt
-    
+
     def plot_mesh_boundary(self,ax=None,edgecolor='k',**kwargs):
         """
-        Plot the edge of the computational grid. 
+        Plot the edge of the computational grid.
         """
         boundary_mesh = self.merged_mesh()
-        patch = []     
-        multi_poly = list(boundary_mesh)        
+        patch = []
+        if isinstance(boundary_mesh, Polygon):
+            multi_poly = [boundary_mesh]
+        else:
+            multi_poly = list(boundary_mesh)
         for pi in multi_poly:
             if isinstance(pi.boundary, MultiLineString):
                 boundary = list(pi.boundary)
                 for b in boundary:
-                    cxy = np.asarray(b.xy).T    
+                    cxy = np.asarray(b.xy).T
                     poly = patches.Polygon(cxy,True)
                     patch.append(poly)
             else:
                 cxy = np.asarray(pi.boundary.xy).T
                 poly = patches.Polygon(cxy,True)
-                patch.append(poly)            
-            
-        p = PatchCollection(patch,facecolor='none',edgecolor=edgecolor,**kwargs)           
+                patch.append(poly)
+
+        p = PatchCollection(patch,facecolor='none',edgecolor=edgecolor,**kwargs)
         if not ax:
-            fig, ax = plt.subplots()            
+            fig, ax = plt.subplots()
+            bounds = boundary_mesh.bounds
+            ax.set_xlim((bounds[0],bounds[2]))
+            ax.set_ylim((bounds[1],bounds[3]))
         ax.add_collection(p)
-        plt.axis('equal')   
+        plt.axis('equal')
         return p
 
 class SchismMeshReader(object):
@@ -1089,22 +1101,26 @@ class SchismMeshGr3Writer(SchismMeshWriter):
             # else:
             #     raise ValueError("Unsupported boundary type.")
 
-        # Land
+        # Land & Island
         buf = "%d = Number of land boundaries\n" % (
-            mesh.n_boundaries(BoundaryType.LAND))
+            mesh.n_boundaries(BoundaryType.LAND) +
+            mesh.n_boundaries(BoundaryType.ISLAND))
         f.write(buf)
         buf = "%d = Total number of land boundary nodes\n" % (
-            mesh.n_total_boundary_nodes(BoundaryType.LAND))
+            mesh.n_total_boundary_nodes(BoundaryType.LAND) +
+            mesh.n_total_boundary_nodes(BoundaryType.ISLAND))
         f.write(buf)
         landbound_count = 0
         for bndry in mesh._boundaries:
-            if bndry.btype == BoundaryType.LAND:
+            if (bndry.btype == BoundaryType.LAND or
+                bndry.btype == BoundaryType.ISLAND):
                 landbound_count += 1
+                island_flag = 0 if bndry.btype == BoundaryType.LAND else 1
                 if bndry.comment is None:
-                    buf = "%d = Number of nodes for land boundary %d\n" % \
-                        (bndry.n_nodes(), landbound_count)
+                    buf = "%d %d = Number of nodes for land boundary %d\n" % \
+                        (bndry.n_nodes(), island_flag, landbound_count)
                 else:
-                    buf = "%d %s\n" % (bndry.n_nodes(), bndry.comment)
+                    buf = "%d %d %s\n" % (bndry.n_nodes(), island_flag, bndry.comment)
                 f.write(buf)
                 buf = ""
                 for node_i in bndry.nodes:
@@ -1262,7 +1278,7 @@ class SchismMeshGr3Writer(SchismMeshWriter):
 #            ring.Empty()
 #            polygon.Empty()
 #        datasource.Destroy()
-        
+
 class SchismMeshShapefileWriter(SchismMeshWriter):
 
     def write(self,  *args, **kwargs):
@@ -1280,7 +1296,7 @@ class SchismMeshShapefileWriter(SchismMeshWriter):
         import pandas as pd
         import geopandas as gpd
         import logging
-        
+
         mesh = kwargs.get('mesh')
         fpath = kwargs.get('fpath')
         node_attr = kwargs.get('node_attr')
@@ -1301,11 +1317,11 @@ class SchismMeshShapefileWriter(SchismMeshWriter):
             proj4 = "+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs"
 
         nodes = mesh.nodes
-        node_values = nodes[:,2]   
+        node_values = nodes[:,2]
         value_name = os.path.basename(fpath).split('.')[0]
-        
-        # Two shape files will be generated, one for the polygons and the other 
-        # for the nodes. 
+
+        # Two shape files will be generated, one for the polygons and the other
+        # for the nodes.
 
         node_values = nodes[:, 2]
         value_name = os.path.basename(fpath).split('.')[0]
@@ -1322,7 +1338,7 @@ class SchismMeshShapefileWriter(SchismMeshWriter):
         mesh.to_geopandas('point', proj4, fpath_point,
                           node_values, value_name=value_name, create_gdf=False)
         logging.info("%s generated" % fpath)
-      
+
 class SchismMeshNetcdfWriter(SchismMeshWriter):
 
     def write(self,  *args, **kwargs):
@@ -1541,7 +1557,7 @@ class SchismMeshIoFactory(object):
             raise ValueError('Not in SchismMeshIoFactory')
 
 
-def read_mesh(fpath_mesh, fpath_vmesh=None, **kwargs):
+def read_mesh(fpath_mesh, fpath_vmesh=None, old_vgrid=True,**kwargs):
     """ Read a mesh data
 
         Returns
@@ -1553,7 +1569,7 @@ def read_mesh(fpath_mesh, fpath_vmesh=None, **kwargs):
         reader = SchismMeshIoFactory().get_reader('gr3')
         mesh = reader.read(fpath_mesh)
         if fpath_vmesh is not None:
-            vmesh = read_vmesh(fpath_vmesh)
+            vmesh = read_vmesh(fpath_vmesh,old_vgrid)
         else:
             vmesh = None
         mesh._vmesh = vmesh
@@ -1596,13 +1612,13 @@ def write_mesh(mesh, fpath_mesh, node_attr=None, write_boundary=False,
         writer = SchismMeshIoFactory().get_writer('nc')
         writer.write(mesh=mesh,
                      fpath=fpath_mesh,
-                     node_attr=node_attr,**kwargs)        
+                     node_attr=node_attr,**kwargs)
     else:
         raise ValueError("Unsupported extension")
 
-def compare_mesh(mesh1, mesh2, dist_threshold=None):    
+def compare_mesh(mesh1, mesh2, dist_threshold=None):
     """
-    For mesh2, find the nearest nodes in mesh1. 
+    For mesh2, find the nearest nodes in mesh1.
     Parameters
     ----------
     mesh1 : schism_mesh
@@ -1618,7 +1634,7 @@ def compare_mesh(mesh1, mesh2, dist_threshold=None):
     dist: distances between the nearest nodes
 
     """
-    mesh1_idx = rtree.index.Rtree()        
+    mesh1_idx = rtree.index.Rtree()
     for i, p in enumerate(mesh1.nodes[:,0:2]):
         mesh1_idx.insert(i, np.append(p,p))
 
@@ -1630,10 +1646,10 @@ def compare_mesh(mesh1, mesh2, dist_threshold=None):
         dist2 = (n2[0]-mesh1.nodes[idx,0])**2 + (n2[1]-mesh1.nodes[idx,1])**2
         dist.append(np.sqrt(dist2))
         indices.append(idx)
-    
+
     if dist_threshold is not None:
         dist = np.array(dist)
         print("The overlapping nodes account for %s percent of total nodes"%
               (len(dist[dist<=dist_threshold])/len(dist)*100))
-    
+
     return indices, dist
