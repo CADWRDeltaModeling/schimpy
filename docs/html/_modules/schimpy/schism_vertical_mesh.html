@@ -85,12 +85,12 @@
         <span class="k">return</span> <span class="mi">0</span>
 
 
-<span class="k">class</span> <span class="nc">SchismSzVerticlMesh</span><span class="p">(</span><span class="n">SchismVerticalMesh</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SchismSzVerticalMesh</span><span class="p">(</span><span class="n">SchismVerticalMesh</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Memory model of S-Z hybrid grid for vertical grid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SchismSzVerticlMesh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SchismSzVerticalMesh</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ivcor</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
@@ -241,7 +241,7 @@
     <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpath</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read vgrid.in</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">vgrid</span> <span class="o">=</span> <span class="n">SchismSzVerticlMesh</span><span class="p">()</span>
+        <span class="n">vgrid</span> <span class="o">=</span> <span class="n">SchismSzVerticalMesh</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vgrid</span> <span class="o">=</span> <span class="n">vgrid</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
             <span class="n">ivcor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>

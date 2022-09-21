@@ -356,10 +356,11 @@ def read_flux_out(fpath,names,reftime):
             seen.add(x)    
     if len(uniq) != len(names):
          raise ValueError("Duplicate station names.")        
-    # todo: lower case
     names = [x.lower() for x in names]
+
+    cols=[0,*(range(1,3*len(names),3))]
     data = pd.read_csv(fpath,sep="\s+", index_col=0,
-                       header=None, names=['time'] + names,
+                       header=None,usecols=cols, names=['time'] + names,
                        dtype='d')
     if reftime is not None:
         data = elapsed_datetime(data,reftime=reftime,time_unit='d')

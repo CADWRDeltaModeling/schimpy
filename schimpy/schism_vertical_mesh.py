@@ -21,12 +21,12 @@ class SchismVerticalMesh(object):
         return 0
 
 
-class SchismSzVerticlMesh(SchismVerticalMesh):
+class SchismSzVerticalMesh(SchismVerticalMesh):
     """ Memory model of S-Z hybrid grid for vertical grid
     """
 
     def __init__(self):
-        super(SchismSzVerticlMesh, self).__init__()
+        super(SchismSzVerticalMesh, self).__init__()
         self.ivcor = 2
         self.reset()
 
@@ -77,8 +77,6 @@ class SchismLocalVerticalMesh(SchismVerticalMesh):
             Parameters
             ----------
             sigma: np.array
-            nvrt: int
-                number of the total levels
         """
         self.sigma = sigma
         nan = np.isnan(self.sigma)
@@ -217,7 +215,7 @@ class SchismSzVerticalMeshReader(object):
     def read(self, fpath='vgrid.in'):
         """ Read vgrid.in
         """
-        vgrid = SchismSzVerticlMesh()
+        vgrid = SchismSzVerticalMesh()
         self._vgrid = vgrid
         with open(fpath, 'r') as fin:
             ivcor = int(fin.readline().split()[0])
@@ -384,7 +382,7 @@ class SchismLocalVerticalMeshWriter(object):
         else:
             nmesh = len(vmesh.sigma)
             kbps = vmesh.kbps
-            nvrt = vmesh.param['nvrt']
+            nvrt = vmesh.n_vert_levels()
             with open(fpath, 'w') as f:
                 buf = "{}\n".format(vmesh.ivcor)
                 f.write(buf)
