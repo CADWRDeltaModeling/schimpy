@@ -196,27 +196,37 @@ def clip(args):
     if outfile != sys.stdout:
         outfile.close()
 
-def multi_file_to_elapsed(input,output,start):
+def prune_dated(name):
+    return name.replace("_dated","")
+
+def multi_file_to_elapsed(input_files,output,start,name_transform = "prune_dated"):
     import os
     import glob
-    if isinstance(input,list):
-        inputs = input
+    if name_transform is None: 
+        name_transform = lambda x: x
+    elif name_transform == "prune_dated": 
+        name_transform = prune_dated
+    
+    if isinstance(input_files,list):
+        inputs = input_files
         if isinstance(output,list):
-            if not len(input) == len(output): 
+            if not len(input_files) == len(output): 
                 raise ValueError("If inputs and outputs are both lists, they should be the same size")
             outputs = output
         elif not os.path.isdir(output):
             raise ValueError("output was a scalar, but not a valid directory name: {}".format(output))
         else:
-             outputs = [os.path.join(output,y) for y in [os.path.split(x)[1] for x in input]]
+             outputs = [os.path.join(output,name_transform(y)) for y in [os.path.split(x)[1] for x in input_files]]
     else:
         is_glob = True
         is_dir = os.path.isdir(output)
         if isinstance(output,list) or not is_dir:
             raise ValueError("If using blob search, output must be a directory not a list: {}".format(output))
-        inputs = glob.glob(input)
-        if len(inputs) == 0: raise ValueError("No files matched pattern: {}".format(input))
-        outputs = [os.path.join(output,y) for y in [os.path.split(x)[1] for x in inputs]]
+        inputs = glob.glob(input_files)
+        if len(inputs) == 0: raise ValueError("No files matched pattern: {}".format(input_files))
+        outputs = [os.path.join(output,name_transform(y)) for y in [os.path.split(x)[1] for x in inputs]]
+    print(inputs)
+    print(outputs)
     for ifn,ofn in zip(inputs,outputs):
         print(ifn)
         file_to_elapsed(ifn,start,ofn)
@@ -249,6 +259,7 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
                 try:
                     mdtm = datetime.datetime(*list(map(int, re.split('[^\d]', timestr))))
                 except:
+                    print(line)
                     raise ValueError("Could not parse time {} in line {}".format(timestr,iline))
                 mdelta = (mdtm - start)
                 mdtime = start + mdelta
@@ -271,9 +282,11 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
                     no_record = False
                 prev_outline = outline
                 prev_use = use
+        print("Last time string processed: {}".format(timestr))
         if no_record:
             if prev_outline is not None:
                 outfile.write(prev_outline)
+        
     if outfile != sys.stdout:
         outfile.close()
 
