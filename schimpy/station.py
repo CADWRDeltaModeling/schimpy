@@ -183,7 +183,7 @@ def read_station_subloc(fpath):
 
        Example might be:
        id,subloc,z
-       12345,top,-0.5
+       12345,upper,-0.5
 
        Other columns are allowed, but this will commonly merged with the station database file so we avoid column names like 'name' that might collide
 
@@ -215,7 +215,7 @@ def read_station_dbase(fpath):
      Parameters
      ----------
      fpath : fname
-        Path to input station.in style file
+        Path to input dbase style file
 
      Returns
      -------
@@ -224,11 +224,14 @@ def read_station_dbase(fpath):
 
     """
     
-    db =  pd.read_csv(fpath,sep=",",header=0,index_col="id",comment="#")
+    db = pd.read_csv(fpath,sep=",",comment="#",header=0,index_col="id",dtype={"agency_id":str})
+    db["agency_id"] = db["agency_id"].str.replace("\'","",regex=True)
+    
     dup = db.index.duplicated()
+    db.index = db.index.str.replace("'","")
     if dup.sum(axis=0)> 0:
         print("Duplicates")
-        print(dup)
+        print(db[dup])
         raise ValueError("Station database has duplicate id keys. See above")
     return db
     
@@ -265,7 +268,7 @@ def read_obs_links(fpath):
                      header=0,
                      index_col=["id", "subloc", "variable"],
                      comment="#")
-    df.index.set_levels(df.index.levels[0].astype(str),
+    df.index.set_levels(df.index.levels[0].astype(str).str.lower(),
                         level=0,
                         inplace=True)
     dups = df.index.duplicated(keep='last')
@@ -309,6 +312,9 @@ def flux_stations_from_yaml(inp):
         name = ls.get("name")
         if name in names: 
             print("Duplicate name: {}".format(name))
+        if not (name == name.lower()):
+            #print("Station ids should be lower case, coercing")
+            name = name.lower()
         names.append(name)
     return names
 
@@ -323,6 +329,21 @@ def station_names_from_file(fpath):
     return station_names
 
 def read_flux_out(fpath,names,reftime):
+    """ Read fluxes from a SCHISM flux.out file 
+    
+    Parameters
+    ----------
+    
+    fpath : str
+    Path to the file
+    
+    names : str
+    name of file that contains  names of  flux areas, typically something like flow_xsects.yaml
+    
+    reftime : str
+    start of simulation, against which relative times will be calculated
+    """
+    
     if isinstance(names,str):
         names = station_names_from_file(names)
         
@@ -335,7 +356,8 @@ def read_flux_out(fpath,names,reftime):
             seen.add(x)    
     if len(uniq) != len(names):
          raise ValueError("Duplicate station names.")        
-    # 
+    # todo: lower case
+    names = [x.lower() for x in names]
     data = pd.read_csv(fpath,sep="\s+", index_col=0,
                        header=None, names=['time'] + names,
                        dtype='d')
@@ -550,10 +572,6 @@ def station_subset_multidir(dirs,staoutfile,run_start,locs,extract_freq,convert,
         names = dirs
     out = pd.concat(dfs,keys = names, names=['sim','loc'],axis=1)
     return out
-
-
-
-
 
 
 
