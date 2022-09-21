@@ -17,7 +17,8 @@ from schimpy.schism_mesh import read_mesh, write_mesh
 from schimpy.geo_tools import utm2ll
 from shapely.geometry import Polygon
 from schimpy  import Interp2D
-import time as timer        
+import time as timer
+from vtools.data.vtime import hours,days
 
 class nudging(object):
     """
@@ -377,7 +378,9 @@ class nudging(object):
                 else:
                     ilo = 1 #there is an overlap between files
 
-                time = ncdata['time'].values
+                filename_start = datetime.datetime(date.year,date.month,date.day,int(hr))
+                time =  [filename_start + hours(ihour) for ihour in range(7)]
+                #time = ncdata['time'].values
                 
                 if time[-1]< np.datetime64(self.start_date)+ \
                     np.timedelta64(8,'h'):
@@ -386,10 +389,12 @@ class nudging(object):
                     np.timedelta64(8,'h'):
                     break                
                 
-                for t in time[ilo:]:
-                    ctime = pd.to_datetime(t)
-                    dt = ctime-pd.to_datetime(self.start_date)
-                    print("Time out (days)=%f"%(dt.total_seconds()/86400))                  
+                for itime in range(ilo,7):
+                    t = time[itime]
+                    ctime = pd.to_datetime(t) - hours(8)   #todo
+                    dt = ctime-pd.to_datetime(self.start_date) 
+                    dt_in_days = dt.total_seconds()/86400.
+                    print(f"Time out at hr stage (days)={ctime}, dt ={dt_in_days} ")                  
                     irecout += 1 
 
                     #Make sure it2=ilo is output (output at precisely the time interval)
@@ -403,10 +408,10 @@ class nudging(object):
                     print("irecount: %d"%irecout)
                            
                     #if  'temp' in var_list:
-                    temp = ncdata['temp'].sel(time=t).transpose(
+                    temp = ncdata['temp'].isel(time=itime).transpose(
                         'lon','lat','depth').values[:,:,-1::-1]
                     #if 'salt' in var_list:
-                    salt = ncdata['salt'].sel(time=t).transpose(
+                    salt = ncdata['salt'].isel(time=itime).transpose(
                         'lon','lat','depth').values[:,:,-1::-1]      
                     # if 'uvel' in var_list:
                     #     uvel = ncdata['uvel'].sel(time=t).transpose(
@@ -1099,9 +1104,12 @@ class nudging(object):
                        pd.to_datetime(self.end_date))]
             # time interpolation
             obs = obs.resample(self.nudge_step).nearest()
-            if len(obs)!= len(self.datetime):
-                raise('The input time series may not cover the \
+            
+            if len(obs)< len(self.datetime):
+                raise ValueError('The input time series may not cover the \
                       entire nudging period: check %s'%data)
+            else:
+                obs = obs.reindex(self.datetime)
         elif data.endswith('nc'):
             obs = xr.open_dataset(data)
             obs = obs.sel(time=self.datetime)     
