@@ -171,6 +171,9 @@ def set_dual_axes(ax, ts, cell_method = 'inst'):
             ax2 = set_dual_axes_flow(ax, filtered=filtered)
             return ax2
         elif unit.lower() == 'psu':
+            lims = ax.get_ylim()
+            llim = 0. if lims[0] < 5. else lims[0]/2.
+            ax.set_ylim(llim,lims[1])
             ax2 = set_dual_axes_salt(ax, filtered=filtered)
             return ax2
         elif unit == 'm/s':
