@@ -325,7 +325,7 @@ class SchismLocalVerticalMeshReader(object):
             vgrid.param['nvrt'] = nvrt
             sigmas = list()
             kbps = list()
-            if vgrid_version<=5.8: # this is the old style of vgrid input            
+            if vgrid_version=="5.8": # this is the old style of vgrid input            
                 while True:
                     tkns = fin.readline().strip().split()
                     if len(tkns) < 1:
@@ -337,7 +337,7 @@ class SchismLocalVerticalMeshReader(object):
                     sigmas.append(sigma)
                 vgrid.sigma = np.array(sigmas)
                 vgrid.kbps = np.array(kbps)
-            else: # this is the new style of vgrid input (from Dec 2021)
+            elif vgrid_version=="5.10": # this is the new style of vgrid input (from Dec 2021)
                 kbps = fin.readline().strip().split()
                 for k in range(nvrt):
                     tkns = fin.readline().strip().split()
@@ -351,6 +351,8 @@ class SchismLocalVerticalMeshReader(object):
                     sigma_sort[k,:nvrt - kbps[k]] = s[kbps[k]:]
                 vgrid.sigma = np.array(sigma_sort)
                 vgrid.kbps = kbps
+            else:
+                raise ValueError(f"vgrid version not recongnized: {vgrid_version}")
         return vgrid
 
 
@@ -362,9 +364,11 @@ class SchismLocalVerticalMeshWriter(object):
     def write(self, vmesh, fpath='vgrid.in',vgrid_version=None):
         """ Write vgrid.in
         """
-        if vgrid_version is None:
-            raise ValueError("vgrid_version input is required!")
-        if vgrid_version<=5.8:
+        if vgrid_version is None or not isinstance(vgrid_version,str):
+            raise ValueError("vgrid_version input is required and must be string.")
+        else:
+            print("vgrid_version=",vgrid_version)
+        if vgrid_version == '5.8':
             with open(fpath, 'w') as f:
                 buf = "{}\n".format(vmesh.ivcor)
                 f.write(buf)
@@ -379,7 +383,7 @@ class SchismLocalVerticalMeshWriter(object):
                                       for d in vmesh.sigma[i][:n_levels]])
                     buf += '\n'
                     f.write(buf)
-        else:
+        elif vgrid_version == '5.10':
             nmesh = len(vmesh.sigma)
             kbps = vmesh.kbps
             nvrt = vmesh.n_vert_levels()
@@ -393,17 +397,19 @@ class SchismLocalVerticalMeshWriter(object):
                 buf += '\n'
                 f.write(buf)            
                 sigma = vmesh.sigma
-                sigma_sort = np.ones_like(sigma)             
+                sigma_sort = -9.*np.ones_like(sigma)             
                 for k,s in enumerate(sigma):
                     sigma_sort[k,kbps[k]:] = s[:nvrt - kbps[k]] 
                 # transpose the matrix for output
                 sigma_sort = sigma_sort.T 
-                sigma_sort[np.isnan(sigma_sort)]=-9.0
+                #sigma_sort[np.isnan(sigma_sort)]=-9.0
                 for k in range(nvrt):
-                    buf = "%10d "%k + " ".join(["%14.6f"%s for s in sigma_sort[k]]) 
+                    one_based_k=k+1
+                    buf = "%10d "% one_based_k + " ".join(["%14.6f"%s for s in sigma_sort[k]]) 
                     buf += '\n'
                     f.write(buf)
-
+        else:
+            raise ValueError(f"Unknown vgrid format: {vgrid_version}")
 
 def read_vmesh(fpath_vmesh,vgrid_version):
     """ Read a vgrid file
@@ -433,6 +439,7 @@ def write_vmesh(vmesh, fpath_vmesh='vgrid.in',vgrid_version=None):
         writer.write(vmesh, fpath_vmesh,vgrid_version)
     else:
         raise ValueError('Unsupported vgrid type')
+
 def convert_vmesh(vmesh_in, vmesh_out, input_vgrid=5.8, 
                   output_vgrid=5.9):
     """conversion between old and new style of vgrid.in
