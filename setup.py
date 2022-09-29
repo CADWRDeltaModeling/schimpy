@@ -13,7 +13,7 @@ with open('HISTORY.rst') as history_file:
 
 install_requires = ['vtools3>=3.4','pandas','geopandas>=0.6',
                     'xarray>=0.15', 'netcdf4>=1.4', 'scipy>=1.4',
-                    'matplotlib>=3.1', 'statsmodels>=0.11',
+                    'matplotlib', 'statsmodels>=0.11',
                     'palettable>=3.3', 'pyyaml>=5.3',
                     'scikit-learn','statsmodels',
                     'beautifulsoup4','pyproj','gdal','nodepy',
