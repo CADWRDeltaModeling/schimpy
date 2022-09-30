@@ -324,7 +324,14 @@ def station_names_from_file(fpath):
     if ext in (".yml",".yaml"):
         station_names = flux_stations_from_yaml(fpath)
     elif ext == ".prop":
-        raise NotImplementedError("Not implemented for .prop")
+        station_names=[]
+        with open(fpath,'r') as f:
+            for line in f:
+                names = line.strip().split()
+                if len(names) == 1: 
+                    station_names.append(names[0])
+    else:
+        raise ValueError(f"File type not recognized for harvesting station names: {fpath}")            
     
     return station_names
 
@@ -357,8 +364,12 @@ def read_flux_out(fpath,names,reftime):
     if len(uniq) != len(names):
          raise ValueError("Duplicate station names.")        
     names = [x.lower() for x in names]
+    nstation = len(names)
+    #probe = pd.read_csv(fpath,sep="\s+",index_col=0,header=None,dtype='d',nrows=2)
+    #ncolfile = probe.shape[1]
 
-    cols=[0,*(range(1,3*len(names),3))]
+    
+    cols=[0,*(range(1,nstation+1))]
     data = pd.read_csv(fpath,sep="\s+", index_col=0,
                        header=None,usecols=cols, names=['time'] + names,
                        dtype='d')
