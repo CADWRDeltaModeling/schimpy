@@ -57,7 +57,9 @@ setup(
             'model_time=schimpy.model_time:main',
             'gen_elev2d=schimpy.gen_elev2D:main',
             'small_areas=schimpy.small_areas:main',
-            'station=schimpy.station:main'
+            'station=schimpy.station:main',
+            'create_hotstart=schimpy.schism_hotstart:main',
+            'create_nudging=schimpy.schism_nudging:main'
         ],
     },
     install_requires=requirements,
