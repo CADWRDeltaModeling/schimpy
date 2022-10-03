@@ -43,6 +43,7 @@ def clip_dem(xlo,xhi,demlist="dem.txt",outformat="AAIGrid",hshift=False,prefix="
         raise ValueError("format not supported? (this may be easily fixed if you add the extension you want and its gdal code)")
 
     for demfile in filelist:
+        if demfile.startswith("-"): demfile = demfile[1:].strip()
         print("Checking: %s" % demfile)
         ds = gdal.Open(demfile, GA_ReadOnly )
         gt = ds.GetGeoTransform()
