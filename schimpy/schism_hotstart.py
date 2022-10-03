@@ -56,35 +56,38 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, yaml_fn, modules=['HYDRO'],proj4=None, **kwargs):
+    def __init__(self, yaml_fn=None,modules=None,crs=None):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
         # the modules to turn on.
         self.yaml_fn = yaml_fn
         self.nc_dataset = None
-        if 'HYDRO' in modules:
-            modules.remove('HYDRO')
-            modules+=['TEM', 'SAL']
-        self.modules = modules # modules can be none for barotropic runs.       
-        if 'param_nml' in kwargs:
-            self.param_nml = kwargs['param_nml']
-        else:
-            if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in modules]): # these modules require param.nml 
-                raise ValueError('param_nml needs to be defined in %s'%yaml_fn)
-            else: # for all other modules, param.nml will not be used. 
-                self.param_nml = "param.nml"
-        if proj4 is None:
-            raise ValueError("proj4 must be specified")
-        else:
-            print("proj4 is {}".format(proj4))
-            self.proj4 = proj4
+        self.modules = modules
+        self.crs = crs
+        # if 'HYDRO' in modules:
+        #     modules.remove('HYDRO')
+        #     modules+=['TEM', 'SAL']
+        # self.modules = modules # modules can be none for barotropic runs.       
+        # if 'param_nml' in kwargs:
+        #     self.param_nml = kwargs['param_nml']
+        # else:
+        #     if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in modules]): # these modules require param.nml 
+        #         raise ValueError('param_nml needs to be defined in %s'%yaml_fn)
+        #     else: # for all other modules, param.nml will not be used. 
+        #         self.param_nml = "param.nml"
+        # if crs is None:
+        #     self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system. 
+        # #    raise ValueError("crs must be specified")
+        # else:
+        #     print("crs is {}".format(crs))
+        #     self.crs = crs
         
-        if self.modules:  # if modules is None for barotropic run, this step is not required. 
-            self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
-                describe_tracers(self.param_nml, modules=self.modules)
-        else:
-            self.ntracers = 0
-            self.tr_mname = []
+        # if self.modules:  # if modules is None for barotropic run, this step is not required. 
+        #     self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
+        #         describe_tracers(self.param_nml, modules=self.modules)
+        # else:
+        #     self.ntracers = 0
+        #     self.tr_mname = []
 
     def read_yaml(self):
         """
@@ -99,10 +102,50 @@ class hotstart(object):
         self.vgrid_fn = hotstart_info['vgrid_input_file']
         variables = list(hotstart_info.keys())
         # remove these items from the list.
-        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date','vgrid_version']
+        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date','vgrid_version',
+               'crs','param_nml','modules','output_fn']
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
         self.vgrid_version = hotstart_info['vgrid_version']  # 5.8 and below is the old version
+
+        if 'output_fn' in hotstart_info.keys():
+            self.output_fn = hotstart_info['output_fn']
+        else:
+            self.output_fn = 'hotstart.nc'
+            
+        if self.modules is None:
+            if 'modules' not in hotstart_info.keys():
+                modules = 'HYDRO' # hydro is the minimum required module
+            else:
+                modules = hotstart_info['modules']
+            if 'HYDRO' in modules:
+                modules.remove('HYDRO')
+                modules+=['TEM', 'SAL']
+            self.modules = modules # modules can be none for barotropic runs.    
+            
+        if 'param_nml' in hotstart_info.keys():
+            self.param_nml = hotstart_info['param_nml']
+        else:
+            if self.modules is not None:
+                if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in self.modules]): # these modules require param.nml 
+                    raise ValueError('param_nml needs to be defined in %s'%self.yaml_fn)
+            self.param_nml = "param.nml" # for all other modules, param.nml will not be used.
+                
+        if self.crs is None:
+            if crs not in hotstart_info.keys():
+                self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system. 
+            #    raise ValueError("crs must be specified")
+            else:
+                crs = hotstart_info['crs']
+                print("crs is {}".format(crs))
+                self.crs = crs
+        
+        if self.modules:  # if modules is None for barotropic run, this step is not required. 
+            self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
+                describe_tracers(self.param_nml, modules=self.modules)
+        else:
+            self.ntracers = 0
+            self.tr_mname = []        
 
     def create_hotstart(self):
         self.read_yaml()
@@ -196,11 +239,11 @@ class hotstart(object):
             kwargs_options.update({'Nbed': self.Nbed})
         if kwargs_options:
             var = VariableField(v_meta, variable, self.mesh,
-                                self.depths, self.date, self.proj4,
+                                self.depths, self.date, self.crs,
                                 self.tr_mname, **kwargs_options)
         else:
             var = VariableField(v_meta, variable, self.mesh,
-                                self.depths, self.date, self.proj4,
+                                self.depths, self.date, self.crs,
                                 self.tr_mname,self.hotstart_ini)
         return var.GenerateField()
 
@@ -370,7 +413,7 @@ class VariableField(object):
     A class initializing each varaible for the hotstart file 
     """
 
-    def __init__(self, v_meta, vname, mesh, depths, date, proj4, tr_mname,
+    def __init__(self, v_meta, vname, mesh, depths, date, crs, tr_mname,
                  hotstart_ini=None, **kwargs):
         #self.centering = v_meta['centering']
         self.variable_name = vname
@@ -384,7 +427,7 @@ class VariableField(object):
             self.elem_depths = [self.mesh.z[e].mean(axis=0) for e 
                                 in self.mesh.elems]
         self.date = date
-        self.proj4 = proj4
+        self.crs = crs
         self.n_edges = mesh.n_edges()
         self.n_nodes = mesh.n_nodes()
         self.n_elems = mesh.n_elems()
@@ -730,7 +773,7 @@ class VariableField(object):
             # perform contiguity check and return a mapping array if successful.
             mapping = geo_tools.partition_check(self.mesh, poly_fn,
                                                 self.centering,
-                                                proj4=self.proj4)            
+                                                crs=self.crs)            
         else:
             raise NotImplementedError("Poly_fn can only be shapefile or ic file")
 
@@ -781,6 +824,7 @@ class VariableField(object):
                 'Station Number', variable, 'Depth']]
             polaris_cast['Station'] = polaris_cast['Station Number'].astype(
                 int)
+        # setting 'Station' as the index below does not remove depth in the column
         polaris_cast.set_index('Station', inplace=True)
         if variable.lower() in polaris_cast.columns.str.lower():
             # change column to lower case
@@ -807,7 +851,7 @@ class VariableField(object):
         # partition the grid domain by polaris stations based on horizontal distance
         grid_df = pd.DataFrame({})
         g_xy = self.hgrid[inpoly]
-        #if self.proj4 == 'EPSG:32610': # utm 10N 
+        #if self.crs == 'EPSG:26910': # utm 10N 
         #    g_xy = geo_tools.utm2ll(g_xy.T).T  # conver to (lon, lat).  
 
         for s in polaris_cast.index.unique():
@@ -913,7 +957,7 @@ class VariableField(object):
         obs_loc = obs_data[['x', 'y']].values
         #print(obs_loc)
         #print(type(obs_loc))
-        #obs_loc = geo_tools.ll2utm([obs_loc[:,0],obs_loc[:,1]],self.proj4).T
+        #obs_loc = geo_tools.ll2utm([obs_loc[:,0],obs_loc[:,1]],self.crs).T
         #print(obs_loc)
         vals = obs_data[variable].values
         #print(vals)
@@ -1616,29 +1660,58 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
 
     output_nc.to_netcdf(outname, format='NETCDF4_CLASSIC')
 
-def project_mesh(mesh,new_proj4):  #the original mesh has to have attribute proj4.
+def project_mesh(mesh,new_crs):  #the original mesh has to have attribute crs.
     # lat, lon: 'EPSG:26910'
-    # UTM10N: 'EPSG:32610'
-    if mesh.proj4==new_proj4:
+    # UTM10N: 'EPSG:26910'
+    if mesh.crs==new_crs:
         return mesh
     else: 
-        projection = geo_tools.project_fun(new_proj4)
+        projection = geo_tools.project_fun(new_crs)
         new_nodes = projection(mesh.nodes[:,0], mesh.nodes[:,1])
         new_nodes = np.asarray(new_nodes).T
         new_nodes = np.append(new_nodes,mesh.nodes[:,2][:,np.newaxis],axis=1)
         mesh.nodes = new_nodes
         return mesh
 
-if __name__ == '__main__':
-    h = hotstart('hotstart.yaml', modules=['TEM', 'SAL'],proj4='EPSG:26910',param_nml="param.nml")
-    #h = hotstart('hotstart_test.yaml')
-    h.read_yaml()
+    
+def create_arg_parser():
+    import argparse
+    parser = argparse.ArgumentParser(description="Create hotstart for a schism run")
+    parser.add_argument('--yaml_fn',type=str, help='yaml file for hotstart',required=True)
+    parser.add_argument('--modules','--list',nargs='+',help='modules activated in schism', default=None)
+    parser.add_argument('--crs',type=str,help='The projection system for the mesh',default=None)
+    parser.add_argument('--output_fn',type=str,help='Output hotstart filename.nc',default=None)
+    return parser
+    
+def main():
+    # User inputs override the yaml file inputs.  
+    parser = create_arg_parser() 
+    args = parser.parse_args()
+    
+    h = hotstart(args.yaml_fn,module=args.modules,crs=args.crs,
+                 output_fn=args.output_fn)
+    if args.output_fn is not None:
+        output_fn = args.output_fn
+    else:
+        output_fn = h.output_fn
     h.create_hotstart()
-    v1 = h.nc_dataset
+    hnc = h.nc_dataset
+    hnc.to_netcdf(output_fn)  
+           
+if __name__ == "__main__":
+    main()
 
-    # %% making plot
-    coll = h.mesh.plot_elems(v1['tr_el'].values[:, -1, 1])
-    cb = plt.colorbar(coll)
-    plt.axis('off')
-    plt.title('Regional Temperature')
-    plt.tight_layout(pad=1)
+
+# if __name__ == '__main__':
+#     h = hotstart('hotstart.yaml', modules=['TEM', 'SAL'],crs='EPSG:26910',param_nml="param.nml")
+#     #h = hotstart('hotstart_test.yaml')
+#     h.read_yaml()
+#     h.create_hotstart()
+#     v1 = h.nc_dataset
+
+#     # %% making plot
+#     coll = h.mesh.plot_elems(v1['tr_el'].values[:, -1, 1])
+#     cb = plt.colorbar(coll)
+#     plt.axis('off')
+#     plt.title('Regional Temperature')
+#     plt.tight_layout(pad=1)

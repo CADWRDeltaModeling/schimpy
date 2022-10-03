@@ -7,6 +7,7 @@ To be implemented: other weights function (length scale) from OI in additional
 to gaussian
 """
 
+import copy
 import datetime
 import yaml
 import pandas as pd
@@ -25,11 +26,12 @@ class nudging(object):
     A class to create schism nudging
     """
     
-    def __init__(self, yaml_fn, proj4=None, **kwargs):
+    def __init__(self, yaml_fn,crs=None,suffix=None, **kwargs):
         self.yaml_fn = yaml_fn
         self._interpolant = ['nearest','inverse distance']
         self._kernel = ['gaussian']   
-        self.proj4 = proj4
+        self.crs = crs
+        self.output_suffix = suffix
            
     def read_yaml(self):
         """
@@ -60,6 +62,19 @@ class nudging(object):
         self.nvrt = self.mesh.n_vert_levels
         self._mesh_gpd = None
         self._z = None
+        if self.crs is None:
+            if 'crs' in nudging_info['crs']:
+                self.crs = nudging_info['crs']
+            else:
+                self.crs = 'EPSG:26910' # this is required because ROMS only provides lat, lon. 
+                print("crs not specified, and assigned to the default crs for UTM10N")
+                    
+        if self.output_suffix is None:
+            if 'output_suffix' in nudging_info:
+                self.output_suffix = nudging_info['output_suffix']
+            else:
+                self.output_suffix = None
+        
     
     @property
     def mesh_gpd(self):
@@ -73,7 +88,7 @@ class nudging(object):
             self._z = self.mesh.build_z()
         return self._z
 
-    def create_nudging(self, suffix='nu', create_file=True):
+    def create_nudging(self, create_file=True):
         """
         Parameters
         ----------
@@ -96,7 +111,6 @@ class nudging(object):
                 values_var,
                 imap_var,
                 var_v,
-                suffix,
                 create_file=True)    
     
     def organize_nudging(self, weights_comb, values_comb, imap_comb):   
@@ -180,7 +194,7 @@ class nudging(object):
         return weights_comb, values_comb, imap_comb    
     
     def concatenate_nudge(self, weights_var, values_var, imap_var,
-                          var_newlist, suffix,create_file=True):
+                          var_newlist, create_file=True):
             
         for i, v in enumerate(var_newlist):
             # merge all the mapping values
@@ -207,13 +221,16 @@ class nudging(object):
                                           self.nvrt)) 
             for im in range(len(imap_merged)):
                 idx_r = np.where(~np.isnan(idx_list[im,:]))[0].astype(int)
-                values_sum = []
-                weights_sum = []  
-                weights_sum2 = []
+                if len(idx_r)>1: # overlapping regions
+                    values_sum = []
+                    weights_sum = []  
+                    weights_sum2 = []
                 for r in idx_r:
                      w = weights_var[i][r,imap_merged[im]]
-                     values_sum.append(w*
-                         values_var[i][r][:,int(idx_list[im,r]),:])
+                     data_values = values_var[i][r][:,int(idx_list[im,r]),:]
+                     if np.isnan(data_values).any():
+                         print("warning: nan values are detected in the overlapping region. The nudging values are set to -9999.0 for these regions. ")
+                     values_sum.append(w*data_values)
                      weights_sum.append(w)
                      weights_sum2.append(w**2)
                 values_temp = np.sum(values_sum,axis=0)/sum(weights_sum)
@@ -223,6 +240,19 @@ class nudging(object):
                     values_merged[:,im,:] = values_temp
                 #values_merged[:,im,:] = np.sum(values_sum,axis=0)/sum(weights_sum)
                 weights_merged[imap_merged[im]] = sum(weights_sum2)/sum(weights_sum)
+            else:
+                r = idx_r[0]
+                weights_merged[imap_merged[im]]  = weights_var[i][r,imap_merged[im]]
+                values_merged[:,im,:] = values_var[i][r][:,int(idx_list[im,r]),:]
+            
+            # for the last time, make sure that all nan values are set to -9999.0
+            values_merged[np.isnan(values_merged)] = -9999.0
+                    
+            
+            if self.output_suffix is None:
+                suffix = ''
+            else:
+                suffix = self.output_suffix 
             
             if v== 'temperature':
                 nudging_fn = "TEM_%s.nc"%suffix     
@@ -252,7 +282,13 @@ class nudging(object):
             rootgrp_T.close()
             print("%s file created"%nudging_fn)  
             
-            write_mesh(self.mesh, fpath_mesh="%s_nudge.gr3"%v, 
+            if self.output_suffix is not None:
+                write_mesh(self.mesh, 
+                           fpath_mesh="%s_nudge.gr3"%v, 
+                           node_attr=weights_merged)
+            else:
+                write_mesh(self.mesh, 
+                           fpath_mesh="%s_nudge_%s.gr3"%(v,self.output_suffix), 
                        node_attr=weights_merged)
         #return values_merged, weights_merged, imap_merged
     
@@ -322,7 +358,7 @@ class nudging(object):
         #     yl.append(float(llist[2]))    
             
         utm_xy = np.array([self.node_x,self.node_y])
-        lonlat= utm2ll(utm_xy,self.proj4)
+        lonlat= utm2ll(utm_xy,self.crs) #roms grid has lat, lon coordinates. 
         xl = lonlat[0]
         yl = lonlat[1]
 
@@ -378,9 +414,7 @@ class nudging(object):
                 else:
                     ilo = 1 #there is an overlap between files
 
-                filename_start = datetime.datetime(date.year,date.month,date.day,int(hr))
-                time =  [filename_start + hours(ihour) for ihour in range(7)]
-                #time = ncdata['time'].values
+                time = ncdata['time'].values
                 
                 if time[-1]< np.datetime64(self.start_date)+ \
                     np.timedelta64(8,'h'):
@@ -389,9 +423,14 @@ class nudging(object):
                     np.timedelta64(8,'h'):
                     break                
                 
-                for itime in range(ilo,7):
-                    t = time[itime]
-                    ctime = pd.to_datetime(t) - hours(8)   #todo
+                if time[0] != np.datetime64(date) + np.timedelta64(int(hr),'h'):
+                    print("Initial time in %s does not match the filename: %s: modification will be applied "%(ncfile,time[0]))
+                    dt_adj = np.datetime64(date) + np.timedelta64(int(hr),'h') - time[0]
+                    ncdata['time'] = ncdata['time'] + dt_adj 
+                    time = ncdata.time.values
+
+                for t in time[ilo:]:
+                    ctime = pd.to_datetime(t)
                     dt = ctime-pd.to_datetime(self.start_date) 
                     dt_in_days = dt.total_seconds()/86400.
                     print(f"Time out at hr stage (days)={ctime}, dt ={dt_in_days} ")                  
@@ -408,10 +447,10 @@ class nudging(object):
                     print("irecount: %d"%irecout)
                            
                     #if  'temp' in var_list:
-                    temp = ncdata['temp'].isel(time=itime).transpose(
+                    temp = ncdata['temp'].sel(time=t).transpose(
                         'lon','lat','depth').values[:,:,-1::-1]
                     #if 'salt' in var_list:
-                    salt = ncdata['salt'].isel(time=itime).transpose(
+                    salt = ncdata['salt'].sel(time=t).transpose(
                         'lon','lat','depth').values[:,:,-1::-1]      
                     # if 'uvel' in var_list:
                     #     uvel = ncdata['uvel'].sel(time=t).transpose(
@@ -928,24 +967,43 @@ class nudging(object):
             #if np.any(np.isnan(vdata)):  
             if vdata.isnull().any(axis=None):
                 if isinstance(vdata, pd.core.series.Series): # pandas array
-                    if none_values == 'interpolate': #other fillna options possible.                        
-                        vdata = vdata.interpolate()                        
-                    elif none_values == 'ignore': #ignore the entire series when there is any none
-                        empty_data = True                        
+                    # if none_values == 'interpolate': #other fillna options possible.                        
+                    #     vdata = vdata.interpolate()    
+                    # elif none_values == 'ambient':  #fillna with -9999. 
+                    #     vdata = vdata.fillna(-9999.)
+                    # elif none_values == 'ignore': #ignore the entire series when there is any none
+                    #     empty_data = True           
+                    if none_values == 'error':
+                        raise ValueError("nan values detected for %s in %s"%(v,v['data']))
+                    elif none_values == 'ambient':
+                        vdata = vdata.fillna(-9999.)
+                    else:
+                        raise NotImplementedError("Fill nan option %s is not implemented"%none_values)
                 if isinstance(vdata,pd.core.frame.DataFrame): # multiple obs data,typically multiple stations
                     vdata = vdata.dropna(axis=1,how='all')
-                    if none_values == 'interpolate':
-                        vdata = vdata.interpolate(axis=0)
-                    elif non_values == 'ignore':
-                        vdata = vdata.dropna(axis=1,how='any') 
-                    if len(vdata.column)==0:
-                        empty_data = True
+                    # if none_values == 'interpolate':
+                    #     vdata = vdata.interpolate(axis=0)
+                    # elif none_values = 'ambient':
+                    #     vdata = vdata.fillna(-9999.)
+                    # elif non_values == 'ignore':
+                    #     vdata = vdata.dropna(axis=1,how='any') 
+                    # if len(vdata.column)==0:
+                    #     empty_data = True
+                    if none_values == 'error':
+                        raise ValueError("nan values detected for %s in %s"%(v,v['data']))
+                    elif none_values == 'ambient':
+                        vdata = vdata.fillna(-9999.)
+                    raise NotImplementedError("Fill nan option %s is not implemented"%none_values)
                 if isinstance(vdata, xr.core.dataarray.DataArray): #xarray
                     vdata = vdata.dropna(dim='site',how='all')
-                    if none_values == 'interpolate':
-                        vdata = vdata.interpolate_na(dim='time')
-                    elif none_values == 'ignore':
-                        vdata = vdata.dropna(dim='site',how='any') 
+                    # if none_values == 'interpolate':
+                    #     vdata = vdata.interpolate_na(dim='time')
+                    if none_values == 'error':
+                        raise ValueError("nan values detected for %s in %s"%(v,v['data']))
+                    elif none_values == 'ambient':
+                        vdata = vdata.fillna(-9999.)
+                    # elif none_values == 'ignore':
+                    #     vdata = vdata.dropna(dim='site',how='any') 
                     if len(vdata.site)==0:
                         empty_data = True
                 elif isinstance(vdata,xr.core.dataarray.Dataset): # the only possibility this happens is that the variable is not in the dataset
@@ -999,13 +1057,36 @@ class nudging(object):
                 elif method == 'inverse_distance':
                     obs_loc = np.array([obs_x,obs_y]).T
                     values_v = []
-                    for t in vdata.index:
-                        vals = vdata.loc[t].values
-                        invdisttree = Interp2D.Invdisttree(obs_loc, vals,
-                                       leafsize=10, stat=1)
-                        node_xy = np.array([self.node_x[imap_v],
-                                            self.node_y[imap_v]]).T
-                        values_v.append(invdisttree(node_xy, nnear=4, p=2))
+                    if isinstance(vdata,xr.core.dataarray.DataArray):
+                        for t in vdata.indexes['time']:
+                            vals = vdata.sel(time=t).values
+                            vals[vals==-9999.0] = np.nan
+                            obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
+                            vals = vals[~np.isnan(vals)]
+                            if (vals<0).any():
+                                raise Exception("negative values detected in %s for %s: "%(v['data'],name)+ 
+                                                 vals[vals<0])
+                            # removing all the nans.                            
+                            invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
+                                           leafsize=10, stat=1)
+                            node_xy = np.array([self.node_x[imap_v],
+                                                self.node_y[imap_v]]).T
+                            values_v.append(invdisttree(node_xy, nnear=4, p=2))
+
+                    else:    
+                        for t in vdata.index:
+                            vals = vdata.loc[t].values
+                            vals[vals==-9999.0] = np.nan
+                            obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
+                            vals = vals[~np.isnan(vals)]     
+                            if (vals<0).any():
+                                raise Exception("negative values detected in %s for %s: "%(v['data'],name)+ 
+                                                 vals[vals<0])
+                            invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
+                                           leafsize=10, stat=1)
+                            node_xy = np.array([self.node_x[imap_v],
+                                                self.node_y[imap_v]]).T
+                            values_v.append(invdisttree(node_xy, nnear=4, p=2))
                 else:
                      raise NotImplementedError                  
             else: # single site
@@ -1209,3 +1290,25 @@ class nudging(object):
         p = Polygon(vertices)        
         inpoly = np.where(self.mesh_gpd.within(p))[0]
         return inpoly  
+
+
+def create_arg_parser():
+    import argparse
+    parser = argparse.ArgumentParser(description="Create hotstart for a schism run")
+    parser.add_argument('--yaml_fn',type=str, help='yaml file for nudging',required=True)
+    parser.add_argument('--suffix',type=str, help='suffix for generated nudging files', default=None)
+    parser.add_argument('--crs',type=str,help='The projection system for the mesh',default=None)
+    return parser
+    
+def main():
+    # User inputs override the yaml file inputs.  
+    parser = create_arg_parser() 
+    args = parser.parse_args()
+    
+    nudging = nudging(args.yaml_fn,crs=args.crs,
+                                     suffix=suffix)
+    nudging.read_yaml()
+    nudging.create_nudging()
+           
+if __name__ == "__main__":
+    main()

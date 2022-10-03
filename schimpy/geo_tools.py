@@ -14,23 +14,23 @@ import geopandas as gpd
 from shapely.geometry import Point, Polygon, LineString, mapping, MultiPolygon
 from pyproj import Proj, CRS
 
-def shapely_to_geopandas(features,Proj4=None,shp_fn=None):
+def shapely_to_geopandas(features,crs=None,shp_fn=None):
     """
     convert shapely features to geopandas and generate shapefiles as needed
     """
     df = pd.DataFrame()
     df['geometry'] = features
     gdf = gpd.GeoDataFrame(df,geometry='geometry')
-    if Proj4:
-        gdf.crs = Proj4
+    if crs:
+        gdf.crs = crs
     else:
-        gdf.crs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_def"
+        gdf.crs = 'EPSG:26910'
     if shp_fn:
         gdf.to_file(shp_fn)
         print("%s generated"%shp_fn)
     return gdf
 
-def ic_to_gpd(fn,proj4=None):
+def ic_to_gpd(fn,crs=None):
     """
     Read ic yaml file and convert the polygons to geopandas format
     """
@@ -50,10 +50,10 @@ def ic_to_gpd(fn,proj4=None):
     df = pd.DataFrame({'id':pid, 'region':regions,'method':methods,
                        'geometry':polys})           
     gdf = gpd.GeoDataFrame(df,geometry='geometry')
-    gdf.crs = proj4
+    gdf.crs = crs
     return gdf
 
-def partition_check(mesh,poly_fn,centering='node',proj4=None):
+def partition_check(mesh,poly_fn,centering='node',crs=None):
     """
     Check if the schism mesh division by the polygon features in poly_fn is unique and complete.
     The partition check is based on either node or element, and the function checks
@@ -63,23 +63,25 @@ def partition_check(mesh,poly_fn,centering='node',proj4=None):
     if poly_fn.endswith('shp'):
         poly_gpd = gpd.read_file(poly_fn)
     else:
-        poly_gpd = ic_to_gpd(poly_fn,proj4)
+        poly_gpd = ic_to_gpd(poly_fn,crs)
         
     if centering == 'elem':
-        mesh_gpd = mesh.to_geopandas(feature_type = 'polygon',proj4=proj4)
+        mesh_gpd = mesh.to_geopandas(feature_type = 'polygon',crs=crs)
         # if the centroid falls in a polygon, the mesh grid is in the polygon
         mesh_gpd['geometry'] = mesh_gpd['geometry'].centroid
     elif centering == 'edge':
-        mesh_gpd = mesh.to_geopandas(feature_type = 'edge',proj4=proj4)
+        mesh_gpd = mesh.to_geopandas(feature_type = 'edge',crs=crs)
     else:
-        mesh_gpd = mesh.to_geopandas(feature_type = 'point',proj4=proj4)
+        mesh_gpd = mesh.to_geopandas(feature_type = 'point',crs=crs)
     
-    poly_gpd_crs = CRS.from_user_input(poly_gpd.crs)
-    mesh_gpd_crs = CRS.from_user_input(mesh_gpd.crs)
-    if not poly_gpd_crs.is_exact_same(mesh_gpd_crs):
-        poly_gpd = poly_gpd.to_crs(mesh_gpd.crs) # project to the mesh crs. 
-    #poly_gpd.set_index('id',inplace=True)
-    #poly_gpd.sort_index(inplace=True)
+    if (poly_gpd.crs is not None) & (mesh_gpd.crs is not None): # only perform projection if crs for both poly_gpd and mesh_gpd are provided
+        poly_gpd_crs = CRS.from_user_input(poly_gpd.crs)
+        mesh_gpd_crs = CRS.from_user_input(mesh_gpd.crs)
+    
+        if not poly_gpd_crs.is_exact_same(mesh_gpd_crs):
+            poly_gpd = poly_gpd.to_crs(mesh_gpd.crs) # project to the mesh crs. 
+        #poly_gpd.set_index('id',inplace=True)
+        #poly_gpd.sort_index(inplace=True)
     for id_n, poly in enumerate(poly_gpd['geometry']):
         id_name = "id_%s"%str(id_n) # make it one-based.
         mesh_gpd[id_name] = mesh_gpd.within(poly)
@@ -92,7 +94,9 @@ def partition_check(mesh,poly_fn,centering='node',proj4=None):
  
     if len(orphaned_cells) == len(mesh_gpd):
         raise Exception("coordinate system mismatch: the default for the mesh \
-                        is utm-xy")
+                        is utm-xy. Either specify crs for both grid and the \
+                        domain polygons, or convert poly_fn to the same \
+                        coordinate system as the model grid")
     elif len(orphaned_cells) >= len(mesh_gpd)/2:
         ID_df[other_id] = False
         ID_df[other_id].loc[orphaned_cells] = True
@@ -139,28 +143,28 @@ def FindMultiPoly(poly_array):
     ind = np.where(np.array(plens)>1)[0]
     return ind
 
-def project_fun(proj4=None):
-    if proj4:
-        projection = Proj(proj4)
+def project_fun(crs=None):
+    if crs:
+        projection = Proj(crs)
     else:
         projection = Proj("+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs") # this is utm zone 10.
     return projection
 
-def ll2utm(lonlat,proj4=None):
+def ll2utm(lonlat,crs=None):
     """
     lonlat can be numpy arrays. lonlat = np.asarray([lon,lat])
-    default proj4 = "+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs"
+    default crs = "+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs"
     """
-    projection = project_fun(proj4)
+    projection = project_fun(crs)
     utm_x, utm_y = projection(lonlat[0], lonlat[1])
     return np.asarray([utm_x,utm_y])
 
-def utm2ll(utm_xy,proj4=None):
+def utm2ll(utm_xy,crs=None):
     """
     utm_xy can be numpy arrays. utm_xy = np.asarray([utm_x,utm_y])
-    default proj4 = "+proj=utm +zone=10, +datum=WGS84 +units=m +no_defs"
+    default crs = "+proj=utm +zone=10, +datum=WGS84 +units=m +no_defs"
     """
-    projection = project_fun(proj4)
+    projection = project_fun(crs)
     lon, lat = projection(utm_xy[0],utm_xy[1],inverse=True)
     return np.asarray([lon,lat])
 
@@ -172,7 +176,7 @@ def geometry2coords(geo_obj):
 def geometry2coords_points(geo_obj):
     return list(mapping(geo_obj['geometry'])['coordinates'][0:2])
 
-def shp2yaml(shp_fn, yaml_fn=None, proj4=None):  
+def shp2yaml(shp_fn, yaml_fn=None, crs=None):  
     """
     Convert a shapefile to yaml file
     Parameters
@@ -181,7 +185,7 @@ def shp2yaml(shp_fn, yaml_fn=None, proj4=None):
         Input shape filename
     yaml_fn : STRING
         Output yaml filename
-    proj4 : STRING, optional
+    crs : STRING, optional
         Output projection. The default is None.
         
     Returns
@@ -191,8 +195,8 @@ def shp2yaml(shp_fn, yaml_fn=None, proj4=None):
     """
     gdf = gpd.read_file(shp_fn)
     gdf = gdf.dropna()
-    if proj4:
-        gdf = gdf.to_crs(proj4)
+    if crs:
+        gdf = gdf.to_crs(crs)
     gdf.reset_index(drop=True,inplace=True)
     stype = gdf.geometry.type[0]    
     if stype == 'LineString':

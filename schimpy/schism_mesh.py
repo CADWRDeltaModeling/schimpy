@@ -631,7 +631,7 @@ class SchismMesh(TriQuadMesh):
             self._merged_mesh = cascaded_union(self._polygons)
         return self._merged_mesh
 
-    def to_geopandas(self,feature_type='polygon',proj4=None,shp_fn=None,
+    def to_geopandas(self,feature_type='polygon',crs=None,shp_fn=None,
                      node_values=None,elem_values=None,edge_values=None,
                      value_name=None,create_gdf=True):
         """
@@ -658,10 +658,10 @@ class SchismMesh(TriQuadMesh):
         df['geometry'] = features
         gdf = gpd.GeoDataFrame(df,geometry='geometry')
 
-        if proj4:
-            gdf.crs = proj4
+        if crs:
+            gdf.crs = crs
         else:
-            gdf.crs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_def"
+            gdf.crs = None
         if shp_fn:
             gdf.to_file(shp_fn)
         if create_gdf:
@@ -1238,10 +1238,10 @@ class SchismMeshGr3Writer(SchismMeshWriter):
 #            raise RuntimeError("File exists already")
 #
 #        spatial_reference = osgeo.osr.SpatialReference()
-#        proj4 = kwargs.get('proj4')
-#        if proj4 is None:
-#            proj4 = '+proj=utm +zone=10N +ellps=NAD83 +datum=NAD83 +units=m'
-#        spatial_reference.ImportFromProj4(proj4)
+#        crs = kwargs.get('crs')
+#        if crs is None:
+#            crs = 'EPSG:26910'
+#        spatial_reference.ImportFromProj4(crs)
 #        driver_name = 'ESRI Shapefile'
 #        driver = osgeo.ogr.GetDriverByName(driver_name)
 #        if driver is None:
@@ -1312,9 +1312,9 @@ class SchismMeshShapefileWriter(SchismMeshWriter):
             print("File with the output file name exists already", fpath)
             raise RuntimeError("File exists already")
 
-        proj4 = kwargs.get('proj4')
-        if proj4 is None:
-            proj4 = "+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs"
+        crs = kwargs.get('crs')
+        if crs is None:
+            crs = 'EPSG:26910'
 
         nodes = mesh.nodes
         node_values = nodes[:,2]
@@ -1334,8 +1334,8 @@ class SchismMeshShapefileWriter(SchismMeshWriter):
         fpath_poly = os.path.join(fdir, fname + '_polygon.shp')
         fpath_point = os.path.join(fdir, fname + '_point.shp')
 
-        mesh.to_geopandas('polygon', proj4, fpath_poly, create_gdf=False)
-        mesh.to_geopandas('point', proj4, fpath_point,
+        mesh.to_geopandas('polygon', crs, fpath_poly, create_gdf=False)
+        mesh.to_geopandas('point', crs, fpath_point,
                           node_values, value_name=value_name, create_gdf=False)
         logging.info("%s generated" % fpath)
 
@@ -1573,20 +1573,20 @@ def read_mesh(fpath_mesh, fpath_vmesh=None, old_vgrid=True,**kwargs):
         else:
             vmesh = None
         mesh._vmesh = vmesh
-        if 'proj4' in kwargs:
-            mesh.proj4 = kwargs['proj4']
+        if 'crs' in kwargs:
+            mesh.crs = kwargs['crs']
         return mesh
     elif fpath_mesh.endswith('.2dm'):
         reader = SchismMeshIoFactory().get_reader('sms')
         mesh = reader.read(fpath_mesh, **kwargs)
-        if 'proj4' in kwargs:
-            mesh.proj4 = kwargs['proj4']
+        if 'crs' in kwargs:
+            mesh.crs = kwargs['crs']
         return mesh
     else:
         raise ValueError("Unsupported extension")
 
 def write_mesh(mesh, fpath_mesh, node_attr=None, write_boundary=False,
-               proj4=None, **kwargs):
+               crs=None, **kwargs):
     """ Write a horizontal mesh
 
         Parameters
@@ -1607,7 +1607,7 @@ def write_mesh(mesh, fpath_mesh, node_attr=None, write_boundary=False,
         writer.write(mesh=mesh,
                      fpath=fpath_mesh,
                      node_attr=node_attr,
-                     proj4=proj4,**kwargs)
+                     crs=crs,**kwargs)
     elif fpath_mesh.endswith(('nc')):
         writer = SchismMeshIoFactory().get_writer('nc')
         writer.write(mesh=mesh,
