@@ -107,7 +107,7 @@ def convert_2dm(file, outfile=None, elev2depth=False, logger=None):
     bc_regex = re.compile(r"""BC\s+\d+\s+\"(land|open|island)\"\s+(\d+).*\nBC_DEF\s+\d+\s+\d+\s+\"(.*)\"\s+\d+\s+\"(.*)\".*""")
 
     boundary_defs = {}
-    for m in bc_regex.finditer(string.join(boundlines, "\n")):
+    for m in bc_regex.finditer("\n".join(boundlines)):
         btype = m.group(1)
         bdef_id = int(m.group(2))
         assert m.group(3) == "name"
@@ -117,7 +117,7 @@ def convert_2dm(file, outfile=None, elev2depth=False, logger=None):
     boundaries = []
     for line in boundlines:
         if line.startswith("BC_VAL"):
-            items = string.split(line)[1:]
+            items = str.split(line)[1:]
             entity_id, def_id, param_id = [int(x)
                                            for x in items[1:-1]]
             name = items[-1]
