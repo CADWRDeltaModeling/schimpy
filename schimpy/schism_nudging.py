@@ -225,25 +225,25 @@ class nudging(object):
                     values_sum = []
                     weights_sum = []  
                     weights_sum2 = []
-                for r in idx_r:
-                     w = weights_var[i][r,imap_merged[im]]
-                     data_values = values_var[i][r][:,int(idx_list[im,r]),:]
-                     if np.isnan(data_values).any():
-                         print("warning: nan values are detected in the overlapping region. The nudging values are set to -9999.0 for these regions. ")
-                     values_sum.append(w*data_values)
-                     weights_sum.append(w)
-                     weights_sum2.append(w**2)
-                values_temp = np.sum(values_sum,axis=0)/sum(weights_sum)
-                if np.shape(values_temp)[0]>len(self.time):
-                    values_merged[:,im,:] = values_temp[:len(self.time),:]
+                    for r in idx_r:
+                        w = weights_var[i][r,imap_merged[im]]
+                        data_values = values_var[i][r][:,int(idx_list[im,r]),:]
+                        if np.isnan(data_values).any():
+                            print("warning: nan values are detected in the overlapping region. The nudging values are set to -9999.0 for these regions. ")
+                        values_sum.append(w*data_values)
+                        weights_sum.append(w)
+                        weights_sum2.append(w**2)
+                    values_temp = np.sum(values_sum,axis=0)/sum(weights_sum)
+                    if np.shape(values_temp)[0]>len(self.time):
+                        values_merged[:,im,:] = values_temp[:len(self.time),:]
+                    else:
+                        values_merged[:,im,:] = values_temp
+                    #values_merged[:,im,:] = np.sum(values_sum,axis=0)/sum(weights_sum)
+                    weights_merged[imap_merged[im]] = sum(weights_sum2)/sum(weights_sum)
                 else:
-                    values_merged[:,im,:] = values_temp
-                #values_merged[:,im,:] = np.sum(values_sum,axis=0)/sum(weights_sum)
-                weights_merged[imap_merged[im]] = sum(weights_sum2)/sum(weights_sum)
-            else:
-                r = idx_r[0]
-                weights_merged[imap_merged[im]]  = weights_var[i][r,imap_merged[im]]
-                values_merged[:,im,:] = values_var[i][r][:,int(idx_list[im,r]),:]
+                    r = idx_r[0]
+                    weights_merged[imap_merged[im]]  = weights_var[i][r,imap_merged[im]]
+                    values_merged[:,im,:] = values_var[i][r][:,int(idx_list[im,r]),:]
             
             # for the last time, make sure that all nan values are set to -9999.0
             values_merged[np.isnan(values_merged)] = -9999.0
