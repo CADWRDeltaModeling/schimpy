@@ -2,7 +2,11 @@ hotstart:
     date: 2020-04-20
     hgrid_input_file: ./data_in/hgrid.gr3
     vgrid_input_file: ./data_in/vgrid.in.new 
-    vgrid_version: 5.9
+    vgrid_version: '5.10'
+    param_nml: param.nml # this does not need to be defined unless any of ['SED', 'AGE', 'GEN', 'ECO'] is turned on.
+    modules: [HYDRO]  # when modeules are not defined, the default modules are ['TEM', 'SAL'] or ['HYDRO']. 
+    crs: 'EPSG:26910' #projection does not need to be defined if projected coordinates are used consistently. 
+    output_fn: hotstart_tropic.nc
     elevation:         
         initializer: 
             simple_trend: 

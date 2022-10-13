@@ -2,7 +2,8 @@ hotstart:
     date: 2020-06-09
     hgrid_input_file: ./data_in/hgrid.gr3                     # hgrid needs to be in utm coordinates. 
     vgrid_input_file: ./data_in/vgrid.in.3d  
-    vgrid_version:5.8
+    vgrid_version: 5.8
+    param_nml: ./data_in/param.nml.clinic # this does not need to be defined unless any of ['SED', 'AGE', 'GEN', 'ECO'] is turned on.
     elevation: 
         initializer: 
             hotstart_nc:

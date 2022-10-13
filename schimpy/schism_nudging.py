@@ -255,9 +255,9 @@ class nudging(object):
                 suffix = self.output_suffix 
             
             if v== 'temperature':
-                nudging_fn = "TEM_%s.nc"%suffix     
+                nudging_fn = "TEM_nu_%s.nc"%suffix     
             elif v=='salinity':
-                nudging_fn = "SAL_%s.nc"%suffix
+                nudging_fn = "SAL_nu_%s.nc"%suffix
             else:
                 raise NotImplementedError(
                     "write %s as nuding nc not implemented"%v)
