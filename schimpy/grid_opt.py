@@ -243,7 +243,7 @@ class GridOptimizer(object):
 
         damp = params.get('damp', 0.)
         if self.logger is not None:
-            self.logger.info("Run the optimization...")
+            self.logger.info("Run volumetric optimization...")
         if solver == 'lsqr':
             result = lsqr(mat, vec, damp)
         elif solver == 'L-BFGS-B':

@@ -46,8 +46,8 @@ def create_arg_parser():
                         help='Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc')
     parser.add_argument('--nlayer_gr3',default='nlayer.gr3',
                         help='Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc')
-    parser.add_argument('--vgrid_version', required=True,
-                        help='SCHISM version number (e.g. 5.8 and below for old style vgrid, 5.9 and above for the new style vgrid')  
+    parser.add_argument('--vgrid_version', required=True,default='5.10',type=str,
+                        help="SCHISM version number as string (e.g. '5.8' and below for old style vgrid, '5.10' is the current new style vgrid")  
 
     return parser
 
@@ -105,6 +105,10 @@ def main():
 def vgrid_gen(hgrid,vgrid_out,vgrid_version, eta,
               minmaxlayerfile,archive_nlayer='out',nlayer_gr3='nlayer.gr3'):
     
+    if not vgrid_version in ['5.8','5.10']:
+        raise ValueError(f"version of vgrid not recognized: {vgrid_version}")
+    else:
+       print(f"Version of vgrid is {vgrid_version}")
 
     meshfun = BilinearMeshDensity()
 
@@ -122,7 +126,7 @@ def vgrid_gen(hgrid,vgrid_out,vgrid_version, eta,
 
     depth = eta+h0
 
-    print("Reading the polygons...")
+    print("Reading polygons...")
     polygons = read_polygons(minmaxlayerfile)
     minlayer = np.ones_like(h0, dtype='int')
     #minlayer[:] = 8 # todo need polygons
