@@ -1,21 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>schimpy.schism_setup &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <title>schimpy.schism_setup &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
@@ -47,12 +46,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -337,12 +336,7 @@
                 <span class="k">try</span><span class="p">:</span> 
                     <span class="n">on_line</span><span class="p">,</span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">find_neighbors_on_segment</span><span class="p">(</span><span class="n">line_segment</span><span class="p">)</span>
                 <span class="k">except</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Neighbor set not found for linestring </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>                
-                <span class="c1">#if not set(neighbors).isdisjoint(assigned): raise ValueError(&quot;Element assigned twice in fluxline:&quot;.format(name))</span>
-                <span class="c1">#if not set(neighbors).isdisjoint(assigned): raise ValueError(&quot;Element assigned twice in fluxline:&quot;.format(name))</span>
-                <span class="c1">#if not set(on_line).isdisjoint(assigned): raise ValueError(&quot;Element assigned twice in fluxline:&quot;.format(name))</span>
-                <span class="c1"># techinically we could (?) survive on_line  members </span>
-                <span class="c1"># being assigned if it was assigned as online in previous group                </span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Neighbor set not found for linestring </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>               
                 <span class="n">flags</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">on_line</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">flagval</span> <span class="o">+</span> <span class="mi">1</span>
                 <span class="n">flags</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">neighbors</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">flagval</span> 
                 <span class="n">assigned</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">on_line</span> <span class="o">+</span> <span class="n">neighbors</span><span class="p">)</span>
@@ -369,7 +363,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
             <span class="n">area</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">fabs</span><span class="p">(</span><span class="n">area</span><span class="p">)</span> <span class="o">*</span> <span class="o">.</span><span class="mi">5</span>
+        <span class="k">return</span> <span class="n">fabs</span><span class="p">(</span><span class="n">area</span><span class="p">)</span> <span class="o">*</span> <span class="mf">.5</span>
 
     <span class="k">def</span> <span class="nf">_clip</span><span class="p">(</span><span class="n">subjectPolygon</span><span class="p">,</span> <span class="n">clipPolygon</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;  Sutherland-Hodgman polygon clipping algorithm</span>
@@ -707,7 +701,20 @@
             <span class="n">newglobals</span><span class="p">[</span><span class="s1">&#39;polygon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">poly</span>
 
             <span class="c1"># Evaluate</span>
-            <span class="n">nodes_sel</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_in_polygon</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">poly</span><span class="p">,</span> <span class="n">newglobals</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">nodes_sel</span><span class="p">,</span> <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_in_polygon</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">poly</span><span class="p">,</span> <span class="n">newglobals</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Polygon failed to evaluate: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">raise</span>
+            <span class="c1"># if 97346 in nodes_sel: </span>
+                <span class="c1"># print(poly.type)</span>
+                <span class="c1"># print(&quot;Arrived in poly {}&quot;.format(name))</span>
+                <span class="c1"># for ii,isel in enumerate(nodes_sel):</span>
+                    <span class="c1"># if isel == 97346: </span>
+                        <span class="c1"># print(ii,isel,mesh.nodes[isel,:],vals[ii])</span>
+                        <span class="c1"># #raise ValueError(&quot;Arrived. Poly type = {}&quot;.format(poly.type))</span>
+                     
+                
 
             <span class="k">if</span> <span class="n">nodes_sel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodes_sel</span><span class="p">):</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;This polygon contains no nodes: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">poly</span><span class="o">.</span><span class="n">name</span>
@@ -1160,7 +1167,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

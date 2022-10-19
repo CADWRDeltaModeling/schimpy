@@ -1,21 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>schimpy.create_vgrid_lsc2 &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <title>schimpy.create_vgrid_lsc2 &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
@@ -47,12 +46,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -110,6 +109,8 @@
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--nlayer_gr3&#39;</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;nlayer.gr3&#39;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--vgrid_version&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;5.10&#39;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;SCHISM version number as string (e.g. &#39;5.8&#39; and below for old style vgrid, &#39;5.10&#39; is the current new style vgrid&quot;</span><span class="p">)</span>  
 
     <span class="k">return</span> <span class="n">parser</span></div>
 
@@ -129,6 +130,7 @@
     <span class="n">maxiter</span><span class="o">=</span><span class="mi">200</span>
     <span class="n">ngen</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">ngen</span>
     <span class="n">transect</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">plot_transects</span>
+    <span class="n">vgrid_version</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">vgrid_version</span>
     <span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">getcwd</span>
     <span class="kn">import</span> <span class="nn">os.path</span>
     <span class="kn">import</span> <span class="nn">glob</span>
@@ -142,7 +144,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Requested output transect file does not exist: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
 
 
-    <span class="n">vgrid_gen</span><span class="p">(</span><span class="n">hgrid</span><span class="p">,</span><span class="n">vgrid_out</span><span class="p">,</span><span class="n">eta</span><span class="p">,</span><span class="n">minmax_region</span><span class="p">,</span><span class="n">archive_nlayer</span><span class="p">,</span><span class="n">nlayer_gr3</span><span class="p">)</span>
+    <span class="n">vgrid_gen</span><span class="p">(</span><span class="n">hgrid</span><span class="p">,</span><span class="n">vgrid_out</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">,</span><span class="n">eta</span><span class="p">,</span><span class="n">minmax_region</span><span class="p">,</span><span class="n">archive_nlayer</span><span class="p">,</span><span class="n">nlayer_gr3</span><span class="p">)</span>
 
     <span class="n">transect_mallard</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mallard_1.csv&quot;</span><span class="p">,</span><span class="s2">&quot;mallard_2.csv&quot;</span><span class="p">]</span>
     <span class="n">transect_gg</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;transect_gg1.csv&quot;</span><span class="p">,</span><span class="s2">&quot;transect_gg2.csv&quot;</span><span class="p">]</span>
@@ -159,13 +161,17 @@
     <span class="k">if</span> <span class="n">transect</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">vgrid_out</span> <span class="o">=</span> <span class="s2">&quot;vgrid.in&quot;</span>
         <span class="n">vgrid0_out</span> <span class="o">=</span> <span class="s2">&quot;vgrid.in&quot;</span>
-        <span class="n">plot_vgrid</span><span class="p">(</span><span class="n">hgrid</span><span class="p">,</span><span class="n">vgrid_out</span><span class="p">,</span><span class="n">vgrid0_out</span><span class="p">,</span><span class="n">eta</span><span class="p">,</span><span class="n">transectfiles</span><span class="p">)</span></div>
+        <span class="n">plot_vgrid</span><span class="p">(</span><span class="n">hgrid</span><span class="p">,</span><span class="n">vgrid_out</span><span class="p">,</span><span class="n">vgrid0_out</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">,</span><span class="n">eta</span><span class="p">,</span><span class="n">transectfiles</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="vgrid_gen"><a class="viewcode-back" href="../../schimpy.html#schimpy.create_vgrid_lsc2.vgrid_gen">[docs]</a><span class="k">def</span> <span class="nf">vgrid_gen</span><span class="p">(</span><span class="n">hgrid</span><span class="p">,</span><span class="n">vgrid_out</span><span class="p">,</span><span class="n">eta</span><span class="p">,</span>
+<div class="viewcode-block" id="vgrid_gen"><a class="viewcode-back" href="../../schimpy.html#schimpy.create_vgrid_lsc2.vgrid_gen">[docs]</a><span class="k">def</span> <span class="nf">vgrid_gen</span><span class="p">(</span><span class="n">hgrid</span><span class="p">,</span><span class="n">vgrid_out</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span>
               <span class="n">minmaxlayerfile</span><span class="p">,</span><span class="n">archive_nlayer</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">,</span><span class="n">nlayer_gr3</span><span class="o">=</span><span class="s1">&#39;nlayer.gr3&#39;</span><span class="p">):</span>
     
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">vgrid_version</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;5.8&#39;</span><span class="p">,</span><span class="s1">&#39;5.10&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;version of vgrid not recognized: </span><span class="si">{</span><span class="n">vgrid_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Version of vgrid is </span><span class="si">{</span><span class="n">vgrid_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">meshfun</span> <span class="o">=</span> <span class="n">BilinearMeshDensity</span><span class="p">()</span>
 
@@ -183,7 +189,7 @@
 
     <span class="n">depth</span> <span class="o">=</span> <span class="n">eta</span><span class="o">+</span><span class="n">h0</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading the polygons...&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading polygons...&quot;</span><span class="p">)</span>
     <span class="n">polygons</span> <span class="o">=</span> <span class="n">read_polygons</span><span class="p">(</span><span class="n">minmaxlayerfile</span><span class="p">)</span>
     <span class="n">minlayer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">h0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
     <span class="c1">#minlayer[:] = 8 # todo need polygons</span>
@@ -251,11 +257,11 @@
     <span class="c1">#write_vmesh(vmesh, vgrid0)</span>
     <span class="c1">#vmesh1 = SchismLocalVerticalMesh(flip_sigma(sigma1))</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Writing vgrid.in output file...&quot;</span><span class="p">)</span>
-    <span class="n">write_vmesh</span><span class="p">(</span><span class="n">vmesh</span><span class="p">,</span> <span class="n">vgrid_out</span><span class="p">)</span>
+    <span class="n">write_vmesh</span><span class="p">(</span><span class="n">vmesh</span><span class="p">,</span> <span class="n">vgrid_out</span><span class="p">,</span> <span class="n">vgrid_version</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="plot_vgrid"><a class="viewcode-back" href="../../schimpy.html#schimpy.create_vgrid_lsc2.plot_vgrid">[docs]</a><span class="k">def</span> <span class="nf">plot_vgrid</span><span class="p">(</span><span class="n">hgrid_file</span><span class="p">,</span><span class="n">vgrid0_file</span><span class="p">,</span><span class="n">vgrid_file</span><span class="p">,</span><span class="n">eta</span><span class="p">,</span><span class="n">transectfiles</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_vgrid"><a class="viewcode-back" href="../../schimpy.html#schimpy.create_vgrid_lsc2.plot_vgrid">[docs]</a><span class="k">def</span> <span class="nf">plot_vgrid</span><span class="p">(</span><span class="n">hgrid_file</span><span class="p">,</span><span class="n">vgrid0_file</span><span class="p">,</span><span class="n">vgrid_file</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span><span class="n">transectfiles</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">schimpy.lsc2</span> <span class="kn">import</span> <span class="n">default_num_layers</span><span class="p">,</span><span class="n">plot_mesh</span>
     <span class="kn">from</span> <span class="nn">schimpy.schism_vertical_mesh</span> <span class="kn">import</span> <span class="n">read_vmesh</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -263,7 +269,7 @@
 
     <span class="n">mesh</span> <span class="o">=</span> <span class="n">read_mesh</span><span class="p">(</span><span class="n">hgrid_file</span><span class="p">)</span>
     <span class="n">x</span><span class="o">=</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">vmesh0</span> <span class="o">=</span> <span class="n">read_vmesh</span><span class="p">(</span><span class="n">vgrid0_file</span><span class="p">)</span>
+    <span class="n">vmesh0</span> <span class="o">=</span> <span class="n">read_vmesh</span><span class="p">(</span><span class="n">vgrid0_file</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">)</span>
     <span class="n">vmesh1</span> <span class="o">=</span> <span class="n">read_vmesh</span><span class="p">(</span><span class="n">vgrid_file</span><span class="p">)</span>
     <span class="n">h0</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
     <span class="n">depth</span> <span class="o">=</span> <span class="n">eta</span><span class="o">+</span><span class="n">h0</span>
@@ -326,7 +332,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

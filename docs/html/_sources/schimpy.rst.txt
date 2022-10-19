@@ -12,6 +12,14 @@ schimpy.Interp2D module
    :undoc-members:
    :show-inheritance:
 
+schimpy.adjust\_source\_sink module
+-----------------------------------
+
+.. automodule:: schimpy.adjust_source_sink
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.base\_io module
 -----------------------
 
@@ -140,6 +148,14 @@ schimpy.create\_vgrid\_lsc2 module
    :undoc-members:
    :show-inheritance:
 
+schimpy.cruise module
+---------------------
+
+.. automodule:: schimpy.cruise
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.cut\_mesh module
 ------------------------
 
@@ -172,6 +188,14 @@ schimpy.gen\_elev2D module
    :undoc-members:
    :show-inheritance:
 
+schimpy.gen\_elev2D1 module
+---------------------------
+
+.. automodule:: schimpy.gen_elev2D1
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.geo\_tools module
 -------------------------
 
@@ -200,6 +224,14 @@ schimpy.hotstart\_generator module
 ----------------------------------
 
 .. automodule:: schimpy.hotstart_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.hotstart\_inventory module
+----------------------------------
+
+.. automodule:: schimpy.hotstart_inventory
    :members:
    :undoc-members:
    :show-inheritance:
@@ -276,6 +308,14 @@ schimpy.priority\_queue module
    :undoc-members:
    :show-inheritance:
 
+schimpy.profile\_plot module
+----------------------------
+
+.. automodule:: schimpy.profile_plot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.raster\_to\_nodes module
 --------------------------------
 
@@ -292,10 +332,10 @@ schimpy.read\_output\_xyt module
    :undoc-members:
    :show-inheritance:
 
-schimpy.schimpy module
-----------------------
+schimpy.schimpy\_locale module
+------------------------------
 
-.. automodule:: schimpy.schimpy
+.. automodule:: schimpy.schimpy_locale
    :members:
    :undoc-members:
    :show-inheritance:
@@ -332,6 +372,14 @@ schimpy.schism\_mesh module
    :undoc-members:
    :show-inheritance:
 
+schimpy.schism\_nudging module
+------------------------------
+
+.. automodule:: schimpy.schism_nudging
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.schism\_polygon module
 ------------------------------
 
@@ -352,6 +400,14 @@ schimpy.schism\_source module
 -----------------------------
 
 .. automodule:: schimpy.schism_source
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.schism\_sources\_sinks module
+-------------------------------------
+
+.. automodule:: schimpy.schism_sources_sinks
    :members:
    :undoc-members:
    :show-inheritance:
@@ -436,6 +492,22 @@ schimpy.station module
    :undoc-members:
    :show-inheritance:
 
+schimpy.subset\_schism\_output module
+-------------------------------------
+
+.. automodule:: schimpy.subset_schism_output
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.three\_point\_linear\_norm module
+-----------------------------------------
+
+.. automodule:: schimpy.three_point_linear_norm
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.trimesh module
 ----------------------
 
@@ -456,6 +528,14 @@ schimpy.unit\_conversions module
 --------------------------------
 
 .. automodule:: schimpy.unit_conversions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.untitled0 module
+------------------------
+
+.. automodule:: schimpy.untitled0
    :members:
    :undoc-members:
    :show-inheritance:

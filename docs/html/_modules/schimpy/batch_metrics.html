@@ -1,21 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>schimpy.batch_metrics &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <title>schimpy.batch_metrics &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
@@ -47,12 +46,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -79,7 +78,7 @@
                                 <span class="n">safe_window</span><span class="p">,</span> <span class="n">check_if_all_tss_are_bad</span><span class="p">,</span> <span class="n">fill_gaps</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">schimpy.unit_conversions</span> <span class="kn">import</span> <span class="n">cfs_to_cms</span><span class="p">,</span><span class="n">ft_to_m</span><span class="p">,</span><span class="n">ec_psu_25c</span><span class="p">,</span><span class="n">fahrenheit_to_celcius</span>
+<span class="kn">from</span> <span class="nn">schimpy.unit_conversions</span> <span class="kn">import</span> <span class="n">cfs_to_cms</span><span class="p">,</span><span class="n">ft_to_m</span><span class="p">,</span><span class="n">ec_psu_25c</span><span class="p">,</span><span class="n">fahrenheit_to_celsius</span>
 <span class="kn">import</span> <span class="nn">schimpy.schism_yaml</span> <span class="k">as</span> <span class="nn">schism_yaml</span>
 <span class="kn">from</span> <span class="nn">vtools.data.vtime</span> <span class="kn">import</span> <span class="n">days</span><span class="p">,</span> <span class="n">hours</span>
 <span class="kn">from</span> <span class="nn">vtools.functions.error_detect</span> <span class="kn">import</span> <span class="n">med_outliers</span>
@@ -152,6 +151,9 @@
                     <span class="n">station_in</span> <span class="o">=</span> <span class="n">stations_input</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">datafname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_dir</span><span class="p">,</span><span class="s2">&quot;flux.out&quot;</span><span class="p">)</span>
                 <span class="n">sim_out</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">read_flux_out</span><span class="p">(</span><span class="n">datafname</span><span class="p">,</span><span class="n">station_in</span><span class="p">,</span><span class="n">reftime</span><span class="o">=</span><span class="n">time_basis</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;old&#39;</span> <span class="ow">in</span> <span class="n">sim_out</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+                    <span class="n">sim_out</span><span class="p">[</span><span class="s1">&#39;old&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">sim_out</span><span class="p">[</span><span class="s1">&#39;old&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find&quot;</span><span class="p">)</span>
                 <span class="n">sim_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_out</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">working_dir</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">outputs_dir</span><span class="p">):</span>
@@ -163,7 +165,10 @@
                 <span class="n">sim_out</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">read_staout</span><span class="p">(</span><span class="n">datafname</span><span class="p">,</span><span class="n">station_infile</span><span class="p">,</span>
                                               <span class="n">reftime</span><span class="o">=</span><span class="n">time_basis</span><span class="p">,</span><span class="n">ret_station_in</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                                               <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># todo: case</span>
+                <span class="n">sim_out</span><span class="o">.</span><span class="n">columns</span><span class="o">=</span><span class="n">sim_out</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span><span class="n">sim_out</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span><span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">sim_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim_out</span><span class="p">)</span>
+                
         <span class="k">return</span> <span class="n">sim_outputs</span>
 
     <span class="k">def</span> <span class="nf">retrieve_tss_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim_outputs</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vert_pos</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -312,7 +317,7 @@
             <span class="n">ts</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;PSU&#39;</span>
         <span class="k">elif</span> <span class="n">unit</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;deg F&#39;</span><span class="p">,</span> <span class="s1">&#39;degF&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Converting deg F to deg C&quot;</span><span class="p">)</span>
-            <span class="n">ts</span> <span class="o">=</span> <span class="n">fahrenheit_to_celcius</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="n">fahrenheit_to_celsius</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
             <span class="n">ts</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;deg C&#39;</span>
         <span class="k">elif</span> <span class="n">unit</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;degC&#39;</span><span class="p">,</span><span class="s1">&#39;deg C&#39;</span><span class="p">):</span>
             <span class="n">ts</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="s1">&#39;deg C&#39;</span>
@@ -331,6 +336,7 @@
         <span class="sd">&quot;&quot;&quot; Create a title for the figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">long_name</span> <span class="o">=</span> <span class="n">db_stations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">station_id</span><span class="p">,</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">agency_id</span> <span class="o">=</span> <span class="n">db_stations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">station_id</span><span class="p">,</span><span class="s1">&#39;agency_id&#39;</span><span class="p">]</span>
         <span class="c1">#todo: These should be part of station_in</span>
         <span class="k">if</span> <span class="n">long_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">long_name</span> <span class="o">=</span> <span class="n">station_id</span>
@@ -339,8 +345,8 @@
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;salt&#39;</span><span class="p">,</span> <span class="s1">&#39;temp&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">subloc</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">title</span> <span class="o">+=</span> <span class="s2">&quot; (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subloc</span><span class="p">)</span>
         <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39;Source: </span><span class="si">{}</span><span class="s1">, ID: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source</span><span class="p">,</span>
-                                             <span class="n">station_id</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">+=</span> <span class="s1">&#39;Source: </span><span class="si">{}</span><span class="s1">, ID: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
+                                             <span class="n">station_id</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">title</span>
 
     <span class="k">def</span> <span class="nf">adjust_obs_datum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts_obs</span><span class="p">,</span> <span class="n">ts_sim</span><span class="p">,</span> <span class="n">station_id</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">subloc</span><span class="p">,</span> <span class="n">db_obs</span><span class="p">):</span>
@@ -373,6 +379,7 @@
         <span class="c1"># Process input parameters</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
         <span class="n">variable</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">]</span>
+
         <span class="n">outputs_dir</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;outputs_dir&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outputs_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">outputs_dir</span> <span class="o">=</span> <span class="n">outputs_dir</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -415,7 +422,6 @@
             <span class="n">max_gap_to_fill</span> <span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">tseries</span><span class="o">.</span><span class="n">frequencies</span><span class="o">.</span><span class="n">to_offset</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;max_gap_to_fill&#39;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span> <span class="n">max_gap_to_fill</span> <span class="o">=</span> <span class="n">hours</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-
         <span class="c1"># Prepare readers of simulation outputs</span>
         <span class="n">sim_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_simulation_outputs</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span>
                                                    <span class="n">outputs_dir</span><span class="p">,</span>
@@ -426,17 +432,21 @@
 
         <span class="c1"># Iterate through the stations in the first simulation outputs</span>
         <span class="k">for</span> <span class="n">stn</span> <span class="ow">in</span> <span class="n">sim_outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="n">station_id</span> <span class="o">=</span> <span class="n">stn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">stn</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span> <span class="k">else</span> <span class="n">stn</span>
+            <span class="n">station_id</span> <span class="o">=</span> <span class="n">stn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">stn</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span> <span class="k">else</span> <span class="n">stn</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="c1"># Prepare</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="s2">&quot;==================================================&quot;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start processing station:: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">station_id</span><span class="p">))</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">station_id</span> <span class="ow">in</span> <span class="n">db_stations</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">station_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">db_stations</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Station id </span><span class="si">{}</span><span class="s2"> not found in station listings&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">station_id</span><span class="p">))</span>
                 <span class="k">continue</span>
-            <span class="n">alias</span> <span class="o">=</span> <span class="n">db_stations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">station_id</span><span class="p">,</span><span class="s1">&#39;alias&#39;</span><span class="p">]</span>
+                
+
+            <span class="k">if</span> <span class="s1">&#39;alias&#39;</span> <span class="ow">in</span> <span class="n">db_stations</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">alias</span> <span class="o">=</span> <span class="n">db_stations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">station_id</span><span class="p">,</span><span class="s1">&#39;alias&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">alias</span> <span class="o">=</span> <span class="n">station_id</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="n">selected_stations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">station_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">selected_stations</span><span class="p">:</span>
@@ -459,6 +469,7 @@
 
             <span class="c1"># Read Obs</span>
             <span class="n">subloc</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span> <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;flow&#39;</span> <span class="k">else</span> <span class="n">stn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
             <span class="n">ts_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_ts_obs</span><span class="p">(</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">window_to_read</span><span class="p">,</span>
                                           <span class="n">db_stations</span><span class="p">,</span> <span class="n">db_obs</span><span class="p">)</span>
 
@@ -472,7 +483,17 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">remove_outliers</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Removing outliers...&quot;</span><span class="p">)</span>
-                    <span class="n">ts_obs</span> <span class="o">=</span> <span class="n">med_outliers</span><span class="p">(</span><span class="n">ts_obs</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">obs_unit</span> <span class="o">=</span> <span class="n">db_obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">station_id</span><span class="p">,</span> <span class="n">subloc</span><span class="p">,</span> <span class="n">variable</span><span class="p">),</span><span class="s1">&#39;unit&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;salt&#39;</span> <span class="ow">and</span> <span class="n">obs_unit</span> <span class="o">==</span> <span class="s1">&#39;ec&#39;</span><span class="p">:</span>
+                        <span class="n">drange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">10.</span><span class="p">,</span><span class="mf">60000.</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;elev&#39;</span><span class="p">:</span>
+                        <span class="n">drange</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">8.</span><span class="p">,</span><span class="mf">100.</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="s1">&#39;temp&#39;</span><span class="p">:</span>
+                        <span class="n">drange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">40.</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">obs_unit</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;deg F&#39;</span><span class="p">,</span><span class="s1">&#39;degF&#39;</span><span class="p">]:</span> <span class="n">drange</span><span class="o">=</span><span class="p">[</span><span class="mf">33.</span><span class="p">,</span><span class="mf">90.</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">drange</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">ts_obs</span> <span class="o">=</span> <span class="n">med_outliers</span><span class="p">(</span><span class="n">ts_obs</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="n">drange</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">adj</span> <span class="o">=</span> <span class="n">db_obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">,</span><span class="n">variable</span><span class="p">),</span><span class="s1">&#39;datum_adj&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">adj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">adj</span> <span class="o">!=</span> <span class="mf">0.</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -501,9 +522,12 @@
                 <span class="n">tss_sim</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">simout</span> <span class="ow">in</span> <span class="n">sim_outputs</span><span class="p">:</span>
-                        <span class="n">s</span> <span class="o">=</span> <span class="n">simout</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,(</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">)]</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-                            <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;Station,Sublocation pair (</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">) not unique&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">)))</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">)</span> <span class="ow">in</span> <span class="n">simout</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                            <span class="n">s</span> <span class="o">=</span> <span class="n">simout</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,(</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">)]</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                                <span class="k">raise</span><span class="p">(</span><span class="s2">&quot;Station,Sublocation pair (</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">) not unique or some other uniqueness problem in station files&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">)))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">s</span><span class="o">=</span><span class="kc">None</span>
                         <span class="n">tss_sim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
                 <span class="k">except</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Problem reading time series for station </span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">station_id</span><span class="p">,</span><span class="n">subloc</span><span class="p">))</span>         
@@ -657,7 +681,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

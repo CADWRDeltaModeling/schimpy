@@ -24,10 +24,10 @@ sys.path.insert(0, os.path.abspath('..'))
 import schimpy
 
 # using mock to avoid nodepy documentation which is hard to import
-import mock
-MOCK_MODULES = ['nodepy']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+#import mock
+#MOCK_MODULES = ['nodepy']
+#for mod_name in MOCK_MODULES:
+#    sys.modules[mod_name] = mock.Mock()
 
 # -- General configuration ---------------------------------------------
 

@@ -1,21 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>schimpy.station &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <title>schimpy.station &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
@@ -47,12 +46,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -132,9 +131,14 @@
 
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">station_infile</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
-        <span class="n">station_in</span> <span class="o">=</span> <span class="n">read_station_in</span><span class="p">(</span><span class="n">station_infile</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span> <span class="n">station_in</span> <span class="o">=</span> <span class="n">station_infile</span>
+        <span class="n">station_in</span> <span class="o">=</span> <span class="n">read_station_in</span><span class="p">(</span><span class="n">station_infile</span><span class="p">)</span>    
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">station_in</span> <span class="o">=</span> <span class="n">station_infile</span>
+
     <span class="n">station_index</span> <span class="o">=</span> <span class="n">station_in</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">station_index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">station_index</span><span class="p">[</span><span class="n">station_index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate id/subloc pair in station.in file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">station_infile</span><span class="p">))</span>
     <span class="n">staout</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="c1"># todo: hardwire</span>
     <span class="n">staout</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">staout</span><span class="o">&lt;=-</span><span class="mf">999.</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -147,7 +151,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">staout</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loc</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">subloc</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">loc</span><span class="p">,</span><span class="n">subloc</span> <span class="ow">in</span> <span class="n">staout</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">infer_freq</span><span class="p">(</span><span class="n">staout</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-    <span class="n">staout</span> <span class="o">=</span> <span class="n">staout</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>    
+    <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1">#raise ValueError(&quot;Could not determine the time frequency of staoutfile&quot;)</span>
+        <span class="n">f2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">infer_freq</span><span class="p">(</span><span class="n">staout</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">newindex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">staout</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">freq</span><span class="o">=</span><span class="n">f2</span><span class="p">,</span><span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">staout</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+        <span class="n">staout</span><span class="o">.</span><span class="n">index</span><span class="o">=</span><span class="n">newindex</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">staout</span> <span class="o">=</span> <span class="n">staout</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>    
     <span class="k">return</span> <span class="p">(</span><span class="n">staout</span><span class="p">,</span> <span class="n">station_infile</span><span class="p">)</span> <span class="k">if</span> <span class="n">ret_station_in</span> <span class="k">else</span> <span class="n">staout</span></div>
 
 
@@ -236,7 +246,7 @@
 
 <span class="sd">       Example might be:</span>
 <span class="sd">       id,subloc,z</span>
-<span class="sd">       12345,top,-0.5</span>
+<span class="sd">       12345,upper,-0.5</span>
 
 <span class="sd">       Other columns are allowed, but this will commonly merged with the station database file so we avoid column names like &#39;name&#39; that might collide</span>
 
@@ -268,7 +278,7 @@
 <span class="sd">     Parameters</span>
 <span class="sd">     ----------</span>
 <span class="sd">     fpath : fname</span>
-<span class="sd">        Path to input station.in style file</span>
+<span class="sd">        Path to input dbase style file</span>
 
 <span class="sd">     Returns</span>
 <span class="sd">     -------</span>
@@ -276,8 +286,18 @@
 <span class="sd">         DataFrame with hierarchical index (id,subloc) and columns x,y,z,name</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
-    <span class="k">return</span>  <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="n">comment</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">)</span></div>
+    
+    <span class="n">db</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="n">comment</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;agency_id&quot;</span><span class="p">:</span><span class="nb">str</span><span class="p">})</span>
+    <span class="n">db</span><span class="p">[</span><span class="s2">&quot;agency_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;agency_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&#39;</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">regex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+    <span class="n">dup</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dup</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Duplicates&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">dup</span><span class="p">])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Station database has duplicate id keys. See above&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">db</span></div>
+    
 
 <div class="viewcode-block" id="merge_station_subloc"><a class="viewcode-back" href="../../schimpy.html#schimpy.station.merge_station_subloc">[docs]</a><span class="k">def</span> <span class="nf">merge_station_subloc</span><span class="p">(</span><span class="n">station_dbase</span><span class="p">,</span><span class="n">station_subloc</span><span class="p">,</span><span class="n">default_z</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Merge BayDeltaSCHISM station database with subloc file, producing the union of all stations and sublocs including a default entry for stations with no subloc entry</span>
@@ -311,9 +331,15 @@
                      <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                      <span class="n">index_col</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;subloc&quot;</span><span class="p">,</span> <span class="s2">&quot;variable&quot;</span><span class="p">],</span>
                      <span class="n">comment</span><span class="o">=</span><span class="s2">&quot;#&quot;</span><span class="p">)</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">set_levels</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
                         <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                         <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">dups</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span>
+    <span class="n">ndup</span> <span class="o">=</span> <span class="n">dups</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ndup</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> duplicate index rows:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ndup</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dups</span><span class="p">,:])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicates not allowed in observation links file, see above list.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 <div class="viewcode-block" id="read_station_out"><a class="viewcode-back" href="../../schimpy.html#schimpy.station.read_station_out">[docs]</a><span class="k">def</span> <span class="nf">read_station_out</span><span class="p">(</span><span class="n">fpath_base</span><span class="p">,</span><span class="n">stationinfo</span><span class="p">,</span><span class="n">var</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -333,8 +359,8 @@
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="flux_names_from_yaml"><a class="viewcode-back" href="../../schimpy.html#schimpy.station.flux_names_from_yaml">[docs]</a><span class="k">def</span> <span class="nf">flux_names_from_yaml</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Retrieve names of fluxlines from yaml file or content&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="flux_stations_from_yaml"><a class="viewcode-back" href="../../schimpy.html#schimpy.station.flux_stations_from_yaml">[docs]</a><span class="k">def</span> <span class="nf">flux_stations_from_yaml</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve station id of fluxlines from yaml file or content&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">yaml</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -345,9 +371,13 @@
     <span class="n">names</span> <span class="o">=</span><span class="p">[]</span>
     <span class="n">linestrings</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">&quot;linestrings&quot;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">ls</span> <span class="ow">in</span> <span class="n">linestrings</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;YAML file is case sensitive. Do not use Name as attribute label&quot;</span><span class="p">)</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Duplicate name: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
+            <span class="c1">#print(&quot;Station ids should be lower case, coercing&quot;)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">names</span></div>
 
@@ -355,20 +385,63 @@
 <div class="viewcode-block" id="station_names_from_file"><a class="viewcode-back" href="../../schimpy.html#schimpy.station.station_names_from_file">[docs]</a><span class="k">def</span> <span class="nf">station_names_from_file</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fpath</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;.yml&quot;</span><span class="p">,</span><span class="s2">&quot;.yaml&quot;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">flux_names_from_yaml</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
+        <span class="n">station_names</span> <span class="o">=</span> <span class="n">flux_stations_from_yaml</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.prop&quot;</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not implemented for .prop&quot;</span><span class="p">)</span></div>
+        <span class="n">station_names</span><span class="o">=</span><span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> 
+                    <span class="n">station_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File type not recognized for harvesting station names: </span><span class="si">{</span><span class="n">fpath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>            
+    
+    <span class="k">return</span> <span class="n">station_names</span></div>
 
 <div class="viewcode-block" id="read_flux_out"><a class="viewcode-back" href="../../schimpy.html#schimpy.station.read_flux_out">[docs]</a><span class="k">def</span> <span class="nf">read_flux_out</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="n">names</span><span class="p">,</span><span class="n">reftime</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Read fluxes from a SCHISM flux.out file </span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    </span>
+<span class="sd">    fpath : str</span>
+<span class="sd">    Path to the file</span>
+<span class="sd">    </span>
+<span class="sd">    names : str</span>
+<span class="sd">    name of file that contains  names of  flux areas, typically something like flow_xsects.yaml</span>
+<span class="sd">    </span>
+<span class="sd">    reftime : str</span>
+<span class="sd">    start of simulation, against which relative times will be calculated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">names</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
         <span class="n">names</span> <span class="o">=</span> <span class="n">station_names_from_file</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                           <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">names</span> <span class="o">=</span> <span class="n">names</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        
+    <span class="c1"># Check uniqueness of names</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">uniq</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">uniq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate station names.&quot;</span><span class="p">)</span>        
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+    <span class="n">nstation</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+    <span class="c1">#probe = pd.read_csv(fpath,sep=&quot;\s+&quot;,index_col=0,header=None,dtype=&#39;d&#39;,nrows=2)</span>
+    <span class="c1">#ncolfile = probe.shape[1]</span>
+
+    
+    <span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">*</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nstation</span><span class="o">+</span><span class="mi">1</span><span class="p">))]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                       <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">usecols</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">names</span><span class="p">,</span>
+                       <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">reftime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">elapsed_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">reftime</span><span class="o">=</span><span class="n">reftime</span><span class="p">,</span><span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
         <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">infer_freq</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">asfreq</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
     <span class="c1"># todo: freq when start is none?</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
@@ -577,10 +650,6 @@
 
 
 
-
-
-
-
 <div class="viewcode-block" id="convert_db_station_in"><a class="viewcode-back" href="../../schimpy.html#schimpy.station.convert_db_station_in">[docs]</a><span class="k">def</span> <span class="nf">convert_db_station_in</span><span class="p">(</span><span class="n">outfile</span><span class="o">=</span><span class="s2">&quot;station.in&quot;</span><span class="p">,</span><span class="n">stationdb</span><span class="o">=</span><span class="s2">&quot;stations_utm.csv&quot;</span><span class="p">,</span><span class="n">sublocdb</span><span class="o">=</span><span class="s2">&quot;station_subloc.csv&quot;</span><span class="p">,</span><span class="n">station_request</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span><span class="n">default</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="n">stations_utm</span> <span class="o">=</span> <span class="n">read_station_dbase</span><span class="p">(</span><span class="n">stationdb</span><span class="p">)</span>
     <span class="n">ssubloc</span> <span class="o">=</span> <span class="n">read_station_subloc</span><span class="p">(</span><span class="n">sublocdb</span><span class="p">)</span>
@@ -649,7 +718,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

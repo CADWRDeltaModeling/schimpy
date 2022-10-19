@@ -1,21 +1,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>schimpy.schism_vertical_mesh &#8212; schimpy 1.2.1+1.ge1e6d39.dirty documentation</title>
-    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <title>schimpy.schism_vertical_mesh &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
@@ -47,12 +46,12 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
 
@@ -141,8 +140,6 @@
 <span class="sd">            Parameters</span>
 <span class="sd">            ----------</span>
 <span class="sd">            sigma: np.array</span>
-<span class="sd">            nvrt: int</span>
-<span class="sd">                number of the total levels</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span>
         <span class="n">nan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
@@ -169,17 +166,57 @@
 <span class="sd">                </span>
 <span class="sd">            todo: behavior with dry locations not described</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sigma values are not provided&quot;</span><span class="p">)</span>
+        <span class="c1"># if self.sigma is None:</span>
+        <span class="c1">#     raise ValueError(&quot;Sigma values are not provided&quot;)</span>
+        <span class="c1"># if type(elev) == float:</span>
+        <span class="c1">#     elev = np.ones((mesh.n_nodes(), ))*elev</span>
+        <span class="c1"># n_vert = self.n_vert_levels()</span>
+        <span class="c1"># self._z = np.empty((mesh.n_nodes(), n_vert))</span>
+        <span class="c1"># for i, (node, eta) in enumerate(zip(mesh.nodes, elev)):</span>
+        <span class="c1">#     self._z[i] = -node[2]</span>
+        <span class="c1">#     self._z[i, self.kbps[i]:] = (</span>
+        <span class="c1">#         eta+(eta + node[2]) * self.sigma[i, :n_vert - self.kbps[i]])</span>
+        <span class="c1"># return self._z    </span>
+        <span class="n">vert_grid</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">vmesh</span>
+        <span class="n">nvrt</span> <span class="o">=</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;nvrt&#39;</span><span class="p">]</span>
+        <span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">(),</span> <span class="n">nvrt</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">elev</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
             <span class="n">elev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">(),</span> <span class="p">))</span><span class="o">*</span><span class="n">elev</span>
-        <span class="n">n_vert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">(),</span> <span class="n">n_vert</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">elev</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">node</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kbps</span><span class="p">[</span><span class="n">i</span><span class="p">]:]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">eta</span><span class="o">+</span><span class="p">(</span><span class="n">eta</span> <span class="o">+</span> <span class="n">node</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">n_vert</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">kbps</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+            
+        <span class="k">if</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">ivcor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nvrt</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">):</span>
+                <span class="n">hmod2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">node</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">elev</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">kbps</span> <span class="o">=</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">kbps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">depths</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">kbps</span><span class="p">:]</span> <span class="o">=</span> <span class="n">hmod2</span> <span class="o">*</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">nvrt</span><span class="o">-</span><span class="n">kbps</span><span class="p">]</span>
+                <span class="n">depths</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">kbps</span><span class="p">]</span> <span class="o">=</span> <span class="n">depths</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">kbps</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">depths</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+        <span class="k">elif</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">ivcor</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">h_s</span> <span class="o">=</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;h_s&#39;</span><span class="p">]</span>
+            <span class="n">h_c</span> <span class="o">=</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;h_c&#39;</span><span class="p">]</span>
+            <span class="n">kz</span> <span class="o">=</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;kz&#39;</span><span class="p">]</span>
+            <span class="n">c_s</span> <span class="o">=</span> <span class="n">vert_grid</span><span class="o">.</span><span class="n">c_s</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">):</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">elev</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>                
+                <span class="c1"># S-level</span>
+                <span class="n">hmod2</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">h_s</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vert_grid</span><span class="o">.</span><span class="n">sigma</span><span class="p">):</span>
+                    <span class="n">k_a</span> <span class="o">=</span> <span class="n">kz</span> <span class="o">+</span> <span class="n">k</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">hmod2</span> <span class="o">&lt;=</span> <span class="n">h_c</span><span class="p">:</span>
+                        <span class="n">depths</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k_a</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">hmod2</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">depths</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k_a</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_c</span> <span class="o">*</span> <span class="n">s</span> <span class="o">+</span> <span class="p">(</span><span class="n">hmod2</span> <span class="o">-</span> <span class="n">h_c</span><span class="p">)</span> <span class="o">*</span> <span class="n">c_s</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="c1"># Z-level</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vert_grid</span><span class="o">.</span><span class="n">ztot</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">depths</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+            <span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">depths</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="n">depths</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not supported ivcor&quot;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SchismVerticalMeshIoFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -338,28 +375,47 @@
         <span class="k">if</span> <span class="n">theta_f</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Wrong theta_f: theta_f &lt;= 0.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpath</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpath</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">,</span><span class="n">vgrid_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read vgrid.in</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vgrid</span> <span class="o">=</span> <span class="n">SchismLocalVerticalMesh</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vgrid</span> <span class="o">=</span> <span class="n">vgrid</span>
+        <span class="k">if</span> <span class="n">vgrid_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;vgrid_version input is required!&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
             <span class="n">ivcor</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">nvrt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">vgrid</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;nvrt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nvrt</span>
             <span class="n">sigmas</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
             <span class="n">kbps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">tkns</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tkns</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="k">break</span>
-                <span class="n">kbp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tkns</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-                <span class="n">kbps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kbp</span><span class="p">)</span>
-                <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">nvrt</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-                <span class="n">sigma</span><span class="p">[:</span><span class="n">nvrt</span> <span class="o">-</span> <span class="n">kbp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">tkns</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">nvrt</span> <span class="o">-</span> <span class="n">kbp</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]))</span>
-                <span class="n">sigmas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
-            <span class="n">vgrid</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span>
-            <span class="n">vgrid</span><span class="o">.</span><span class="n">kbps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kbps</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">vgrid_version</span><span class="o">==</span><span class="s2">&quot;5.8&quot;</span><span class="p">:</span> <span class="c1"># this is the old style of vgrid input            </span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">tkns</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tkns</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">break</span>
+                    <span class="n">kbp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tkns</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+                    <span class="n">kbps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kbp</span><span class="p">)</span>
+                    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">nvrt</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                    <span class="n">sigma</span><span class="p">[:</span><span class="n">nvrt</span> <span class="o">-</span> <span class="n">kbp</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">tkns</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="n">nvrt</span> <span class="o">-</span> <span class="n">kbp</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]))</span>
+                    <span class="n">sigmas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+                <span class="n">vgrid</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span>
+                <span class="n">vgrid</span><span class="o">.</span><span class="n">kbps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kbps</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">vgrid_version</span><span class="o">==</span><span class="s2">&quot;5.10&quot;</span><span class="p">:</span> <span class="c1"># this is the new style of vgrid input (from Dec 2021)</span>
+                <span class="n">kbps</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nvrt</span><span class="p">):</span>
+                    <span class="n">tkns</span> <span class="o">=</span> <span class="n">fin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tkns</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                    <span class="n">sigma</span><span class="p">[</span><span class="n">sigma</span><span class="o">==-</span><span class="mf">9.0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="n">sigmas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+                <span class="n">sigmas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                <span class="n">kbps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kbps</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># to conform to the old style  </span>
+                <span class="n">sigma_sort</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">sigmas</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sigmas</span><span class="p">):</span>
+                    <span class="n">sigma_sort</span><span class="p">[</span><span class="n">k</span><span class="p">,:</span><span class="n">nvrt</span> <span class="o">-</span> <span class="n">kbps</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">kbps</span><span class="p">[</span><span class="n">k</span><span class="p">]:]</span>
+                <span class="n">vgrid</span><span class="o">.</span><span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sigma_sort</span><span class="p">)</span>
+                <span class="n">vgrid</span><span class="o">.</span><span class="n">kbps</span> <span class="o">=</span> <span class="n">kbps</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vgrid version not recongnized: </span><span class="si">{</span><span class="n">vgrid_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">vgrid</span>
 
 
@@ -368,26 +424,57 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
 
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmesh</span><span class="p">,</span> <span class="n">fpath</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmesh</span><span class="p">,</span> <span class="n">fpath</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">,</span><span class="n">vgrid_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write vgrid.in</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vmesh</span><span class="o">.</span><span class="n">ivcor</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
-            <span class="n">n_max_levels</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">()</span>
-            <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_max_levels</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vmesh</span><span class="o">.</span><span class="n">sigma</span><span class="p">)):</span>
-                <span class="n">kbps</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">kbps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="n">n_levels</span> <span class="o">=</span> <span class="n">n_max_levels</span> <span class="o">-</span> <span class="n">kbps</span>
-                <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\t</span><span class="si">{}</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kbps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="n">buf</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-                                  <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="n">n_levels</span><span class="p">]])</span>
-                <span class="n">buf</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">vgrid_version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vgrid_version</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;vgrid_version input is required and must be string.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vgrid_version=&quot;</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vgrid_version</span> <span class="o">==</span> <span class="s1">&#39;5.8&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vmesh</span><span class="o">.</span><span class="n">ivcor</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                <span class="n">n_max_levels</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">()</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_max_levels</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vmesh</span><span class="o">.</span><span class="n">sigma</span><span class="p">)):</span>
+                    <span class="n">kbps</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">kbps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">n_levels</span> <span class="o">=</span> <span class="n">n_max_levels</span> <span class="o">-</span> <span class="n">kbps</span>
+                    <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\t</span><span class="si">{}</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">kbps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">buf</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">{:.6f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                                      <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">sigma</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="n">n_levels</span><span class="p">]])</span>
+                    <span class="n">buf</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">vgrid_version</span> <span class="o">==</span> <span class="s1">&#39;5.10&#39;</span><span class="p">:</span>
+            <span class="n">nmesh</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vmesh</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
+            <span class="n">kbps</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">kbps</span>
+            <span class="n">nvrt</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vmesh</span><span class="o">.</span><span class="n">ivcor</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                <span class="n">n_max_levels</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">()</span>
+                <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_max_levels</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+                <span class="n">buf</span> <span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%10d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">kbps</span><span class="p">])</span>
+                <span class="n">buf</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>            
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">sigma</span>
+                <span class="n">sigma_sort</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>             
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sigma</span><span class="p">):</span>
+                    <span class="n">sigma_sort</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">kbps</span><span class="p">[</span><span class="n">k</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">s</span><span class="p">[:</span><span class="n">nvrt</span> <span class="o">-</span> <span class="n">kbps</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span> 
+                <span class="c1"># transpose the matrix for output</span>
+                <span class="n">sigma_sort</span> <span class="o">=</span> <span class="n">sigma_sort</span><span class="o">.</span><span class="n">T</span> 
+                <span class="c1">#sigma_sort[np.isnan(sigma_sort)]=-9.0</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nvrt</span><span class="p">):</span>
+                    <span class="n">one_based_k</span><span class="o">=</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="n">buf</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%10d</span><span class="s2"> &quot;</span><span class="o">%</span> <span class="n">one_based_k</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%14.6f</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sigma_sort</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span> 
+                    <span class="n">buf</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown vgrid format: </span><span class="si">{</span><span class="n">vgrid_version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="read_vmesh"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_vertical_mesh.read_vmesh">[docs]</a><span class="k">def</span> <span class="nf">read_vmesh</span><span class="p">(</span><span class="n">fpath_vmesh</span><span class="p">):</span>
+<div class="viewcode-block" id="read_vmesh"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_vertical_mesh.read_vmesh">[docs]</a><span class="k">def</span> <span class="nf">read_vmesh</span><span class="p">(</span><span class="n">fpath_vmesh</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Read a vgrid file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">fpath_vmesh</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -399,7 +486,7 @@
 
     <span class="k">if</span> <span class="n">ivcor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">reader</span> <span class="o">=</span> <span class="n">SchismVerticalMeshIoFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="s1">&#39;local&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath_vmesh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath_vmesh</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">ivcor</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">reader</span> <span class="o">=</span> <span class="n">SchismVerticalMeshIoFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_reader</span><span class="p">(</span><span class="s1">&#39;sz&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath_vmesh</span><span class="p">)</span>
@@ -407,12 +494,54 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported vgrid type&#39;</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">write_vmesh</span><span class="p">(</span><span class="n">vmesh</span><span class="p">,</span> <span class="n">fpath_vmesh</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">write_vmesh</span><span class="p">(</span><span class="n">vmesh</span><span class="p">,</span> <span class="n">fpath_vmesh</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">,</span><span class="n">vgrid_version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">vgrid_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValueErorr</span><span class="p">(</span><span class="s2">&quot;vgrid_version is a required input!&quot;</span><span class="p">)</span> 
     <span class="k">if</span> <span class="n">vmesh</span><span class="o">.</span><span class="n">ivcor</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">writer</span> <span class="o">=</span> <span class="n">SchismVerticalMeshIoFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_writer</span><span class="p">(</span><span class="s1">&#39;local&#39;</span><span class="p">)</span>
-        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">vmesh</span><span class="p">,</span> <span class="n">fpath_vmesh</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">vmesh</span><span class="p">,</span> <span class="n">fpath_vmesh</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported vgrid type&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">convert_vmesh</span><span class="p">(</span><span class="n">vmesh_in</span><span class="p">,</span> <span class="n">vmesh_out</span><span class="p">,</span> <span class="n">input_vgrid</span><span class="o">=</span><span class="mf">5.8</span><span class="p">,</span> 
+                  <span class="n">output_vgrid</span><span class="o">=</span><span class="mf">5.9</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;conversion between old and new style of vgrid.in</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vgrid</span> <span class="o">=</span> <span class="n">read_vmesh</span><span class="p">(</span><span class="n">vmesh_in</span><span class="p">,</span><span class="n">input_vgrid</span><span class="p">)</span> 
+    <span class="n">write_vmesh</span><span class="p">(</span><span class="n">vgrid</span><span class="p">,</span><span class="n">vmesh_out</span><span class="p">,</span><span class="n">output_vgrid</span><span class="p">)</span> 
+        
+<span class="k">def</span> <span class="nf">compare_vmesh</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Comparing two vertical meshes and check if the values are equal in the two meshes</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    v1 : vgrid</span>
+<span class="sd">        First mesh, created by read_vmesh</span>
+<span class="sd">    v2 : vgrid</span>
+<span class="sd">        Second mesh, created by read_vmesh</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    equal=True or False</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">equal</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">v1</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;nvrt&#39;</span><span class="p">]</span><span class="o">!=</span><span class="n">v2</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;nvrt&#39;</span><span class="p">]:</span>
+        <span class="n">equal</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The number of vertical layers are not equal between the two meshes&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">v1</span><span class="o">.</span><span class="n">kbps</span> <span class="o">-</span> <span class="n">v2</span><span class="o">.</span><span class="n">kbps</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">equal</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;kbps are not equal between the two meshes&quot;</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">v1</span><span class="o">.</span><span class="n">sigma</span> <span class="o">-</span> <span class="n">v2</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+        <span class="n">equal</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sigma are not equal between the two meshes&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">equal</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;the two meshes are equal&quot;</span><span class="p">)</span>
+    
+    
 </pre></div>
 
             <div class="clearer"></div>
@@ -439,7 +568,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>
