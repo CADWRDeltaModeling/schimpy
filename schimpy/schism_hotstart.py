@@ -869,7 +869,7 @@ class VariableField(object):
             grid_nearest = np.where(grid_df.nearest == s)[0]
             zc = polaris_cast.loc[s]
             f = interpolate.interp1d(
-                zc['depth'], zc[variable.lower()], fill_value='extrapolate', kind='previous')
+                zc['depth'], zc[variable.lower()], fill_value='extrapolate')
             for g in grid_nearest:
                 depth = grid_depths[g]
                 v[g, :] = f(depth)
