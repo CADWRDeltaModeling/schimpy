@@ -42,7 +42,7 @@ nudging:
             variables: 
                 - name: temperature
                   data: ./nudging_data_temperature.csv  #this could be a csv file or a netcdf file (time series required). 
-                  none_values: ignore
+                  none_values: ambient
                 - name: salinity
                   data: ./nudging_data_salinity.csv
-                  none_values: ignore
+                  none_values: ambient

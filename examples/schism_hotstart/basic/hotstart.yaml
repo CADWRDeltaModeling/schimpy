@@ -6,7 +6,7 @@ hotstart:
     elevation:  
         initializer: 
             simple_trend: 
-                value: 0.97 + 1.e-5*x      #x, y, and z coordinate based equation (x and y are utm based)
+                value: max(0.97,-z-0.01)      #x, y, and z coordinate based equation (x and y are utm based)
     temperature:
         initializer: 
             patch_init: 
