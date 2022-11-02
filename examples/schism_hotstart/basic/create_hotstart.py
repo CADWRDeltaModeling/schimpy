@@ -14,7 +14,7 @@ hotstart_fn = "hotstart.nc" # output hotstart file
 ini_date = '2021-04-20' 
 
 # create a hotstart file for SCHISM
-h = sh.hotstart(yaml_fn,modules=modules,param_nml='./data_in/param.nml.clinic',
+h = sh.hotstart(yaml_fn,modules=modules,
                 proj4 ='EPSG:32610')
 h.create_hotstart()
 hnc = h.nc_dataset
