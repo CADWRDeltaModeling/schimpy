@@ -1005,6 +1005,8 @@ class nudging(object):
                         vdata = vdata.fillna(-9999.)
                     # elif none_values == 'ignore':
                     #     vdata = vdata.dropna(dim='site',how='any') 
+                    else:
+                        raise NotImplementedError("Fill nan option %s is not implemented"%none_values)
                     if len(vdata.site)==0:
                         empty_data = True
                 elif isinstance(vdata,xr.core.dataarray.Dataset): # the only possibility this happens is that the variable is not in the dataset
