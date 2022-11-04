@@ -993,7 +993,8 @@ class nudging(object):
                         raise ValueError("nan values detected for %s in %s"%(v,v['data']))
                     elif none_values == 'ambient':
                         vdata = vdata.fillna(-9999.)
-                    raise NotImplementedError("Fill nan option %s is not implemented"%none_values)
+                    else:
+                        raise NotImplementedError("Fill nan option %s is not implemented"%none_values)
                 if isinstance(vdata, xr.core.dataarray.DataArray): #xarray
                     vdata = vdata.dropna(dim='site',how='all')
                     # if none_values == 'interpolate':
