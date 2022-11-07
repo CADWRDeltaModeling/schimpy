@@ -132,8 +132,8 @@ class hotstart(object):
             self.param_nml = "param.nml" # for all other modules, param.nml will not be used.
                 
         if self.crs is None:
-            if crs not in hotstart_info.keys():
-                self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system. 
+            if 'crs' not in hotstart_info.keys():
+                self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.
             #    raise ValueError("crs must be specified")
             else:
                 crs = hotstart_info['crs']
