@@ -695,7 +695,7 @@ class VariableField(object):
             text_fn = self.get_value(ini_meta)
         else:
             text_fn = self.get_value(self.ini_meta)
-        if text_fn.endswith('.ic'):
+        if text_fn.endswith('.ic') or text_fn.endswith('.gr3'):
             if self.centering == 'node2D':
                 reader = SchismMeshGr3Reader()  # the ic file has the same format as the .gr3 file
                 reader.read(fpath_mesh=text_fn)
@@ -742,7 +742,7 @@ class VariableField(object):
                         "The horizontal dim of %f does not match with the mesh grid" % text_fn)
         else:
             raise TypeError(
-                "Only .ic, .prop, or .nc are allowed as text input")
+                "Only .ic, .gr3, .prop, or .nc are allowed as text input")
 
         vmap = np.squeeze(vmap)
         vdim = np.shape(vmap)
