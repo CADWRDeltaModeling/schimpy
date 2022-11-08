@@ -651,8 +651,8 @@ class VariableField(object):
 
         if isinstance(value, (float, int)):
             # initialize the 3D field
-            v_ini = np.zeros((n_hgrid, self.n_vgrid))
-            return v_ini + value
+            v_ini = np.full((n_hgrid, self.n_vgrid), value)
+            return v_ini
         elif isinstance(value, str):
             if ('max' in value) & ('np.maximumm' not in value):
                 value = value.replace('max','np.maximum')
