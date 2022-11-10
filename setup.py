@@ -59,7 +59,8 @@ setup(
             'small_areas=schimpy.small_areas:main',
             'station=schimpy.station:main',
             'create_hotstart=schimpy.schism_hotstart:main',
-            'create_nudging=schimpy.schism_nudging:main'
+            'create_nudging=schimpy.schism_nudging:main',
+            'interpolate_structure=schimpy.interpolate_structure:main'
         ],
     },
     install_requires=requirements,

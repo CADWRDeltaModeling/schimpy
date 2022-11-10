@@ -1,0 +1,29 @@
+datetime install ndup_weir op_down_weir op_up_weir elev_weir width_weir ndup_pipe down_op_pipe up_op_pipe elev_pipe radius_pipe
+1990-01-01T00:00 0 1 1.0 1.0 -6.00 210.0 48 1.5 1.5 -3. 0.0   # Undefined before 1990
+2015-01-01T00:00 0 1 1.0 1.0 -6.00 210.0 48 1.5 1.5 -3. 0.0   # Added point, no change
+2015-05-14T09:00 1 1 1.0 1.0 -6.00 210.0 48 1.5 1.5 -3. 0.0   # Begin 2015 installation
+2015-05-19T00:00 1 1 1.0 1.0 -2.43 210.0 48 1.5 1.5 -3. 0.0   # Pause at this elevation while closing width
+2015-05-27T00:00 1 1 1.0 1.0 -2.43 5.2 48 1.5 1.5 -3. 0.595   # Rapidly finish closure
+2015-05-28T00:00 1 1 1.0 1.0 10.00 0.0 48 1.5 1.5 -3. 0.61    # Closure
+2015-09-30T23:00 1 1 1.0 1.0 10.00 0.0 48 1.5 1.5 -3. 0.61    # Fall pre-breach, added point so intermediate times will be dropped
+2015-10-01T00:00 1 1 1.0 1.0  4.00 0.0 48 1.5 1.5 -3. 0.61    # Breach
+2015-10-31T23:00 1 1 1.0 1.0 -6.00 210.0 48 1.5 1.5 -3. 0.0   # Removed but installed
+2015-11-01T00:00 0 1 1.0 1.0 -6.00 210.0 48 1.5 1.5 -3. 0.0   # Now uninstalled
+2021-01-01T00:00 0 1 1.0 1.0 -6.00 210.00 48 1.5 1.5 -3. 0.0  # Added point to mark the passing of years, no change
+2021-05-31T23:00 0 1 1.0 1.0 -6.00 210.00 48 1.5 1.5 -3. 0.0  # Added point to prevent interpolation so intermediate times will be droppped
+2021-06-01T00:00 1 1 1.0 1.0 -6.00 200.00 48 1.5 1.5 -3. 0.0  # Start install 2021 with slightly different nominal width
+2021-06-08T00:00 1 1 1.0 1.0 -2.43 200.00 48 1.5 1.5 -3. 0.0  # Pause at -2.43 elev, start to decrease width, ramp leakage
+2021-06-22T00:00 1 1 1.0 1.0 -2.43 10.00 48 1.5 1.5 -3. 0.61  # Start rapid completion of closure
+2021-06-22T01:00 1 1 1.0 1.0 10.00 0.00 48 1.5 1.5 -3. 0.61   # Closed
+2022-01-06T23:00 1 1 1.0 1.0 10.00 0.00 48 1.5 1.5 -3. 0.61   # Pre-notch. Added identical point so intermediate times will be dropped
+2022-01-07T00:00 1 1 1.0 1.0 -3.70 0.00 48 1.5 1.5 -3. 0.61   # Start increasing width for notching with depth fixed at notch elev
+2022-01-17T23:00 1 1 1.0 1.0 -3.70 120.00 48 1.5 1.5 -3. 0.0  # Notch complete
+2022-04-07T00:00 1 1 1.0 1.0 -3.70 120.00 48 1.5 1.5 -3. 0.0  # Begin historical re-closure by decreasing width of notch, ramp in leakage
+2022-04-11T00:00 1 1 1.0 1.0 -3.70 0.00 48 1.5 1.5 -3. 0.61   # Width part complete
+2022-04-11T01:00 1 1 1.0 1.0 10.00 0.00 48 1.5 1.5 -3. 0.61   # Closed
+2022-10-31T23:00 1 1 1.0 1.0 10.00 0.00 48 1.5 1.5 -3. 0.61   # Duplicate for flat interpolation 
+2022-11-01T00:00 1 1 1.0 1.0 10.00 0.00 48 1.5 1.5 -3. 0.61   # Begin removal with width, elev and leakage
+2022-11-05T00:00 1 1 1.0 1.0 -6.00 57.14 48 1.5 1.5 -3. 0.0   # Depth and leakage complete
+2022-11-14T23:00 1 1 1.0 1.0 -6.00 200.00 48 1.5 1.5 -3. 0.0  # Full width, still installed
+2022-11-15T00:00 0 1 1.0 1.0 -6.00 200.00 48 1.5 1.5 -3. 0.0  # Full width, not installed
+
