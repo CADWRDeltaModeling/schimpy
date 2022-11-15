@@ -20,6 +20,7 @@ from shapely.geometry import Polygon
 from schimpy  import Interp2D
 import time as timer
 from vtools.data.vtime import hours,days
+import os
 
 class nudging(object):
     """
@@ -37,6 +38,9 @@ class nudging(object):
         """
         read yaml and load mesh grid
         """
+
+        write_to_log("---read_yaml---\n")
+
         with open(self.yaml_fn) as file:
             info = yaml.load(file, Loader=yaml.FullLoader)
         nudging_info = info['nudging']
@@ -102,6 +106,9 @@ class nudging(object):
         None.
 
         """
+
+        write_to_log("---create_nudging---\n")
+
         weights_comb, values_comb, imap_comb = self.get_nudging_comb()
         
         weights_var, values_var, imap_var, var_v = self.organize_nudging(
@@ -114,6 +121,9 @@ class nudging(object):
                 create_file=True)    
     
     def organize_nudging(self, weights_comb, values_comb, imap_comb):   
+
+        write_to_log("---organize_nudging---\n")
+
         weights_list = [] #dimension [region, var, node]
         values_list = [] # dimensino [region, var, time, map_node, nlevel]
         imap_list = [] # dimension [region, var, map_node] 
@@ -182,6 +192,9 @@ class nudging(object):
         return weights_var, values_var, imap_var, var_v
 
     def get_nudging_comb(self):
+
+        write_to_log("---get_nudging_comb---\n")
+
         weights_comb = []
         values_comb = []
         imap_comb = []
@@ -195,7 +208,9 @@ class nudging(object):
     
     def concatenate_nudge(self, weights_var, values_var, imap_var,
                           var_newlist, create_file=True):
-            
+
+        write_to_log("---concatenate_nudge---\n")
+
         for i, v in enumerate(var_newlist):
             # merge all the mapping values
             imap_merged = []
@@ -293,6 +308,9 @@ class nudging(object):
         #return values_merged, weights_merged, imap_merged
     
     def create_region_nudging(self, region_info):
+
+        write_to_log("---create_region_nudging---\n")
+
         if region_info['type'] == 'roms':
             weights, values_list, imap, time = self.gen_nudge_roms(region_info)
             #values_list =  [vl[:,imap,:] for vl in values_list]
@@ -312,6 +330,9 @@ class nudging(object):
         return weights_list, values_list, imap_list
     
     def gen_nudge_roms(self,region_info):
+
+        write_to_log("---gen_nudge_roms---\n")
+
         rjunk = 9998 #!Define junk value for sid; the test is abs()>rjunk
         hr_char = ['03','09','15','21'] #each day has 4 starting hours in ROMS
         small1 = 1.e-2 #used to check area ratios
@@ -388,7 +409,7 @@ class nudging(object):
                 datetime.timedelta(d)
             day = (datetime.date(istart_year,istart_mon,istart_day) - 
                 self.start_date).days + d
-            print('Time out (days)=%d'%day)  
+            write_to_log('Time out (days)=%d\n'%day)
             for hr in hr_char:
                 ncfile = "%s%4d%02d%02d%s.nc"%(ncfile1,date.year,date.month,
                                             date.day,hr)                
@@ -424,7 +445,7 @@ class nudging(object):
                     break                
                 
                 if time[0] != np.datetime64(date) + np.timedelta64(int(hr),'h'):
-                    print("Initial time in %s does not match the filename: %s: modification will be applied "%(ncfile,time[0]))
+                    write_to_log("Initial time in %s does not match the filename: %s: modification will be applied\n"%(ncfile,time[0]))
                     dt_adj = np.datetime64(date) + np.timedelta64(int(hr),'h') - time[0]
                     ncdata['time'] = ncdata['time'] + dt_adj 
                     time = ncdata.time.values
@@ -433,7 +454,7 @@ class nudging(object):
                     ctime = pd.to_datetime(t)
                     dt = ctime-pd.to_datetime(self.start_date) 
                     dt_in_days = dt.total_seconds()/86400.
-                    print(f"Time out at hr stage (days)={ctime}, dt ={dt_in_days} ")                  
+                    write_to_log(f"Time out at hr stage (days)={ctime}, dt ={dt_in_days}\n")
                     irecout += 1 
 
                     #Make sure it2=ilo is output (output at precisely the time interval)
@@ -444,7 +465,7 @@ class nudging(object):
                         continue
 
                     irecout2 += 1
-                    print("irecount: %d"%irecout)
+                    write_to_log("irecount: %d\n"%irecout)
                            
                     #if  'temp' in var_list:
                     temp = ncdata['temp'].sel(time=t).transpose(
@@ -516,7 +537,7 @@ class nudging(object):
                     wetj = wetij[1] 
                     
                     if wetij[0].size==0:
-                        print("no ROMS data available for: %s"%str(ctime))
+                        write_to_log("no ROMS data available for: %s\n"%str(ctime))
                         salt = -9999.0*np.ones_like(salt)
                         temp = -9999.0*np.ones_like(temp)
                     else: 
@@ -577,7 +598,7 @@ class nudging(object):
                                     #     any(temp[i,j,:]>tempmax):
                                     #     print("Fatal: no valid values:%s,%d,%d for salt or temp at"
                                     #           (ncfile,i,j))  
-                        print("dealing with horizontal nan values!") 
+                        write_to_log("dealing with horizontal nan values!\n")
                         #print("time3=%f"%(timer.time() - start))
                     
                     if d ==0 and hr == hr_char[0] and t==time[ilo]:
@@ -898,8 +919,8 @@ class nudging(object):
                 
                     #             #Enforce lower bound for temp. for eqstate
                     #             tempout[k,i]=max(0.,tempout[k,i])  
-                    print("applying spatial interpolation!")          
-                    print("outputting at day ",dt.total_seconds()/86400, npout) 
+                    write_to_log("applying spatial interpolation!\n")
+                    write_to_log(f"outputting at day , {dt.total_seconds()/86400}, {npout}\n")
                     
                     # only save the nodes with valid values. 
                     tempout_in = [temp_t[imap[:npout]] for temp_t in tempout]
@@ -924,8 +945,9 @@ class nudging(object):
         salinity = np.transpose(salinity,(0,2,1))        
         #Enforce lower bound for temp. for eqstate
         temperature[temperature<0]== 0 
-        print("reorganizing matrix!")  
+        write_to_log("reorganizing matrix!\n")
         #print("time=%f"%(timer.time() - start))
+
         return weights, [temperature, salinity], \
             imap[:npout].astype(int), output_day   #schism is one-based 
 
@@ -943,9 +965,13 @@ class nudging(object):
         return [var_info[i] for i in idx]
        
     def gen_nudge_obs(self, region_info):
+
+        write_to_log("---gen_nudge_obs---\n")
+
         cutoff = 1e3  #when weights are less than cutoff, they will be set to zero
         weights, obs_df = self.gen_region_weight(region_info['attribute'],
                                                  region_info['vertices'])
+
         if len(obs_df)>1:
             obs_sites = obs_df.index.values
         weights[weights<weights.max()/cutoff] = 0
@@ -1045,8 +1071,8 @@ class nudging(object):
             
             imap_v = np.where(weights_v>0)[0]            
             if (len(obs_df)>1) & (len(vdata_sites)>1): # multiple sites    
-                print(vdata_sites)
-                print(obs_df)                
+                write_to_log(vdata_sites)
+                write_to_log(obs_df)
                 obs_x = obs_df.loc[vdata_sites].x.values.astype(float)
                 obs_y = obs_df.loc[vdata_sites].y.values.astype(float)                
                                      
@@ -1179,6 +1205,9 @@ class nudging(object):
         return weights_list, values_list, imap_list          
 
     def read_data(self, data):
+
+        write_to_log("---read_data---\n")
+
         if data.endswith('csv'):
             obs = pd.read_csv(data,index_col='datetime',parse_dates=['datetime'])
             obs.index.name = 'time'   
@@ -1202,6 +1231,9 @@ class nudging(object):
         return obs        
 
     def gen_region_weight(self, attribute, vertices):
+
+        write_to_log("---gen_region_weight---\n")
+
         if isinstance(attribute, str):
             if vertices:
                 inpoly = self.in_vertices(vertices)
@@ -1276,6 +1308,9 @@ class nudging(object):
                     "%s kernel not implemented"%attribute['kernel'])
                 
     def plot(self,imap,values,**kwargs):
+
+        write_to_log("---plot---\n")
+
         v = np.zeros(self.nnode)
         v[imap] = values
         col = self.mesh.plot_nodes(v,**kwargs)
@@ -1302,8 +1337,20 @@ def create_arg_parser():
     parser.add_argument('--suffix',type=str, help='suffix for generated nudging files', default=None)
     parser.add_argument('--crs',type=str,help='The projection system for the mesh',default=None)
     return parser
+
+log_file = "log_nudging.out"
+def write_to_log(message):
+    global log_file
     
+    if(os.path.exists(log_file)):
+        with open(log_file,"a") as f:
+            f.write(message)
+    else:
+        with open(log_file,"w") as f:
+            f.write(message)
+
 def main():
+
     # User inputs override the yaml file inputs.  
     parser = create_arg_parser() 
     args = parser.parse_args()
@@ -1312,6 +1359,6 @@ def main():
                                      suffix=suffix)
     nudging.read_yaml()
     nudging.create_nudging()
-           
+
 if __name__ == "__main__":
     main()
