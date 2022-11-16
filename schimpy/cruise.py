@@ -50,7 +50,12 @@ def process_cruise(path):
         if not station in cruise_data.keys():
             cruise_data[station] = ([],[],time)
         depth = float(entry[3])
-        salinity = float(entry[4])
+        try:
+            salinity = float(entry[4])
+        except ValueError:
+            print(path+" station no."+station+" has invalid salinity observation!")
+            cruise_data.pop(station,None)
+            continue
         cruise_data[station][0].append(depth)
         cruise_data[station][1].append(salinity)
     for station in cruise_data.keys():
@@ -426,9 +431,9 @@ if __name__== "__main__":
             print("processing crusier data "+file_name)
             cruise_time=parser.parse(match_re.group("date"))
             xyt_file="station.xyt"
-            gen_station_xyt(base_date,cruise_time,file_name,station_file,xyt_file)
-            copyfile(os.path.join(data_folder,xyt_file),os.path.join(schism_output_folder,xyt_file))
-            cmd = ['read_output9_xyt.exe']
+            gen_station_xyt(base_date,cruise_time,os.path.join(data_folder,file_name),os.path.join(data_folder,station_file),xyt_file)
+            copyfile(xyt_file,os.path.join(schism_output_folder,xyt_file))
+            cmd = ['read_output9_xyt']
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE,cwd=schism_output_folder)
             for line in p.stdout:
                 print(line)
@@ -436,8 +441,8 @@ if __name__== "__main__":
             if (p.returncode):
                 raise ChildProcessError("Fail to extract schism outputs")
             model_salt="salt_"+match_re.group("date")
-            copyfile(os.path.join(schism_output_folder,"fort.18"),os.path.join(data_folder,model_salt))
-            gen_profile_plot(base_date,cruise_time,file_name,model_salt,station_file,xyt_file)
+            copyfile(os.path.join(schism_output_folder,"fort.18"),os.path.join(schism_output_folder,model_salt))
+            gen_profile_plot(base_date,cruise_time,os.path.join(data_folder,file_name),os.path.join(schism_output_folder,model_salt),os.path.join(data_folder,station_file),os.path.join(schism_output_folder,xyt_file))
             
             
 
