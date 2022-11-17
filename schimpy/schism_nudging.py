@@ -1105,7 +1105,7 @@ class nudging(object):
                             obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
                             vals = vals[~np.isnan(vals)]
                             if (vals<0).any():
-                                raise Exception("negative values detected in %s for %s: "%(v['data'],name)+ 
+                                raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
                             # removing all the nans.                            
                             invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
@@ -1121,7 +1121,7 @@ class nudging(object):
                             obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
                             vals = vals[~np.isnan(vals)]     
                             if (vals<0).any():
-                                raise Exception("negative values detected in %s for %s: "%(v['data'],name)+ 
+                                raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
                             invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
                                            leafsize=10, stat=1)
