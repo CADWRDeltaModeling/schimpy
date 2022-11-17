@@ -68,7 +68,7 @@ class nudging(object):
         self._mesh_gpd = None
         self._z = None
         if self.crs is None:
-            if 'crs' in nudging_info['crs']:
+            if 'crs' in nudging_info:
                 self.crs = nudging_info['crs']
             else:
                 self.crs = 'EPSG:26910' # this is required because ROMS only provides lat, lon. 
