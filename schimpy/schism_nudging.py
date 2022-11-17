@@ -1097,11 +1097,12 @@ class nudging(object):
                     values_v = vdata.isel(site=nn_id).values    
                 elif method == 'inverse_distance':
                     obs_loc = np.array([obs_x,obs_y]).T
-                    values_v = []
+                    values_v = [[] for i in range(len(vdata))]
+                    vdata[vdata==-9999.0] = np.nan
                     if isinstance(vdata,xr.core.dataarray.DataArray):
+                        i=0
                         for t in vdata.indexes['time']:
                             vals = vdata.sel(time=t).values
-                            vals[vals==-9999.0] = np.nan
                             obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
                             vals = vals[~np.isnan(vals)]
                             if (vals<0).any():
@@ -1112,12 +1113,12 @@ class nudging(object):
                                            leafsize=10, stat=1)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
-                            values_v.append(invdisttree(node_xy, nnear=4, p=2))
-
-                    else:    
+                            values_v[i]=invdisttree(node_xy, nnear=4, p=2)
+                            i+=1
+                    else:
+                        i=0
                         for t in vdata.index:
                             vals = vdata.loc[t].values
-                            vals[vals==-9999.0] = np.nan
                             obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
                             vals = vals[~np.isnan(vals)]     
                             if (vals<0).any():
@@ -1127,7 +1128,8 @@ class nudging(object):
                                            leafsize=10, stat=1)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
-                            values_v.append(invdisttree(node_xy, nnear=4, p=2))
+                            values_v[i]=invdisttree(node_xy, nnear=4, p=2)
+                            i+=1
                 else:
                      raise NotImplementedError                  
             else: # single site
