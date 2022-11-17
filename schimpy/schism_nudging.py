@@ -22,6 +22,7 @@ import time as timer
 from vtools.data.vtime import hours,days
 import os
 
+log_file = "log_nudging.out"
 class nudging(object):
     """
     A class to create schism nudging
@@ -106,6 +107,9 @@ class nudging(object):
         None.
 
         """
+        global log_file
+        if(os.path.exists(log_file)):
+            os.remove(log_file)
 
         write_to_log("---create_nudging---\n")
 
@@ -1346,23 +1350,17 @@ def create_arg_parser():
     parser.add_argument('--crs',type=str,help='The projection system for the mesh',default=None)
     return parser
 
-log_file = "log_nudging.out"
 def write_to_log(message):
     if type(message)==pd.core.indexes.base.Index:
         message=', '.join(message.to_list())+'\n'
     elif type(message) == pd.core.frame.DataFrame:
         message=message.to_string()+'\n'
     global log_file
-    
-    if(os.path.exists(log_file)):
-        with open(log_file,"a") as f:
-            f.write(message)
-    else:
-        with open(log_file,"w") as f:
-            f.write(message)
+
+    with open(log_file,"a") as f:
+        f.write(message)
 
 def main():
-
     # User inputs override the yaml file inputs.  
     parser = create_arg_parser() 
     args = parser.parse_args()
