@@ -437,6 +437,13 @@ class nudging(object):
 
                 time = ncdata['time'].values
                 
+                
+                if time[0] != np.datetime64(date) + np.timedelta64(int(hr),'h'):
+                    print("Initial time in %s does not match the filename: %s: modification will be applied "%(ncfile,time[0]))
+                    dt_adj = np.datetime64(date) + np.timedelta64(int(hr),'h') - time[0]
+                    ncdata['time'] = ncdata['time'] + dt_adj 
+                    time = ncdata.time.values
+                    
                 if time[-1]< np.datetime64(self.start_date)+ \
                     np.timedelta64(8,'h'):
                     continue
@@ -444,11 +451,6 @@ class nudging(object):
                     np.timedelta64(8,'h'):
                     break                
                 
-                if time[0] != np.datetime64(date) + np.timedelta64(int(hr),'h'):
-                    write_to_log("Initial time in %s does not match the filename: %s: modification will be applied\n"%(ncfile,time[0]))
-                    dt_adj = np.datetime64(date) + np.timedelta64(int(hr),'h') - time[0]
-                    ncdata['time'] = ncdata['time'] + dt_adj 
-                    time = ncdata.time.values
 
                 for t in time[ilo:]:
                     ctime = pd.to_datetime(t)
@@ -947,6 +949,12 @@ class nudging(object):
         temperature[temperature<0]== 0 
         write_to_log("reorganizing matrix!\n")
         #print("time=%f"%(timer.time() - start))
+        max_time = self.time[-1].total_seconds()/3600/24+8/24
+        output_day = np.array(output_day)
+        if max_time<output_day[-1]: 
+            temperature = temperature[output_day<=max_time,:,:]
+            salinity = salinity[output_day<=max_time,:,:]
+            output_day = output_day[output_day<=max_time]
 
         return weights, [temperature, salinity], \
             imap[:npout].astype(int), output_day   #schism is one-based 
