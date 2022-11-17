@@ -1348,6 +1348,10 @@ def create_arg_parser():
 
 log_file = "log_nudging.out"
 def write_to_log(message):
+    if type(message)==pd.core.indexes.base.Index:
+        message=', '.join(message.to_list())+'\n'
+    elif type(message) == pd.core.frame.DataFrame:
+        message=message.to_string()+'\n'
     global log_file
     
     if(os.path.exists(log_file)):
