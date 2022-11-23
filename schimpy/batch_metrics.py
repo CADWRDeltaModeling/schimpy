@@ -20,7 +20,7 @@ import schimpy.schism_yaml as schism_yaml
 from vtools.data.vtime import days, hours
 from vtools.functions.error_detect import med_outliers
 import argparse
-from vtools.datastore.read_ts import read_ts
+from dms_datastore.read_ts import read_ts
 import schimpy.station as station
 import numpy as np
 from datetime import datetime
