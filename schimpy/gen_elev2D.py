@@ -13,8 +13,8 @@ import pandas as pd
 from netCDF4 import Dataset
 from schimpy.separate_species import separate_species
 from schimpy.schism_mesh import read_mesh
-from vtools.data.vtime import hours, days, seconds
-from vtools.datastore.read_ts import read_noaa, read_ts
+from vtools import hours, days, seconds
+from dms_datastore.read_ts import read_noaa, read_ts
 import numpy as np
 from datetime import datetime
 import struct, argparse, re
