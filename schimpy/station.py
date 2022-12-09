@@ -268,9 +268,8 @@ def read_obs_links(fpath):
                      header=0,
                      index_col=["id", "subloc", "variable"],
                      comment="#")
-    df.index.set_levels(df.index.levels[0].astype(str).str.lower(),
-                        level=0,
-                        inplace=True)
+    df.index = df.index.set_levels(df.index.levels[0].astype(str).str.lower(),
+                        level=0)
     dups = df.index.duplicated(keep='last')
     ndup = dups.sum(axis=0)
     if ndup > 0:
