@@ -64,8 +64,11 @@ class BatchMetrics(object):
                 parameters
         """
         self.params = params
-        # self.sim_outputs = None
-        # self.tss = []
+        if "obs_search_path" in params:
+            self.obs_search_path = params["obs_search_path"]
+        else:
+            self.obs_search_path = None
+
         self.logger = logging.getLogger("metrics")
 
     def read_simulation_outputs(self, variable, outputs_dir,
@@ -183,22 +186,21 @@ class BatchMetrics(object):
             try:
                 fpath_obs = db_obs.loc[(station_id, subloc, variable), "path"]
             except:
-                repo = "//cnrastore-bdo/Modeling_Data/continuous_station_repo_beta/formatted_1yr"
-
-                possible = db_obs.loc[(station_id, subloc, variable), "filename"]
-                print(possible)
-                fpath_obs = os.path.join(repo,possible)
+                fpath_obs = None
+                for repo in self.obs_search_path:
+                    possible = db_obs.loc[(station_id, subloc, variable), "filename"]
+                    fpath_obs = os.path.join(repo,possible)
+                    if os.path.exists(fpath_obs): 
+                        break
+                    
         else:
             fpath_obs = None
 
         if fpath_obs_fnd:
             absfpath = os.path.abspath(fpath_obs)
-            if data_expected is True:
-                self.logger.info(
-                    "Observation file for id {}: {}".format(station_id, absfpath))
-            else:
-                self.logger.warning("File link {} found for station {} but station not expected to have data for variable: {}".format(
-                    absfpath, station_id, variable))
+            self.logger.info(
+                 "Observation file for id {}: {}".format(station_id, absfpath))
+
         else:
             expectstr = '(Data not expected)' if (
                 not data_expected) else '(Not in the file links)'
@@ -216,12 +218,8 @@ class BatchMetrics(object):
         
         if fpath_obs:
             if os.path.exists(fpath_obs) or len(glob.glob(fpath_obs)) > 0:
-                print("file exists")
                 try:
                     ts_obs = read_ts(fpath_obs)
-                    print(window[0],window[1])
-                    #.loc[window[0]:window[1]] #, start=window[0], end=window[1])
-                    print(ts_obs)
                     if ts_obs.shape[1] > 1:
                         raise Exception(
                             "Multiple column series received. Need to implement selector")
