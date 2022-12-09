@@ -6,7 +6,7 @@ visualize the results.
 @author: zzhang
 """
 
-from schism_nudging import schism_nudging
+from schimpy import schism_nudging
 from schimpy.schism_mesh import read_mesh
 import xarray as xr
 import matplotlib.pyplot as plt
