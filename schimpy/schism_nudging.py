@@ -22,6 +22,7 @@ import time as timer
 from vtools.data.vtime import hours,days
 import os
 
+log_file = "log_nudging.out"
 class nudging(object):
     """
     A class to create schism nudging
@@ -67,7 +68,7 @@ class nudging(object):
         self._mesh_gpd = None
         self._z = None
         if self.crs is None:
-            if 'crs' in nudging_info['crs']:
+            if 'crs' in nudging_info:
                 self.crs = nudging_info['crs']
             else:
                 self.crs = 'EPSG:26910' # this is required because ROMS only provides lat, lon. 
@@ -106,6 +107,9 @@ class nudging(object):
         None.
 
         """
+        global log_file
+        if(os.path.exists(log_file)):
+            os.remove(log_file)
 
         write_to_log("---create_nudging---\n")
 
@@ -437,6 +441,13 @@ class nudging(object):
 
                 time = ncdata['time'].values
                 
+                
+                if time[0] != np.datetime64(date) + np.timedelta64(int(hr),'h'):
+                    print("Initial time in %s does not match the filename: %s: modification will be applied "%(ncfile,time[0]))
+                    dt_adj = np.datetime64(date) + np.timedelta64(int(hr),'h') - time[0]
+                    ncdata['time'] = ncdata['time'] + dt_adj 
+                    time = ncdata.time.values
+                    
                 if time[-1]< np.datetime64(self.start_date)+ \
                     np.timedelta64(8,'h'):
                     continue
@@ -444,11 +455,6 @@ class nudging(object):
                     np.timedelta64(8,'h'):
                     break                
                 
-                if time[0] != np.datetime64(date) + np.timedelta64(int(hr),'h'):
-                    write_to_log("Initial time in %s does not match the filename: %s: modification will be applied\n"%(ncfile,time[0]))
-                    dt_adj = np.datetime64(date) + np.timedelta64(int(hr),'h') - time[0]
-                    ncdata['time'] = ncdata['time'] + dt_adj 
-                    time = ncdata.time.values
 
                 for t in time[ilo:]:
                     ctime = pd.to_datetime(t)
@@ -947,6 +953,12 @@ class nudging(object):
         temperature[temperature<0]== 0 
         write_to_log("reorganizing matrix!\n")
         #print("time=%f"%(timer.time() - start))
+        max_time = self.time[-1].total_seconds()/3600/24+8/24
+        output_day = np.array(output_day)
+        if max_time<output_day[-1]: 
+            temperature = temperature[output_day<=max_time,:,:]
+            salinity = salinity[output_day<=max_time,:,:]
+            output_day = output_day[output_day<=max_time]
 
         return weights, [temperature, salinity], \
             imap[:npout].astype(int), output_day   #schism is one-based 
@@ -1085,37 +1097,39 @@ class nudging(object):
                     values_v = vdata.isel(site=nn_id).values    
                 elif method == 'inverse_distance':
                     obs_loc = np.array([obs_x,obs_y]).T
-                    values_v = []
+                    values_v = [[] for i in range(len(vdata))]
+                    vdata[vdata==-9999.0] = np.nan
                     if isinstance(vdata,xr.core.dataarray.DataArray):
+                        i=0
                         for t in vdata.indexes['time']:
                             vals = vdata.sel(time=t).values
-                            vals[vals==-9999.0] = np.nan
                             obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
                             vals = vals[~np.isnan(vals)]
                             if (vals<0).any():
-                                raise Exception("negative values detected in %s for %s: "%(v['data'],name)+ 
+                                raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
                             # removing all the nans.                            
                             invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
                                            leafsize=10, stat=1)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
-                            values_v.append(invdisttree(node_xy, nnear=4, p=2))
-
-                    else:    
+                            values_v[i]=invdisttree(node_xy, nnear=4, p=2)
+                            i+=1
+                    else:
+                        i=0
                         for t in vdata.index:
                             vals = vdata.loc[t].values
-                            vals[vals==-9999.0] = np.nan
                             obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
                             vals = vals[~np.isnan(vals)]     
                             if (vals<0).any():
-                                raise Exception("negative values detected in %s for %s: "%(v['data'],name)+ 
+                                raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
                             invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
                                            leafsize=10, stat=1)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
-                            values_v.append(invdisttree(node_xy, nnear=4, p=2))
+                            values_v[i]=invdisttree(node_xy, nnear=4, p=2)
+                            i+=1
                 else:
                      raise NotImplementedError                  
             else: # single site
@@ -1338,19 +1352,17 @@ def create_arg_parser():
     parser.add_argument('--crs',type=str,help='The projection system for the mesh',default=None)
     return parser
 
-log_file = "log_nudging.out"
 def write_to_log(message):
+    if type(message)==pd.core.indexes.base.Index:
+        message=', '.join(message.to_list())+'\n'
+    elif type(message) == pd.core.frame.DataFrame:
+        message=message.to_string()+'\n'
     global log_file
-    
-    if(os.path.exists(log_file)):
-        with open(log_file,"a") as f:
-            f.write(message)
-    else:
-        with open(log_file,"w") as f:
-            f.write(message)
+
+    with open(log_file,"a") as f:
+        f.write(message)
 
 def main():
-
     # User inputs override the yaml file inputs.  
     parser = create_arg_parser() 
     args = parser.parse_args()

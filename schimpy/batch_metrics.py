@@ -1,37 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# todo
-# unit conversions
-""" Create metrics plots in a batch mode
-    Python version 2.7
+""" Create metrics plots in batch mode
 """
+from schimpy.unit_conversions import cfs_to_cms, ft_to_m, ec_psu_25c, fahrenheit_to_celsius
+from copy import deepcopy
+import logging
+import re
+import os
 import matplotlib
 import pandas as pd
 import glob
+from datetime import datetime
+import numpy as np
+import schimpy.station as station
+import argparse
+from vtools.functions.error_detect import med_outliers
+from vtools.data.vtime import days, hours
+import schimpy.schism_yaml as schism_yaml
+import matplotlib.pyplot as plt
+from schimpy.metricsplot import plot_metrics, plot_comparison, get_common_window,\
+    safe_window, check_if_all_tss_are_bad, fill_gaps
+from dms_datastore.read_ts import *
+
 
 matplotlib.use('Agg')  # To prevent an unwanted failure on Linux
-from schimpy.metricsplot import plot_metrics, plot_comparison, get_common_window,\
-                                safe_window, check_if_all_tss_are_bad, fill_gaps
-
-import matplotlib.pyplot as plt
-from schimpy.unit_conversions import cfs_to_cms,ft_to_m,ec_psu_25c,fahrenheit_to_celsius
-import schimpy.schism_yaml as schism_yaml
-from vtools.data.vtime import days, hours
-from vtools.functions.error_detect import med_outliers
-import argparse
-from vtools.datastore.read_ts import read_ts
-import schimpy.station as station
-import numpy as np
-from datetime import datetime
-import os
-import re
-import logging
-from copy import deepcopy
-
 __all__ = ['generate_metricsplots', ]
 
 pd.plotting.register_matplotlib_converters()
+
 
 def process_time_str(val):
     return datetime(*list(map(int, re.split(r'[^\d]', val))))
@@ -59,7 +56,7 @@ class BatchMetrics(object):
     MAP_VAR_FOR_STATIONDB = {'flow': 'flow', 'elev': 'stage', 'salt': 'wq',
                              'temp': 'wq'}
     variable_units = {'flow': 'cms', 'elev': 'm', 'salt': 'PSU',
-                             'temp': 'deg C'}
+                      'temp': 'deg C'}
 
     def __init__(self, params=None):
         """ Constructor
@@ -67,8 +64,11 @@ class BatchMetrics(object):
                 parameters
         """
         self.params = params
-        # self.sim_outputs = None
-        # self.tss = []
+        if "obs_search_path" in params:
+            self.obs_search_path = params["obs_search_path"]
+        else:
+            self.obs_search_path = None
+
         self.logger = logging.getLogger("metrics")
 
     def read_simulation_outputs(self, variable, outputs_dir,
@@ -86,8 +86,13 @@ class BatchMetrics(object):
                     station_in = os.path.join(working_dir, "flowlines.yaml")
                 else:
                     station_in = stations_input[i]
-                datafname = os.path.join(working_dir,"flux.out")
-                sim_out = station.read_flux_out(datafname,station_in,reftime=time_basis)
+                datafname = os.path.join(working_dir, "flux.out")
+                sim_out = station.read_flux_out(
+                    datafname, station_in, reftime=time_basis)
+                if ('old' in sim_out.columns):
+                    sim_out['old'] = -sim_out['old']
+                else:
+                    raise ValueError("Couldn't find")
                 sim_outputs.append(sim_out)
         else:
             for i, working_dir in enumerate(outputs_dir):
@@ -95,11 +100,16 @@ class BatchMetrics(object):
                     station_infile = os.path.join(working_dir, "station.in")
                 else:
                     station_infile = stations_input[i]
-                datafname = os.path.join(working_dir,station.staout_name(variable))
-                sim_out = station.read_staout(datafname,station_infile,
-                                              reftime=time_basis,ret_station_in = False,
+                datafname = os.path.join(
+                    working_dir, station.staout_name(variable))
+                sim_out = station.read_staout(datafname, station_infile,
+                                              reftime=time_basis, ret_station_in=False,
                                               multi=True)
+                # todo: case
+                sim_out.columns = sim_out.columns.set_levels(
+                    sim_out.columns.levels[0].str.lower(), level=0)
                 sim_outputs.append(sim_out)
+
         return sim_outputs
 
     def retrieve_tss_sim(self, sim_outputs, station_id, variable, vert_pos=0):
@@ -114,9 +124,9 @@ class BatchMetrics(object):
             if variable == 'flow':
                 ts = sim_output[station_id]
             elif variable in self.VAR_2D:
-                ts = sim_output[(station_id,vert_pos)]
+                ts = sim_output[(station_id, vert_pos)]
             elif variable in self.VAR_3D:
-                ts = sim_output[(station_id,vert_pos)]
+                ts = sim_output[(station_id, vert_pos)]
             else:
                 raise ValueError('The variable is not supported yet')
             tss_sim.append(ts.to_series())
@@ -152,7 +162,7 @@ class BatchMetrics(object):
 #                 return True
 #             return False
 
-    def find_obs_file(self, station_id,subloc,variable,
+    def find_obs_file(self, station_id, subloc, variable,
                       db_stations, db_obs):
         """ Find a file path of a given station_id from a link table
             of station_id and observation file names
@@ -165,52 +175,65 @@ class BatchMetrics(object):
 
         mapvar = self.MAP_VAR_FOR_STATIONDB[variable]
         if station_id in db_stations:
-            flag_station = db_stations.loc[station_id,mapvar]
+            flag_station = db_stations.loc[station_id, mapvar]
             data_expected = not (flag_station == '')
         else:
             data_expected = False
 
-        fpath_obs_fnd = (station_id,subloc,variable) in db_obs.index
+        
+        fpath_obs_fnd = (station_id, subloc, variable) in db_obs.index
         if fpath_obs_fnd:
-            fpath_obs = db_obs.loc[(station_id,subloc,variable),"path"]
+            try:
+                fpath_obs = db_obs.loc[(station_id, subloc, variable), "path"]
+            except:
+                fpath_obs = None
+                for repo in self.obs_search_path:
+                    possible = db_obs.loc[(station_id, subloc, variable), "filename"]
+                    fpath_obs = os.path.join(repo,possible)
+                    if os.path.exists(fpath_obs): 
+                        break
+                    
         else:
             fpath_obs = None
 
         if fpath_obs_fnd:
             absfpath = os.path.abspath(fpath_obs)
-            if data_expected is True:
-                self.logger.info("Observation file for id {}: {}".format(station_id, absfpath))
-            else:
-                self.logger.warning("File link {} found for station {} but station not expected to have data for variable: {}".format(absfpath,station_id,variable))
+            self.logger.info(
+                 "Observation file for id {}: {}".format(station_id, absfpath))
+
         else:
-            expectstr = '(Data not expected)' if (not data_expected)  else '(Not in the file links)'
+            expectstr = '(Data not expected)' if (
+                not data_expected) else '(Not in the file links)'
             level = logging.WARNING if data_expected is True else logging.INFO
-            self.logger.log(level, "{} No {} data link listing for: {}".format(expectstr, variable, station_id))
+            self.logger.log(level, "{} No {} data link listing for: {}".format(
+                expectstr, variable, station_id))
         return fpath_obs
 
-    def retrieve_ts_obs(self, station_id,subloc,variable, window,
+    def retrieve_ts_obs(self, station_id, subloc, variable, window,
                         db_stations, db_obs):
         """ Retrieve a file name of a field data
         """
-        fpath_obs = self.find_obs_file(station_id,subloc,variable,
+        fpath_obs = self.find_obs_file(station_id, subloc, variable,
                                        db_stations, db_obs)
-
+        
         if fpath_obs:
             if os.path.exists(fpath_obs) or len(glob.glob(fpath_obs)) > 0:
                 try:
-                    ts_obs = read_ts(fpath_obs, start=window[0], end=window[1])
+                    ts_obs = read_ts(fpath_obs)
                     if ts_obs.shape[1] > 1:
-                        raise Exception("Multiple column series received. Need to implement selector")
-                    ts_obs = ts_obs.iloc[:,0]
+                        raise Exception(
+                            "Multiple column series received. Need to implement selector")
+                    ts_obs = ts_obs.squeeze()
                 except ValueError as e:
                     raise
                     self.logger.warning(
                         "Got ValueError while reading an observation file: {}".format(e))
                     ts_obs = None
-                if ts_obs is None or len(ts_obs)==0:
-                    #todo: settle this behavior as None or len==0
+                
+                if ts_obs is None or len(ts_obs) == 0:
+                    # todo: settle this behavior as None or len==0
                     self.logger.warning(
-                        "File {} does not contain useful data for the requested time window".format( os.path.abspath(fpath_obs)))
+                        "File {} does not contain useful data for the requested time window".format(os.path.abspath(fpath_obs)))
                     ts_obs = None
                 return ts_obs
             else:
@@ -230,27 +253,27 @@ class BatchMetrics(object):
         """
         if ts is None:
             raise ValueError("Cannot convert None")
-        if unit == 'ft':
+        if unit in ['ft', 'feet']:
             self.logger.info("Converting the unit of obs ts from ft to m.")
             ts = ft_to_m(ts)
             ts.unit = 'm'
-        elif unit in ('m','meter'):
+        elif unit in ('m', 'meter'):
             ts.unit = 'm'
-        elif unit == 'cfs':
+        elif unit in ['cfs', 'ft^3/s']:
             self.logger.info("Converting the unit of obs ts from cfs to cms.")
             ts = cfs_to_cms(ts)
             ts.unit = 'cms'
-        elif unit == 'ec':
+        elif unit in ['ec', 'microS/cm',"uS/cm"]:
             self.logger.info("Converting ec to psu...")
-            ts .iloc[:]= ec_psu_25c(ts)
+            ts .iloc[:] = ec_psu_25c(ts)
             ts.unit = 'PSU'
-        elif unit == 'psu':
+        elif unit in ['psu', '1']:
             ts.unit = 'PSU'
-        elif unit in ('deg F', 'degF'):
+        elif unit in ('deg F', 'degF', 'deg_f'):
             self.logger.info("Converting deg F to deg C")
             ts = fahrenheit_to_celsius(ts)
             ts.unit = 'deg C'
-        elif unit in ('degC','deg C'):
+        elif unit in ('degC', 'deg C', 'deg_c'):
             ts.unit = 'deg C'
         elif unit is None:
             ts.unit = None
@@ -260,23 +283,26 @@ class BatchMetrics(object):
         else:
             self.logger.warning(
                 "  Not supported unit in the time series: {}.".format(unit))
-            raise ValueError("Not supported unit in the time series: {}".format(unit))
+            raise ValueError(
+                "Not supported unit in the time series: {}".format(unit))
         return ts
 
     def create_title(self, db_stations, station_id, source, variable, subloc):
         """ Create a title for the figure
         """
-        long_name = db_stations.loc[station_id,'name']
-        #todo: These should be part of station_in
+        long_name = db_stations.loc[station_id, 'name']
+        agency_id = db_stations.loc[station_id, 'agency_id']
+        # todo: These should be part of station_in
         if long_name is None:
             long_name = station_id
         title = long_name
 
         if variable in ('salt', 'temp'):
-            if subloc != 'default': title += " ({})".format(subloc)
+            if subloc != 'default':
+                title += " ({})".format(subloc)
         title += '\n'
-        title += 'Source: {}, ID: {}\n'.format(source,
-                                             station_id)
+        title += 'Source: {}, ID: {}\n'.format(source.upper(),
+                                               station_id.upper())
         return title
 
     def adjust_obs_datum(self, ts_obs, ts_sim, station_id, variable, subloc, db_obs):
@@ -286,7 +312,7 @@ class BatchMetrics(object):
         """
         # NOTE: No vert_pos...
         #todo: pandas
-        datum = db_obs.loc[(station_id,variable,subloc),'vdatum']
+        datum = db_obs.loc[(station_id, variable, subloc), 'vdatum']
         if datum == '' or datum == 'STND':
             self.logger.info("Adjusting obs ts automatically...")
             window = get_common_window((ts_obs, ts_sim))
@@ -309,15 +335,18 @@ class BatchMetrics(object):
         # Process input parameters
         params = self.params
         variable = params['variable']
+
         outputs_dir = params['outputs_dir']
         if isinstance(outputs_dir, str):
             outputs_dir = outputs_dir.split()
         time_basis = process_time_str(params['time_basis'])
         stations_input = params.get('stations_input')
         if stations_input is None:
-            stations_input = params.get('flow_station_input') if variable == "flow" else params.get('station_input')
+            stations_input = params.get(
+                'flow_station_input') if variable == "flow" else params.get('station_input')
         else:
-            raise ValueError("Old style input file. \nUse 'station_input' and 'flow_station_input' respectively for staout* and flow.dat")
+            raise ValueError(
+                "Old style input file. \nUse 'station_input' and 'flow_station_input' respectively for staout* and flow.dat")
         if isinstance(stations_input, str):
             stations_input = stations_input.split()
 
@@ -348,9 +377,10 @@ class BatchMetrics(object):
         fill_gap = read_optional_flag_param(params, 'fill_gap')
         max_gap_to_fill = hours(1)
         if 'max_gap_to_fill' in params:
-            max_gap_to_fill =pd.tseries.frequencies.to_offset(params['max_gap_to_fill'])
-        else: max_gap_to_fill = hours(1)
-
+            max_gap_to_fill = pd.tseries.frequencies.to_offset(
+                params['max_gap_to_fill'])
+        else:
+            max_gap_to_fill = hours(1)
 
         # Prepare readers of simulation outputs
         sim_outputs = self.read_simulation_outputs(variable,
@@ -362,20 +392,22 @@ class BatchMetrics(object):
 
         # Iterate through the stations in the first simulation outputs
         for stn in sim_outputs[0].columns:
-            station_id = stn[0] if type(stn) == tuple else stn
+            station_id = stn[0].lower() if type(stn) == tuple else stn.lower()
             # Prepare
             self.logger.info(
                 "==================================================")
 
-            self.logger.info("Start processing station:: {}".format(station_id))
-
-            if not station_id in db_stations.index:
-                self.logger.warning("Station id {} not found in station listings".format(station_id))
+            self.logger.info(
+                "Start processing station:: {}".format(station_id))
+            if not station_id.lower() in db_stations.index:
+                self.logger.warning(
+                    "Station id {} not found in station listings".format(station_id))
                 continue
+
             if 'alias' in db_stations.columns:
-                alias = db_stations.loc[station_id,'alias']
-            else: 
-                alias = station_id
+                alias = db_stations.loc[station_id, 'alias']
+            else:
+                alias = station_id.upper()
 
             if selected_stations is not None:
                 if station_id not in selected_stations:
@@ -398,21 +430,34 @@ class BatchMetrics(object):
 
             # Read Obs
             subloc = 'default' if variable == 'flow' else stn[1]
-            ts_obs = self.retrieve_ts_obs(station_id,subloc, variable, window_to_read,
+
+            ts_obs = self.retrieve_ts_obs(station_id, subloc, variable, window_to_read,
                                           db_stations, db_obs)
 
-
             if ts_obs is None or ts_obs.isnull().all():
-                self.logger.warning("No observation data: %s.",
-                                    station_id)
+                self.logger.warning(f"No observation data: {station_id}, {subloc}, {variable}.")
                 if plot_all is False:
                     self.logger.warning("Skipping this station")
                     continue
             else:
                 if remove_outliers is True:
                     self.logger.info("Removing outliers...")
-                    ts_obs = med_outliers(ts_obs, level=3, copy=False)
-                adj = db_obs.loc[(station_id,subloc,variable),'datum_adj']
+                    obs_unit = db_obs.loc[(
+                        station_id, subloc, variable), 'unit']
+                    if variable == 'salt' and obs_unit in ['microS/cm','uS/cm']:
+                        drange = [10., 60000.]
+                    elif variable == 'elev':
+                        drange = [-8., 100.]
+                    elif variable == 'temp':
+                        drange = [1., 40.]
+                        if obs_unit in ['deg F', 'degF']:
+                            drange = [33., 90.]
+                    else:
+                        drange = None
+                    ts_obs = med_outliers(
+                        ts_obs, level=4, range=drange, copy=False)
+                
+                adj = db_obs.loc[(station_id, subloc, variable), 'datum_adj']
                 if adj is not None and adj != 0.:
                     self.logger.info(
                         "Adjusting obs value with the value in the table...")
@@ -424,9 +469,11 @@ class BatchMetrics(object):
                         ValueError("Not supported unit for adjustment.")
                     adj_obs += adj
                 try:
-                    obs_unit = db_obs.loc[(station_id, subloc, variable),'unit']
+                    obs_unit = db_obs.loc[(
+                        station_id, subloc, variable), 'unit']
 
-                    ts_obs = self.convert_unit_of_ts_obs_to_SI(ts_obs,obs_unit)
+                    ts_obs = self.convert_unit_of_ts_obs_to_SI(
+                        ts_obs, obs_unit)
 
                     obs_unit = ts_obs.unit
                 except Exception as e:
@@ -434,24 +481,28 @@ class BatchMetrics(object):
 
             # Read simulation
             if variable == "flow":
-                tss_sim = [None if simout[station_id].isnull().all() else simout[station_id] for simout in sim_outputs]
+                tss_sim = [None if simout[station_id].isnull().all(
+                ) else simout[station_id] for simout in sim_outputs]
 
             else:
                 tss_sim = []
                 try:
                     for simout in sim_outputs:
-                        if(station_id,subloc) in simout.columns:
-                            s = simout.loc[:,(station_id,subloc)]
-                            if isinstance(s,pd.DataFrame):
-                                raise("Station,Sublocation pair ({},{}) not unique or some other uniqueness problem in station files".format((station_id,subloc)))
+                        if (station_id, subloc) in simout.columns:
+                            s = simout.loc[:, (station_id, subloc)]
+                            if isinstance(s, pd.DataFrame):
+                                raise("Station,Sublocation pair ({},{}) not unique or some other uniqueness problem in station files".format(
+                                    (station_id, subloc)))
                         else:
-                            s=None
+                            s = None
                         tss_sim.append(s)
                 except:
-                    self.logger.warning("Problem reading time series for station {},{}".format(station_id,subloc))         
-                    raise                    
+                    self.logger.warning(
+                        "Problem reading time series for station {},{}".format(station_id, subloc))
+                    raise
             for ts in tss_sim:
-                if ts is None: continue
+                if ts is None:
+                    continue
                 if ts_obs is None or ts_obs.isnull().all():
                     ts.unit = self.variable_units[variable]
                 else:
@@ -474,12 +525,14 @@ class BatchMetrics(object):
                 self.logger.error("None of time series have data.")
                 continue
             self.logger.info("Start plotting...")
-            source = db_obs.loc[(station_id,subloc,variable),"agency"].upper()
+            source = db_obs.loc[(station_id, subloc,
+                                 variable), "agency"].upper()
             figtitle = self.create_title(
                 db_stations, station_id, source, variable, vert_pos)
 
             title = None
-            if type(tss_sim) == list: tss_sim=tuple(tss_sim)
+            if type(tss_sim) == list:
+                tss_sim = tuple(tss_sim)
 
             # labels
             labels_to_plot = deepcopy(labels)
@@ -506,7 +559,7 @@ class BatchMetrics(object):
                                               station_id,
                                               vert_pos)
             fpath_output = os.path.join(dest_dir, fname_output + '.png')
-            fig.suptitle(figtitle,fontsize=14)
+            fig.suptitle(figtitle, fontsize=14)
             fig.savefig(fpath_output, dpi=300)
             self.logger.info("Done for the station.")
 
@@ -532,7 +585,7 @@ def init_logger():
                         filemode='w')
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
-    #%(asctime)s - %(name)s - %(levelname)s
+    # %(asctime)s - %(name)s - %(levelname)s
     formatter = logging.Formatter('%(message)s')
     console.setFormatter(formatter)
     filer = logging.FileHandler('metrics_missing.log', mode='w')
