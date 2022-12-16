@@ -69,7 +69,7 @@ class boundary(object):
     def write_bctides(self,bctides_file):
        
         with open(bctides_file,"w") as outf:
-            tt=self.date.strftime("%YYYY-%MM-%DD %H:%M")
+            tt=self.date.strftime("%Y-%m-%d %H:%M")
             outf.write(tt)
             outf.write("\n")
             
@@ -319,7 +319,9 @@ class boundary(object):
                                                          
                                 outf.write(str(u_amp_val)+" "+str(u_phase_val)+" "+str(v_amp_val)+" "+str(v_phase_val)+"\n")
                     elif (vel_id==-4):
-                        outf.write("1 1\n")
+                        relax_inflow=vel_boundary["inflow_relax"]
+                        relax_outflow=vel_boundary["outflow_relax"]
+                        outf.write(str(relax_inflow)+" "+str(relax_outflow)+"\n")
                     elif (vel_id==-1):
                         eta_mean = vel_boundary["eta_mean"]
                         outf.write(str(eta_mean)+"\n")
