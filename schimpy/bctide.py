@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 
+  This class will read in a yaml file which define SCHISM boundary and generate bctides.in.
+  It supports  all type of elevation, velocity, salinity, temperature and tracer boundaries.
+  At the end of this script, there is a example which demonstrates the format of bctide YAML file.
+  
 """
 from schimpy.schism_yaml import load
 from schimpy.schism_mesh import SchismMeshGr3Reader
 import numbers
-import pdb
+
 
 __all__ = ["load_boundary"]
 
@@ -376,5 +380,317 @@ if __name__ == "__main__":
     by=load_boundary(bcyaml)
     by.write_bctides(bctides)           
            
+ 
+    
+##################### YAML EXMAPLE #####################################################
+
+# bctides: 
+#     date: 2011-01-28
+#     hgrid_input_file: G:\schism\bctides\hgrid.gr3
+#     earth_tidals:
+#         tidal_cutoff_depth: 40
+#         tidal_constitutes:
+#           - tidal_constitute: Sa
+#             amplitude: 0.05
+#             node_factor: 1.0
+#             angular_frequency: 0.0027
+#             earth_equilibrium_argument: 0.01
+#           - tidal_constitute: O1
+#             amplitude: 0.2
+#             node_factor: 1.1
+#             angular_frequency: 4.001
+#             earth_equilibrium_argument: 0.0
+#           - tidal_constitute: M2 
+#             amplitude: 0.5
+#             node_factor: 0.99
+#             angular_frequency: 1.9323
+#             earth_equilibrium_argument: 0.0
+#     bounary_forcing_tidals:
+#         tidal_constitutes:
+#           - tidal_constitute: Z0
+#             angular_frequency: 0.0
+#             node_factor: 1 
+#             earth_equilibrium_argument: 0
+#           - tidal_constitute: O1
+#             angular_frequency: 0.675977E-04 
+#             node_factor: 1.11945
+#             earth_equilibrium_argument: 7.47302
+#           - tidal_constitute: K1
+#             angular_frequency: 0.729212E-04
+#             node_factor: 1.07391
+#             earth_equilibrium_argument: 206.78674
+#           - tidal_constitute: M2
+#             angular_frequency: 0.140519E-04
+#             node_factor: 0.97907
+#             earth_equilibrium_argument: 217.04138
+#     open_boundaries:
+#       - open_boundary:
+#         name: ocean
+#         elevation_boundary: 
+#             boundary: tidal
+#             tidal_constitutes:
+#               - tidal_constitute: Z0 
+#                 tidal_amplitude: 1.0
+#                 tidal_phase: 0.0
+#               - tidal_constitute: O1
+#                 tidal_amplitude: 0.226
+#                 tidal_phase: 206
+#               - tidal_constitute: K1
+#                 tidal_amplitude: 0.369
+#                 tidal_phase: 220        
+#               - tidal_constitute: M2
+#                 tidal_amplitude: 0.578
+#                 tidal_phase: 190                     
+#         velocity_boundary: 
+#             boundary: tidal
+#             tidal_constitutes:
+#               - tidal_constitute: Z0 
+#                 u_amplitude: 0.20
+#                 u_phase: 0.0
+#                 v_amplitude: 0.10
+#                 v_phase: 0.0
+#               - tidal_constitute: O1
+#                 u_amplitude: 0.0226
+#                 u_phase: 206
+#                 v_amplitude: 0.0226
+#                 v_phase: 206
+#               - tidal_constitute: K1
+#                 u_amplitude: 0.0369
+#                 u_phase: 220  
+#                 v_amplitude: 0.0226
+#                 v_phase: 206                
+#               - tidal_constitute: M2
+#                 u_amplitude: 0.0578
+#                 u_phase: 190 
+#                 v_amplitude: 0.0226
+#                 v_phase: 206                
+        
+#         temperature_boundary: 
+#             boundary: initial profile
+#             nudge: 0.5
+#         salinity_boundary: 
+#             boundary: initial profile
+#             nudge: 0.5
+#         tracer_boundaries:
+#             boundary: none
+#       - open_boundary:
+#         name: coyote
+#         elevation_boundary:
+#             boundary: elev2D.th.nc  
+#         velocity_boundary: 
+#             boundary: uv3D.th.nc
+#         temperature_boundary: 
+#             boundary: initial profile
+#             nudge: 0.5
+#         salinity_boundary: 
+#             boundary: initial profile
+#             nudge: 0.5
+#       - open_boundary:
+#         name: ccc_rock_slough    
+#         velocity_boundary:
+#             boundary: flux.th
+#         temperature_boundary: 
+#             boundary: initial profile
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: initial profile
+#             nudge: 1.0
+#         tracers:
+#           - tracer: GEN
+#             number_of_tracers: 2
+#             boundary: time history
+#             nudge: 0.5
+#           - tracer: AGE
+#             number_of_tracers: 2
+#             boundary: [10, 20]      
+#             nudge: 1.0
+#           - tracer: SED
+#             number_of_tracers: 5
+#             boundary: [0.1, 0.2, 0.1, 0.12, 0.23]
+#             nudge: 0.3
+#       - open_boundary:
+#         name: ccc_old                    
+#         velocity_boundary: 
+#             boundary: flux.th
+#         temperature_boundary: 
+#             boundary: initial profile
+#             nudge: 0.5
+#         salinity_boundary: 
+#             boundary: initial profile
+#             nudge: 0.5
+#         tracers: 
+#           - tracer: GEN
+#             number_of_tracers: 1
+#             boundary: 10
+#             nudge: 0.5
+#       - open_boundary:
+#         name: swp       
+#         velocity_boundary: 
+#              boundary: flux.th
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0
+#       - open_boundary:
+#         name: cvp      
+#         velocity_boundary: 
+#              boundary: flux.th
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0
+#       - open_boundary:
+#         name: sjr      
+#         velocity_boundary: 
+#              boundary: flux.th
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0
+#       - open_boundary:
+#         name: calaveras
+#         elevation_boundary: 
+#              boundary: 0.3        
+#         velocity_boundary: 
+#              boundary: 0.3
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0
+#       - open_boundary:
+#         name: moke      
+#         velocity_boundary: 
+#              boundary: flux.th
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0
+#       - open_boundary:
+#         name: american  
+#         velocity_boundary: 
+#              boundary: flux.th        
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0   
+#       - open_boundary:
+#         name: sac  
+#         velocity_boundary: 
+#              boundary: flux.th        
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0  
+#       - open_boundary:
+#         name: yolo_toedrain 
+#         velocity_boundary: 
+#              boundary: flux.th        
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0 
+#       - open_boundary:
+#         name: yolo  
+#         velocity_boundary: 
+#              boundary: flux.th        
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0  
+#       - open_boundary:
+#         name: north bay 
+#         elevation_boundary: 
+#             boundary: tidal elev2D.th.nc 
+#             tidal_constitutes:
+#               - tidal_constitute: Z0
+#                 tidal_amplitude: 1.0
+#                 tidal_phase: 0.0
+#               - tidal_constitute: O1
+#                 tidal_amplitude: 0.226
+#                 tidal_phase: 206
+#               - tidal_constitute: K1
+#                 tidal_amplitude: 0.369
+#                 tidal_phase: 220        
+#               - tidal_constitute: M2
+#                 tidal_amplitude: 0.578
+#                 tidal_phase: 190  
+#         velocity_boundary: 
+#              boundary: tidal uv3D.th.nc  
+#              tidal_constitutes:
+#               - tidal_constitute: Z0 
+#                 u_amplitude: 0.20
+#                 u_phase: 0.0
+#                 v_amplitude: 0.10
+#                 v_phase: 0.0
+#               - tidal_constitute: O1
+#                 u_amplitude: 0.0226
+#                 u_phase: 206
+#                 v_amplitude: 0.0226
+#                 v_phase: 206
+#               - tidal_constitute: K1
+#                 u_amplitude: 0.0369
+#                 u_phase: 220  
+#                 v_amplitude: 0.0226
+#                 v_phase: 206                
+#               - tidal_constitute: M2
+#                 u_amplitude: 0.0578
+#                 u_phase: 190 
+#                 v_amplitude: 0.0226
+#                 v_phase: 206              
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0             
+#       - open_boundary:
+#         name: napa       
+#         velocity_boundary: 
+#              boundary: flather 1
+#              eta_mean: 0.23
+#              eta_m0: [0.23,0.23,0.23]
+#              vnormal_mean: 0.01
+#              vnormal_nodes: 
+#                - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.01, 0.01]
+#                - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.01, 0.01]
+#                - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.01, 0.01]
+#         temperature_boundary: 
+#             boundary: 10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0
+#       - open_boundary:
+#         name: ccc_vic
+#         elevation_boundary:
+#             boundary: elev.th    
+#         velocity_boundary: 
+#             boundary: flux.th
+#         temperature_boundary:
+#             boundary:  10.0
+#             nudge: 1.0
+#         salinity_boundary: 
+#             boundary: SAL_3D.th.nc
+#             nudge: 1.0
+#############################################################################################################################
+
         
 
