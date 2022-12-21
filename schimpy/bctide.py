@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 
-  This class will read in a yaml file which define SCHISM boundary and generate bctides.in.
+  This class will read in a yaml file which defines SCHISM boundary and generate bctides.in.
   It supports  all type of elevation, velocity, salinity, temperature and tracer boundaries.
-  At the end of this script, there is a example which demonstrates the format of bctide YAML file.
+  At the end of this script, there is a synthetic example which demonstrates the format of bctide YAML file.
   
 """
 from schimpy.schism_yaml import load
