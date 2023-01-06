@@ -12,6 +12,8 @@ hotstart:
             patch_init: 
                 smoothing: False
                 regions_filename: ../shapefile/RegionsPolygon.shp # the attribute 'region' in the shapefile needs to match with the region values below.
+                # Note that for the shapefile, in the cases when only a small portion of the domain require special treatment, only polygons for these regions need to be defined in the shapefile, and 
+                # the rest of the domain will be automatically assigned a region name 'other'. 
                 regions: 
                   - region: ocean
                     initializer: 

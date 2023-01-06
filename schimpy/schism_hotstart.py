@@ -173,7 +173,7 @@ class hotstart(object):
                 if 'hotstart_nc' in patch_init:
                     idx_h = np.where(np.array(patch_init)=='hotstart_nc')[0][0]
                     sub_init = initializer['patch_init'][
-                        'regions'][0]['initializer']['hotstart_nc']
+                        'regions'][idx_h]['initializer']['hotstart_nc']
                     self.hotstart_ini['hotstart_nc_hfn'] = sub_init['hgrid']
                     self.hotstart_ini['hotstart_nc_vfn'] = sub_init['vgrid']
                     self.hotstart_ini['source_vgrid_version'] = sub_init[
