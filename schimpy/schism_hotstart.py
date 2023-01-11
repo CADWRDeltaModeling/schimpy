@@ -235,7 +235,7 @@ class hotstart(object):
                     self.Nbed = params['Nbed']
                 else:
                     raise FileNotFoundError(
-                        "sediment.in is required if SED module is turned on")
+                        "sediment.nml is required if SED module is turned on")
             kwargs_options.update({'Nbed': self.Nbed})
         if kwargs_options:
             var = VariableField(v_meta, variable, self.mesh,
