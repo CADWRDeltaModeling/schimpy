@@ -220,18 +220,18 @@ schimpy.grid\_opt module
    :undoc-members:
    :show-inheritance:
 
-schimpy.hotstart\_generator module
-----------------------------------
-
-.. automodule:: schimpy.hotstart_generator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 schimpy.hotstart\_inventory module
 ----------------------------------
 
 .. automodule:: schimpy.hotstart_inventory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.interpolate\_structure module
+-------------------------------------
+
+.. automodule:: schimpy.interpolate_structure
    :members:
    :undoc-members:
    :show-inheritance:

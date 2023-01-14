@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>schimpy.schism_nudging &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <title>schimpy.schism_nudging &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -83,7 +83,9 @@
 <span class="kn">from</span> <span class="nn">schimpy</span>  <span class="kn">import</span> <span class="n">Interp2D</span>
 <span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">timer</span>
 <span class="kn">from</span> <span class="nn">vtools.data.vtime</span> <span class="kn">import</span> <span class="n">hours</span><span class="p">,</span><span class="n">days</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
+<span class="n">log_file</span> <span class="o">=</span> <span class="s2">&quot;log_nudging.out&quot;</span>
 <div class="viewcode-block" id="nudging"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging">[docs]</a><span class="k">class</span> <span class="nc">nudging</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class to create schism nudging</span>
@@ -100,6 +102,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        read yaml and load mesh grid</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---read_yaml---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml_fn</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">info</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
         <span class="n">nudging_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;nudging&#39;</span><span class="p">]</span>
@@ -126,7 +131,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_gpd</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_z</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;crs&#39;</span> <span class="ow">in</span> <span class="n">nudging_info</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s1">&#39;crs&#39;</span> <span class="ow">in</span> <span class="n">nudging_info</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">nudging_info</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="s1">&#39;EPSG:26910&#39;</span> <span class="c1"># this is required because ROMS only provides lat, lon. </span>
@@ -165,6 +170,12 @@
 <span class="sd">        None.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">log_file</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_file</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---create_nudging---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">weights_comb</span><span class="p">,</span> <span class="n">values_comb</span><span class="p">,</span> <span class="n">imap_comb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_nudging_comb</span><span class="p">()</span>
         
         <span class="n">weights_var</span><span class="p">,</span> <span class="n">values_var</span><span class="p">,</span> <span class="n">imap_var</span><span class="p">,</span> <span class="n">var_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">organize_nudging</span><span class="p">(</span>
@@ -177,6 +188,9 @@
                 <span class="n">create_file</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>    </div>
     
 <div class="viewcode-block" id="nudging.organize_nudging"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.organize_nudging">[docs]</a>    <span class="k">def</span> <span class="nf">organize_nudging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights_comb</span><span class="p">,</span> <span class="n">values_comb</span><span class="p">,</span> <span class="n">imap_comb</span><span class="p">):</span>   
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---organize_nudging---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">weights_list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1">#dimension [region, var, node]</span>
         <span class="n">values_list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># dimensino [region, var, time, map_node, nlevel]</span>
         <span class="n">imap_list</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># dimension [region, var, map_node] </span>
@@ -245,6 +259,9 @@
         <span class="k">return</span> <span class="n">weights_var</span><span class="p">,</span> <span class="n">values_var</span><span class="p">,</span> <span class="n">imap_var</span><span class="p">,</span> <span class="n">var_v</span></div>
 
 <div class="viewcode-block" id="nudging.get_nudging_comb"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.get_nudging_comb">[docs]</a>    <span class="k">def</span> <span class="nf">get_nudging_comb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---get_nudging_comb---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">weights_comb</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">values_comb</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">imap_comb</span> <span class="o">=</span> <span class="p">[]</span>
@@ -258,7 +275,9 @@
     
 <div class="viewcode-block" id="nudging.concatenate_nudge"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.concatenate_nudge">[docs]</a>    <span class="k">def</span> <span class="nf">concatenate_nudge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weights_var</span><span class="p">,</span> <span class="n">values_var</span><span class="p">,</span> <span class="n">imap_var</span><span class="p">,</span>
                           <span class="n">var_newlist</span><span class="p">,</span> <span class="n">create_file</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---concatenate_nudge---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">var_newlist</span><span class="p">):</span>
             <span class="c1"># merge all the mapping values</span>
             <span class="n">imap_merged</span> <span class="o">=</span> <span class="p">[]</span>
@@ -323,7 +342,7 @@
                 <span class="n">nudging_fn</span> <span class="o">=</span> <span class="s2">&quot;SAL_nu_</span><span class="si">%s</span><span class="s2">.nc&quot;</span><span class="o">%</span><span class="n">suffix</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                    <span class="s2">&quot;write </span><span class="si">%s</span><span class="s2"> as nuding nc not implemented&quot;</span><span class="o">%</span><span class="n">v</span><span class="p">)</span>
+                    <span class="sa">f</span><span class="s2">&quot;write </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> as nuding nc not implemented&quot;</span><span class="p">)</span>
                            
             <span class="n">rootgrp_T</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">nudging_fn</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;NETCDF4&quot;</span><span class="p">)</span>
             <span class="n">node_dim</span> <span class="o">=</span> <span class="n">rootgrp_T</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s2">&quot;node&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">imap_merged</span><span class="p">))</span>
@@ -345,17 +364,20 @@
             <span class="n">rootgrp_T</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> file created&quot;</span><span class="o">%</span><span class="n">nudging_fn</span><span class="p">)</span>  
             
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                 <span class="n">write_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> 
-                           <span class="n">fpath_mesh</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_nudge.gr3&quot;</span><span class="o">%</span><span class="n">v</span><span class="p">,</span> 
+                           <span class="n">fpath_mesh</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_nudge.gr3&quot;</span><span class="p">,</span> 
                            <span class="n">node_attr</span><span class="o">=</span><span class="n">weights_merged</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">write_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> 
-                           <span class="n">fpath_mesh</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_nudge_</span><span class="si">%s</span><span class="s2">.gr3&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">output_suffix</span><span class="p">),</span> 
+                           <span class="n">fpath_mesh</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_nudge_</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">.gr3&quot;</span><span class="p">,</span> 
                        <span class="n">node_attr</span><span class="o">=</span><span class="n">weights_merged</span><span class="p">)</span></div>
         <span class="c1">#return values_merged, weights_merged, imap_merged</span>
     
 <div class="viewcode-block" id="nudging.create_region_nudging"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.create_region_nudging">[docs]</a>    <span class="k">def</span> <span class="nf">create_region_nudging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_info</span><span class="p">):</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---create_region_nudging---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">region_info</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;roms&#39;</span><span class="p">:</span>
             <span class="n">weights</span><span class="p">,</span> <span class="n">values_list</span><span class="p">,</span> <span class="n">imap</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_nudge_roms</span><span class="p">(</span><span class="n">region_info</span><span class="p">)</span>
             <span class="c1">#values_list =  [vl[:,imap,:] for vl in values_list]</span>
@@ -375,6 +397,9 @@
         <span class="k">return</span> <span class="n">weights_list</span><span class="p">,</span> <span class="n">values_list</span><span class="p">,</span> <span class="n">imap_list</span></div>
     
 <div class="viewcode-block" id="nudging.gen_nudge_roms"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.gen_nudge_roms">[docs]</a>    <span class="k">def</span> <span class="nf">gen_nudge_roms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">region_info</span><span class="p">):</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---gen_nudge_roms---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">rjunk</span> <span class="o">=</span> <span class="mi">9998</span> <span class="c1">#!Define junk value for sid; the test is abs()&gt;rjunk</span>
         <span class="n">hr_char</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;03&#39;</span><span class="p">,</span><span class="s1">&#39;09&#39;</span><span class="p">,</span><span class="s1">&#39;15&#39;</span><span class="p">,</span><span class="s1">&#39;21&#39;</span><span class="p">]</span> <span class="c1">#each day has 4 starting hours in ROMS</span>
         <span class="n">small1</span> <span class="o">=</span> <span class="mf">1.e-2</span> <span class="c1">#used to check area ratios</span>
@@ -451,7 +476,7 @@
                 <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
             <span class="n">day</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="n">istart_year</span><span class="p">,</span><span class="n">istart_mon</span><span class="p">,</span><span class="n">istart_day</span><span class="p">)</span> <span class="o">-</span> 
                 <span class="bp">self</span><span class="o">.</span><span class="n">start_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">+</span> <span class="n">d</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time out (days)=</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">day</span><span class="p">)</span>  
+            <span class="n">write_to_log</span><span class="p">(</span><span class="s1">&#39;Time out (days)=</span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">day</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">hr</span> <span class="ow">in</span> <span class="n">hr_char</span><span class="p">:</span>
                 <span class="n">ncfile</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s%4d%02d%02d%s</span><span class="s2">.nc&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">ncfile1</span><span class="p">,</span><span class="n">date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span><span class="n">date</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
                                             <span class="n">date</span><span class="o">.</span><span class="n">day</span><span class="p">,</span><span class="n">hr</span><span class="p">)</span>                
@@ -479,6 +504,13 @@
 
                 <span class="n">time</span> <span class="o">=</span> <span class="n">ncdata</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
                 
+                
+                <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hr</span><span class="p">),</span><span class="s1">&#39;h&#39;</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial time in </span><span class="si">%s</span><span class="s2"> does not match the filename: </span><span class="si">%s</span><span class="s2">: modification will be applied &quot;</span><span class="o">%</span><span class="p">(</span><span class="n">ncfile</span><span class="p">,</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                    <span class="n">dt_adj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hr</span><span class="p">),</span><span class="s1">&#39;h&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">ncdata</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncdata</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt_adj</span> 
+                    <span class="n">time</span> <span class="o">=</span> <span class="n">ncdata</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span>
+                    
                 <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_date</span><span class="p">)</span><span class="o">+</span> \
                     <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;h&#39;</span><span class="p">):</span>
                     <span class="k">continue</span>
@@ -486,17 +518,12 @@
                     <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="s1">&#39;h&#39;</span><span class="p">):</span>
                     <span class="k">break</span>                
                 
-                <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hr</span><span class="p">),</span><span class="s1">&#39;h&#39;</span><span class="p">):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Initial time in </span><span class="si">%s</span><span class="s2"> does not match the filename: </span><span class="si">%s</span><span class="s2">: modification will be applied &quot;</span><span class="o">%</span><span class="p">(</span><span class="n">ncfile</span><span class="p">,</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-                    <span class="n">dt_adj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">(</span><span class="n">date</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hr</span><span class="p">),</span><span class="s1">&#39;h&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">ncdata</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncdata</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt_adj</span> 
-                    <span class="n">time</span> <span class="o">=</span> <span class="n">ncdata</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">values</span>
 
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time</span><span class="p">[</span><span class="n">ilo</span><span class="p">:]:</span>
                     <span class="n">ctime</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
                     <span class="n">dt</span> <span class="o">=</span> <span class="n">ctime</span><span class="o">-</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_date</span><span class="p">)</span> 
                     <span class="n">dt_in_days</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mf">86400.</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time out at hr stage (days)=</span><span class="si">{</span><span class="n">ctime</span><span class="si">}</span><span class="s2">, dt =</span><span class="si">{</span><span class="n">dt_in_days</span><span class="si">}</span><span class="s2"> &quot;</span><span class="p">)</span>                  
+                    <span class="n">write_to_log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time out at hr stage (days)=</span><span class="si">{</span><span class="n">ctime</span><span class="si">}</span><span class="s2">, dt =</span><span class="si">{</span><span class="n">dt_in_days</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="n">irecout</span> <span class="o">+=</span> <span class="mi">1</span> 
 
                     <span class="c1">#Make sure it2=ilo is output (output at precisely the time interval)</span>
@@ -507,7 +534,7 @@
                         <span class="k">continue</span>
 
                     <span class="n">irecout2</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;irecount: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">irecout</span><span class="p">)</span>
+                    <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;irecount: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">irecout</span><span class="p">)</span>
                            
                     <span class="c1">#if  &#39;temp&#39; in var_list:</span>
                     <span class="n">temp</span> <span class="o">=</span> <span class="n">ncdata</span><span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
@@ -579,7 +606,7 @@
                     <span class="n">wetj</span> <span class="o">=</span> <span class="n">wetij</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> 
                     
                     <span class="k">if</span> <span class="n">wetij</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;no ROMS data available for: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">ctime</span><span class="p">))</span>
+                        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;no ROMS data available for: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">ctime</span><span class="p">))</span>
                         <span class="n">salt</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9999.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">salt</span><span class="p">)</span>
                         <span class="n">temp</span> <span class="o">=</span> <span class="o">-</span><span class="mf">9999.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span> 
@@ -640,7 +667,7 @@
                                     <span class="c1">#     any(temp[i,j,:]&gt;tempmax):</span>
                                     <span class="c1">#     print(&quot;Fatal: no valid values:%s,%d,%d for salt or temp at&quot;</span>
                                     <span class="c1">#           (ncfile,i,j))  </span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dealing with horizontal nan values!&quot;</span><span class="p">)</span> 
+                        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;dealing with horizontal nan values!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="c1">#print(&quot;time3=%f&quot;%(timer.time() - start))</span>
                     
                     <span class="k">if</span> <span class="n">d</span> <span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">hr</span> <span class="o">==</span> <span class="n">hr_char</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">t</span><span class="o">==</span><span class="n">time</span><span class="p">[</span><span class="n">ilo</span><span class="p">]:</span>
@@ -961,8 +988,8 @@
                 
                     <span class="c1">#             #Enforce lower bound for temp. for eqstate</span>
                     <span class="c1">#             tempout[k,i]=max(0.,tempout[k,i])  </span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;applying spatial interpolation!&quot;</span><span class="p">)</span>          
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;outputting at day &quot;</span><span class="p">,</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mi">86400</span><span class="p">,</span> <span class="n">npout</span><span class="p">)</span> 
+                    <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;applying spatial interpolation!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">write_to_log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;outputting at day , </span><span class="si">{</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mi">86400</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">npout</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                     
                     <span class="c1"># only save the nodes with valid values. </span>
                     <span class="n">tempout_in</span> <span class="o">=</span> <span class="p">[</span><span class="n">temp_t</span><span class="p">[</span><span class="n">imap</span><span class="p">[:</span><span class="n">npout</span><span class="p">]]</span> <span class="k">for</span> <span class="n">temp_t</span> <span class="ow">in</span> <span class="n">tempout</span><span class="p">]</span>
@@ -987,8 +1014,15 @@
         <span class="n">salinity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">salinity</span><span class="p">,(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>        
         <span class="c1">#Enforce lower bound for temp. for eqstate</span>
         <span class="n">temperature</span><span class="p">[</span><span class="n">temperature</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span> <span class="mi">0</span> 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;reorganizing matrix!&quot;</span><span class="p">)</span>  
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;reorganizing matrix!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1">#print(&quot;time=%f&quot;%(timer.time() - start))</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="o">/</span><span class="mi">3600</span><span class="o">/</span><span class="mi">24</span><span class="o">+</span><span class="mi">8</span><span class="o">/</span><span class="mi">24</span>
+        <span class="n">output_day</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output_day</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_time</span><span class="o">&lt;</span><span class="n">output_day</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> 
+            <span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span><span class="p">[</span><span class="n">output_day</span><span class="o">&lt;=</span><span class="n">max_time</span><span class="p">,:,:]</span>
+            <span class="n">salinity</span> <span class="o">=</span> <span class="n">salinity</span><span class="p">[</span><span class="n">output_day</span><span class="o">&lt;=</span><span class="n">max_time</span><span class="p">,:,:]</span>
+            <span class="n">output_day</span> <span class="o">=</span> <span class="n">output_day</span><span class="p">[</span><span class="n">output_day</span><span class="o">&lt;=</span><span class="n">max_time</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">weights</span><span class="p">,</span> <span class="p">[</span><span class="n">temperature</span><span class="p">,</span> <span class="n">salinity</span><span class="p">],</span> \
             <span class="n">imap</span><span class="p">[:</span><span class="n">npout</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">output_day</span>   <span class="c1">#schism is one-based </span></div>
 
@@ -1006,9 +1040,13 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">var_info</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span></div>
        
 <div class="viewcode-block" id="nudging.gen_nudge_obs"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.gen_nudge_obs">[docs]</a>    <span class="k">def</span> <span class="nf">gen_nudge_obs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_info</span><span class="p">):</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---gen_nudge_obs---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">cutoff</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1">#when weights are less than cutoff, they will be set to zero</span>
         <span class="n">weights</span><span class="p">,</span> <span class="n">obs_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_region_weight</span><span class="p">(</span><span class="n">region_info</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">],</span>
                                                  <span class="n">region_info</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">])</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs_df</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
             <span class="n">obs_sites</span> <span class="o">=</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span>
         <span class="n">weights</span><span class="p">[</span><span class="n">weights</span><span class="o">&lt;</span><span class="n">weights</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="n">cutoff</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1056,7 +1094,8 @@
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;nan values detected for </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]))</span>
                     <span class="k">elif</span> <span class="n">none_values</span> <span class="o">==</span> <span class="s1">&#39;ambient&#39;</span><span class="p">:</span>
                         <span class="n">vdata</span> <span class="o">=</span> <span class="n">vdata</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="o">-</span><span class="mf">9999.</span><span class="p">)</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Fill nan option </span><span class="si">%s</span><span class="s2"> is not implemented&quot;</span><span class="o">%</span><span class="n">none_values</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Fill nan option </span><span class="si">%s</span><span class="s2"> is not implemented&quot;</span><span class="o">%</span><span class="n">none_values</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vdata</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataarray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span> <span class="c1">#xarray</span>
                     <span class="n">vdata</span> <span class="o">=</span> <span class="n">vdata</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="s1">&#39;site&#39;</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
                     <span class="c1"># if none_values == &#39;interpolate&#39;:</span>
@@ -1067,6 +1106,8 @@
                         <span class="n">vdata</span> <span class="o">=</span> <span class="n">vdata</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="o">-</span><span class="mf">9999.</span><span class="p">)</span>
                     <span class="c1"># elif none_values == &#39;ignore&#39;:</span>
                     <span class="c1">#     vdata = vdata.dropna(dim=&#39;site&#39;,how=&#39;any&#39;) </span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Fill nan option </span><span class="si">%s</span><span class="s2"> is not implemented&quot;</span><span class="o">%</span><span class="n">none_values</span><span class="p">)</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vdata</span><span class="o">.</span><span class="n">site</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
                         <span class="n">empty_data</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vdata</span><span class="p">,</span><span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataarray</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span> <span class="c1"># the only possibility this happens is that the variable is not in the dataset</span>
@@ -1105,8 +1146,8 @@
             
             <span class="n">imap_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">weights_v</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>            
             <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obs_df</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vdata_sites</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># multiple sites    </span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">vdata_sites</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">obs_df</span><span class="p">)</span>                
+                <span class="n">write_to_log</span><span class="p">(</span><span class="n">vdata_sites</span><span class="p">)</span>
+                <span class="n">write_to_log</span><span class="p">(</span><span class="n">obs_df</span><span class="p">)</span>
                 <span class="n">obs_x</span> <span class="o">=</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">vdata_sites</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
                 <span class="n">obs_y</span> <span class="o">=</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">vdata_sites</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>                
                                      
@@ -1119,37 +1160,39 @@
                     <span class="n">values_v</span> <span class="o">=</span> <span class="n">vdata</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">site</span><span class="o">=</span><span class="n">nn_id</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>    
                 <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;inverse_distance&#39;</span><span class="p">:</span>
                     <span class="n">obs_loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">obs_x</span><span class="p">,</span><span class="n">obs_y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
-                    <span class="n">values_v</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">values_v</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vdata</span><span class="p">))]</span>
+                    <span class="n">vdata</span><span class="p">[</span><span class="n">vdata</span><span class="o">==-</span><span class="mf">9999.0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vdata</span><span class="p">,</span><span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataarray</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+                        <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
                         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">vdata</span><span class="o">.</span><span class="n">indexes</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]:</span>
                             <span class="n">vals</span> <span class="o">=</span> <span class="n">vdata</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
-                            <span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">==-</span><span class="mf">9999.0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                             <span class="n">obs_loc_t</span> <span class="o">=</span> <span class="n">obs_loc</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span> <span class="c1"># removing nan points</span>
                             <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>
                             <span class="k">if</span> <span class="p">(</span><span class="n">vals</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;negative values detected in </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">: &quot;</span><span class="o">%</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span><span class="n">name</span><span class="p">)</span><span class="o">+</span> 
+                                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;negative values detected in </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">: &quot;</span><span class="o">%</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span><span class="n">name</span><span class="p">),</span>
                                                  <span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">])</span>
                             <span class="c1"># removing all the nans.                            </span>
                             <span class="n">invdisttree</span> <span class="o">=</span> <span class="n">Interp2D</span><span class="o">.</span><span class="n">Invdisttree</span><span class="p">(</span><span class="n">obs_loc_t</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span>
                                            <span class="n">leafsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
                             <span class="n">node_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">[</span><span class="n">imap_v</span><span class="p">],</span>
                                                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">imap_v</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
-                            <span class="n">values_v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">invdisttree</span><span class="p">(</span><span class="n">node_xy</span><span class="p">,</span> <span class="n">nnear</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-
-                    <span class="k">else</span><span class="p">:</span>    
+                            <span class="n">values_v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">invdisttree</span><span class="p">(</span><span class="n">node_xy</span><span class="p">,</span> <span class="n">nnear</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
                         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">vdata</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
                             <span class="n">vals</span> <span class="o">=</span> <span class="n">vdata</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-                            <span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">==-</span><span class="mf">9999.0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                             <span class="n">obs_loc_t</span> <span class="o">=</span> <span class="n">obs_loc</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span> <span class="c1"># removing nan points</span>
                             <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>     
                             <span class="k">if</span> <span class="p">(</span><span class="n">vals</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;negative values detected in </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">: &quot;</span><span class="o">%</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span><span class="n">name</span><span class="p">)</span><span class="o">+</span> 
+                                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;negative values detected in </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">: &quot;</span><span class="o">%</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span><span class="n">name</span><span class="p">),</span>
                                                  <span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">])</span>
                             <span class="n">invdisttree</span> <span class="o">=</span> <span class="n">Interp2D</span><span class="o">.</span><span class="n">Invdisttree</span><span class="p">(</span><span class="n">obs_loc_t</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span>
                                            <span class="n">leafsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
                             <span class="n">node_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">node_x</span><span class="p">[</span><span class="n">imap_v</span><span class="p">],</span>
                                                 <span class="bp">self</span><span class="o">.</span><span class="n">node_y</span><span class="p">[</span><span class="n">imap_v</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
-                            <span class="n">values_v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">invdisttree</span><span class="p">(</span><span class="n">node_xy</span><span class="p">,</span> <span class="n">nnear</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+                            <span class="n">values_v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">invdisttree</span><span class="p">(</span><span class="n">node_xy</span><span class="p">,</span> <span class="n">nnear</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                            <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
                 <span class="k">else</span><span class="p">:</span>
                      <span class="k">raise</span> <span class="ne">NotImplementedError</span>                  
             <span class="k">else</span><span class="p">:</span> <span class="c1"># single site</span>
@@ -1239,6 +1282,9 @@
         <span class="k">return</span> <span class="n">weights_list</span><span class="p">,</span> <span class="n">values_list</span><span class="p">,</span> <span class="n">imap_list</span>          </div>
 
 <div class="viewcode-block" id="nudging.read_data"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---read_data---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;csv&#39;</span><span class="p">):</span>
             <span class="n">obs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;datetime&#39;</span><span class="p">,</span><span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">])</span>
             <span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;time&#39;</span>   
@@ -1262,6 +1308,9 @@
         <span class="k">return</span> <span class="n">obs</span>        </div>
 
 <div class="viewcode-block" id="nudging.gen_region_weight"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.gen_region_weight">[docs]</a>    <span class="k">def</span> <span class="nf">gen_region_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">vertices</span><span class="p">):</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---gen_region_weight---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">vertices</span><span class="p">:</span>
                 <span class="n">inpoly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_vertices</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
@@ -1336,6 +1385,9 @@
                     <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> kernel not implemented&quot;</span><span class="o">%</span><span class="n">attribute</span><span class="p">[</span><span class="s1">&#39;kernel&#39;</span><span class="p">])</span></div>
                 
 <div class="viewcode-block" id="nudging.plot"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.nudging.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">imap</span><span class="p">,</span><span class="n">values</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">write_to_log</span><span class="p">(</span><span class="s2">&quot;---plot---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nnode</span><span class="p">)</span>
         <span class="n">v</span><span class="p">[</span><span class="n">imap</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
         <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">plot_nodes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1362,7 +1414,17 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--suffix&#39;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;suffix for generated nudging files&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--crs&#39;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;The projection system for the mesh&#39;</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parser</span></div>
-    
+
+<div class="viewcode-block" id="write_to_log"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.write_to_log">[docs]</a><span class="k">def</span> <span class="nf">write_to_log</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="o">==</span><span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">indexes</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Index</span><span class="p">:</span>
+        <span class="n">message</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">==</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">global</span> <span class="n">log_file</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span><span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_nudging.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="c1"># User inputs override the yaml file inputs.  </span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">create_arg_parser</span><span class="p">()</span> 
@@ -1372,7 +1434,7 @@
                                      <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
     <span class="n">nudging</span><span class="o">.</span><span class="n">read_yaml</span><span class="p">()</span>
     <span class="n">nudging</span><span class="o">.</span><span class="n">create_nudging</span><span class="p">()</span></div>
-           
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>

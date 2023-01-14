@@ -4,8 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Assigning Bathymetry &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Assigning Bathymetry &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -127,7 +128,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="assigning-bathymetry">
+  <section id="assigning-bathymetry">
 <h1>Assigning Bathymetry<a class="headerlink" href="#assigning-bathymetry" title="Permalink to this heading">¶</a></h1>
 <p>Converting a 2dm file to gr3 or between gr3/2dm and shapefile</p>
 <p><p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
@@ -135,7 +136,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">proj4</span> <span class="n">PROJ4</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="Named Arguments">
+<section id="Named Arguments">
 <h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h2>
 <dl class="option-list">
 <dt><kbd>--input</kbd></dt>
@@ -148,17 +149,17 @@
 <dd><p>Proj4 string for the projection</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="assigning-depths-from-prioritized-dems">
+</section>
+<section id="assigning-depths-from-prioritized-dems">
 <h2>Assigning depths from prioritized DEMs<a class="headerlink" href="#assigning-depths-from-prioritized-dems" title="Permalink to this heading">¶</a></h2>
-<div class="section" id="stacked-dem-fill">
+<section id="stacked-dem-fill">
 <h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Permalink to this heading">¶</a></h3>
 <p><p>Fill node elevations in a <a href="#id1"><span class="problematic" id="id2">*</span></a>.2dm SMS mesh or gr3 file using a prioritized list of DEMs.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outfile</span> <span class="n">OUTFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
+<section id="Positional Arguments">
 <h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>filename</kbd></dt>
@@ -168,10 +169,13 @@
 <dd><p>file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Named Arguments">
+</section>
+<section id="Named Arguments">
 <h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
+<dt><kbd>--outfile</kbd></dt>
+<dd><p>Name of output if input is csv</p>
+</dd>
 <dt><kbd>--elev2depth</kbd></dt>
 <dd><p>Convert elevation to depth by flipping sign. This is typical when using gr3 format, less so with 2dm.</p>
 <p>Default: False</p>
@@ -181,10 +185,10 @@
 <p>Default: 2.0</p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
-<div class="section" id="smoother-for-complex-topography">
+</section>
+</section>
+</section>
+<section id="smoother-for-complex-topography">
 <h2>Smoother for complex topography<a class="headerlink" href="#smoother-for-complex-topography" title="Permalink to this heading">¶</a></h2>
 <p>Often it is necessary to incorporate inudated marshy areas where elevations
 are poorly sampled and contours are tortuous. The script <em>contour_smooth.py</em>
@@ -202,7 +206,7 @@ $ model_time.py subcommand –help</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">contour_smooth</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="n">smooth</span><span class="p">,</span><span class="n">view</span><span class="p">,</span><span class="n">save</span><span class="p">}</span> <span class="o">...</span>
 </pre></div>
 </div>
-<div class="section" id="subcommands">
+<section id="subcommands">
 <h3>subcommands<a class="headerlink" href="#subcommands" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>subcommand</kbd></dt>
@@ -210,16 +214,17 @@ $ model_time.py subcommand –help</p>
 <p>sub-commands indicating the particular action required.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Sub-commands:">
+</section>
+<section id="Sub-commands:">
 <h3>Sub-commands:<a class="headerlink" href="#Sub-commands:" title="Permalink to this heading">¶</a></h3>
-<div class="section" id="smooth">
+<section id="smooth">
 <h4>smooth<a class="headerlink" href="#smooth" title="Permalink to this heading">¶</a></h4>
 <p>Smooth the input DEM.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">smooth</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scales</span> <span class="p">[</span><span class="n">SCALES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">nstep</span> <span class="n">NSTEP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">max_time</span> <span class="n">MAX_TIME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">report_interval</span> <span class="n">REPORT_INTERVAL</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">smooth</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scales</span> <span class="p">[</span><span class="n">SCALES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">nstep</span> <span class="n">NSTEP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">max_time</span> <span class="n">MAX_TIME</span><span class="p">]</span>
+                      <span class="p">[</span><span class="o">--</span><span class="n">report_interval</span> <span class="n">REPORT_INTERVAL</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="Named Arguments">
+<section id="Named Arguments">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--input</kbd></dt>
@@ -242,15 +247,15 @@ $ model_time.py subcommand –help</p>
 <p>Default: 1.0</p>
 </dd>
 </dl>
-</div>
-</div>
-<div class="section" id="view">
+</section>
+</section>
+<section id="view">
 <h4>view<a class="headerlink" href="#view" title="Permalink to this heading">¶</a></h4>
 <p>View two versions of the smoothed DEM based on their .npy dump.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">view</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">levels</span> <span class="p">[</span><span class="n">LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">vmin</span> <span class="n">VMIN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vmax</span> <span class="n">VMAX</span><span class="p">]</span> <span class="n">file0</span> <span class="n">file1</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
+<section id="Positional Arguments">
 <h5>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>file0</kbd></dt>
@@ -260,8 +265,8 @@ $ model_time.py subcommand –help</p>
 <dd><p>Second file in .npy format.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Named Arguments_repeat1">
+</section>
+<section id="Named Arguments_repeat1">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat1" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--levels</kbd></dt>
@@ -277,15 +282,15 @@ $ model_time.py subcommand –help</p>
 <p>Default: 4.0</p>
 </dd>
 </dl>
-</div>
-</div>
-<div class="section" id="save">
+</section>
+</section>
+<section id="save">
 <h4>save<a class="headerlink" href="#save" title="Permalink to this heading">¶</a></h4>
 <p>save dumped DEM based on .npy dump and the original DEM it came from.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">save</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dumpfile</span> <span class="n">DUMPFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">original</span> <span class="n">ORIGINAL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outfile</span> <span class="n">OUTFILE</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="Named Arguments_repeat2">
+<section id="Named Arguments_repeat2">
 <h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat2" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--dumpfile</kbd></dt>
@@ -298,11 +303,11 @@ $ model_time.py subcommand –help</p>
 <dd><p>Output file that will be saved (GeoTiff format).</p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
-</div>
-<div class="section" id="optimizing-depths-for-volume">
+</section>
+</section>
+</section>
+</section>
+<section id="optimizing-depths-for-volume">
 <h2>Optimizing depths for volume<a class="headerlink" href="#optimizing-depths-for-volume" title="Permalink to this heading">¶</a></h2>
 <p>A mesh draped over noisy bathymetry data does not necessarily represent important moments (volumes and vertical face areas) smoothly and realistically. To better represent these facets
 of the geometry, we compare the volumetric quantities that come from SCHISM’s shape functions (which are much like a TIN) to a higher order quadrature using the DEM with bilinear interpolation. The quadrature is more accurate, and also incorporates more sample points.</p>
@@ -311,7 +316,7 @@ of the geometry, we compare the volumetric quantities that come from SCHISM’s 
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">grid_opt</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">optfile</span> <span class="n">OPTFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">solver</span> <span class="n">SOLVER</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span> <span class="n">optparm</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
+<section id="Positional Arguments">
 <h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>filename</kbd></dt>
@@ -324,8 +329,8 @@ of the geometry, we compare the volumetric quantities that come from SCHISM’s 
 <dd><p>file containing optimization parameters: damp, damp_shoreline, face_coeff, volume_coeff</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Named Arguments">
+</section>
+<section id="Named Arguments">
 <h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--optfile</kbd></dt>
@@ -336,9 +341,9 @@ of the geometry, we compare the volumetric quantities that come from SCHISM’s 
 <p>Default: “L-BFGS-B”</p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>

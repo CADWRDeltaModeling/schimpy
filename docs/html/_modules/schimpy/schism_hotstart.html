@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>schimpy.schism_hotstart &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <title>schimpy.schism_hotstart &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -62,24 +62,24 @@
             
   <h1>Source code for schimpy.schism_hotstart</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Module for creating a schism hotstart file</span>
 
 <span class="sd">Options:</span>
 <span class="sd">1. Centering:</span>
 <span class="sd">    * node2D: node (2D surface)</span>
-<span class="sd">    * node3D: node at whole level </span>
+<span class="sd">    * node3D: node at whole level</span>
 <span class="sd">    * edge: edge center at whole level (mainly for horizontal velocty)</span>
 <span class="sd">    * elem: element center at whole level (mainly for vertical velocity)</span>
 <span class="sd">    * prism: prism center (for tracers); three different variables tr_el, tr_nd,</span>
-<span class="sd">    * tr_el need to be generated for the hotstart.nc file. </span>
+<span class="sd">    * tr_el need to be generated for the hotstart.nc file.</span>
 <span class="sd">        *  tr_nd = tr_nd0 (on nodes)</span>
 <span class="sd">        *  tr_el (on element at middle level)</span>
 <span class="sd">2. Initializer:</span>
-<span class="sd">    * text_init: 2D map input from either *.prop or *.ic files; require input text file. </span>
-<span class="sd">    * simple_trend: can either be a number or an equation that depends on x (lat) and y(lon). e.g,: 0.97 + 1.e-5*x </span>
+<span class="sd">    * text_init: 2D map input from either *.prop or *.ic files; require input text file.</span>
+<span class="sd">    * simple_trend: can either be a number or an equation that depends on x (lat) and y(lon). e.g,: 0.97 + 1.e-5*x</span>
 <span class="sd">    * patch_init: regional-based method. Polygon shapefile input required.</span>
-<span class="sd">    * extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects. </span>
+<span class="sd">    * extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects.</span>
 <span class="sd">    * obs_points: interpolated from 1D (time series of) observational points.</span>
 <span class="sd">    * hotstart_nc: initialize with a previous hotstart output from the same or a different mesh.</span>
 <span class="sd">    * schout_nc: initialize with a schism output snapshot.</span>
@@ -88,7 +88,7 @@
 <span class="sd">    * param.in</span>
 <span class="sd">    * hgrid.gr3</span>
 <span class="sd">    * vgrid.in</span>
-<span class="sd">    * hotstart.yaml and input files defined in the yaml file. </span>
+<span class="sd">    * hotstart.yaml and input files defined in the yaml file.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
@@ -108,14 +108,14 @@
 <div class="viewcode-block" id="SCHISMHotstart"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.SCHISMHotstart">[docs]</a><span class="k">class</span> <span class="nc">SCHISMHotstart</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Mock object &quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
-    
+
 <div class="viewcode-block" id="read_hotstart"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.read_hotstart">[docs]</a><span class="k">def</span> <span class="nf">read_hotstart</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Mock method to read existing hotstart&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="hotstart"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.hotstart">[docs]</a><span class="k">class</span> <span class="nc">hotstart</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class to generate hotstart initial condition for SCHISM </span>
+<span class="sd">    A class to generate hotstart initial condition for SCHISM</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># will change these into yaml file on</span>
@@ -130,22 +130,22 @@
         <span class="c1"># if &#39;HYDRO&#39; in modules:</span>
         <span class="c1">#     modules.remove(&#39;HYDRO&#39;)</span>
         <span class="c1">#     modules+=[&#39;TEM&#39;, &#39;SAL&#39;]</span>
-        <span class="c1"># self.modules = modules # modules can be none for barotropic runs.       </span>
+        <span class="c1"># self.modules = modules # modules can be none for barotropic runs.</span>
         <span class="c1"># if &#39;param_nml&#39; in kwargs:</span>
         <span class="c1">#     self.param_nml = kwargs[&#39;param_nml&#39;]</span>
         <span class="c1"># else:</span>
-        <span class="c1">#     if any([m in [&#39;SED&#39;, &#39;AGE&#39;, &#39;GEN&#39;, &#39;ECO&#39;] for m in modules]): # these modules require param.nml </span>
+        <span class="c1">#     if any([m in [&#39;SED&#39;, &#39;AGE&#39;, &#39;GEN&#39;, &#39;ECO&#39;] for m in modules]): # these modules require param.nml</span>
         <span class="c1">#         raise ValueError(&#39;param_nml needs to be defined in %s&#39;%yaml_fn)</span>
-        <span class="c1">#     else: # for all other modules, param.nml will not be used. </span>
+        <span class="c1">#     else: # for all other modules, param.nml will not be used.</span>
         <span class="c1">#         self.param_nml = &quot;param.nml&quot;</span>
         <span class="c1"># if crs is None:</span>
-        <span class="c1">#     self.crs = &#39;EPSG:26910&#39;  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system. </span>
+        <span class="c1">#     self.crs = &#39;EPSG:26910&#39;  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.</span>
         <span class="c1"># #    raise ValueError(&quot;crs must be specified&quot;)</span>
         <span class="c1"># else:</span>
         <span class="c1">#     print(&quot;crs is {}&quot;.format(crs))</span>
         <span class="c1">#     self.crs = crs</span>
-        
-        <span class="c1"># if self.modules:  # if modules is None for barotropic run, this step is not required. </span>
+
+        <span class="c1"># if self.modules:  # if modules is None for barotropic run, this step is not required.</span>
         <span class="c1">#     self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \</span>
         <span class="c1">#         describe_tracers(self.param_nml, modules=self.modules)</span>
         <span class="c1"># else:</span>
@@ -175,7 +175,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">output_fn</span> <span class="o">=</span> <span class="n">hotstart_info</span><span class="p">[</span><span class="s1">&#39;output_fn&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">output_fn</span> <span class="o">=</span> <span class="s1">&#39;hotstart.nc&#39;</span>
-            
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;modules&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hotstart_info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">modules</span> <span class="o">=</span> <span class="s1">&#39;HYDRO&#39;</span> <span class="c1"># hydro is the minimum required module</span>
@@ -184,31 +184,31 @@
             <span class="k">if</span> <span class="s1">&#39;HYDRO&#39;</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
                 <span class="n">modules</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;HYDRO&#39;</span><span class="p">)</span>
                 <span class="n">modules</span><span class="o">+=</span><span class="p">[</span><span class="s1">&#39;TEM&#39;</span><span class="p">,</span> <span class="s1">&#39;SAL&#39;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="n">modules</span> <span class="c1"># modules can be none for barotropic runs.    </span>
-            
+            <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="n">modules</span> <span class="c1"># modules can be none for barotropic runs.</span>
+
         <span class="k">if</span> <span class="s1">&#39;param_nml&#39;</span> <span class="ow">in</span> <span class="n">hotstart_info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">param_nml</span> <span class="o">=</span> <span class="n">hotstart_info</span><span class="p">[</span><span class="s1">&#39;param_nml&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">m</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;SED&#39;</span><span class="p">,</span> <span class="s1">&#39;AGE&#39;</span><span class="p">,</span> <span class="s1">&#39;GEN&#39;</span><span class="p">,</span> <span class="s1">&#39;ECO&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">]):</span> <span class="c1"># these modules require param.nml </span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">m</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;SED&#39;</span><span class="p">,</span> <span class="s1">&#39;AGE&#39;</span><span class="p">,</span> <span class="s1">&#39;GEN&#39;</span><span class="p">,</span> <span class="s1">&#39;ECO&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">]):</span> <span class="c1"># these modules require param.nml</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;param_nml needs to be defined in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml_fn</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">param_nml</span> <span class="o">=</span> <span class="s2">&quot;param.nml&quot;</span> <span class="c1"># for all other modules, param.nml will not be used.</span>
-                
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">crs</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hotstart_info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="s1">&#39;EPSG:26910&#39;</span>  <span class="c1"># when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system. </span>
+            <span class="k">if</span> <span class="s1">&#39;crs&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hotstart_info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="s1">&#39;EPSG:26910&#39;</span>  <span class="c1"># when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.</span>
             <span class="c1">#    raise ValueError(&quot;crs must be specified&quot;)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">crs</span> <span class="o">=</span> <span class="n">hotstart_info</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">]</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;crs is </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crs</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>  <span class="c1"># if modules is None for barotropic run, this step is not required. </span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>  <span class="c1"># if modules is None for barotropic run, this step is not required.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ntracers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ntrs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">irange_tr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_mname</span> <span class="o">=</span> \
                 <span class="n">describe_tracers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param_nml</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ntracers</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tr_mname</span> <span class="o">=</span> <span class="p">[]</span>        </div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tr_mname</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="hotstart.create_hotstart"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.hotstart.create_hotstart">[docs]</a>    <span class="k">def</span> <span class="nf">create_hotstart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_yaml</span><span class="p">()</span>
@@ -219,19 +219,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;creating hotstart for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">v</span><span class="p">)</span>
-            <span class="n">initializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="s1">&#39;initializer&#39;</span><span class="p">]</span>  
+            <span class="n">initializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="s1">&#39;initializer&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;hotstart_nc&#39;</span> <span class="ow">in</span> <span class="n">initializer</span><span class="p">)</span> <span class="ow">and</span> \
-                <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">)</span> <span class="p">:</span>                
+                <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">)</span> <span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_hfn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">[</span>
                     <span class="s1">&#39;hotstart_nc&#39;</span><span class="p">][</span><span class="s1">&#39;source_hgrid&#39;</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_vfn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">[</span>
                     <span class="s1">&#39;hotstart_nc&#39;</span><span class="p">][</span><span class="s1">&#39;source_vgrid&#39;</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;source_vgrid_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">[</span>
-                    <span class="s1">&#39;hotstart_nc&#39;</span><span class="p">][</span><span class="s1">&#39;source_vgrid_version&#39;</span><span class="p">]</span>  
+                    <span class="s1">&#39;hotstart_nc&#39;</span><span class="p">][</span><span class="s1">&#39;source_vgrid_version&#39;</span><span class="p">]</span>
             <span class="k">elif</span> <span class="s1">&#39;patch_init&#39;</span> <span class="ow">in</span> <span class="n">initializer</span> <span class="ow">and</span> \
                 <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">)</span> <span class="p">:</span>
-                <span class="n">patch_init</span> <span class="o">=</span>  <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">ini</span><span class="p">[</span><span class="s1">&#39;initializer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> 
+                <span class="n">patch_init</span> <span class="o">=</span>  <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">ini</span><span class="p">[</span><span class="s1">&#39;initializer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
                                <span class="k">for</span> <span class="n">ini</span> <span class="ow">in</span> <span class="n">initializer</span><span class="p">[</span><span class="s1">&#39;patch_init&#39;</span><span class="p">][</span><span class="s1">&#39;regions&#39;</span><span class="p">]]</span>
                 <span class="k">if</span> <span class="s1">&#39;hotstart_nc&#39;</span> <span class="ow">in</span> <span class="n">patch_init</span><span class="p">:</span>
                     <span class="n">idx_h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">patch_init</span><span class="p">)</span><span class="o">==</span><span class="s1">&#39;hotstart_nc&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -241,7 +241,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_vfn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_init</span><span class="p">[</span><span class="s1">&#39;vgrid&#39;</span><span class="p">]</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;source_vgrid_version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_init</span><span class="p">[</span>
                         <span class="s1">&#39;source_vgrid_version&#39;</span><span class="p">]</span>
-                        
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">:</span>
                 <span class="n">hotstart_mesh</span> <span class="o">=</span> <span class="n">read_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_hfn&#39;</span><span class="p">],</span>
                                           <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_vfn&#39;</span><span class="p">],</span>
@@ -249,7 +249,7 @@
                 <span class="n">indices</span><span class="p">,</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">compare_mesh</span><span class="p">(</span><span class="n">hotstart_mesh</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_indices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indices</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist</span>
-                
+
             <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_3D_field</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="s1">&#39;tke&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -262,13 +262,13 @@
             <span class="n">cumsum_eta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">elevation</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;COSINE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span> <span class="c1">#COS_mS2=COS_5, COS_mDN=COS_8, COS_mZ1 = COS_6, COS_mZ2 = COS_7</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-                <span class="n">COS_mS2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_5_el</span><span class="p">)</span>     
+                <span class="n">COS_mS2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_5_el</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-                <span class="n">COS_mDN</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_8_el</span><span class="p">)</span> 
+                <span class="n">COS_mDN</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_8_el</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-                <span class="n">COS_mZ1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_6_el</span><span class="p">)</span> 
+                <span class="n">COS_mZ1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_6_el</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
-                <span class="n">COS_mZ2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_7_el</span><span class="p">)</span> 
+                <span class="n">COS_mZ2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_7_el</span><span class="p">)</span>
             <span class="c1"># for COS_sxx, these means the sum values and will be set to zero</span>
             <span class="c1"># &#39;COS_sS2  &#39;,&#39;COS_sDN  &#39;,&#39;COS_sZ1  &#39;,&#39;COS_sZ2  &#39;,&#39;COS_nstep&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="p">[</span><span class="s1">&#39;COS_sS2&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span>
@@ -282,7 +282,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="p">[</span><span class="s1">&#39;COS_nstep&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">(</span>
                 <span class="p">(</span><span class="s1">&#39;elem&#39;</span><span class="p">,</span><span class="s1">&#39;nVert&#39;</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="o">.</span><span class="n">COS_1_el</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
         <span class="c1"># correct wet/dry cells depending on water level (eta2 value):mostly not needed.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">build_z</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="c1"># compute depth again for the updated elevation.        </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">build_z</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="c1"># compute depth again for the updated elevation.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wet_dry_check</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">map_to_schism</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span></div>
@@ -292,8 +292,8 @@
         <span class="n">kwargs_options</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="s1">&#39;SED&#39;</span> <span class="ow">in</span> <span class="n">variable</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;Nbed&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;sediment.in&quot;</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">sediment_fn</span> <span class="o">=</span> <span class="s2">&quot;sediment.in&quot;</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;sediment.nml&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sediment_fn</span> <span class="o">=</span> <span class="s2">&quot;sediment.nml&quot;</span>
                     <span class="n">params</span> <span class="o">=</span> <span class="n">read_param_nml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sediment_fn</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">Nbed</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;Nbed&#39;</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -343,7 +343,7 @@
 
 <div class="viewcode-block" id="hotstart.wet_dry_check"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.hotstart.wet_dry_check">[docs]</a>    <span class="k">def</span> <span class="nf">wet_dry_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        modify idry_e, idry, and idry_s based on eta2 and water depth. </span>
+<span class="sd">        modify idry_e, idry, and idry_s based on eta2 and water depth.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 <span class="c1">#        if hasattr(self.nc_dataset,&#39;eta2&#39;):</span>
 <span class="c1">#            z = self.mesh.build_z(elev=self.nc_dataset[&#39;eta2&#39;])</span>
@@ -398,7 +398,7 @@
     <span class="c1">#             if elevation is None:</span>
     <span class="c1">#                 depth = node[2]</span>
     <span class="c1">#             else:</span>
-    <span class="c1">#                 depth = node[2]+elevation[i]                </span>
+    <span class="c1">#                 depth = node[2]+elevation[i]</span>
     <span class="c1">#             # S-level</span>
     <span class="c1">#             hmod2 = max(0.1, min(depth, h_s))</span>
     <span class="c1">#             for k, s in enumerate(vert_grid.sigma):</span>
@@ -416,8 +416,8 @@
 
 <div class="viewcode-block" id="hotstart.map_to_schism"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.hotstart.map_to_schism">[docs]</a>    <span class="k">def</span> <span class="nf">map_to_schism</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        map the hotstart variable to the variable names required by SCHISM </span>
-<span class="sd">        hotstart file. </span>
+<span class="sd">        map the hotstart variable to the variable names required by SCHISM</span>
+<span class="sd">        hotstart file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">param_nml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_nml</span>
         <span class="n">schism_hotstart_var</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eta2&#39;</span><span class="p">:</span> <span class="s1">&#39;elevation&#39;</span><span class="p">,</span>
@@ -433,7 +433,7 @@
             <span class="n">schism_hotstart_var</span><span class="p">[</span><span class="s1">&#39;tr_el&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tr_mname_el</span>
             <span class="n">schism_hotstart_var</span><span class="p">[</span><span class="s1">&#39;tr_nd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tr_mname_nd</span>
             <span class="n">schism_hotstart_var</span><span class="p">[</span><span class="s1">&#39;tr_nd0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tr_mname_nd0</span>
-            
+
         <span class="n">nc_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span>
         <span class="c1">#v_keys =list(nc_dataset.data_vars)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;HYDRO&#39;</span><span class="p">,</span><span class="s1">&#39;TEM&#39;</span><span class="p">,</span><span class="s1">&#39;SAL&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">]):</span>
@@ -446,7 +446,7 @@
 
             <span class="n">nc_dataset</span> <span class="o">=</span> <span class="n">nc_dataset</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">mapping_dict</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">var_values</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">schism_hotstart_var</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> 
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">var_values</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">schism_hotstart_var</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                                    <span class="n">schism_hotstart_var</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var_values</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="n">nc_dataset</span> <span class="o">=</span> <span class="n">nc_dataset</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="n">var_values</span><span class="p">:</span> <span class="n">key</span><span class="p">})</span>
@@ -468,26 +468,26 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
             <span class="n">nc_dataset</span><span class="p">[</span><span class="s1">&#39;tracer_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tr_mname</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span> <span class="o">=</span> <span class="n">nc_dataset</span>     </div></div>
-        
- 
+        <span class="bp">self</span><span class="o">.</span><span class="n">nc_dataset</span> <span class="o">=</span> <span class="n">nc_dataset</span></div></div>
+
+
 <div class="viewcode-block" id="VariableField"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField">[docs]</a><span class="k">class</span> <span class="nc">VariableField</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class initializing each varaible for the hotstart file </span>
+<span class="sd">    A class initializing each varaible for the hotstart file</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_meta</span><span class="p">,</span> <span class="n">vname</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">depths</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">tr_mname</span><span class="p">,</span>
                  <span class="n">hotstart_ini</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1">#self.centering = v_meta[&#39;centering&#39;]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span> <span class="o">=</span> <span class="n">vname</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_centering</span><span class="p">()</span> <span class="c1"># the centering option is dependent on the varialbe name. </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_centering</span><span class="p">()</span> <span class="c1"># the centering option is dependent on the varialbe name.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">mesh</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">depths</span> <span class="o">=</span> <span class="n">depths</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;edge&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">edge_depths</span> <span class="o">=</span> <span class="p">(</span><span class="n">depths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_depths</span> <span class="o">=</span> <span class="p">(</span><span class="n">depths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span>
                                 <span class="n">depths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]])</span><span class="o">/</span><span class="mi">2</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;elem&#39;</span><span class="p">:</span> 
-            <span class="bp">self</span><span class="o">.</span><span class="n">elem_depths</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> 
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;elem&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elem_depths</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span>
                                 <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">elems</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">date</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
@@ -523,13 +523,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sdim_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">2</span><span class="p">]</span>
 
 <div class="viewcode-block" id="VariableField.var_centering"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.var_centering">[docs]</a>    <span class="k">def</span> <span class="nf">var_centering</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># built-in centering options for model input variables. </span>
+        <span class="c1"># built-in centering options for model input variables.</span>
         <span class="n">tr_key_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tem&#39;</span><span class="p">,</span><span class="s1">&#39;sal&#39;</span><span class="p">,</span><span class="s1">&#39;age_&#39;</span><span class="p">,</span><span class="s1">&#39;gen_&#39;</span><span class="p">,</span><span class="s1">&#39;icm&#39;</span><span class="p">,</span><span class="s1">&#39;sed_&#39;</span><span class="p">,</span><span class="s1">&#39;cos_&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tr_key_list</span><span class="p">]):</span>
             <span class="n">variable_type</span> <span class="o">=</span> <span class="s1">&#39;tracer&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">variable_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span>
-        
+
         <span class="n">vc_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elevation&#39;</span><span class="p">:</span><span class="s1">&#39;node2D&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;velocity_u&#39;</span><span class="p">:</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;velocity_v&#39;</span><span class="p">:</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span>
@@ -537,7 +537,7 @@
                       <span class="s1">&#39;SED3D_dp&#39;</span><span class="p">:</span><span class="s1">&#39;node2D&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;SED3D_rough&#39;</span><span class="p">:</span><span class="s1">&#39;node2D&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;SED3D_bed&#39;</span><span class="p">:</span><span class="s1">&#39;bed&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;SED3D_bedfrac&#39;</span><span class="p">:</span><span class="s1">&#39;bedfrac&#39;</span><span class="p">,</span>  
+                      <span class="s1">&#39;SED3D_bedfrac&#39;</span><span class="p">:</span><span class="s1">&#39;bedfrac&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;tracer&#39;</span><span class="p">:</span><span class="s1">&#39;prism&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;tke&#39;</span><span class="p">:</span><span class="s1">&#39;node3D&#39;</span>
                       <span class="p">}</span>
@@ -546,8 +546,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;variable </span><span class="si">%s</span><span class="s2"> does not have a valid input centering option&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span><span class="p">)</span></div>
 <div class="viewcode-block" id="VariableField.get_grid"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.get_grid">[docs]</a>    <span class="k">def</span> <span class="nf">get_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Getting the number and coordinates of horizontal nodes/elems/edges for </span>
-<span class="sd">        different centering options and return them as grid.   </span>
+        <span class="sd">&quot;&quot;&quot;Getting the number and coordinates of horizontal nodes/elems/edges for</span>
+<span class="sd">        different centering options and return them as grid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;node3D&#39;</span><span class="p">,</span> <span class="s1">&#39;node2D&#39;</span><span class="p">,</span> <span class="s1">&#39;edge&#39;</span><span class="p">,</span>
                    <span class="s1">&#39;elem&#39;</span><span class="p">,</span> <span class="s1">&#39;prism&#39;</span><span class="p">,</span> <span class="s1">&#39;bed&#39;</span><span class="p">,</span> <span class="s1">&#39;bedfrac&#39;</span><span class="p">]</span>
@@ -559,7 +559,7 @@
                                         <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depths</span><span class="p">)},</span>
 
                              <span class="s1">&#39;prism&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;node&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">),</span>        <span class="c1"># on prism center: mainly for tracers; first average from nodes to centers and then then average to prism center</span>
-                                       <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depths</span><span class="p">)},</span>                             
+                                       <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depths</span><span class="p">)},</span>
                              <span class="s1">&#39;node2D&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;node&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">),</span>
                                         <span class="s1">&#39;surface&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_z</span><span class="p">[:,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])},</span>
                              <span class="s1">&#39;bed&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;elem&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_elems</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elem</span><span class="p">),</span>
@@ -568,17 +568,17 @@
                              <span class="s1">&#39;bedfrac&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;elem&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_elems</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elem</span><span class="p">),</span>
                                          <span class="s1">&#39;Nbed&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nbed</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                          <span class="s1">&#39;nsed&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}}</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;edge&#39;</span><span class="p">:</span>
             <span class="n">centering_options</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;side&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_edges</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge</span><span class="p">),</span>
-                                         <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> 
+                                         <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span>
                                                    <span class="bp">self</span><span class="o">.</span><span class="n">edge_depths</span><span class="p">)}</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;elem&#39;</span><span class="p">:</span>
             <span class="n">centering_options</span><span class="p">[</span><span class="s1">&#39;elem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elem&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_elems</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elem</span><span class="p">),</span>         <span class="c1"># on element but at whole level: mainly for w</span>
-                                         <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> 
+                                         <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span>
                                                    <span class="bp">self</span><span class="o">.</span><span class="n">elem_depths</span><span class="p">)}</span>
         <span class="k">return</span> <span class="n">centering_options</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">centering</span><span class="p">]</span></div>
-    
+
 <div class="viewcode-block" id="VariableField.define_new_grid"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.define_new_grid">[docs]</a>    <span class="k">def</span> <span class="nf">define_new_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generating hgrid and vgrid based on centering option for a new grid</span>
@@ -595,7 +595,7 @@
         <span class="n">mesh_edge</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_centers_of_sides</span><span class="p">()[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">mesh_elem</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_centers_of_elements</span><span class="p">()</span>
         <span class="n">mesh_depth</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">build_z</span><span class="p">()</span>
-        
+
         <span class="n">centering_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;node3D&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;node&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">mesh_node</span><span class="p">),</span>
                                         <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> <span class="n">mesh_depth</span><span class="p">)},</span>
                              <span class="s1">&#39;prism&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;node&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_nodes</span><span class="p">,</span> <span class="n">mesh_node</span><span class="p">),</span>        <span class="c1"># on prism center: mainly for tracers; first average from nodes to centers and then then average to prism center</span>
@@ -607,9 +607,9 @@
                                      <span class="s1">&#39;MBEDP&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;layer thickness&#39;</span><span class="p">,</span> <span class="s1">&#39;layer age&#39;</span><span class="p">,</span> <span class="s1">&#39;layer porosity&#39;</span><span class="p">])},</span>
                              <span class="s1">&#39;bedfrac&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;elem&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_elems</span><span class="p">,</span> <span class="n">mesh_elem</span><span class="p">),</span>
                                          <span class="s1">&#39;Nbed&#39;</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nbed</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                                         <span class="s1">&#39;nsed&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}}</span>   
+                                         <span class="s1">&#39;nsed&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)}}</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;edge&#39;</span><span class="p">:</span>
-            <span class="n">edge_depths</span> <span class="o">=</span> <span class="p">(</span><span class="n">mesh_depth</span><span class="p">[</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> 
+            <span class="n">edge_depths</span> <span class="o">=</span> <span class="p">(</span><span class="n">mesh_depth</span><span class="p">[</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span>
                            <span class="n">mesh_depth</span><span class="p">[</span><span class="n">mesh</span><span class="o">.</span><span class="n">edges</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]])</span><span class="o">/</span><span class="mi">2</span>
             <span class="n">centering_options</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;side&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_edges</span><span class="p">,</span> <span class="n">mesh_edge</span><span class="p">),</span>
                                          <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> <span class="n">edge_depths</span><span class="p">)}</span>
@@ -617,19 +617,19 @@
             <span class="n">elem_depths</span> <span class="o">=</span> <span class="p">[</span><span class="n">mesh_depth</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">elems</span><span class="p">]</span>
             <span class="n">centering_options</span><span class="p">[</span><span class="s1">&#39;elem&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elem&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_elems</span><span class="p">,</span> <span class="n">mesh_elem</span><span class="p">),</span>         <span class="c1"># on element but at whole level: mainly for w</span>
                                          <span class="s1">&#39;nVert&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_vert_levels</span><span class="p">,</span> <span class="n">elem_depths</span><span class="p">)}</span>
-            
+
         <span class="k">return</span> <span class="n">centering_options</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">centering</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="VariableField.initializer_options"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.initializer_options">[docs]</a>    <span class="k">def</span> <span class="nf">initializer_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Options for input file initializers</span>
-<span class="sd">        The input initializer overwrites self.initializer </span>
+<span class="sd">        The input initializer overwrites self.initializer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">initializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initializer</span>
         <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;text_init&#39;</span><span class="p">,</span> <span class="s1">&#39;simple_trend&#39;</span><span class="p">,</span>
                    <span class="s1">&#39;patch_init&#39;</span><span class="p">,</span> <span class="s1">&#39;extrude_casts&#39;</span><span class="p">,</span> <span class="s1">&#39;obs_points&#39;</span><span class="p">,</span>
                    <span class="s1">&#39;hotstart_nc&#39;</span><span class="p">,</span><span class="s1">&#39;schout_nc&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">initializer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;initializer </span><span class="si">%s</span><span class="s1"> is not implimented </span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;initializer </span><span class="si">%s</span><span class="s1"> is not implimented</span>
 <span class="s1">                                      available options are: &#39;&#39;&#39;</span> <span class="o">%</span> <span class="n">initializer</span> <span class="o">+</span>
                                       <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options</span><span class="p">))</span>
         <span class="n">initializers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;text_init&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_init</span><span class="p">,</span>
@@ -643,12 +643,12 @@
 
 <div class="viewcode-block" id="VariableField.patch_initializer_options"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.patch_initializer_options">[docs]</a>    <span class="k">def</span> <span class="nf">patch_initializer_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initializer</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Options for patch initializers</span>
-<span class="sd">        The input initializer overwrites self.initializer </span>
+<span class="sd">        The input initializer overwrites self.initializer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;text_init&#39;</span><span class="p">,</span> <span class="s1">&#39;simple_trend&#39;</span><span class="p">,</span> <span class="s1">&#39;extrude_casts&#39;</span><span class="p">,</span> <span class="s1">&#39;obs_points&#39;</span><span class="p">,</span>
                    <span class="s1">&#39;hotstart_nc&#39;</span><span class="p">,</span><span class="s1">&#39;schout_nc&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">initializer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;initializer </span><span class="si">%s</span><span class="s1"> is not implimented </span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;initializer </span><span class="si">%s</span><span class="s1"> is not implimented</span>
 <span class="s1">                                      available options are: &#39;&#39;&#39;</span> <span class="o">%</span> <span class="n">initializer</span> <span class="o">+</span>
                                       <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options</span><span class="p">))</span>
         <span class="n">initializers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;text_init&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_init</span><span class="p">,</span>
@@ -662,7 +662,7 @@
 <div class="viewcode-block" id="VariableField.GenerateField"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.GenerateField">[docs]</a>    <span class="k">def</span> <span class="nf">GenerateField</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1">#initializer = globals()[self.initializer_options()]()</span>
         <span class="n">initializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initializer_options</span><span class="p">()</span>
-        <span class="n">var</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">()</span>           
+        <span class="n">var</span> <span class="o">=</span> <span class="n">initializer</span><span class="p">()</span>
         <span class="c1">#if np.all(np.isnan(var)):</span>
         <span class="c1">#    raise ValueError(</span>
         <span class="c1">#        &quot;%s field has nan value everywhere: check input data and variable name&quot; % self.variable_name)</span>
@@ -672,7 +672,7 @@
 <div class="viewcode-block" id="VariableField.map_to_3D"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.map_to_3D">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">map_to_3D</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v_2d</span><span class="p">,</span> <span class="n">nz</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        polulate the 2D map values to 3D by applying the uniform values over dpeth. </span>
+<span class="sd">        polulate the 2D map values to 3D by applying the uniform values over dpeth.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">v_2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v_2d</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">v_2d</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nz</span><span class="p">))</span></div>
@@ -687,7 +687,7 @@
 
 <div class="viewcode-block" id="VariableField.elem2node_values"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.elem2node_values">[docs]</a>    <span class="k">def</span> <span class="nf">elem2node_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmap</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        equation converting 2D values on element to nodes. </span>
+<span class="sd">        equation converting 2D values on element to nodes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">vmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vmap</span><span class="p">)</span>
         <span class="n">vnode</span> <span class="o">=</span> <span class="p">[</span><span class="n">vmap</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">node2elems</span><span class="p">]</span>
@@ -714,13 +714,13 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
             <span class="c1"># initialize the 3D field</span>
-            <span class="n">v_ini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_hgrid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_vgrid</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">v_ini</span> <span class="o">+</span> <span class="n">value</span>
+            <span class="n">v_ini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_hgrid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_vgrid</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">v_ini</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;max&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="s1">&#39;np.maximumm&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">):</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;max&#39;</span><span class="p">,</span><span class="s1">&#39;np.maximum&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;min&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="s1">&#39;np.minimum&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">):</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;min&#39;</span><span class="p">,</span><span class="s1">&#39;np.minimum&#39;</span><span class="p">)</span> 
+                <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;min&#39;</span><span class="p">,</span><span class="s1">&#39;np.minimum&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">inpoly</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hgrid</span><span class="p">[</span><span class="n">inpoly</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vgrid</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span><span class="nb">int</span><span class="p">)):</span>
@@ -730,7 +730,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vgrid</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span><span class="nb">int</span><span class="p">)):</span>
                     <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>            
+            <span class="n">y</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;SED3D_bed&#39;</span><span class="p">,</span> <span class="s1">&#39;SED3D_bedfrac&#39;</span><span class="p">]:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
                 <span class="n">v_ini</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_hgrid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_vgrid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_sdim</span><span class="p">))</span>
@@ -751,14 +751,14 @@
 
 <div class="viewcode-block" id="VariableField.text_init"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.text_init">[docs]</a>    <span class="k">def</span> <span class="nf">text_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ini_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inpoly</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reading 2D map from either a .prop (on element) or a .ic (on node) file </span>
-<span class="sd">        If a prop file is read, the element values will need to be converted to node values. </span>
+<span class="sd">        Reading 2D map from either a .prop (on element) or a .ic (on node) file</span>
+<span class="sd">        If a prop file is read, the element values will need to be converted to node values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">ini_meta</span><span class="p">:</span>
             <span class="n">text_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">ini_meta</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">text_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ini_meta</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">text_fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ic&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">text_fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ic&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">text_fn</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.gr3&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;node2D&#39;</span><span class="p">:</span>
                 <span class="n">reader</span> <span class="o">=</span> <span class="n">SchismMeshGr3Reader</span><span class="p">()</span>  <span class="c1"># the ic file has the same format as the .gr3 file</span>
                 <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fpath_mesh</span><span class="o">=</span><span class="n">text_fn</span><span class="p">)</span>
@@ -805,7 +805,7 @@
                         <span class="s2">&quot;The horizontal dim of </span><span class="si">%f</span><span class="s2"> does not match with the mesh grid&quot;</span> <span class="o">%</span> <span class="n">text_fn</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s2">&quot;Only .ic, .prop, or .nc are allowed as text input&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Only .ic, .gr3, .prop, or .nc are allowed as text input&quot;</span><span class="p">)</span>
 
         <span class="n">vmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">vmap</span><span class="p">)</span>
         <span class="n">vdim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">vmap</span><span class="p">)</span>
@@ -836,7 +836,7 @@
             <span class="c1"># perform contiguity check and return a mapping array if successful.</span>
             <span class="n">mapping</span> <span class="o">=</span> <span class="n">geo_tools</span><span class="o">.</span><span class="n">partition_check</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">poly_fn</span><span class="p">,</span>
                                                 <span class="bp">self</span><span class="o">.</span><span class="n">centering</span><span class="p">,</span>
-                                                <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>            
+                                                <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Poly_fn can only be shapefile or ic file&quot;</span><span class="p">)</span>
 
@@ -914,8 +914,8 @@
         <span class="c1"># partition the grid domain by polaris stations based on horizontal distance</span>
         <span class="n">grid_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({})</span>
         <span class="n">g_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hgrid</span><span class="p">[</span><span class="n">inpoly</span><span class="p">]</span>
-        <span class="c1">#if self.crs == &#39;EPSG:26910&#39;: # utm 10N </span>
-        <span class="c1">#    g_xy = geo_tools.utm2ll(g_xy.T).T  # conver to (lon, lat).  </span>
+        <span class="c1">#if self.crs == &#39;EPSG:26910&#39;: # utm 10N</span>
+        <span class="c1">#    g_xy = geo_tools.utm2ll(g_xy.T).T  # conver to (lon, lat).</span>
 
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">polaris_cast</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
             <span class="n">s_xy</span> <span class="o">=</span> <span class="p">[</span><span class="n">stations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">stations</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
@@ -924,7 +924,7 @@
 
         <span class="k">if</span> <span class="s1">&#39;depth&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">polaris_cast</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="n">polaris_cast</span> <span class="o">=</span> <span class="n">polaris_cast</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;depth (m)&#39;</span><span class="p">:</span><span class="s1">&#39;depth&#39;</span><span class="p">})</span>
-            
+
         <span class="c1"># loop through each station and perform vertical interpolations for the nearest grid</span>
         <span class="c1"># the depths computed are negative but polaris depths are positive</span>
         <span class="n">grid_depths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid</span><span class="p">[</span><span class="n">inpoly</span><span class="p">,</span> <span class="p">:]</span><span class="o">*-</span><span class="mf">1.0</span>
@@ -932,11 +932,11 @@
             <span class="n">grid_nearest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">grid_df</span><span class="o">.</span><span class="n">nearest</span> <span class="o">==</span> <span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">zc</span> <span class="o">=</span> <span class="n">polaris_cast</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
-                <span class="n">zc</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">],</span> <span class="n">zc</span><span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">lower</span><span class="p">()],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;previous&#39;</span><span class="p">)</span>
+                <span class="n">zc</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">],</span> <span class="n">zc</span><span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">lower</span><span class="p">()],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">grid_nearest</span><span class="p">:</span>
                 <span class="n">depth</span> <span class="o">=</span> <span class="n">grid_depths</span><span class="p">[</span><span class="n">g</span><span class="p">]</span>
                 <span class="n">v</span><span class="p">[</span><span class="n">g</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
-            
+
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">v</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;The interpolated </span><span class="si">%s</span><span class="s2"> field has nan in it&quot;</span> <span class="o">%</span> <span class="n">variable</span><span class="p">)</span>
@@ -994,7 +994,7 @@
 
 <div class="viewcode-block" id="VariableField.obs_points"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.obs_points">[docs]</a>    <span class="k">def</span> <span class="nf">obs_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ini_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inpoly</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># 1D observational points</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        obs_file includes Lat, Lon, and values for the variable. </span>
+<span class="sd">        obs_file includes Lat, Lon, and values for the variable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Interp2D</span>  <span class="c1"># now onl 2D interpolation IDW is implemented.</span>
         <span class="k">if</span> <span class="n">ini_meta</span><span class="p">:</span>
@@ -1036,7 +1036,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;vmap has nan value in it.Check </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obs_file</span><span class="p">)</span>
         <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_to_3D</span><span class="p">(</span><span class="n">vmap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_vgrid</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">v</span></div>
-    
+
 <div class="viewcode-block" id="VariableField.hotstart_nc"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.hotstart_nc">[docs]</a>    <span class="k">def</span> <span class="nf">hotstart_nc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ini_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inpoly</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span>
         <span class="k">if</span> <span class="n">var</span><span class="o">==</span><span class="s1">&#39;temperature&#39;</span><span class="p">:</span>
@@ -1052,7 +1052,7 @@
                     <span class="s1">&#39;velocity_v&#39;</span><span class="p">:</span><span class="s1">&#39;sv2&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;TEM&#39;</span><span class="p">:</span> <span class="s1">&#39;tr_nd&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;SAL&#39;</span><span class="p">:</span><span class="s1">&#39;tr_nd&#39;</span><span class="p">,</span>   <span class="c1">#[&#39;tr_el&#39;,&#39;tr_nd&#39;,&#39;tr_nd0&#39;]</span>
-                    <span class="s1">&#39;tke&#39;</span><span class="p">:[</span><span class="s1">&#39;q2&#39;</span><span class="p">,</span> <span class="s1">&#39;xl&#39;</span><span class="p">,</span> <span class="s1">&#39;dfv&#39;</span><span class="p">,</span> <span class="s1">&#39;dfh&#39;</span><span class="p">,</span> <span class="s1">&#39;dfq1&#39;</span><span class="p">,</span> 
+                    <span class="s1">&#39;tke&#39;</span><span class="p">:[</span><span class="s1">&#39;q2&#39;</span><span class="p">,</span> <span class="s1">&#39;xl&#39;</span><span class="p">,</span> <span class="s1">&#39;dfv&#39;</span><span class="p">,</span> <span class="s1">&#39;dfh&#39;</span><span class="p">,</span> <span class="s1">&#39;dfq1&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;dfq2&#39;</span><span class="p">],</span>
                     <span class="s1">&#39;SED3D_dp&#39;</span><span class="p">:</span><span class="s1">&#39;SED3D_dp&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;SED3D_rough&#39;</span><span class="p">:</span><span class="s1">&#39;SED3D_rough&#39;</span><span class="p">,</span>
@@ -1061,8 +1061,8 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yaml_var</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_mname</span><span class="p">):</span>
             <span class="n">yamel_var</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;tr_nd&#39;</span>
         <span class="k">if</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_mname</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tr_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_mname</span><span class="p">)</span><span class="o">==</span><span class="n">var</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>                
-                
+            <span class="bp">self</span><span class="o">.</span><span class="n">tr_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_mname</span><span class="p">)</span><span class="o">==</span><span class="n">var</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="n">hotstart_data</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">data_source</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s1">&#39;source_hgrid&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ini_meta</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="c1">#if the grids are exactly the same</span>
@@ -1074,7 +1074,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">vin</span> <span class="o">=</span> <span class="n">hotstart_data</span><span class="p">[</span><span class="n">yaml_var</span><span class="p">[</span><span class="n">var</span><span class="p">]]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ntracers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_index</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">vin</span> <span class="o">=</span> <span class="n">hotstart_data</span><span class="p">[</span><span class="n">yaml_var</span><span class="p">[</span><span class="n">var</span><span class="p">]]</span>  
+                <span class="n">vin</span> <span class="o">=</span> <span class="n">hotstart_data</span><span class="p">[</span><span class="n">yaml_var</span><span class="p">[</span><span class="n">var</span><span class="p">]]</span>
             <span class="k">if</span> <span class="s1">&#39;distance_threshold&#39;</span> <span class="ow">in</span> <span class="n">ini_meta</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_from_mesh</span><span class="p">(</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_hgrid&#39;</span><span class="p">],</span> <span class="n">vin</span><span class="p">,</span> <span class="n">inpoly</span><span class="p">,</span>
                                           <span class="n">dist</span><span class="o">=</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;distance_threshold&#39;</span><span class="p">],</span>
@@ -1085,52 +1085,52 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tr_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">vin</span> <span class="o">=</span> <span class="n">hotstart_data</span><span class="p">[</span><span class="n">yaml_var</span><span class="p">[</span><span class="n">var</span><span class="p">]]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">ntracers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tr_index</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">vin</span> <span class="o">=</span> <span class="n">hotstart_data</span><span class="p">[</span><span class="n">yaml_var</span><span class="p">[</span><span class="n">var</span><span class="p">]]</span>  
+                <span class="n">vin</span> <span class="o">=</span> <span class="n">hotstart_data</span><span class="p">[</span><span class="n">yaml_var</span><span class="p">[</span><span class="n">var</span><span class="p">]]</span>
             <span class="k">if</span> <span class="s1">&#39;distance_threshold&#39;</span> <span class="ow">in</span> <span class="n">ini_meta</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                 <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_from_mesh</span><span class="p">(</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_hgrid&#39;</span><span class="p">],</span> <span class="n">vin</span><span class="p">,</span> 
-                                          <span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_vgrid&#39;</span><span class="p">],</span> 
+                 <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_from_mesh</span><span class="p">(</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_hgrid&#39;</span><span class="p">],</span> <span class="n">vin</span><span class="p">,</span>
+                                          <span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_vgrid&#39;</span><span class="p">],</span>
                                           <span class="n">inpoly</span><span class="o">=</span><span class="n">inpoly</span><span class="p">,</span>
                                           <span class="n">dist_th</span><span class="o">=</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;distance_threshold&#39;</span><span class="p">],</span>
-                                          <span class="n">method</span><span class="o">=</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">])</span>                 
+                                          <span class="n">method</span><span class="o">=</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_from_mesh</span><span class="p">(</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_hgrid&#39;</span><span class="p">],</span> <span class="n">vin</span><span class="p">,</span> 
-                                          <span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_vgrid&#39;</span><span class="p">],</span> 
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp_from_mesh</span><span class="p">(</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_hgrid&#39;</span><span class="p">],</span> <span class="n">vin</span><span class="p">,</span>
+                                          <span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_vgrid&#39;</span><span class="p">],</span>
                                           <span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;source_vgrid_version&#39;</span><span class="p">],</span>
-                                          <span class="n">inpoly</span><span class="p">)</span>          
-        <span class="c1"># if type(yaml_var[var]) is list: </span>
+                                          <span class="n">inpoly</span><span class="p">)</span>
+        <span class="c1"># if type(yaml_var[var]) is list:</span>
         <span class="c1">#     ds = xr.Dataset()</span>
         <span class="c1">#     for j, name in enumerate(yaml_var[var]):</span>
         <span class="c1">#         ds_ar = xr.Dataset({name: ([&#39;node&#39;, &#39;nVert&#39;],</span>
         <span class="c1">#                                    v[j,:,:])})</span>
         <span class="c1">#         # coords={&#39;node&#39;:range(self.mesh.n_nodes()),</span>
         <span class="c1">#         # &#39;nVert&#39;:range(self.mesh.n_vert_levels)})</span>
-        <span class="c1">#         ds = ds.merge(ds_ar)          </span>
+        <span class="c1">#         ds = ds.merge(ds_ar)</span>
         <span class="c1"># else:</span>
         <span class="c1">#     ds = v</span>
-        <span class="k">return</span> <span class="n">v</span>            </div>
-    
+        <span class="k">return</span> <span class="n">v</span></div>
+
 <div class="viewcode-block" id="VariableField.interp_from_mesh"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.interp_from_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">interp_from_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hgrid_fn</span><span class="p">,</span> <span class="n">vin</span><span class="p">,</span><span class="n">vgrid_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vgrid_version</span><span class="o">=</span><span class="mf">5.8</span><span class="p">,</span>
                          <span class="n">inpoly</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dist_th</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">rtree.index</span>
         <span class="n">mesh1</span> <span class="o">=</span> <span class="n">read_mesh</span><span class="p">(</span><span class="n">hgrid_fn</span><span class="p">,</span><span class="n">vgrid_fn</span><span class="p">,</span><span class="n">vgrid_version</span><span class="p">)</span>
-            
+
         <span class="n">grid1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">define_new_grid</span><span class="p">(</span><span class="n">mesh1</span><span class="p">)</span>
         <span class="n">hgrid1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">grid1</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">vgrid1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">grid1</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>  
-        
+        <span class="n">vgrid1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">grid1</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="n">inpoly</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">hgrid2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hgrid</span>
             <span class="n">vgrid2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">hgrid2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hgrid</span><span class="p">[</span><span class="n">inpoly</span><span class="p">]</span>
             <span class="n">vgrid2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid</span><span class="p">[</span><span class="n">inpoly</span><span class="p">,:]</span>
-            
+
         <span class="n">compare_mesh_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="s1">&#39;hotstart_nc_hfn&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_hfn&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">hgrid_fn</span><span class="p">)</span> <span class="ow">and</span> \
             <span class="p">(</span><span class="s1">&#39;node&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="ow">or</span> <span class="s1">&#39;prism&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span><span class="p">):</span>
                 <span class="n">compare_mesh_flag</span> <span class="o">=</span> <span class="kc">True</span>
-                
+
         <span class="k">if</span> <span class="n">compare_mesh_flag</span><span class="p">:</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_indices&#39;</span><span class="p">]</span>
             <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hotstart_ini</span><span class="p">[</span><span class="s1">&#39;hotstart_nc_dist&#39;</span><span class="p">]</span>
@@ -1138,7 +1138,7 @@
                 <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices</span><span class="p">)[</span><span class="n">inpoly</span><span class="p">]</span>
                 <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dist</span><span class="p">)[</span><span class="n">inpoly</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mesh1_idx</span> <span class="o">=</span> <span class="n">rtree</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Rtree</span><span class="p">()</span>        
+            <span class="n">mesh1_idx</span> <span class="o">=</span> <span class="n">rtree</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Rtree</span><span class="p">()</span>
             <span class="c1"># Horizontal: nearest neighbor method</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hgrid1</span><span class="p">):</span>
                 <span class="n">mesh1_idx</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">p</span><span class="p">))</span>
@@ -1154,7 +1154,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;horizontal interpolation completed!&quot;</span><span class="p">)</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">dist_th</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># same points, apply nearest; different points, apply the method defined</span>
             <span class="n">same_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist</span><span class="o">&lt;=</span><span class="n">dist_th</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">diff_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist</span><span class="o">&gt;</span><span class="n">dist_th</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1167,48 +1167,48 @@
                     <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">vin</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
                         <span class="c1">#vout[j,:] = vin[v][indices]</span>
                         <span class="n">vout</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">same_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">indices</span><span class="p">[</span><span class="n">same_points</span><span class="p">]]</span>
-                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">diff_points</span><span class="p">:</span>  
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">diff_points</span><span class="p">:</span>
                         <span class="n">z1</span> <span class="o">=</span> <span class="n">vgrid1</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">p</span><span class="p">]]</span>
                         <span class="n">z2</span> <span class="o">=</span> <span class="n">vgrid2</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
                         <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">vin</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
                             <span class="n">f</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
-                            <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">indices</span><span class="p">[</span><span class="n">p</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span> 
+                            <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">indices</span><span class="p">[</span><span class="n">p</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span>
                             <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
-                            <span class="n">vout</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>        
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vertical grid interpolation completed!&quot;</span><span class="p">)</span>                     
+                            <span class="n">vout</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vertical grid interpolation completed!&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span> <span class="c1"># nearest or equation</span>
                     <span class="n">x</span> <span class="o">=</span> <span class="n">hgrid2</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">y</span> <span class="o">=</span> <span class="n">hgrid2</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">z</span> <span class="o">=</span> <span class="n">vgrid2</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">vout</span><span class="p">[:,</span><span class="n">diff_points</span><span class="p">,:]</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
-                    <span class="n">vout</span><span class="p">[:,</span><span class="n">same_points</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[:,</span><span class="n">indices</span><span class="p">[</span><span class="n">same_points</span><span class="p">],:]</span>                
+                    <span class="n">vout</span><span class="p">[:,</span><span class="n">same_points</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[:,</span><span class="n">indices</span><span class="p">[</span><span class="n">same_points</span><span class="p">],:]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">vout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vgrid2</span><span class="p">)</span> 
+                <span class="n">vout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vgrid2</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;nearest&#39;</span><span class="p">:</span>
                     <span class="n">vout</span><span class="p">[</span><span class="n">same_points</span><span class="p">]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">same_points</span><span class="p">]]</span>
-                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">diff_points</span><span class="p">:</span>  
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">diff_points</span><span class="p">:</span>
                         <span class="n">z1</span> <span class="o">=</span> <span class="n">vgrid1</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">p</span><span class="p">]]</span>
                         <span class="n">z2</span> <span class="o">=</span> <span class="n">vgrid2</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
                         <span class="n">f</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
-                        <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">p</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span> 
+                        <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">p</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span>
                         <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
                         <span class="n">vout</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vertical grid interpolation completed!&quot;</span><span class="p">)</span> 
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vertical grid interpolation completed!&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">x</span> <span class="o">=</span> <span class="n">hgrid2</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">y</span> <span class="o">=</span> <span class="n">hgrid2</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="n">z</span> <span class="o">=</span> <span class="n">vgrid2</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> 
+                    <span class="n">z</span> <span class="o">=</span> <span class="n">vgrid2</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">vout</span><span class="p">[</span><span class="n">diff_points</span><span class="p">,:]</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">method</span><span class="p">)[:,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">vin</span><span class="p">)</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">vout</span><span class="p">):</span>
                         <span class="n">vout</span><span class="p">[</span><span class="n">same_points</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">same_points</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">vout</span><span class="p">[</span><span class="n">same_points</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">same_points</span><span class="p">],:]</span>            
-        <span class="k">else</span><span class="p">:</span>        
-      
+                        <span class="n">vout</span><span class="p">[</span><span class="n">same_points</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">same_points</span><span class="p">],:]</span>
+        <span class="k">else</span><span class="p">:</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="o">==</span> <span class="s1">&#39;node2D&#39;</span> <span class="ow">or</span> \
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">n_vert_levels</span> <span class="o">==</span> <span class="n">mesh1</span><span class="o">.</span><span class="n">n_vert_levels</span> <span class="ow">and</span> \
-                 <span class="p">(</span><span class="s1">&#39;vinterp&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ini_meta</span> <span class="ow">or</span> 
-                  <span class="bp">self</span><span class="o">.</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;vinterp&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)):</span> 
+                 <span class="p">(</span><span class="s1">&#39;vinterp&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ini_meta</span> <span class="ow">or</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">ini_meta</span><span class="p">[</span><span class="s1">&#39;vinterp&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vin</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
                     <span class="n">vout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">vin</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span>
                                       <span class="nb">len</span><span class="p">(</span><span class="n">vin</span><span class="o">.</span><span class="n">nVert</span><span class="p">)))</span>
@@ -1216,7 +1216,7 @@
                         <span class="n">vout</span><span class="p">[</span><span class="n">j</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">indices</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">vout</span> <span class="o">=</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>   
+            <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;interpolating vertical grid from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span>
                     <span class="n">vgrid_fn</span><span class="p">))</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vin</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
@@ -1224,23 +1224,23 @@
                                       <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">vgrid2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">vout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vgrid2</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hgrid2</span><span class="p">):</span>  
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hgrid2</span><span class="p">):</span>
                     <span class="n">z1</span> <span class="o">=</span> <span class="n">vgrid1</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
                     <span class="n">z2</span> <span class="o">=</span> <span class="n">vgrid2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vin</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
                         <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">vin</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
                             <span class="n">f</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
-                            <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span> 
+                            <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span>
                             <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
-                            <span class="n">vout</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>        
-                    <span class="k">else</span><span class="p">:</span> 
+                            <span class="n">vout</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
                         <span class="n">f</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span>
-                        <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span> 
+                        <span class="n">z1</span><span class="p">,</span> <span class="n">vin</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">,</span>
                         <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
                         <span class="n">vout</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">z2</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vertical grid interpolation completed!&quot;</span><span class="p">)</span> 
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;vertical grid interpolation completed!&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">vout</span></div>
-    
+
 <div class="viewcode-block" id="VariableField.schout_nc"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.VariableField.schout_nc">[docs]</a>    <span class="k">def</span> <span class="nf">schout_nc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">ini_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inpoly</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
@@ -1270,7 +1270,7 @@
             <span class="n">ds</span> <span class="o">=</span> <span class="n">ds_var</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">centering</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bed&#39;</span><span class="p">,</span> <span class="s1">&#39;bedfrac&#39;</span><span class="p">]:</span>
             <span class="n">ds_var</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">var</span><span class="p">,</span>  <span class="c1"># coords=[range(self.n_hgrid),range(self.n_vgrid),range(self.n_sdim)],</span>
-                                  <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hgrid_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid_name</span><span class="p">,</span> 
+                                  <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hgrid_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid_name</span><span class="p">,</span>
                                         <span class="bp">self</span><span class="o">.</span><span class="n">sdim_name</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span><span class="p">)</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">ds_var</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span> <span class="o">==</span> <span class="s1">&#39;tke&#39;</span><span class="p">:</span>
@@ -1281,10 +1281,10 @@
                                             <span class="n">var</span><span class="p">[</span><span class="n">j</span><span class="p">,:,:])})</span>
                 <span class="c1"># coords={&#39;node&#39;:range(self.mesh.n_nodes()),</span>
                 <span class="c1"># &#39;nVert&#39;:range(self.mesh.n_vert_levels)})</span>
-                <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">ds_ar</span><span class="p">)</span>  
-        <span class="k">else</span><span class="p">:</span>            
+                <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">ds_ar</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">ds_var</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">var</span><span class="p">,</span>  <span class="c1"># coords=[range(self.n_hgrid),range(self.n_vgrid)],</span>
-                                  <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hgrid_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid_name</span><span class="p">],</span> 
+                                  <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hgrid_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vgrid_name</span><span class="p">],</span>
                                   <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span><span class="p">)</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">ds_var</span><span class="o">.</span><span class="n">to_dataset</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">ds</span></div></div>
@@ -1301,7 +1301,7 @@
             <span class="c1"># only take the portion of the arguement before the comment</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">)</span> <span class="ow">or</span>
-                <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="ow">or</span> 
+                <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="ow">not</span> <span class="n">line</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1324,9 +1324,9 @@
 
 
 <div class="viewcode-block" id="describe_tracers"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.describe_tracers">[docs]</a><span class="k">def</span> <span class="nf">describe_tracers</span><span class="p">(</span><span class="n">param_nml</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;HYDRO&#39;</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot; return the number of tracers, the sequence of the tracers and a list </span>
-<span class="sd">    of tracer names based on the input list of modules and corresponding </span>
-<span class="sd">    input files. </span>
+    <span class="sd">&quot;&quot;&quot; return the number of tracers, the sequence of the tracers and a list</span>
+<span class="sd">    of tracer names based on the input list of modules and corresponding</span>
+<span class="sd">    input files.</span>
 <span class="sd">    Availabel modules are:</span>
 <span class="sd">!     1: T (default)</span>
 <span class="sd">!     2: S (default)</span>
@@ -1338,8 +1338,8 @@
 <span class="sd">!     8: CoSiNE: COSINE</span>
 <span class="sd">!     9: Feco: FIB</span>
 <span class="sd">!    10: TIMOR</span>
-<span class="sd">!    11: FABM    </span>
-<span class="sd">    The script is mainly translated from schism_ini.F90    </span>
+<span class="sd">!    11: FABM</span>
+<span class="sd">    The script is mainly translated from schism_ini.F90</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ntrs</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># number of tracers for each module</span>
     <span class="n">tr_mname</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># tracer moodule name</span>
@@ -1442,11 +1442,11 @@
     <span class="k">return</span> <span class="n">ntracers</span><span class="p">,</span> <span class="n">ntrs</span><span class="p">,</span> <span class="n">irange_tr</span><span class="p">,</span> <span class="n">tr_mname</span></div>
 
 
-<div class="viewcode-block" id="hotstart_to_outputnc"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.hotstart_to_outputnc">[docs]</a><span class="k">def</span> <span class="nf">hotstart_to_outputnc</span><span class="p">(</span><span class="n">hotstart_fn</span><span class="p">,</span> <span class="n">init_date</span><span class="p">,</span> <span class="n">hgrid_fn</span><span class="o">=</span><span class="s1">&#39;hgrid.gr3&#39;</span><span class="p">,</span> 
-                         <span class="n">vgrid_fn</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">,</span> <span class="n">vgrid_version</span> <span class="o">=</span> <span class="mf">5.8</span><span class="p">,</span>
+<div class="viewcode-block" id="hotstart_to_outputnc"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.hotstart_to_outputnc">[docs]</a><span class="k">def</span> <span class="nf">hotstart_to_outputnc</span><span class="p">(</span><span class="n">hotstart_fn</span><span class="p">,</span> <span class="n">init_date</span><span class="p">,</span> <span class="n">hgrid_fn</span><span class="o">=</span><span class="s1">&#39;hgrid.gr3&#39;</span><span class="p">,</span>
+                         <span class="n">vgrid_fn</span><span class="o">=</span><span class="s1">&#39;vgrid.in&#39;</span><span class="p">,</span> <span class="n">vgrid_version</span> <span class="o">=</span> <span class="s1">&#39;5.10&#39;</span><span class="p">,</span>
                          <span class="n">outname</span><span class="o">=</span><span class="s2">&quot;hotstart_out.nc&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    convert hotstart.nc to schism output nc file format that can be read by VisIt. </span>
+<span class="sd">    convert hotstart.nc to schism output nc file format that can be read by VisIt.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># load hotstart file and grid file</span>
     <span class="n">hnc</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_dataset</span><span class="p">(</span><span class="n">hotstart_fn</span><span class="p">)</span>
@@ -1728,7 +1728,7 @@
     <span class="c1"># UTM10N: &#39;EPSG:26910&#39;</span>
     <span class="k">if</span> <span class="n">mesh</span><span class="o">.</span><span class="n">crs</span><span class="o">==</span><span class="n">new_crs</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mesh</span>
-    <span class="k">else</span><span class="p">:</span> 
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">projection</span> <span class="o">=</span> <span class="n">geo_tools</span><span class="o">.</span><span class="n">project_fun</span><span class="p">(</span><span class="n">new_crs</span><span class="p">)</span>
         <span class="n">new_nodes</span> <span class="o">=</span> <span class="n">projection</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">new_nodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">new_nodes</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
@@ -1736,7 +1736,7 @@
         <span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">new_nodes</span>
         <span class="k">return</span> <span class="n">mesh</span></div>
 
-    
+
 <div class="viewcode-block" id="create_arg_parser"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.create_arg_parser">[docs]</a><span class="k">def</span> <span class="nf">create_arg_parser</span><span class="p">():</span>
     <span class="kn">import</span> <span class="nn">argparse</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Create hotstart for a schism run&quot;</span><span class="p">)</span>
@@ -1745,12 +1745,12 @@
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--crs&#39;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;The projection system for the mesh&#39;</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--output_fn&#39;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span><span class="n">help</span><span class="o">=</span><span class="s1">&#39;Output hotstart filename.nc&#39;</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parser</span></div>
-    
+
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../schimpy.html#schimpy.schism_hotstart.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="c1"># User inputs override the yaml file inputs.  </span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">create_arg_parser</span><span class="p">()</span> 
+    <span class="c1"># User inputs override the yaml file inputs.</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">create_arg_parser</span><span class="p">()</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    
+
     <span class="n">h</span> <span class="o">=</span> <span class="n">hotstart</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">yaml_fn</span><span class="p">,</span><span class="n">module</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">modules</span><span class="p">,</span><span class="n">crs</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
                  <span class="n">output_fn</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">output_fn</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">output_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1759,8 +1759,8 @@
         <span class="n">output_fn</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">output_fn</span>
     <span class="n">h</span><span class="o">.</span><span class="n">create_hotstart</span><span class="p">()</span>
     <span class="n">hnc</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">nc_dataset</span>
-    <span class="n">hnc</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">output_fn</span><span class="p">)</span>  </div>
-           
+    <span class="n">hnc</span><span class="o">.</span><span class="n">to_netcdf</span><span class="p">(</span><span class="n">output_fn</span><span class="p">)</span></div>
+
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 

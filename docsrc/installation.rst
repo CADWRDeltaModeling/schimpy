@@ -8,25 +8,22 @@ Installation
 Stable release
 --------------
 
-To install schimpy, run this command in your terminal:
+We recommend conda for installing schimpy. The simplest way to install 
+schimpy is to run this command in your terminal:
 
 .. code-block:: console
 
     $ conda install -c cadwr-dms schimpy
 
-This is the preferred method to install schimpy, as it will always install the most recent stable release.
-
-If you don't have `conda`_ installed, this `Conda installation guide`_ can guide
-you through the process.
-
-.. _conda: https://docs.conda.io/en/latest/
-.. _Conda installation guide: https://docs.conda.io/projects/conda/en/latest/user-guide/install/
-
+For greater flexibility and a set of tools that are commonly used with SCHISM, however, 
+you may want to install a more complete schism environment using the 
+schism_environment.yml file that is in the parent directory of 
+`BayDeltaSCHISM <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM>`_
 
 From sources
 ------------
 
-The sources for schimpy can be downloaded from the `Github repo`_.
+The sources for schimpy can be downloaded from the `Github repo <https://github.com/CADWRDeltaModeling/schimpy>`_.
 
 You can either clone the public repository:
 
@@ -47,7 +44,7 @@ Once you have a copy of the source, you can install it with:
     # make sure all dependencies from setup_devenv.bat are installed by conda
     $ setup_devenv.bat # or copy and paste the commands into shell
     $ conda activate dev_schimpy
-    $ pip install -e .
+    $ pip install --no-deps -e .
 
 
 .. _Github repo: https://github.com/CADWRDeltaModeling/schimpy

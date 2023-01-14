@@ -4,8 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Installation &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Installation &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -95,19 +96,21 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="installation">
+  <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h1>
-<div class="section" id="stable-release">
+<section id="stable-release">
 <h2>Stable release<a class="headerlink" href="#stable-release" title="Permalink to this heading">¶</a></h2>
-<p>To install schimpy, run this command in your terminal:</p>
+<p>We recommend conda for installing schimpy. The simplest way to install
+schimpy is to run this command in your terminal:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda install -c cadwr-dms schimpy
 </pre></div>
 </div>
-<p>This is the preferred method to install schimpy, as it will always install the most recent stable release.</p>
-<p>If you don’t have <a class="reference external" href="https://docs.conda.io/en/latest/">conda</a> installed, this <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">Conda installation guide</a> can guide
-you through the process.</p>
-</div>
-<div class="section" id="from-sources">
+<p>For greater flexibility and a set of tools that are commonly used with SCHISM, however,
+you may want to install a more complete schism environment using the
+schism_environment.yml file that is in the parent directory of
+<a class="reference external" href="https://github.com/CADWRDeltaModeling/BayDeltaSCHISM">BayDeltaSCHISM</a></p>
+</section>
+<section id="from-sources">
 <h2>From sources<a class="headerlink" href="#from-sources" title="Permalink to this heading">¶</a></h2>
 <p>The sources for schimpy can be downloaded from the <a class="reference external" href="https://github.com/CADWRDeltaModeling/schimpy">Github repo</a>.</p>
 <p>You can either clone the public repository:</p>
@@ -122,11 +125,11 @@ you through the process.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>make sure all dependencies from setup_devenv.bat are installed by conda
 <span class="gp">$ </span>setup_devenv.bat <span class="c1"># or copy and paste the commands into shell</span>
 <span class="gp">$ </span>conda activate dev_schimpy
-<span class="gp">$ </span>pip install -e .
+<span class="gp">$ </span>pip install --no-deps -e .
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>

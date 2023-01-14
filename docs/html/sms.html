@@ -4,8 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Working with SMS &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Working with SMS &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -121,15 +122,15 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="working-with-sms">
+  <section id="working-with-sms">
 <h1>Working with SMS<a class="headerlink" href="#working-with-sms" title="Permalink to this heading">¶</a></h1>
 <p>The preprocessing toolkit has some utilities that can help when working with
 Aquaveo SMS, the main form of mesh generation we use until we are
 able to distrubute a sufficient open source mesh generator.</p>
-<div class="section" id="converting-an-sms-mesh-2dm-file-to-gr3">
+<section id="converting-an-sms-mesh-2dm-file-to-gr3">
 <h2>Converting an SMS mesh (2dm) file to gr3<a class="headerlink" href="#converting-an-sms-mesh-2dm-file-to-gr3" title="Permalink to this heading">¶</a></h2>
 <p>The script that converts SMS mesh to SCHISM gr3 format is available as a standalone script.</p>
-<div class="section" id="convert-mesh">
+<section id="convert-mesh">
 <h3>convert_mesh<a class="headerlink" href="#convert-mesh" title="Permalink to this heading">¶</a></h3>
 <p>schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files</p>
 <p><p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
@@ -137,7 +138,7 @@ able to distrubute a sufficient open source mesh generator.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">proj4</span> <span class="n">PROJ4</span><span class="p">]</span>
 </pre></div>
 </div>
-<div class="section" id="Named Arguments">
+<section id="Named Arguments">
 <h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>--input</kbd></dt>
@@ -150,24 +151,24 @@ able to distrubute a sufficient open source mesh generator.</p>
 <dd><p>Proj4 string for the projection</p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
-<div class="section" id="getting-sms-polygons-for-preprocessor">
+</section>
+</section>
+</section>
+<section id="getting-sms-polygons-for-preprocessor">
 <h2>Getting SMS Polygons for Preprocessor<a class="headerlink" href="#getting-sms-polygons-for-preprocessor" title="Permalink to this heading">¶</a></h2>
 <p>SMS is able to create mesh coverages that are not mesh generation hints, including
 spatial properties maps whose polygons have “material properties”. If you save the
 coverage as a polygon shapefile, the script <em>material_poly.py</em> can help convert the
 resulting shapefile to the preprocessor yaml format. At the time of writing we do
 not have a tutorial example of this process.</p>
-<div class="section" id="material-poly">
+<section id="material-poly">
 <h3>material_poly<a class="headerlink" href="#material-poly" title="Permalink to this heading">¶</a></h3>
 <p><p>Convert shapefile from SMS into polygon format for preprocessor</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">material_poly</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">keyfile</span> <span class="n">KEYFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">type</span> <span class="n">TYPE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">default</span> <span class="n">DEFAULT</span><span class="p">]</span> <span class="n">shapefile</span> <span class="n">dset</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
+<section id="Positional Arguments">
 <h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>shapefile</kbd></dt>
@@ -177,8 +178,8 @@ not have a tutorial example of this process.</p>
 <dd><p>name of dataset inside shapefile</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Named Arguments">
+</section>
+<section id="Named Arguments">
 <h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>--keyfile</kbd></dt>
@@ -195,31 +196,33 @@ not have a tutorial example of this process.</p>
 <dd><p>Global default in polygon specs</p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
-<div class="section" id="visualizing-detailed-bathymetry-inside-sms">
+</section>
+</section>
+</section>
+<section id="visualizing-detailed-bathymetry-inside-sms">
 <h2>Visualizing detailed bathymetry inside SMS<a class="headerlink" href="#visualizing-detailed-bathymetry-inside-sms" title="Permalink to this heading">¶</a></h2>
 <p>Earlier versions (before 11.2) of SMS had bugs causing incorrect georefercing of DEMs
 and very poor memory management. It was – and probably still is – impossible
 to efficiently assign elevations within the software for a large mesh. We have two scripts
 that were designed to help with this problem: <em>clip_dems.py</em> and <em>stacked_dem_fill.py</em>.</p>
-<div class="section" id="clip-dems">
+<section id="clip-dems">
 <h3>clip_dems<a class="headerlink" href="#clip-dems" title="Permalink to this heading">¶</a></h3>
 <p><p>Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">clip_dems</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">coords</span> <span class="n">ul_x</span> <span class="n">ul_y</span> <span class="n">lr_x</span> <span class="n">lr_y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">image</span> <span class="n">INFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">prefix</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outformat</span> <span class="n">OUTFORMAT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hshift</span><span class="p">]</span> <span class="n">demlist</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">clip_dems</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">coords</span> <span class="n">ul_x</span> <span class="n">ul_y</span> <span class="n">lr_x</span> <span class="n">lr_y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">image</span> <span class="n">INFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">prefix</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outformat</span> <span class="n">OUTFORMAT</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">hshift</span><span class="p">]</span>
+                 <span class="n">demlist</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
+<section id="Positional Arguments">
 <h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>demlist</kbd></dt>
 <dd><p>file containing prioritized (high to low) list of dems.</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Named Arguments">
+</section>
+<section id="Named Arguments">
 <h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>--coords</kbd></dt>
@@ -246,7 +249,7 @@ that were designed to help with this problem: <em>clip_dems.py</em> and <em>stac
 <p>Default: False</p>
 </dd>
 </dl>
-</div>
+</section>
 <p>The script clip_dems.py is used to create mini-DEMs on the fly that are small
 enough to be brought into the SMS environment as rasters without slowing it down too much.
 The same The:ref:<cite>dem_list_file</cite> is used here as elsewhere in the pre-processor.</p>
@@ -255,15 +258,15 @@ work area as a jpeg image and use it as the -image argument to <em>clip_dems.py<
 One cut DEM will be produced for each DEM on the <em>dem_list</em> file that intersects the
 work area, using file names in order of priority (0 highest). The cut DEMs would then
 be imported and visualized in SMS, ideally using “contours” as the viewing choice and a carefully crafted color map designed to focus on the elevations that are locally most important.</p>
-</div>
-<div class="section" id="stacked-dem-fill">
+</section>
+<section id="stacked-dem-fill">
 <h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Permalink to this heading">¶</a></h3>
 <p><p>Fill node elevations in a <a href="#id1"><span class="problematic" id="id2">*</span></a>.2dm SMS mesh or gr3 file using a prioritized list of DEMs.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outfile</span> <span class="n">OUTFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
 </pre></div>
 </div>
-<div class="section" id="Positional Arguments">
+<section id="Positional Arguments">
 <h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>filename</kbd></dt>
@@ -273,10 +276,13 @@ be imported and visualized in SMS, ideally using “contours” as the viewing c
 <dd><p>file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs</p>
 </dd>
 </dl>
-</div>
-<div class="section" id="Named Arguments">
+</section>
+<section id="Named Arguments">
 <h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
+<dt><kbd>--outfile</kbd></dt>
+<dd><p>Name of output if input is csv</p>
+</dd>
 <dt><kbd>--elev2depth</kbd></dt>
 <dd><p>Convert elevation to depth by flipping sign. This is typical when using gr3 format, less so with 2dm.</p>
 <p>Default: False</p>
@@ -286,12 +292,12 @@ be imported and visualized in SMS, ideally using “contours” as the viewing c
 <p>Default: 2.0</p>
 </dd>
 </dl>
-</div>
+</section>
 <p>The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.
 It can be used on a 2dm file in which case the</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>

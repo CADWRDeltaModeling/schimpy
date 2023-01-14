@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; schimpy 1.3.6+7.g9f86f0f.dirty documentation</title>
+    <title>Index &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -156,12 +156,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.base_io.BaseIO">BaseIO (class in schimpy.base_io)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.bay_delta_hotstart.bay_delta_hotstart_with_cdec_stations">bay_delta_hotstart_with_cdec_stations() (in module schimpy.bay_delta_hotstart)</a>
-</li>
       <li><a href="schimpy.html#schimpy.stacked_dem_fill.bilinear">bilinear() (in module schimpy.stacked_dem_fill)</a>
 </li>
       <li><a href="schimpy.html#schimpy.lsc2.BilinearMeshDensity">BilinearMeshDensity (class in schimpy.lsc2)</a>
 </li>
+      <li><a href="schimpy.html#schimpy.gen_elev2D.BinaryTHWriter">BinaryTHWriter (class in schimpy.gen_elev2D)</a>
+
+      <ul>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.BinaryTHWriter">(class in schimpy.gen_elev2D1)</a>
+</li>
+      </ul></li>
       <li><a href="schimpy.html#schimpy.bound_linear.bound_linear">bound_linear() (in module schimpy.bound_linear)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_mesh.SchismMesh.boundaries">boundaries (schimpy.schism_mesh.SchismMesh property)</a>
@@ -174,10 +178,10 @@
         <li><a href="schimpy.html#schimpy.triquadmesh.BoundaryType">(in module schimpy.triquadmesh)</a>
 </li>
       </ul></li>
-      <li><a href="schimpy.html#schimpy.trimesh.BoundaryTypes">BoundaryTypes (in module schimpy.trimesh)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="schimpy.html#schimpy.trimesh.BoundaryTypes">BoundaryTypes (in module schimpy.trimesh)</a>
+</li>
       <li><a href="schimpy.html#schimpy.clip_dems.bounding_coords">bounding_coords() (in module schimpy.clip_dems)</a>
 </li>
       <li><a href="schimpy.html#schimpy.polygons.Polygon.box">box() (schimpy.polygons.Polygon method)</a>
@@ -290,10 +294,6 @@
 </li>
       <li><a href="schimpy.html#schimpy.triquadmesh.TriQuadMesh.compare">compare() (schimpy.triquadmesh.TriQuadMesh method)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.HotstartGenerator.compute_depth">compute_depth() (schimpy.hotstart_generator.HotstartGenerator method)</a>
-</li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.HotstartGenerator.compute_variables">compute_variables() (schimpy.hotstart_generator.HotstartGenerator method)</a>
-</li>
       <li><a href="schimpy.html#schimpy.schism_sources_sinks.concat_msource_csv">concat_msource_csv() (in module schimpy.schism_sources_sinks)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_sources_sinks.concat_source_sink_yaml">concat_source_sink_yaml() (in module schimpy.schism_sources_sinks)</a>
@@ -306,12 +306,12 @@
 </li>
       <li><a href="schimpy.html#schimpy.schism_polygon.SchismPolygon.contains">contains() (schimpy.schism_polygon.SchismPolygon method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.contour_smooth.contour_smooth">contour_smooth() (in module schimpy.contour_smooth)</a>
 </li>
       <li><a href="schimpy.html#schimpy.contour_smooth.contour_smooth2d">contour_smooth2d() (in module schimpy.contour_smooth)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.sms2gr3.convert_2dm">convert_2dm() (in module schimpy.sms2gr3)</a>
 </li>
       <li><a href="schimpy.html#schimpy.station.convert_db_station_in">convert_db_station_in() (in module schimpy.station)</a>
@@ -328,11 +328,9 @@
 </li>
       <li><a href="schimpy.html#schimpy.convert_sav_class_to_number.create_arg_parse">create_arg_parse() (in module schimpy.convert_sav_class_to_number)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.bay_delta_hotstart.create_arg_parser">create_arg_parser() (in module schimpy.bay_delta_hotstart)</a>
+      <li><a href="schimpy.html#schimpy.check_mesh_skewness.create_arg_parser">create_arg_parser() (in module schimpy.check_mesh_skewness)</a>
 
       <ul>
-        <li><a href="schimpy.html#schimpy.check_mesh_skewness.create_arg_parser">(in module schimpy.check_mesh_skewness)</a>
-</li>
         <li><a href="schimpy.html#schimpy.clip_dems.create_arg_parser">(in module schimpy.clip_dems)</a>
 </li>
         <li><a href="schimpy.html#schimpy.combine_consume.create_arg_parser">(in module schimpy.combine_consume)</a>
@@ -353,7 +351,15 @@
 </li>
         <li><a href="schimpy.html#schimpy.embed_raster.create_arg_parser">(in module schimpy.embed_raster)</a>
 </li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D.create_arg_parser">(in module schimpy.gen_elev2D)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.create_arg_parser">(in module schimpy.gen_elev2D1)</a>
+</li>
         <li><a href="schimpy.html#schimpy.grid_opt.create_arg_parser">(in module schimpy.grid_opt)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.hotstart_inventory.create_arg_parser">(in module schimpy.hotstart_inventory)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.interpolate_structure.create_arg_parser">(in module schimpy.interpolate_structure)</a>
 </li>
         <li><a href="schimpy.html#schimpy.material_poly.create_arg_parser">(in module schimpy.material_poly)</a>
 </li>
@@ -380,12 +386,8 @@
 </li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.create_flux_regions">create_flux_regions() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.HotstartGenerator.create_hotstart">create_hotstart() (schimpy.hotstart_generator.HotstartGenerator method)</a>
-
-      <ul>
-        <li><a href="schimpy.html#schimpy.schism_hotstart.hotstart.create_hotstart">(schimpy.schism_hotstart.hotstart method)</a>
+      <li><a href="schimpy.html#schimpy.schism_hotstart.hotstart.create_hotstart">create_hotstart() (schimpy.schism_hotstart.hotstart method)</a>
 </li>
-      </ul></li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.create_node_partitioning">create_node_partitioning() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_nudging.nudging.create_nudging">create_nudging() (schimpy.schism_nudging.nudging method)</a>
@@ -494,10 +496,10 @@
       </ul></li>
       <li><a href="schimpy.html#schimpy.schism_source.SchismSource.element_id">element_id (schimpy.schism_source.SchismSource property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.elements_on_linestring">elements_on_linestring() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.trimesh.TriMesh.elems">elems (schimpy.trimesh.TriMesh property)</a>
 
       <ul>
@@ -505,6 +507,8 @@
 </li>
       </ul></li>
       <li><a href="schimpy.html#schimpy.embed_raster.embed_raster">embed_raster() (in module schimpy.embed_raster)</a>
+</li>
+      <li><a href="schimpy.html#schimpy.interpolate_structure.ensure_offset">ensure_offset() (in module schimpy.interpolate_structure)</a>
 </li>
       <li><a href="schimpy.html#schimpy.trimesh.enum">enum() (in module schimpy.trimesh)</a>
 
@@ -544,6 +548,8 @@
 </li>
       <li><a href="schimpy.html#schimpy.stacked_dem_fill.fill_2dm">fill_2dm() (in module schimpy.stacked_dem_fill)</a>
 </li>
+      <li><a href="schimpy.html#schimpy.stacked_dem_fill.fill_csv">fill_csv() (in module schimpy.stacked_dem_fill)</a>
+</li>
       <li><a href="schimpy.html#schimpy.stacked_dem_fill.fill_gr3">fill_gr3() (in module schimpy.stacked_dem_fill)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_mesh.SchismMesh.fill_land_and_island_boundaries">fill_land_and_island_boundaries() (schimpy.schism_mesh.SchismMesh method)</a>
@@ -562,10 +568,10 @@
         <li><a href="schimpy.html#schimpy.triquadmesh.TriQuadMesh.find_closest_nodes">(schimpy.triquadmesh.TriQuadMesh method)</a>
 </li>
       </ul></li>
-      <li><a href="schimpy.html#schimpy.triquadmesh.TriQuadMesh.find_edge">find_edge() (schimpy.triquadmesh.TriQuadMesh method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="schimpy.html#schimpy.triquadmesh.TriQuadMesh.find_edge">find_edge() (schimpy.triquadmesh.TriQuadMesh method)</a>
+</li>
       <li><a href="schimpy.html#schimpy.trimesh.TriMesh.find_elem">find_elem() (schimpy.trimesh.TriMesh method)</a>
 
       <ul>
@@ -575,8 +581,6 @@
       <li><a href="schimpy.html#schimpy.trimesh.TriMesh.find_elem_with_tolerance">find_elem_with_tolerance() (schimpy.trimesh.TriMesh method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.triquadmesh.TriQuadMesh.find_intersecting_elems_with_line">find_intersecting_elems_with_line() (schimpy.triquadmesh.TriQuadMesh method)</a>
-</li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.NearestNeighborInitializer.find_nearest_stations">find_nearest_stations() (schimpy.hotstart_generator.NearestNeighborInitializer method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.triquadmesh.TriQuadMesh.find_neighbors_on_segment">find_neighbors_on_segment() (schimpy.triquadmesh.TriQuadMesh method)</a>
 </li>
@@ -618,6 +622,12 @@
 </li>
       <li><a href="schimpy.html#schimpy.gaussian_quadrature.GaussianQuadratureTri3">GaussianQuadratureTri3 (class in schimpy.gaussian_quadrature)</a>
 </li>
+      <li><a href="schimpy.html#schimpy.gen_elev2D.gen_elev2D">gen_elev2D() (in module schimpy.gen_elev2D)</a>
+
+      <ul>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.gen_elev2D">(in module schimpy.gen_elev2D1)</a>
+</li>
+      </ul></li>
       <li><a href="schimpy.html#schimpy.schism_nudging.nudging.gen_nudge_obs">gen_nudge_obs() (schimpy.schism_nudging.nudging method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_nudging.nudging.gen_nudge_roms">gen_nudge_roms() (schimpy.schism_nudging.nudging method)</a>
@@ -642,10 +652,10 @@
 </li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.get_closest_node_i_from_new_mesh">get_closest_node_i_from_new_mesh() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.schism_mesh.SchismMesh.get_coordinates_3d">get_coordinates_3d() (schimpy.schism_mesh.SchismMesh method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="schimpy.html#schimpy.schism_mesh.SchismMesh.get_coordinates_3d">get_coordinates_3d() (schimpy.schism_mesh.SchismMesh method)</a>
+</li>
       <li><a href="schimpy.html#schimpy.grid_opt.GridOptimizer.get_dem_elevation">get_dem_elevation() (schimpy.grid_opt.GridOptimizer method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.trimesh.TriMesh.get_edges_from_node">get_edges_from_node() (schimpy.trimesh.TriMesh method)</a>
@@ -708,11 +718,11 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="schimpy.html#schimpy.hotstart_inventory.hotstart_inventory">hotstart_inventory() (in module schimpy.hotstart_inventory)</a>
+</li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.VariableField.hotstart_nc">hotstart_nc() (schimpy.schism_hotstart.VariableField method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.hotstart_to_outputnc">hotstart_to_outputnc() (in module schimpy.schism_hotstart)</a>
-</li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.HotstartGenerator">HotstartGenerator (class in schimpy.hotstart_generator)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -729,26 +739,24 @@
       <li><a href="schimpy.html#schimpy.vgrid_opt2.index_interior">index_interior() (in module schimpy.vgrid_opt2)</a>
 </li>
       <li><a href="schimpy.html#schimpy.grid_opt.init_logger">init_logger() (in module schimpy.grid_opt)</a>
-
-      <ul>
-        <li><a href="schimpy.html#schimpy.hotstart_generator.init_logger">(in module schimpy.hotstart_generator)</a>
 </li>
-      </ul></li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.hotstart.initialize_netcdf">initialize_netcdf() (schimpy.schism_hotstart.hotstart method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.VariableField.initializer_options">initializer_options() (schimpy.schism_hotstart.VariableField method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.input">input (schimpy.schism_setup.SchismSetup property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.gaussian_quadrature.GaussianQuadrature.integrate">integrate() (schimpy.gaussian_quadrature.GaussianQuadrature method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.grid_opt.GridOptimizer.integrate_over_edges">integrate_over_edges() (schimpy.grid_opt.GridOptimizer method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.grid_opt.GridOptimizer.integrate_over_elements">integrate_over_elements() (schimpy.grid_opt.GridOptimizer method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.VariableField.interp_from_mesh">interp_from_mesh() (schimpy.schism_hotstart.VariableField method)</a>
+</li>
+      <li><a href="schimpy.html#schimpy.interpolate_structure.interpolate_structure">interpolate_structure() (in module schimpy.interpolate_structure)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.interpolate_tide">interpolate_tide() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
@@ -847,8 +855,6 @@
       <li><a href="schimpy.html#schimpy.adjust_source_sink.main">main() (in module schimpy.adjust_source_sink)</a>
 
       <ul>
-        <li><a href="schimpy.html#schimpy.bay_delta_hotstart.main">(in module schimpy.bay_delta_hotstart)</a>
-</li>
         <li><a href="schimpy.html#schimpy.check_mesh_skewness.main">(in module schimpy.check_mesh_skewness)</a>
 </li>
         <li><a href="schimpy.html#schimpy.clip_dems.main">(in module schimpy.clip_dems)</a>
@@ -871,7 +877,15 @@
 </li>
         <li><a href="schimpy.html#schimpy.create_vgrid_lsc2.main">(in module schimpy.create_vgrid_lsc2)</a>
 </li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D.main">(in module schimpy.gen_elev2D)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.main">(in module schimpy.gen_elev2D1)</a>
+</li>
         <li><a href="schimpy.html#schimpy.grid_opt.main">(in module schimpy.grid_opt)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.hotstart_inventory.main">(in module schimpy.hotstart_inventory)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.interpolate_structure.main">(in module schimpy.interpolate_structure)</a>
 </li>
         <li><a href="schimpy.html#schimpy.model_time.main">(in module schimpy.model_time)</a>
 </li>
@@ -932,8 +946,6 @@
 </li>
         <li><a href="schimpy.html#module-schimpy.batch_metrics">schimpy.batch_metrics</a>
 </li>
-        <li><a href="schimpy.html#module-schimpy.bay_delta_hotstart">schimpy.bay_delta_hotstart</a>
-</li>
         <li><a href="schimpy.html#module-schimpy.bound_linear">schimpy.bound_linear</a>
 </li>
         <li><a href="schimpy.html#module-schimpy.cencoos_download">schimpy.cencoos_download</a>
@@ -966,17 +978,21 @@
 </li>
         <li><a href="schimpy.html#module-schimpy.gaussian_quadrature">schimpy.gaussian_quadrature</a>
 </li>
+        <li><a href="schimpy.html#module-schimpy.gen_elev2D">schimpy.gen_elev2D</a>
+</li>
+        <li><a href="schimpy.html#module-schimpy.gen_elev2D1">schimpy.gen_elev2D1</a>
+</li>
         <li><a href="schimpy.html#module-schimpy.geo_tools">schimpy.geo_tools</a>
 </li>
         <li><a href="schimpy.html#module-schimpy.gr3">schimpy.gr3</a>
 </li>
         <li><a href="schimpy.html#module-schimpy.grid_opt">schimpy.grid_opt</a>
 </li>
-        <li><a href="schimpy.html#module-schimpy.hotstart_generator">schimpy.hotstart_generator</a>
-</li>
         <li><a href="schimpy.html#module-schimpy.hotstart_inventory">schimpy.hotstart_inventory</a>
 </li>
         <li><a href="schimpy.html#module-schimpy.Interp2D">schimpy.Interp2D</a>
+</li>
+        <li><a href="schimpy.html#module-schimpy.interpolate_structure">schimpy.interpolate_structure</a>
 </li>
         <li><a href="schimpy.html#module-schimpy.laplace_smooth_data">schimpy.laplace_smooth_data</a>
 </li>
@@ -1103,8 +1119,6 @@
 </li>
       <li><a href="schimpy.html#schimpy.polygons.Polygon.n_vertices">n_vertices() (schimpy.polygons.Polygon method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.polygons.Polygon.name">name (schimpy.polygons.Polygon property)</a>
 
       <ul>
@@ -1113,8 +1127,14 @@
         <li><a href="schimpy.html#schimpy.schism_structure.SchismStructure.name">(schimpy.schism_structure.SchismStructure property)</a>
 </li>
       </ul></li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.NearestNeighborInitializer">NearestNeighborInitializer (class in schimpy.hotstart_generator)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="schimpy.html#schimpy.gen_elev2D.NetCDFTHWriter">NetCDFTHWriter (class in schimpy.gen_elev2D)</a>
+
+      <ul>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.NetCDFTHWriter">(class in schimpy.gen_elev2D1)</a>
 </li>
+      </ul></li>
       <li><a href="schimpy.html#schimpy.triquadmesh.TriQuadMesh.node">node() (schimpy.triquadmesh.TriQuadMesh method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.VariableField.node2elem_values">node2elem_values() (schimpy.schism_hotstart.VariableField method)</a>
@@ -1207,8 +1227,6 @@
 </li>
       <li><a href="schimpy.html#schimpy.priority_queue.priorityDictionary">priorityDictionary (class in schimpy.priority_queue)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.bay_delta_hotstart.process_cruise_data">process_cruise_data() (in module schimpy.bay_delta_hotstart)</a>
-</li>
       <li><a href="schimpy.html#schimpy.lsc2.process_orphans">process_orphans() (in module schimpy.lsc2)</a>
 </li>
       <li><a href="schimpy.html#schimpy.lsc2.process_orphans2">process_orphans2() (in module schimpy.lsc2)</a>
@@ -1299,10 +1317,10 @@
 </li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.read_param_nml">read_param_nml() (in module schimpy.schism_hotstart)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.schism_polygon.read_polygons">read_polygons() (in module schimpy.schism_polygon)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="schimpy.html#schimpy.schism_polygon.read_polygons">read_polygons() (in module schimpy.schism_polygon)</a>
+</li>
       <li><a href="schimpy.html#schimpy.schism_sources_sinks.read_source_sink_csv">read_source_sink_csv() (in module schimpy.schism_sources_sinks)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_sources_sinks.read_source_sink_in">read_source_sink_in() (in module schimpy.schism_sources_sinks)</a>
@@ -1321,8 +1339,6 @@
 </li>
       <li><a href="schimpy.html#schimpy.station.read_station_subloc">read_station_subloc() (in module schimpy.station)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.read_stations">read_stations() (in module schimpy.hotstart_generator)</a>
-</li>
       <li><a href="schimpy.html#schimpy.schism_vertical_mesh.read_vmesh">read_vmesh() (in module schimpy.schism_vertical_mesh)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_hotstart.hotstart.read_yaml">read_yaml() (schimpy.schism_hotstart.hotstart method)</a>
@@ -1336,8 +1352,6 @@
       <li><a href="schimpy.html#schimpy.schism_structure.SchismStructure.reference">reference (schimpy.schism_structure.SchismStructure property)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_structure.SchismStructure.reference_pair">reference_pair (schimpy.schism_structure.SchismStructure property)</a>
-</li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.RegionalInitializer">RegionalInitializer (class in schimpy.hotstart_generator)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_linestring.LineStringIoFactory.registered_readers">registered_readers (schimpy.schism_linestring.LineStringIoFactory attribute)</a>
 
@@ -1356,8 +1370,6 @@
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.reorder_open_boundaries">reorder_open_boundaries() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_nudging.nudging.reorder_variables">reorder_variables() (schimpy.schism_nudging.nudging static method)</a>
-</li>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.HotstartGenerator.reset">reset() (schimpy.hotstart_generator.HotstartGenerator method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.separate_species.run_example">run_example() (in module schimpy.separate_species)</a>
 </li>
@@ -1397,13 +1409,6 @@
 
       <ul>
         <li><a href="schimpy.html#module-schimpy.batch_metrics">module</a>
-</li>
-      </ul></li>
-      <li>
-    schimpy.bay_delta_hotstart
-
-      <ul>
-        <li><a href="schimpy.html#module-schimpy.bay_delta_hotstart">module</a>
 </li>
       </ul></li>
       <li>
@@ -1519,6 +1524,20 @@
 </li>
       </ul></li>
       <li>
+    schimpy.gen_elev2D
+
+      <ul>
+        <li><a href="schimpy.html#module-schimpy.gen_elev2D">module</a>
+</li>
+      </ul></li>
+      <li>
+    schimpy.gen_elev2D1
+
+      <ul>
+        <li><a href="schimpy.html#module-schimpy.gen_elev2D1">module</a>
+</li>
+      </ul></li>
+      <li>
     schimpy.geo_tools
 
       <ul>
@@ -1540,13 +1559,6 @@
 </li>
       </ul></li>
       <li>
-    schimpy.hotstart_generator
-
-      <ul>
-        <li><a href="schimpy.html#module-schimpy.hotstart_generator">module</a>
-</li>
-      </ul></li>
-      <li>
     schimpy.hotstart_inventory
 
       <ul>
@@ -1558,6 +1570,13 @@
 
       <ul>
         <li><a href="schimpy.html#module-schimpy.Interp2D">module</a>
+</li>
+      </ul></li>
+      <li>
+    schimpy.interpolate_structure
+
+      <ul>
+        <li><a href="schimpy.html#module-schimpy.interpolate_structure">module</a>
 </li>
       </ul></li>
       <li>
@@ -1974,9 +1993,13 @@
 </li>
       <li><a href="schimpy.html#schimpy.combine_flux.test_combine_flux">test_combine_flux() (in module schimpy.combine_flux)</a>
 </li>
+      <li><a href="schimpy.html#schimpy.interpolate_structure.test_date_label_correct">test_date_label_correct() (in module schimpy.interpolate_structure)</a>
+</li>
       <li><a href="schimpy.html#schimpy.vgrid_opt2.test_gradients">test_gradients() (in module schimpy.vgrid_opt2)</a>
 </li>
       <li><a href="schimpy.html#schimpy.stacked_dem_fill.test_main">test_main() (in module schimpy.stacked_dem_fill)</a>
+</li>
+      <li><a href="schimpy.html#schimpy.interpolate_structure.test_template_times">test_template_times() (in module schimpy.interpolate_structure)</a>
 </li>
       <li><a href="schimpy.html#schimpy.vgrid_opt2.test_vgrid_spacing">test_vgrid_spacing() (in module schimpy.vgrid_opt2)</a>
 </li>
@@ -1984,16 +2007,22 @@
 </li>
       <li><a href="schimpy.html#schimpy.three_point_linear_norm.ThreePointLinearNorm">ThreePointLinearNorm (class in schimpy.three_point_linear_norm)</a>
 </li>
+      <li><a href="schimpy.html#schimpy.gen_elev2D.THWriter">THWriter (class in schimpy.gen_elev2D)</a>
+
+      <ul>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.THWriter">(class in schimpy.gen_elev2D1)</a>
+</li>
+      </ul></li>
       <li><a href="schimpy.html#schimpy.cencoos_download.time_block_report">time_block_report() (in module schimpy.cencoos_download)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_input.SchismInput.time_start">time_start (schimpy.schism_input.SchismInput property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.model_time.to_datetime">to_datetime() (in module schimpy.model_time)</a>
 </li>
       <li><a href="schimpy.html#schimpy.model_time.to_elapsed">to_elapsed() (in module schimpy.model_time)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.schism_mesh.SchismMesh.to_geopandas">to_geopandas() (schimpy.schism_mesh.SchismMesh method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.combine_consume.touch">touch() (in module schimpy.combine_consume)</a>
@@ -2090,6 +2119,20 @@
         <li><a href="schimpy.html#schimpy.schism_structure.SchismStructureIO.write">(schimpy.schism_structure.SchismStructureIO method)</a>
 </li>
       </ul></li>
+      <li><a href="schimpy.html#schimpy.gen_elev2D.BinaryTHWriter.write_all">write_all() (schimpy.gen_elev2D.BinaryTHWriter method)</a>
+
+      <ul>
+        <li><a href="schimpy.html#schimpy.gen_elev2D.NetCDFTHWriter.write_all">(schimpy.gen_elev2D.NetCDFTHWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D.THWriter.write_all">(schimpy.gen_elev2D.THWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.BinaryTHWriter.write_all">(schimpy.gen_elev2D1.BinaryTHWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.NetCDFTHWriter.write_all">(schimpy.gen_elev2D1.NetCDFTHWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.THWriter.write_all">(schimpy.gen_elev2D1.THWriter method)</a>
+</li>
+      </ul></li>
       <li><a href="schimpy.html#schimpy.contour_smooth.RasterWrapper.write_copy">write_copy() (schimpy.contour_smooth.RasterWrapper method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.write_hgrid">write_hgrid() (schimpy.schism_setup.SchismSetup method)</a>
@@ -2098,8 +2141,6 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="schimpy.html#schimpy.hotstart_generator.HotstartGenerator.write_hotstart">write_hotstart() (schimpy.hotstart_generator.HotstartGenerator method)</a>
-</li>
       <li><a href="schimpy.html#schimpy.schism_linestring.write_linestrings">write_linestrings() (in module schimpy.schism_linestring)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_mesh.write_mesh">write_mesh() (in module schimpy.schism_mesh)</a>
@@ -2116,9 +2157,25 @@
 </li>
       <li><a href="schimpy.html#schimpy.station.write_station_in">write_station_in() (in module schimpy.station)</a>
 </li>
+      <li><a href="schimpy.html#schimpy.gen_elev2D.BinaryTHWriter.write_step">write_step() (schimpy.gen_elev2D.BinaryTHWriter method)</a>
+
+      <ul>
+        <li><a href="schimpy.html#schimpy.gen_elev2D.NetCDFTHWriter.write_step">(schimpy.gen_elev2D.NetCDFTHWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D.THWriter.write_step">(schimpy.gen_elev2D.THWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.BinaryTHWriter.write_step">(schimpy.gen_elev2D1.BinaryTHWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.NetCDFTHWriter.write_step">(schimpy.gen_elev2D1.NetCDFTHWriter method)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.gen_elev2D1.THWriter.write_step">(schimpy.gen_elev2D1.THWriter method)</a>
+</li>
+      </ul></li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.write_structures">write_structures() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
       <li><a href="schimpy.html#schimpy.separate_species.write_th">write_th() (in module schimpy.separate_species)</a>
+</li>
+      <li><a href="schimpy.html#schimpy.schism_nudging.write_to_log">write_to_log() (in module schimpy.schism_nudging)</a>
 </li>
       <li><a href="schimpy.html#schimpy.write_ts.write_ts">write_ts() (in module schimpy.write_ts)</a>
 </li>
