@@ -795,10 +795,13 @@ class VariableField(object):
             if self.variable_name == 'tke':
                 v_merge[:,inpoly,:] = v
             else:
-                try:
-                    v_merge[inpoly, :] = v
-                except ValueError:
-                    v_merge[inpoly, :] = v[:,np.newaxis]
+                if type(v) == xr.core.dataarray.DataArray:
+                    v_merge[inpoly, :] = np.array(v)[:,np.newaxis] # for cases where hotstart is returning 2D array
+                else:
+                    try:
+                        v_merge[inpoly, :] = v
+                    except ValueError:
+                        v_merge[inpoly, :] = v[:,np.newaxis]
             #print(i, r)
         return v_merge
 
@@ -1028,7 +1031,8 @@ class VariableField(object):
                                           ini_meta['source_vgrid'],
                                           inpoly=inpoly,
                                           dist_th=ini_meta['distance_threshold'],
-                                          method=ini_meta['method'])
+                                          method=ini_meta['method'],
+                                          vgrid_version=ini_meta['vgrid_version'])
             else:
                 v = self.interp_from_mesh(ini_meta['source_hgrid'], vin,
                                           ini_meta['source_vgrid'],
@@ -1051,7 +1055,7 @@ class VariableField(object):
         import rtree.index
         mesh1 = read_mesh(hgrid_fn,vgrid_fn,vgrid_version)
 
-        grid1 = self.define_new_grid(mesh1)
+        grid1 = self.define_new_grid(mesh1) # mesh to be interpolated from
         hgrid1 = list(grid1.values())[0][1]
         vgrid1 = list(grid1.values())[1][1]
 
@@ -1059,7 +1063,7 @@ class VariableField(object):
             hgrid2 = self.hgrid
             vgrid2 = self.vgrid
         else:
-            hgrid2 = self.hgrid[inpoly]
+            hgrid2 = self.hgrid[inpoly] # mesh to be interpolated into
             vgrid2 = self.vgrid[inpoly,:]
 
         compare_mesh_flag = False
@@ -1097,7 +1101,7 @@ class VariableField(object):
             diff_points = np.where(dist>dist_th)[0]
             if self.mesh.n_vert_levels != mesh1.n_vert_levels:
                 raise("distance threshold should only be defined when the two grids have the same vertical layer numbers")
-            if isinstance(vin, xr.core.dataset.Dataset):
+            if isinstance(vin, xr.core.dataset.Dataset): # vin is array for variable from hotstart file
                 vout = np.zeros( (len(vin),np.shape(vgrid2)[0],
                                   np.shape(vgrid2)[1]))
                 if method == 'nearest':
@@ -1108,9 +1112,9 @@ class VariableField(object):
                         z1 = vgrid1[indices[p]]
                         z2 = vgrid2[p]
                         for j,v in enumerate(list(vin.keys())):
-                            f = interpolate.interp1d(
-                            z1, vin[v][indices[p]], fill_value='extrapolate',
-                            kind='nearest')
+                            f = interpolate.interp1d(z1, vin[v][indices[p]], 
+                                                    fill_value='extrapolate',
+                                                    kind='nearest')
                             vout[j, p, :] = f(z2)
                     print("vertical grid interpolation completed!")
                 else: # nearest or equation
@@ -1122,13 +1126,16 @@ class VariableField(object):
             else:
                 vout = np.zeros_like(vgrid2)
                 if method == 'nearest':
-                    vout[same_points] = vin[indices[same_points]]
+                    try:
+                       vout[same_points] = vin[indices[same_points]]
+                    except ValueError:
+                        vout[same_points] = vin[indices[same_points]].to_numpy()[:,np.newaxis]
                     for p in diff_points:
                         z1 = vgrid1[indices[p]]
                         z2 = vgrid2[p]
-                        f = interpolate.interp1d(
-                        z1, vin[indices[p]], fill_value='extrapolate',
-                        kind='nearest')
+                        f = interpolate.interp1d(z1, vin[indices[p]], 
+                                                fill_value='extrapolate',
+                                                kind='nearest')
                         vout[p, :] = f(z2)
                     print("vertical grid interpolation completed!")
                 else:
