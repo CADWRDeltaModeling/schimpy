@@ -11,27 +11,28 @@ def create_arg_parser():
     """ Create an argument parser
         return: argparse.ArgumentParser
     """
-    parser = argparse.ArgumentParser()
+
     # Read in the input file
     parser = argparse.ArgumentParser(
-        description="""Download Download NOAA High-Resolution Rapid Refresh (HRRR) Model using AWS bucket service
+        description="""
+                       Download Download NOAA High-Resolution Rapid Refresh (HRRR) Model using AWS bucket service.
                        
-                     Example:
-                           download_hrr.py 01/01/2023  g:\temp 15 -123.15 37.3 -121.1 39.0
+                     Usage:
+                           download_hrr.py 01/01/2023  g:\\temp 15  37.3  39.0 -123.15 -121.1
                      """)
-    parser.add_argument(dest='start_date', default=None,
-                        help='starting date of HRRR data, must be format of %m/%d/%y, like 09/19/18')
-    parser.add_argument(dest='destination', default=None,
+    parser.add_argument('start_date', default=None,
+                        help='starting date of HRRR data, must be format like 09/19/2018')
+    parser.add_argument('destination', default=None,
                         help='path to store downloaded HRRR data')
-    parser.add_argument(dest='rnday', default=None,type=int,
+    parser.add_argument('rnday', default=None,type=int,
                         help="number of days of data to be downloaded")
-    parser.add_argument(dest='latitude_min', default=None,
+    parser.add_argument('latitude_min', default=None,type=float,
                         help='Minimal latitude of bounding box for raw data to be downloaded')
-    parser.add_argument(dest='latitude_max', default=None,
+    parser.add_argument('latitude_max', default=None,type=float,
                         help='Maximal latitude of bounding box for raw data to be downloaded')
-    parser.add_argument(dest='longititude_min', default=None,
+    parser.add_argument('longitude_min', default=None,type=float,
                         help='Minimal longititude of bounding box for raw data to be downloaded')
-    parser.add_argument(dest='longititude_max', default=None,
+    parser.add_argument('longitude_max', default=None,type=float,
                         help='Maximal longititude of bounding box for raw data to be downloaded')
     
     
@@ -48,7 +49,8 @@ def main():
     """
     parser = create_arg_parser()
     args = parser.parse_args()
-    bbox=[args.longititude_min,args.latitude_min,args.longititude_max,args.latitude_max]
+
+    bbox=[args.longitude_min,args.latitude_min,args.longitude_max,args.latitude_max]
     pscr=args.destination
     rnday=args.rnday
     start_date= datetime.datetime.strptime(args.start_date, '%m/%d/%Y')

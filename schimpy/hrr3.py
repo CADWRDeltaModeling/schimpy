@@ -24,7 +24,7 @@ import xarray as xr
 
 
 import pytz
-import pdb
+
 
 def localize_datetime(d):
     # datetime is naïve iff:
@@ -308,6 +308,7 @@ class HRRR:
         lat=ds.latitude.astype('float32')
         lat_idxs=(lat.values >= ymin) & (lat.values <= ymax + 2.0)
         idxs = lon_idxs & lat_idxs
+
         idxs = np.argwhere(idxs)
         idx_ymin = np.min(idxs[:,0])
         idx_ymax = np.max(idxs[:,0])
