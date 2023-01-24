@@ -291,8 +291,22 @@ class HRRR:
             'units': 'W m-2',
             'long_name': 'Downward long-wave radiation flux'
         }
-                       
-        fout.to_netcdf(path=path/ f'hrrr_{date.strftime("%Y%m%d")}{cycle:02d}.nc',mode='w',format='NETCDF4', engine='netcdf4', unlimited_dims='time')
+        
+        fout.attrs={
+            
+            "creator_institution": "NOAA",
+            "geospatial_lat_min":  self.bbox_ymin,
+            "geospatial_lat_max":  self.bbox_ymax,
+            "geospatial_lon_min":  self.bbox_xmin,
+            "geospatial_lon_max":  self.bbox_xmax,
+            "publisher_institution": "California Department of Water Resources",
+            "program": "HRRR",
+            "title": "Subsetted reanalysis atmospheric data for Bay-Delta SCHISM"
+            }
+        
+        year_path = pathlib.Path(pscr+"/"+date.strftime("%Y"))
+        year_path.mkdir(parents=True, exist_ok=True)
+        fout.to_netcdf(path=path/ f'{pscr}/{date.strftime("%Y")}/hrrr_{date.strftime("%Y%m%d")}{cycle:02d}.nc',mode='w',format='NETCDF4', engine='netcdf4', unlimited_dims='time')
 
     def modified_latlon(self, grbfile):
 
@@ -306,7 +320,7 @@ class HRRR:
         lon=ds.longitude.astype('float32')
         lon_idxs=(lon.values >= xmin) & (lon.values <= xmax)
         lat=ds.latitude.astype('float32')
-        lat_idxs=(lat.values >= ymin) & (lat.values <= ymax + 2.0)
+        lat_idxs=(lat.values >= ymin) & (lat.values <= ymax )
         idxs = lon_idxs & lat_idxs
 
         idxs = np.argwhere(idxs)
