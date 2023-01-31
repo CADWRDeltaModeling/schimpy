@@ -7,7 +7,7 @@ nudging:
     vgrid_version: '5.10'
     default: 0.
     crs: 'EPSG:32610' #projection does not need to be defined if the projected coordinates are used consistently. 
-    output_suffix: 'roms' # the suffix for output files, e.g, TEM nudging file will be named 'TEM_nu.nc'
+    output_suffix: 'hycom' # the suffix for output files, e.g, TEM nudging file will be named 'TEM_nu.nc'
     polygons:
       - name: ocean
         type: 3dfield
@@ -20,8 +20,7 @@ nudging:
             - [496487, 4137742]
         interpolant: 
             method: nearest
-            data: //cnrastore-bdo/Modeling_Data/roms/cencoos_ca_roms/processed/cencoos_hourly_pst  #cencoos ROMS data available from 2014-01-01 to 2022-09-14.
-            # data: //cnrastore-bdo/Modeling_Data/roms/sfb_forecast/ca_subSFB_fcst_hourly_pst       #sfb ROMS data available from 2005-01-01 to 2014-04-29. 
+            data: //cnrastore-bdo/Modeling_Data/hycom/processed/hycom_interpolated_hourly_pst  #this should only be a path for the hycom data.
             dt: 1H  #time step in the input nc file.
             vcoords: Z    # Z coordinates or S coordinates. For Z coordinates, depths are directly given, for S coordinats, depths need to be calculated.  
             variables: 
@@ -32,21 +31,3 @@ nudging:
                 - name: salinity
                   varname: salt  #variable name in the netcdf file/default is temp if not provided.
                   none_values: 33.5           
-      - name: obs_region  #define multiple points of observation at the same time . 
-        type: obs  # mutliple observational points
-        vertices: None
-        attribute: 
-            kernel: gaussian
-            xy: ./obs_xy.csv     #or obs.nc; must include ['site','x','y'] in the key.             
-            length_scale: 1000
-            time_scale: 1H
-        interpolant: 
-            method: inverse_distance #interpolate using inverse distance weighing from obs of multiple points; nearest can also be used here.            
-            data: 
-            variables: 
-                - name: temperature
-                  data: ./nudging_data_temperature.csv  #this could be a csv file or a netcdf file (time series required). 
-                  none_values: ambient
-                - name: salinity
-                  data: ./nudging_data_salinity.csv
-                  none_values: ambient
