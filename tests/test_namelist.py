@@ -81,3 +81,16 @@ def test_sample_param_nml():
     with open('param2.nml','w') as fh: fh.write(namelist.write(params2))
     import filecmp
     assert filecmp.cmp('param.nml','param2.nml'), 'Reading and writing from parser to writer is resulting in differences!'
+
+
+def test_mapping():
+    from schimpy import namelist
+    namelist_dict = {'group1': {'var1': 1, 'var2': 2}, 'group2': {'var3': 3, 'var4': 4}}
+    obj = namelist.map_to_object(namelist_dict)
+    assert obj.group1.var1 == 1
+    assert obj.group1.var2 == 2
+    assert obj.group2.var3 == 3
+    assert obj.group2.var4 == 4
+    round_trip_dict = namelist.map_to_dict(obj)
+    assert namelist_dict == round_trip_dict
+
