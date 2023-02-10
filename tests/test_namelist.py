@@ -22,3 +22,48 @@ def test_namelist_parser():
         'VAR4': {'value': '4', 'full_line_comment': None, 'inline_comment': None}}}
 
     assert namelists == expected_namelists
+
+def test_write_namelist():
+    from schimpy import namelist
+    namelist_data = {
+        "first_namelist": {
+            "comment": "This is the first namelist",
+            "first_value": {
+                "value": 1,
+                "inline_comment": "This is the first value"
+            },
+            "second_value": {
+                "value": 2
+            }
+        },
+        "second_namelist": {
+            "comment": "This is the second namelist",
+            "third_value": {
+                "value": 3,
+                "inline_comment": "This is the third value"
+            }
+        }
+    }
+    expected_output = "&first_namelist\n! This is the first namelist\n  first_value = 1\n  ! This is the first value\n  second_value = 2\n/\n&second_namelist\n! This is the second namelist\n  third_value = 3\n  ! This is the third value\n/"
+    output = namelist.write(namelist_data)
+    assert output == expected_output, f"Expected: {expected_output}\nGot: {output}"
+
+    namelist_data = {
+        "first_namelist": {
+            "first_value": {
+                "value": 1
+            },
+            "second_value": {
+                "value": 2
+            }
+        },
+        "second_namelist": {
+            "third_value": {
+                "value": 3
+            }
+        }
+    }
+    expected_output = "&first_namelist\n  first_value = 1\n  second_value = 2\n/\n&second_namelist\n  third_value = 3\n/"
+    output = namelist.write(namelist_data)
+    assert output == expected_output, f"Expected: {expected_output}\nGot: {output}"
+
