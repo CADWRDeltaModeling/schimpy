@@ -11,13 +11,13 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-install_requires = ['vtools3>=3.4','pandas','geopandas>=0.6',
-                    'xarray>=0.15', 'netcdf4>=1.4', 'scipy>=1.4',
-                    'matplotlib', 'statsmodels>=0.11',
-                    'palettable>=3.3', 'pyyaml>=5.3',
+install_requires = ['geopandas', 'vtools3',
+                    'xarray', 'netcdf4', 'scipy',
+                    'matplotlib', 'statsmodels',
+                    'palettable', 'pyyaml',
                     'scikit-learn','statsmodels',
-                    'beautifulsoup4','pyproj','gdal','nodepy',
-                    'shapely','rasterstats>=0.14']
+                    'beautifulsoup4','pyproj', 'nodepy',
+                    'shapely<2.0','rasterstats']
 
 requirements = install_requires
 
@@ -26,7 +26,7 @@ setup_requirements = ['pytest-runner', ]
 test_requirements = ['pytest>=3', ]
 
 setup(
-    author="Eli Ateljevich, Kjin Nam",
+    author="California Department of Water Resources",
     author_email='Eli.Ateljevich@water.ca.gov, Kijin.Nam@water.ca.gov',
     python_requires='>=3.5',
     classifiers=[
@@ -39,6 +39,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     description="Python package for SCHISM",
     entry_points={
