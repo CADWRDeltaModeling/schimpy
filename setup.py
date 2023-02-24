@@ -17,7 +17,7 @@ install_requires = ['geopandas', 'vtools3',
                     'palettable', 'pyyaml',
                     'scikit-learn','statsmodels',
                     'beautifulsoup4','pyproj', 'nodepy',
-                    'shapely<2.0','rasterstats']
+                    'shapely<2.0','rasterstats','param']
 
 requirements = install_requires
 
