@@ -247,7 +247,7 @@ def yaml2shp(fn,shp_fn=None, crs=None):
         gdf = gdf.drop([0,1],axis=1) 
         gdf['name'] = gdf.index
     if not crs: 
-        gdf.crs = "EPSG:32610"
+        gdf.crs = "EPSG:26910"
     else:
         gdf.crs = crs
     gdf = gdf.rename(columns={'name':'region'})

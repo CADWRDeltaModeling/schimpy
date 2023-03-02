@@ -20,15 +20,15 @@ ini_date = '2021-04-20'
 # from schimpy.geo_tools import project_fun
 # import numpy as np
 # mesh1 =  read_mesh('./data_in/hgrid.gr3',
-#                    proj4='EPSG:32610')   # utm coordinates
+#                    crs='EPSG:26910')   # utm coordinates
 # mesh2 =  read_mesh('./data_in/hgrid2.gr3',
-#                    proj4='EPSG:4326 ')   # lat, lon coordinates
-# mesh2_new = sh.project_mesh(mesh2,'EPSG:32610')
+#                    crsSG:4326 ')   # lat, lon coordinates
+# mesh2_new = sh.project_mesh(mesh2,'EPSG:26910')
 # write_mesh(mesh2_new,'./data_in/hgrid2_new.gr3')
 
 #%% create a hotstart file for SCHISM
 h = sh.hotstart(yaml_fn,modules=modules,param_nml='./data_in/param.nml.clinic',
-                proj4 ='EPSG:26910')
+                crs ='EPSG:26910')
 h.create_hotstart()
 hnc = h.nc_dataset
 hnc.to_netcdf(hotstart_fn)   

@@ -15,7 +15,7 @@ ini_date = '2021-04-20'
 
 # create a hotstart file for SCHISM
 h = sh.hotstart(yaml_fn,modules=modules,
-                proj4 ='EPSG:26910')
+                crs ='EPSG:26910')
 h.create_hotstart()
 hnc = h.nc_dataset
 hnc.to_netcdf(hotstart_fn)   

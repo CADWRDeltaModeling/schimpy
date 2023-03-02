@@ -231,7 +231,7 @@ class SchismPolygonShapefileWriter(SchismPolygonIo):
             output file name
         polygons: array of schism_polygon.SchismPolygon
             polygons to write
-        spatial_reference: osgeo.osr.SpatialReference or proj4 string
+        spatial_reference: osgeo.osr.SpatialReference or crs string
             default: NAD83, UTM zone 10N, meter
         driver_name: osgeo.ogr Driver name
             default: ESRI Shapefile

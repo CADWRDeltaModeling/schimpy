@@ -11,7 +11,7 @@ def create_arg_parser():
         description="Convert a mesh from one format to another. The format is decided by the extensions automatically.")
     parser.add_argument('--input', help="Input mesh file")
     parser.add_argument('--output', help="Output mesh file")
-    parser.add_argument('--proj4', help="Proj4 string for the projection")
+    parser.add_argument('--crs', help="crs string for the projection")
     return parser
 
 
@@ -23,7 +23,7 @@ def main():
 
 def convert_mesh(args):
     mesh = read_mesh(args.input)
-    write_mesh(mesh, args.output, proj4=args.proj4)
+    write_mesh(mesh, args.output, crs=args.crs)
 
 
 if __name__ == '__main__':

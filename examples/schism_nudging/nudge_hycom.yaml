@@ -6,7 +6,7 @@ nudging:
     vgrid_input_file: ./schism_inputs/vgrid.in.new
     vgrid_version: '5.10'
     default: 0.
-    crs: 'EPSG:32610' #projection does not need to be defined if the projected coordinates are used consistently. 
+    crs: 'EPSG:26910' #projection does not need to be defined if the projected coordinates are used consistently. 
     output_suffix: 'hycom' # the suffix for output files, e.g, TEM nudging file will be named 'TEM_nu.nc'
     polygons:
       - name: ocean
