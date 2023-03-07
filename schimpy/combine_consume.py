@@ -21,12 +21,12 @@ combine_hotstart_exe = "combine_hotstart7"
 
 def do_combine(wdir,begin,end,filebase):
     for iblock in range(begin,end+1):
-        finfile = "{}+{}".format(iblock,filebase)
+        finfile = f"{iblock}+{filebase}"
         combinefile = os.path.join(wdir,finfile)
         touch(combinefile)
 
 def do_combine_hotstart(wdir,step):
-    finfile = "{}_hotstart".format(step)
+    finfile = f"{step}_hotstart"
     combinefile = os.path.join(wdir,finfile)
     touch(combinefile)
 
@@ -39,10 +39,11 @@ def appears_done(wdir,fb,exten,firstblock,lastblock):
     appears_done = True
     for i in range(firstblock, lastblock+1):
         #fname = "{}_{}".format(i,fb)
-        fname = "{}_{}".format(fb,i)
-        if exten == ".nc": fname = fname + exten
+        fname = f"{fb}_{i}"
+        if exten == ".nc":
+            fname += exten
         combined_filepath = os.path.join(wdir,fname)
-        print("checking {}".format(combined_filepath))
+        print(f"checking {combined_filepath}")
         if not os.path.exists(combined_filepath):
             appears_done=False
             break
@@ -60,7 +61,7 @@ def failed_incomplete(e):
 
 
 def combine(wdir,blocks,fbase,combine_exe,consume=True,assume_done=True):
-    print("Called combine with {} in directory {}".format(fbase,wdir))
+    print(f"Called combine with {fbase} in directory {wdir}")
     pesky_fn = os.path.join(wdir,"combine_files_pesky.txt")
     if os.path.exists(pesky_fn): os.remove(pesky_fn)
     deletable_fn = os.path.join(wdir,"combine_files_deletable.txt")
@@ -77,8 +78,8 @@ def combine(wdir,blocks,fbase,combine_exe,consume=True,assume_done=True):
                 exten = ".nc"
             else:
                 exten = ""
-            print("Working on file type %s from stack %s to %s" % (fb, firstblock,lastblock))
-            print(" In directory %s" % workdir)
+            print(f"Working on file type {fb} from stack {firstblock} to {lastblock}")
+            print(f" In directory {workdir}")
             if appears_done(wdir,fb,exten,firstblock,lastblock):
                 print("Skipping combine for block because it appears fully combined")
                 block_delete = True
@@ -105,13 +106,13 @@ def combine(wdir,blocks,fbase,combine_exe,consume=True,assume_done=True):
                     else:
                         print("not ")
                         print(e.returncode)
-       
+
             #do_combine(wdir,firstblock,lastblock,fb)
             for block in range(firstblock,lastblock+1):
                 #pat = "%s_????_" % block
-                pat = "{}_????_{}".format(fb,block)
+                pat = f"{fb}_????_{block}"
                 if exten == ".nc": 
-                    pat = pat+exten
+                    pat += exten
                 pat = os.path.join(workdir,pat)
                 to_delete_files = glob.glob(pat)
                 if block_delete:
@@ -121,12 +122,11 @@ def combine(wdir,blocks,fbase,combine_exe,consume=True,assume_done=True):
         if consume:
             for fname in all_delete_files:
                 os.remove(fname)
-        else:
-            if len(to_delete_files) > 0:
-                with open(deletable_fn,'a') as dd:
-                    dd.write("\n".join(to_delete_files))
+        elif len(to_delete_files) > 0:
+            with open(deletable_fn,'a') as dd:
+                dd.write("\n".join(to_delete_files))
 
-    if len(pesky_files) > 0:
+    if pesky_files:
         with open(pesky_fn,'a') as pp:
             pp.write("\n".join(pesky_files))
 
@@ -142,7 +142,7 @@ def combine_hotstart(wdir,combine_hotstart_exe,minstep=0,maxstep=99999999,consum
     if maxstep:
         allindex = [x for x in allindex if x > minstep and x<maxstep]
     else: 
-        allindex = [x for x in allindex if x > minstep]    
+        allindex = [x for x in allindex if x > minstep]
     allindex.sort()
     all_delete_files = []
     for step in allindex:
@@ -154,8 +154,9 @@ def combine_hotstart(wdir,combine_hotstart_exe,minstep=0,maxstep=99999999,consum
         #print("renaming {} as {} ".format(hotstartsrc,hotstartdest))
         #os.rename(hotstartsrc,hotstartdest)
         #pat = "%s_????_hotstart" % step
-        pat = "hotstart_????_{}".format(step)
-        if  exten == ".nc": pat = pat + exten
+        pat = f"hotstart_????_{step}"
+        if exten == ".nc":
+            pat += exten
         to_delete_files = glob.glob(os.path.join(wdir,pat))
         all_delete_files.extend(to_delete_files)
     if consume:
@@ -218,9 +219,9 @@ def prune_ppf_files(wdir,blocks,fbase,list_only=False):
             exten = ""
         for b in blocks:
             #globpath = os.path.join(wdir,"%s_????_%s" % (int(b),fb))
-            gpath = "{}_????_{}{}".format(fb,int(b),exten)
+            gpath = f"{fb}_????_{int(b)}{exten}"
             globpath = os.path.join(wdir,gpath)
-            globlist = glob.glob(globpath)            
+            globlist = glob.glob(globpath)
             for g in globlist:
                 os.remove(g)
 
@@ -235,25 +236,23 @@ def touch(fname, times=None):
 
 def setup(wdir,filebase):
     for fb in filebase:
-        for iday in range(5,180):
-            for icore in range(0,4): 
-                fname = "%s_%04d_%s" % (iday,icore,fb)
-                fpath = os.path.join(wdir,fname)
-                touch( fpath)
-    for istep in range(1,60000,1440):
-        for icore in range(0,4):
-            fname = "%s_%04d_hotstart" % (istep,icore)
+        for iday, icore in product(range(5,180), range(4)):
+            fname = "%s_%04d_%s" % (iday,icore,fb)
             fpath = os.path.join(wdir,fname)
-            touch (fpath)
+            touch( fpath)
+    for istep, icore in product(range(1,60000,1440), range(4)):
+        fname = "%s_%04d_hotstart" % (istep,icore)
+        fpath = os.path.join(wdir,fname)
+        touch (fpath)
 
 #def detect_nproc(wdir,sample_fbase,sample_ndx):
 #    os.path.join(wdir,"*_0000_%s" % sample_fbase)  
             
 def detect_min_max_index(wdir,sample_fbase):
     if sample_fbase.endswith(".nc"):
-        bpat = "{}_0000_*{}".format(sample_fbase[:-3],".nc")
+        bpat = f"{sample_fbase[:-3]}_0000_*.nc"
     else:
-        bpat = "*_0000_{}".format(sample_fbase)
+        bpat = f"*_0000_{sample_fbase}"
     pat = os.path.join(wdir,bpat)
     proc0files = glob.glob(pat)
 
@@ -262,7 +261,9 @@ def detect_min_max_index(wdir,sample_fbase):
     print(os.path.splitext(os.path.split(proc0files[0])[1])[0].split("_"))
 
     if len(proc0files) == 0:
-        raise ValueError("No files detecting matching base filename patterns. Wrong directory or pattern? ({})".format(pat))
+        raise ValueError(
+            f"No files detecting matching base filename patterns. Wrong directory or pattern? ({pat})"
+        )
     allindex = [int(os.path.splitext( os.path.split(p0)[1])[0].split("_")[2]) for p0 in proc0files]
     allindex.sort()
 
@@ -314,7 +315,7 @@ def combine_consume(is_test=False):
     hotstart = args.hotstart or args.hotstart_only
     hotstart_only = args.hotstart_only
     datefile = args.datefile.strip()
-    sndx = args.sndx    
+    sndx = args.sndx
     endx = args.endx
     assume_done = args.assume_done
 
@@ -330,21 +331,20 @@ def combine_consume(is_test=False):
 
     if not hotstart_only:
         ndxmin,ndxmax = detect_min_max_index(wdir,fbase[0])
-        if not sndx is None: 
+        if sndx is not None: 
             ndxmin = sndx
-        if not endx is None:
+        if endx is not None:
             ndxmax = endx
-        print("min/max: %s %s" % (ndxmin,ndxmax ))
+        print(f"min/max: {ndxmin} {ndxmax}")
 
         blocks = archive_blocks(datefile,start,blocks_per_day,ndxmin,ndxmax)
         wanted = set()
         for b in blocks: 
             wanted.update(range(b[0],b[1]+1))
         u  = range(ndxmin,ndxmax+1)
-        unwanted = [ii for ii in u if not ii in wanted]
-        unwanted = [ii for ii in u if not ii in wanted]
-        wanted = list(wanted)
-        wanted.sort()
+        unwanted = [ii for ii in u if ii not in wanted]
+        unwanted = [ii for ii in u if ii not in wanted]
+        wanted = sorted(wanted)
         unwanted.sort()
         if consume: 
             prune_ppf_files(wdir,unwanted,fbase,list_only = True)

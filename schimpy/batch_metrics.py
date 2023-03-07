@@ -38,14 +38,13 @@ def read_optional_flag_param(params, name):
     param = params.get(name)
     if param is None:
         return False
+    param = param.lower()
+    if param in ('true', 'yes', 'y'):
+        return True
+    elif param in ('false', 'no', 'n'):
+        return False
     else:
-        param = param.lower()
-        if param in ('true', 'yes', 'y'):
-            return True
-        elif param in ('false', 'no', 'n'):
-            return False
-        else:
-            raise ValueError('Value for %s is not understood' % name)
+        raise ValueError(f'Value for {name} is not understood')
 
 
 class BatchMetrics(object):
@@ -119,13 +118,11 @@ class BatchMetrics(object):
             -------
             list of vtools.data.timeseries.TimeSeries
         """
-        tss_sim = list()
+        tss_sim = []
         for sim_output in sim_outputs:
             if variable == 'flow':
                 ts = sim_output[station_id]
-            elif variable in self.VAR_2D:
-                ts = sim_output[(station_id, vert_pos)]
-            elif variable in self.VAR_3D:
+            elif variable in self.VAR_2D or variable in self.VAR_3D:
                 ts = sim_output[(station_id, vert_pos)]
             else:
                 raise ValueError('The variable is not supported yet')
@@ -142,16 +139,16 @@ class BatchMetrics(object):
         if alias is None:
             fout_name = "{}_{}" % (variable, station_id)
         else:
-            fout_name = "{}_{}".format(variable, alias)
+            fout_name = f"{variable}_{alias}"
             if alias != station_id:
-                fout_name += "_{}".format(station_id)
+                fout_name += f"_{station_id}"
         if variable in self.VAR_3D:
             if vert_pos == 0:
                 fout_name += "_upper"
             elif vert_pos == 1:
                 fout_name += "_lower"
             else:
-                fout_name += "_{}".format(vert_pos)
+                fout_name += f"_{vert_pos}"
         return fout_name
 
 #     def is_selected_station(self):
@@ -173,14 +170,14 @@ class BatchMetrics(object):
                 a file path of an observation file
         """
 
-        mapvar = self.MAP_VAR_FOR_STATIONDB[variable]
         if station_id in db_stations:
+            mapvar = self.MAP_VAR_FOR_STATIONDB[variable]
             flag_station = db_stations.loc[station_id, mapvar]
-            data_expected = not (flag_station == '')
+            data_expected = flag_station != ''
         else:
             data_expected = False
 
-        
+
         fpath_obs_fnd = (station_id, subloc, variable) in db_obs.index
         if fpath_obs_fnd:
             try:
@@ -192,55 +189,57 @@ class BatchMetrics(object):
                     fpath_obs = os.path.join(repo,possible)
                     if os.path.exists(fpath_obs): 
                         break
-                    
+
         else:
             fpath_obs = None
 
         if fpath_obs_fnd:
             absfpath = os.path.abspath(fpath_obs)
-            self.logger.info(
-                 "Observation file for id {}: {}".format(station_id, absfpath))
+            self.logger.info(f"Observation file for id {station_id}: {absfpath}")
 
         else:
-            expectstr = '(Data not expected)' if (
-                not data_expected) else '(Not in the file links)'
-            level = logging.WARNING if data_expected is True else logging.INFO
-            self.logger.log(level, "{} No {} data link listing for: {}".format(
-                expectstr, variable, station_id))
+            expectstr = (
+                '(Not in the file links)'
+                if data_expected
+                else '(Data not expected)'
+            )
+            level = logging.WARNING if data_expected else logging.INFO
+            self.logger.log(
+                level,
+                f"{expectstr} No {variable} data link listing for: {station_id}",
+            )
         return fpath_obs
 
     def retrieve_ts_obs(self, station_id, subloc, variable, window,
                         db_stations, db_obs):
         """ Retrieve a file name of a field data
         """
-        fpath_obs = self.find_obs_file(station_id, subloc, variable,
-                                       db_stations, db_obs)
-        
-        if fpath_obs:
-            if os.path.exists(fpath_obs) or len(glob.glob(fpath_obs)) > 0:
-                try:
-                    ts_obs = read_ts(fpath_obs)
-                    if ts_obs.shape[1] > 1:
-                        raise Exception(
-                            "Multiple column series received. Need to implement selector")
-                    ts_obs = ts_obs.squeeze()
-                except ValueError as e:
-                    raise
-                    self.logger.warning(
-                        "Got ValueError while reading an observation file: {}".format(e))
-                    ts_obs = None
-                
-                if ts_obs is None or len(ts_obs) == 0:
+        if not (
+            fpath_obs := self.find_obs_file(
+                station_id, subloc, variable, db_stations, db_obs
+            )
+        ):
+            return None
+        if os.path.exists(fpath_obs) or len(glob.glob(fpath_obs)) > 0:
+            try:
+                ts_obs = read_ts(fpath_obs)
+                if ts_obs.shape[1] > 1:
+                    raise Exception(
+                        "Multiple column series received. Need to implement selector")
+                ts_obs = ts_obs.squeeze()
+            except ValueError as e:
+                raise
+            if ts_obs is None or len(ts_obs) == 0:
                     # todo: settle this behavior as None or len==0
-                    self.logger.warning(
-                        "File {} does not contain useful data for the requested time window".format(os.path.abspath(fpath_obs)))
-                    ts_obs = None
-                return ts_obs
-            else:
                 self.logger.warning(
-                    "Data file not found on file system: {}".format(os.path.abspath(fpath_obs)))
-                return None
+                    f"File {os.path.abspath(fpath_obs)} does not contain useful data for the requested time window"
+                )
+                ts_obs = None
+            return ts_obs
         else:
+            self.logger.warning(
+                f"Data file not found on file system: {os.path.abspath(fpath_obs)}"
+            )
             return None
 
     def convert_unit_of_ts_obs_to_SI(self, ts, unit):
@@ -281,10 +280,8 @@ class BatchMetrics(object):
         elif unit == '':
             self.logger.warning("Empty (blank) unit in the time series")
         else:
-            self.logger.warning(
-                "  Not supported unit in the time series: {}.".format(unit))
-            raise ValueError(
-                "Not supported unit in the time series: {}".format(unit))
+            self.logger.warning(f"  Not supported unit in the time series: {unit}.")
+            raise ValueError(f"Not supported unit in the time series: {unit}")
         return ts
 
     def create_title(self, db_stations, station_id, source, variable, subloc):
@@ -297,12 +294,10 @@ class BatchMetrics(object):
             long_name = station_id
         title = long_name
 
-        if variable in ('salt', 'temp'):
-            if subloc != 'default':
-                title += " ({})".format(subloc)
+        if variable in ('salt', 'temp') and subloc != 'default':
+            title += f" ({subloc})"
         title += '\n'
-        title += 'Source: {}, ID: {}\n'.format(source.upper(),
-                                               station_id.upper())
+        title += f'Source: {source.upper()}, ID: {station_id.upper()}\n'
         return title
 
     def adjust_obs_datum(self, ts_obs, ts_sim, station_id, variable, subloc, db_obs):
@@ -313,21 +308,20 @@ class BatchMetrics(object):
         # NOTE: No vert_pos...
         #todo: pandas
         datum = db_obs.loc[(station_id, variable, subloc), 'vdatum']
-        if datum == '' or datum == 'STND':
-            self.logger.info("Adjusting obs ts automatically...")
-            window = get_common_window((ts_obs, ts_sim))
-            ts_obs_common = safe_window(ts_obs, window)
-            ts_sim_common = safe_window(ts_sim, window)
-            if ts_obs_common is None or ts_sim_common is None:
-                return ts_obs, 0.
-            if (np.all(np.isnan(ts_obs_common.data)) or
-                    np.all(np.isnan(ts_sim_common.data))):
-                return ts_obs, 0.
-            adj = np.average(ts_sim.data) - np.nanmean(ts_obs.data)
-            ts_obs += adj
-            return ts_obs, adj
-        else:
+        if datum not in ['', 'STND']:
             return ts_obs, 0.
+        self.logger.info("Adjusting obs ts automatically...")
+        window = get_common_window((ts_obs, ts_sim))
+        ts_obs_common = safe_window(ts_obs, window)
+        ts_sim_common = safe_window(ts_sim, window)
+        if ts_obs_common is None or ts_sim_common is None:
+            return ts_obs, 0.
+        if (np.all(np.isnan(ts_obs_common.data)) or
+                np.all(np.isnan(ts_sim_common.data))):
+            return ts_obs, 0.
+        adj = np.average(ts_sim.data) - np.nanmean(ts_obs.data)
+        ts_obs += adj
+        return ts_obs, adj
 
     def plot(self):
         """ Generate metrics plots

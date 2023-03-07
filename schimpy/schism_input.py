@@ -61,11 +61,7 @@ class SchismInput(object):
         self._time_start = value
 
     def _countmatching(self, iterable, predicate):
-        v = 0
-        for e in iterable:
-            if predicate(e):
-                v += 1
-        return v
+        return sum(bool(predicate(e)) for e in iterable)
 
     def add_structure(self, value):
         self._structures.append(value)

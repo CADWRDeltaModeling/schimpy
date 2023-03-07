@@ -18,11 +18,11 @@ DEFAULT_NA_FILL = 6.0
 def bounding_coords(image):
     ds = gdal.Open( image, GA_ReadOnly )
     gt = ds.GetGeoTransform()
-    cols=ds.RasterXSize  
-    rows=ds.RasterYSize 
+    cols=ds.RasterXSize
+    rows=ds.RasterYSize
     xlo = (gt[0],gt[3])
     xhi = (xlo[0]+ds.RasterXSize*gt[1],xlo[1]+ds.RasterYSize*gt[5])
-    print("Upper left and lower right coords of requested region: %s %s" % (xlo, xhi))
+    print(f"Upper left and lower right coords of requested region: {xlo} {xhi}")
     ds = None
     return xlo,xhi
 
@@ -44,22 +44,22 @@ def clip_dem(xlo,xhi,demlist="dem.txt",outformat="AAIGrid",hshift=False,prefix="
 
     for demfile in filelist:
         if demfile.startswith("-"): demfile = demfile[1:].strip()
-        print("Checking: %s" % demfile)
+        print(f"Checking: {demfile}")
         ds = gdal.Open(demfile, GA_ReadOnly )
         gt = ds.GetGeoTransform()
-        cols=ds.RasterXSize  
-        rows=ds.RasterYSize 
+        cols=ds.RasterXSize
+        rows=ds.RasterYSize
         ds_xlo = (gt[0],gt[3])
         ds_dx = gt[1]
         ds_dy = gt[5]
         ds_xhi = (ds_xlo[0]+ds.RasterXSize*ds_dx,ds_xlo[1]+ds.RasterYSize*ds_dy)
-    
+
         if (ds_xhi[0] > xlo[0] and ds_xhi[1] < xlo[1] and \
             ds_xlo[0] < xhi[0] and ds_xlo[1] > xhi[1]):
             complete = ds_xlo[0] < xlo[0] and ds_xlo[1] > xlo[1] and \
                    ds_xhi[0] > xhi[0] and ds_xhi[1] < xhi[1]
-            
-                         
+
+
             win_xlo = (max(xlo[0], ds_xlo[0]),min(xlo[1], ds_xlo[1]))
             win_xlo = (math.floor((win_xlo[0] - ds_xlo[0])/ds_dx)*ds_dx + gt[0], \
                        math.ceil((win_xlo[1] - ds_xlo[1])/ds_dy)*ds_dy + gt[3])
@@ -69,28 +69,26 @@ def clip_dem(xlo,xhi,demlist="dem.txt",outformat="AAIGrid",hshift=False,prefix="
 
             print("\n********\nDataset %s intersects region and is complete: %s" % (demfile, complete))
             if verbose:
-                print("Upper left and lower right coords of requested region: %s %s" % (xlo, xhi))
-                print("ds_dx %s ds_dy %s" % (ds_dx, ds_dy))
+                print(f"Upper left and lower right coords of requested region: {xlo} {xhi}")
+                print(f"ds_dx {ds_dx} ds_dy {ds_dy}")
                 print("ds origin %s %s" % ds_xlo)
-                print("Data set upper left %s, lower right: %s"  % (ds_xlo,ds_xhi))
-                print("Final upper left %s, lower right: %s"  % (win_xlo,win_xhi))
+                print(f"Data set upper left {ds_xlo}, lower right: {ds_xhi}")
+                print(f"Final upper left {win_xlo}, lower right: {win_xhi}")
                 approx_size = (win_xhi[0] - win_xlo[0])*(win_xhi[1] - win_xlo[1])/ds_dx*ds_dy
-                print("Approx number of raster cells: %s " % int(approx_size))
-            outname = "%s_%s.%s" % (prefix,iout,extension)
+                print(f"Approx number of raster cells: {int(approx_size)} ")
+            outname = f"{prefix}_{iout}.{extension}"
             if hshift:
-                shift = "-a_ullr %s %s %s %s " % (win_xlo[0] + ds_dx/2.,win_xlo[1] - ds_dy/2.,win_xhi[0] + ds_dx/2.,win_xhi[1] - ds_dy/2.)
+                shift = f"-a_ullr {win_xlo[0] + ds_dx / 2.0} {win_xlo[1] - ds_dy / 2.0} {win_xhi[0] + ds_dx / 2.0} {win_xhi[1] - ds_dy / 2.0} "
             else:
                 shift = ""
             iout += 1
             quiet = "" if verbose else "-quiet"
-            command = "gdal_translate %s -projwin %s %s %s %s %s -of %s %s %s" % \
-                      (quiet,win_xlo[0],win_xlo[1],win_xhi[0],win_xhi[1],shift,outformat,demfile,outname)
+            command = f"gdal_translate {quiet} -projwin {win_xlo[0]} {win_xlo[1]} {win_xhi[0]} {win_xhi[1]} {shift} -of {outformat} {demfile} {outname}"
             if verbose: print("Calling gdal_translate with command:\n %s" % command)
             p = subprocess.Popen(command.split(), shell=True)
-            err = p.wait()
-            if err:
+            if err := p.wait():
                 raise Exception("Command failed:\n %s" % command)
-            print("Output file: %s" % outname)
+            print(f"Output file: {outname}")
 
 def create_arg_parser():
     import argparse

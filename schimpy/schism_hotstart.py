@@ -125,24 +125,24 @@ class hotstart(object):
 
         if 'param_nml' in hotstart_info.keys():
             self.param_nml = hotstart_info['param_nml']
+        elif self.modules is not None and any(
+            m in ['SED', 'AGE', 'GEN', 'ECO'] for m in self.modules
+        ):
+            raise ValueError(f'param_nml needs to be defined in {self.yaml_fn}')
         else:
-            if self.modules is not None:
-                if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in self.modules]): # these modules require param.nml
-                    raise ValueError('param_nml needs to be defined in %s'%self.yaml_fn)
             self.param_nml = "param.nml" # for all other modules, param.nml will not be used.
 
         if self.crs is None:
-            if 'crs' not in hotstart_info.keys():
-                self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.
-            #    raise ValueError("crs must be specified")
-            else:
+            if 'crs' in hotstart_info.keys():
                 crs = hotstart_info['crs']
-                print("crs is {}".format(crs))
+                print(f"crs is {crs}")
                 self.crs = crs
 
+            else:
+                self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.
         if self.modules:  # if modules is None for barotropic run, this step is not required.
             self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
-                describe_tracers(self.param_nml, modules=self.modules)
+                    describe_tracers(self.param_nml, modules=self.modules)
         else:
             self.ntracers = 0
             self.tr_mname = []
@@ -155,11 +155,11 @@ class hotstart(object):
         #v = self.variables[1]
         self.hotstart_ini = {}
         for v in self.variables:
-            print("creating hotstart for %s" % v)
+            print(f"creating hotstart for {v}")
             initializer = self.info[v]['initializer']
 
             if ('hotstart_nc' in initializer) and \
-                (not self.hotstart_ini) :
+                    (not self.hotstart_ini) :
                 self.hotstart_ini['hotstart_nc_hfn'] = initializer[
                     'hotstart_nc']['source_hgrid']
                 self.hotstart_ini['hotstart_nc_vfn'] = initializer[
@@ -167,7 +167,7 @@ class hotstart(object):
                 self.hotstart_ini['source_vgrid_version'] = initializer[
                     'hotstart_nc']['source_vgrid_version']
             elif 'patch_init' in initializer and \
-                (not self.hotstart_ini) :
+                    (not self.hotstart_ini) :
                 patch_init =  [list(ini['initializer'].keys())[0]
                                for ini in initializer['patch_init']['regions']]
                 if 'hotstart_nc' in patch_init:
@@ -229,14 +229,13 @@ class hotstart(object):
         kwargs_options = {}
         if 'SED' in variable:
             if 'Nbed' not in self.__dict__.keys():
-                if os.path.isfile("sediment.nml"):
-                    self.sediment_fn = "sediment.nml"
-                    params = read_param_nml(self.sediment_fn)
-                    self.Nbed = params['Nbed']
-                else:
+                if not os.path.isfile("sediment.nml"):
                     raise FileNotFoundError(
                         "sediment.nml is required if SED module is turned on")
-            kwargs_options.update({'Nbed': self.Nbed})
+                self.sediment_fn = "sediment.nml"
+                params = read_param_nml(self.sediment_fn)
+                self.Nbed = params['Nbed']
+            kwargs_options['Nbed'] = self.Nbed
         if kwargs_options:
             var = VariableField(v_meta, variable, self.mesh,
                                 self.depths, self.date, self.crs,
@@ -364,16 +363,16 @@ class hotstart(object):
         if self.modules:
             ntracers, ntrs, irange_tr, tr_mname = describe_tracers(
                  param_nml, modules=self.modules)
-            tr_mname_el = ["%s_el" % n for n in tr_mname]
-            tr_mname_nd = ["%s_nd" % n for n in tr_mname]
-            tr_mname_nd0 = ["%s_nd0" % n for n in tr_mname]
+            tr_mname_el = [f"{n}_el" for n in tr_mname]
+            tr_mname_nd = [f"{n}_nd" for n in tr_mname]
+            tr_mname_nd0 = [f"{n}_nd0" for n in tr_mname]
             schism_hotstart_var['tr_el'] = tr_mname_el
             schism_hotstart_var['tr_nd'] = tr_mname_nd
             schism_hotstart_var['tr_nd0'] = tr_mname_nd0
 
         nc_dataset = self.nc_dataset
         #v_keys =list(nc_dataset.data_vars)
-        if any([v in ['HYDRO','TEM','SAL'] for v in self.modules]):
+        if any(v in ['HYDRO', 'TEM', 'SAL'] for v in self.modules):
             mapping_dict = {'temperature_nd': 'TEM_nd',
                             'temperature_nd0': 'TEM_nd0',
                             'temperature_el': 'TEM_el',
@@ -443,10 +442,7 @@ class VariableField(object):
         self.tr_index = None
         self.hotstart_ini = hotstart_ini
 
-        if vname in ['SED3D_bed', 'SED3D_bedfrac']:
-            self.Nbed = kwargs['Nbed']
-        else:
-            self.Nbed = 1
+        self.Nbed = kwargs['Nbed'] if vname in ['SED3D_bed', 'SED3D_bedfrac'] else 1
         self.grid = self.get_grid()  # grid can be nodes/elems/edges
         self.n_hgrid = list(self.grid.values())[0][0]
         self.n_vgrid = list(self.grid.values())[1][0]
@@ -462,7 +458,7 @@ class VariableField(object):
     def var_centering(self):
         # built-in centering options for model input variables.
         tr_key_list = ['tem','sal','age_','gen_','icm','sed_','cos_']
-        if any([t in self.variable_name.lower() for t in tr_key_list]):
+        if any(t in self.variable_name.lower() for t in tr_key_list):
             variable_type = 'tracer'
         else:
             variable_type = self.variable_name
@@ -478,10 +474,12 @@ class VariableField(object):
                       'tracer':'prism',
                       'tke':'node3D'
                       }
-        if variable_type in vc_mapping.keys():
+        if variable_type in vc_mapping:
             return vc_mapping[variable_type]
         else:
-            raise ValueError("variable %s does not have a valid input centering option"%self.variable_name)
+            raise ValueError(
+                f"variable {self.variable_name} does not have a valid input centering option"
+            )
     def get_grid(self):
         """Getting the number and coordinates of horizontal nodes/elems/edges for
         different centering options and return them as grid.
@@ -600,11 +598,7 @@ class VariableField(object):
         #initializer = globals()[self.initializer_options()]()
         initializer = self.initializer_options()
         var = initializer()
-        #if np.all(np.isnan(var)):
-        #    raise ValueError(
-        #        "%s field has nan value everywhere: check input data and variable name" % self.variable_name)
-        da = self.create_dataarray(var)
-        return da
+        return self.create_dataarray(var)
 
     @classmethod
     def map_to_3D(cls, v_2d, nz):
@@ -627,32 +621,20 @@ class VariableField(object):
         equation converting 2D values on element to nodes.
         """
         vmap = np.asarray(vmap)
-        vnode = [vmap[list(n)].mean(axis=0) for n in self.mesh.node2elems]
-        return vnode
+        return [vmap[list(n)].mean(axis=0) for n in self.mesh.node2elems]
 
     def node2elem_values(self, vmap):
         vmap = np.asarray(vmap)
-        velem = [vmap[el].mean(axis=0) for el in self.elems]
-        return velem
+        return [vmap[el].mean(axis=0) for el in self.elems]
 
     def simple_trend(self, ini_meta=None, inpoly=None):
         """
         Assigning a spatially uniformed value or an equation that's dependent on lat, lon
         """
-        if ini_meta:
-            value = self.get_value(ini_meta)
-        else:
-            value = self.get_value(self.ini_meta)  # get variable values
-
-        if inpoly is not None:
-            n_hgrid = len(inpoly)
-        else:
-            n_hgrid = self.n_hgrid
-
+        value = self.get_value(ini_meta) if ini_meta else self.get_value(self.ini_meta)
+        n_hgrid = len(inpoly) if inpoly is not None else self.n_hgrid
         if isinstance(value, (float, int)):
-            # initialize the 3D field
-            v_ini = np.full((n_hgrid, self.n_vgrid), value)
-            return v_ini
+            return np.full((n_hgrid, self.n_vgrid), value)
         elif isinstance(value, str):
             if ('max' in value) & ('np.maximumm' not in value):
                 value = value.replace('max','np.maximum')
@@ -666,7 +648,6 @@ class VariableField(object):
                 xy = self.hgrid
                 if not isinstance(self.vgrid, (float,int)):
                     z = self.vgrid[:,0]
-            x = xy[:, 0]
             y = xy[:, 1]
             if self.variable_name in ['SED3D_bed', 'SED3D_bedfrac']:
                 value = value.split(',')
@@ -677,12 +658,10 @@ class VariableField(object):
             else:
                 # x and y based function where x and y are lat and lon.
                 vmap = eval(value)
+                x = xy[:, 0]
                 if isinstance(vmap,(int,float)):
                     vmap = np.ones_like(x)*vmap
-                if '2D' in self.centering:
-                    return vmap
-                else:
-                    return self.map_to_3D(vmap, self.n_vgrid)
+                return vmap if '2D' in self.centering else self.map_to_3D(vmap, self.n_vgrid)
         else:
             raise("input value not recognised as float, int, or str")
 
@@ -696,37 +675,39 @@ class VariableField(object):
         else:
             text_fn = self.get_value(self.ini_meta)
         if text_fn.endswith('.ic') or text_fn.endswith('.gr3'):
-            if self.centering == 'node2D':
-                reader = SchismMeshGr3Reader()  # the ic file has the same format as the .gr3 file
-                reader.read(fpath_mesh=text_fn)
-                icmesh = reader.read(fpath_mesh=text_fn)
+            if self.centering != 'node2D':
+                raise ValueError(
+                    f'{text_fn} gives value on node, but value on {self.centering} is required'
+                )
+            reader = SchismMeshGr3Reader()  # the ic file has the same format as the .gr3 file
+            reader.read(fpath_mesh=text_fn)
+            icmesh = reader.read(fpath_mesh=text_fn)
 
-                if icmesh.n_nodes() == self.n_nodes:
-                    vmap = icmesh.nodes[:, 2]
-                else:
-                    raise Exception(
-                        "The node of %s is incompatible with the grid node in hgrid.gr3" % text_fn)
-
-                # if the required input is on element, but values on nodes are provided.
-                if len(vmap) != self.n_hgrid:
-                    vmap = self.node2elem_values(vmap)
+            if icmesh.n_nodes() == self.n_nodes:
+                vmap = icmesh.nodes[:, 2]
             else:
-                raise ValueError('%s gives value on node, but value on %s is required' % (
-                    text_fn, self.centering))
+                raise Exception(
+                    f"The node of {text_fn} is incompatible with the grid node in hgrid.gr3"
+                )
+
+            # if the required input is on element, but values on nodes are provided.
+            if len(vmap) != self.n_hgrid:
+                vmap = self.node2elem_values(vmap)
         elif text_fn.endswith('.prop'):
-            if self.centering in ['elem', 'prism']:
-                with open(text_fn) as f:
-                    content = f.read().splitlines()
-                vmap = [float(x.split()[1]) for x in content]
-                if len(vmap) != self.n_elems:
-                    raise ValueError(
-                        "The element of {} is incompatible with grid element in hgrid.gr3".format(text_fn))
-                # if the required input is on nodes, but values on elements are provided
-                if len(vmap) != self.n_hgrid:
-                    vmap = self.elem2node_values(vmap)
-            else:
-                raise ValueError('%s gives value on element, but value on %s is required' % (
-                    text_fn, self.centering))
+            if self.centering not in ['elem', 'prism']:
+                raise ValueError(
+                    f'{text_fn} gives value on element, but value on {self.centering} is required'
+                )
+            with open(text_fn) as f:
+                content = f.read().splitlines()
+            vmap = [float(x.split()[1]) for x in content]
+            if len(vmap) != self.n_elems:
+                raise ValueError(
+                    f"The element of {text_fn} is incompatible with grid element in hgrid.gr3"
+                )
+            # if the required input is on nodes, but values on elements are provided
+            if len(vmap) != self.n_hgrid:
+                vmap = self.elem2node_values(vmap)
         elif text_fn.endswith('.nc'):
             ncdata = xr.open_dataset(text_fn)
             vmap = ncdata[self.variable_name].values
@@ -746,21 +727,22 @@ class VariableField(object):
 
         vmap = np.squeeze(vmap)
         vdim = np.shape(vmap)
-        if len(vdim) == 1:  # 1D array
-            if self.centering == 'node2D':
-                return vmap[inpoly]
-            else:
-                v = self.map_to_3D(vmap, self.n_vgrid)
-                return v[inpoly, :]
-        elif len(vdim) == 2:  # 2D array
-            if self.vname not in ['SED3D_bed', 'SED3D_bedfrac']:
-                return vmap[inpoly]
-            else:
-                v = self.map_to_3D(vmap, self.n_vgrid)
-                v = np.transpose(v, [0, 2, 1])
-                return v[inpoly]
-        else:  # if alrady 3D array
+        if (
+            len(vdim) == 1
+            and self.centering == 'node2D'
+            or len(vdim) != 1
+            and len(vdim) == 2
+            and self.vname not in ['SED3D_bed', 'SED3D_bedfrac']
+            or len(vdim) not in [1, 2]
+        ):
             return vmap[inpoly]
+        elif len(vdim) == 1:
+            v = self.map_to_3D(vmap, self.n_vgrid)
+            return v[inpoly, :]
+        else:
+            v = self.map_to_3D(vmap, self.n_vgrid)
+            v = np.transpose(v, [0, 2, 1])
+            return v[inpoly]
 
     def patch_init(self, poly_fn=None):  # regional based initializer
         try:
@@ -794,15 +776,14 @@ class VariableField(object):
                                  (r, self.variable_name))
             if self.variable_name == 'tke':
                 v_merge[:,inpoly,:] = v
+            elif type(v) == xr.core.dataarray.DataArray:
+                v_merge[inpoly, :] = np.array(v)[:,np.newaxis] # for cases where hotstart is returning 2D array
             else:
-                if type(v) == xr.core.dataarray.DataArray:
-                    v_merge[inpoly, :] = np.array(v)[:,np.newaxis] # for cases where hotstart is returning 2D array
-                else:
-                    try:
-                        v_merge[inpoly, :] = v
-                    except ValueError:
-                        v_merge[inpoly, :] = v[:,np.newaxis]
-            #print(i, r)
+                try:
+                    v_merge[inpoly, :] = v
+                except ValueError:
+                    v_merge[inpoly, :] = v[:,np.newaxis]
+                #print(i, r)
         return v_merge
 
     # USGS cast (2D observational points)
@@ -829,26 +810,21 @@ class VariableField(object):
                 int)
         # setting 'Station' as the index below does not remove depth in the column
         polaris_cast.set_index('Station', inplace=True)
-        if variable.lower() in polaris_cast.columns.str.lower():
-            # change column to lower case
-            polaris_cast.columns = map(str.lower, polaris_cast.columns)
-            indnan = np.where(np.isnan(polaris_cast[variable.lower()]))[0]
-            if len(indnan) > 0:
-                polaris_cast = polaris_cast[~indnan]
-        else:
-            raise IndexError("The variable %s is not in %s" %
-                             (variable, data_fn))
+        if variable.lower() not in polaris_cast.columns.str.lower():
+            raise IndexError(f"The variable {variable} is not in {data_fn}")
 
+        # change column to lower case
+        polaris_cast.columns = map(str.lower, polaris_cast.columns)
+        indnan = np.where(np.isnan(polaris_cast[variable.lower()]))[0]
+        if len(indnan) > 0:
+            polaris_cast = polaris_cast[~indnan]
         # find the corresponding station locations
         stations = pd.read_csv(station_fn,sep=",",header=0)[
             ['Station', 'y', 'x']]
         stations.set_index('Station', inplace=True)
         polaris_cast = polaris_cast.join(stations, on='Station', how='left')
 
-        if inpoly is not None:
-            n_hgrid = len(inpoly)
-        else:
-            n_hgrid = self.n_hgrid
+        n_hgrid = len(inpoly) if inpoly is not None else self.n_hgrid
         v = np.zeros((n_hgrid, self.n_vgrid))
 
         # partition the grid domain by polaris stations based on horizontal distance
@@ -878,8 +854,7 @@ class VariableField(object):
                 v[g, :] = f(depth)
 
         if np.any(np.isnan(v)):
-            raise ValueError(
-                "The interpolated %s field has nan in it" % variable)
+            raise ValueError(f"The interpolated {variable} field has nan in it")
         return v
 
 #    def extrude_casts(self,ini_meta=None,inpoly=None): # USGS cast (2D observational points)
@@ -932,7 +907,7 @@ class VariableField(object):
 #                raise ValueError("The interpolated %s field has nan in it"%variable)
 #        return v
 
-    def obs_points(self, ini_meta=None, inpoly=None):  # 1D observational points
+    def obs_points(self, ini_meta=None, inpoly=None):    # 1D observational points
         """
         obs_file includes Lat, Lon, and values for the variable.
         """
@@ -966,16 +941,12 @@ class VariableField(object):
         #print(vals)
         invdisttree = Interp2D.Invdisttree(obs_loc, vals,
                                            leafsize=10, stat=1)
-        if inpoly is not None:
-            node_xy = self.hgrid[inpoly]
-        else:
-            node_xy = self.hgrid
+        node_xy = self.hgrid[inpoly] if inpoly is not None else self.hgrid
         #print(node_xy)
         vmap = invdisttree(node_xy, nnear=4, p=2)
         if np.any(np.isnan(vmap)):
-            raise ValueError("vmap has nan value in it.Check %s" % obs_file)
-        v = self.map_to_3D(vmap, self.n_vgrid)
-        return v
+            raise ValueError(f"vmap has nan value in it.Check {obs_file}")
+        return self.map_to_3D(vmap, self.n_vgrid)
 
     def hotstart_nc(self, ini_meta=None, inpoly=None):
         var = self.variable_name

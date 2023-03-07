@@ -82,11 +82,7 @@ class SaltConversionLocator(AutoLocator):
         vmax_ec = psu_ec_25c(vmax) if vmax >= 0. else -psu_ec_25c(abs(vmax))
         # Determine "neat" values of EC for tick locations
         auto_ticks = AutoLocator.tick_values(self, vmin_ec, vmax_ec)
-        # Now determine the locations in psu, since the axis is psu for
-        # locations and EC for labeling.
-        convert_ticks = [x for x in ec_psu_25c(auto_ticks)
-                         if x >= 0. and x <= 35.]
-        return convert_ticks
+        return [x for x in ec_psu_25c(auto_ticks) if x >= 0.0 and x <= 35.0]
 
 
 class SaltConversionFormatter(ScalarFormatter):
@@ -104,8 +100,7 @@ class SaltConversionFormatter(ScalarFormatter):
             xnew = np.around(xnew, np.max((-n_digits+2, -2)))
         else:
             raise Exception()
-        t = "%5.0f" % xnew
-        return t
+        return "%5.0f" % xnew
 
 
 ##############################################################################
@@ -161,41 +156,37 @@ def set_dual_axes(ax, ts, cell_method = 'inst'):
     """
     if ts is None:
         return
-    filtered = (cell_method == 'filtered') or (cell_method == 'ave')
-    if hasattr(ts,'unit'):
-        unit = ts.unit
-        if unit == 'm' or unit == 'meter':
-            ax2 = set_dual_axes_elev(ax, filtered=filtered)
-            return ax2
-        elif unit.lower() == 'cms':
-            ax2 = set_dual_axes_flow(ax, filtered=filtered)
-            return ax2
-        elif unit.lower() == 'psu':
-            lims = ax.get_ylim()
-            llim = 0. if lims[0] < 5. else lims[0]/2.
-            ax.set_ylim(llim,lims[1])
-            ax2 = set_dual_axes_salt(ax, filtered=filtered)
-            return ax2
-        elif unit == 'm/s':
-            ax2 = create_second_axis(ax, m_to_ft)
-            if filtered:
-                ax.set_ylabel(FILTERED_MPS_LABEL)
-                ax2.set_ylabel(FILTERED_FTPS_LABEL)
-            else:
-                ax.set_ylabel(MPS_LABEL)
-                ax2.set_ylabel(FTPS_LABEL)
-            return ax2
-        elif unit == 'deg C' or unit == 'degC':
-            ax2 = create_second_axis(ax, celsius_to_fahrenheit)
-            if filtered:
-                ax.set_ylabel(FILTERED_DEG_C_LABEL)
-                ax2.set_ylabel(FILTERED_DEG_F_LABEL)
-            else:
-                ax.set_ylabel(DEG_C_LABEL)
-                ax2.set_ylabel(DEG_F_LABEL)
-            return ax2
-    else:
+    if not hasattr(ts, 'unit'):
         raise ValueError("No unit provided for output and not inferred")
+    unit = ts.unit
+    filtered = cell_method in ['filtered', 'ave']
+    if unit in ['m', 'meter']:
+        return set_dual_axes_elev(ax, filtered=filtered)
+    elif unit.lower() == 'cms':
+        return set_dual_axes_flow(ax, filtered=filtered)
+    elif unit.lower() == 'psu':
+        lims = ax.get_ylim()
+        llim = 0. if lims[0] < 5. else lims[0]/2.
+        ax.set_ylim(llim,lims[1])
+        return set_dual_axes_salt(ax, filtered=filtered)
+    elif unit == 'm/s':
+        ax2 = create_second_axis(ax, m_to_ft)
+        if filtered:
+            ax.set_ylabel(FILTERED_MPS_LABEL)
+            ax2.set_ylabel(FILTERED_FTPS_LABEL)
+        else:
+            ax.set_ylabel(MPS_LABEL)
+            ax2.set_ylabel(FTPS_LABEL)
+        return ax2
+    elif unit in ['deg C', 'degC']:
+        ax2 = create_second_axis(ax, celsius_to_fahrenheit)
+        if filtered:
+            ax.set_ylabel(FILTERED_DEG_C_LABEL)
+            ax2.set_ylabel(FILTERED_DEG_F_LABEL)
+        else:
+            ax.set_ylabel(DEG_C_LABEL)
+            ax2.set_ylabel(DEG_F_LABEL)
+        return ax2
     print("Warning: set_dual_axes: Time series unit missing or not supported.")
     return None
 
@@ -414,7 +405,7 @@ def auto_ylabels(axes, timeseries, dual=True):
             if isinstance(item, vtools.data.timeseries.TimeSeries):
                 ts = item
     unit = ts.props['unit']
-    if unit == 'm' or unit == 'meter':
+    if unit in ['m', 'meter']:
         if 'filtered' in ts.props:
             axes.set_ylabel(FILTERED_M_LABEL)
         else:
@@ -489,7 +480,7 @@ def create_second_axis(ax1, y_converter_f=None,
         for axes in shared_x:
             if axes != ax1:
                 ax2 = axes
-                axes.cla()
+                ax2.cla()
     else:
         ax2 = ax1.twinx()
     ax1.xaxis.set_major_locator(major_locator)

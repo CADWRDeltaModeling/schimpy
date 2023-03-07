@@ -191,19 +191,12 @@ class OutControls(param.Parameterized):
     def to_iof_array(self):
         out_params = self.param.params()
         valuemap = dict(self.param.get_param_values())
-        iof_array = []
-        for i,name in enumerate(out_params):
-            if i==0: # skip 
-                pass
-            else:
-                iof_array.append(int(valuemap[name]))
-        return iof_array
+        return [int(valuemap[name]) for i, name in enumerate(out_params) if i != 0]
 
     def from_iof_array(self, iof_array):
         bool_values = [bool(val) for val in iof_array]
         # Enumerate the variables and create a param_dict
-        param_dict = { param_name: bool_value 
-                    for param_name, bool_value in zip(self.param.params(), [0]+bool_values)}
+        param_dict = dict(zip(self.param.params(), [0]+bool_values))
         self.set_param(**param_dict)
 
 
@@ -348,9 +341,7 @@ def get_type_dict(cls):
     return {k: v['type'] if 'type' in v else 'str' for k,v in cls.param.schema().items() }
 
 def coerce_to_type(schema, value):
-    typename = 'str'
-    if 'type' in schema:
-        typename = schema['type']
+    typename = schema['type'] if 'type' in schema else 'str'
     if typename == 'integer':
         return int(value)
     elif typename == 'number':

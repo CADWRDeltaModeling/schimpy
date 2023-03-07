@@ -36,18 +36,17 @@ def process_stations(station_file):
 
 def process_cruise(path):
     print ("process_cruise")
-    cruisefile = open(path,'r')
-    cruisetxt = cruisefile.readlines()[2:]
-    cruisefile.close()
+    with open(path,'r') as cruisefile:
+        cruisetxt = cruisefile.readlines()[2:]
     cruiselines = [line.strip().split(",") for line in cruisetxt if (line != "\n")]
     cruise_data = {}
     for entry in cruiselines:
-        time = dtm.datetime.strptime("%s %s" % (entry[0],entry[1]), "%m/%d/%Y %H:%M")
+        time = dtm.datetime.strptime(f"{entry[0]} {entry[1]}", "%m/%d/%Y %H:%M")
         station = entry[2]
         if station.endswith(".0"): 
             station = station[:-2]
 
-        if not station in cruise_data.keys():
+        if station not in cruise_data:
             cruise_data[station] = ([],[],time)
         depth = float(entry[3])
         try:
@@ -58,7 +57,7 @@ def process_cruise(path):
             continue
         cruise_data[station][0].append(depth)
         cruise_data[station][1].append(salinity)
-    for station in cruise_data.keys():
+    for station in cruise_data:
         time = cruise_data[station][2]
         depth = np.array(cruise_data[station][0])
         salinity = np.array(cruise_data[station][1])
@@ -71,12 +70,11 @@ def process_cruise(path):
 
 def process_xyt(path,casts,base_time):
     print ("process_cruise")
-    cruisefile = open(path,'r')
-    cruisetxt = cruisefile.readlines()
-    cruisefile.close()
+    with open(path,'r') as cruisefile:
+        cruisetxt = cruisefile.readlines()
     cruiselines = [line.strip().split() for line in cruisetxt if (line != "\n")]
     cruise_data = {}
-   
+
     for entry in cruiselines:
         castno = int(entry[0])
         salt = float(entry[1])
@@ -84,12 +82,12 @@ def process_xyt(path,casts,base_time):
         elapsed = 24.*3600.*float(entry[4])
         time = base_time + dtm.timedelta(seconds=elapsed)
         station = casts[castno][4]
-      
-        if not station in cruise_data.keys():
+
+        if station not in cruise_data:
             cruise_data[station] = ([],[],time)
         cruise_data[station][0].append(depth)
         cruise_data[station][1].append(salt)
-    for station in cruise_data.keys():
+    for station in cruise_data:
         time = cruise_data[station][2]
         depth = np.array(cruise_data[station][0])
         salinity = np.array(cruise_data[station][1])
@@ -104,8 +102,10 @@ def match_cruise(time, station, x, z, times, data):
     times = np.array(times)
     ndxR = np.searchsorted( times, time)
     ndxL = max(ndxR - 1,0)
-    if not (time >= times[0] and time <= times[-1]):
-        raise ValueError("Time %s (in days) is not in model file spanning from %s to %s" % (time, times[0], times[-1]))
+    if time < times[0] or time > times[-1]:
+        raise ValueError(
+            f"Time {time} (in days) is not in model file spanning from {times[0]} to {times[-1]}"
+        )
     wl = (times[ndxR] - time)/(times[ndxR] - times[ndxL])
     wr = 1 - wl
     station_ndx = station.data_index
@@ -119,7 +119,7 @@ def match_cruise(time, station, x, z, times, data):
     for n in range(ndx_farleft,ndx_farright):
         t = times[n]
         vals = data[n,:,station_ndx]
-        surrounding_profiles.append((t, vals))            
+        surrounding_profiles.append((t, vals))
     return zz, surrounding_profiles
     
 def do_depth_plot(station,cruise_data,surrounding_profiles,ax,xlabel,ylabel,add_legend = False):
@@ -251,25 +251,24 @@ def model_data_for_longitude(cruise_data,station_data,x, z, times, model_data, b
 def cruise_xyt(path,station_data,base_time,outfile): 
     print ("cruise_xyt")
 
-    cruisefile = open(path,'r')
-    cruisetxt = cruisefile.readlines()[2:]
-    cruisefile.close()
+    with open(path,'r') as cruisefile:
+        cruisetxt = cruisefile.readlines()[2:]
     cruiselines = [line.strip().split(",") for line in cruisetxt if (line != "\n")]
     cruise_locs = []
     processed = []
     casts = {}
     for entry in cruiselines:
         if len(entry) < 2: continue
-        time = dtm.datetime.strptime("%s %s" % (entry[0],entry[1]), "%m/%d/%Y %H:%M")
+        time = dtm.datetime.strptime(f"{entry[0]} {entry[1]}", "%m/%d/%Y %H:%M")
         elapsed = (time - base_time).total_seconds()
         station = entry[2]
         if station.endswith(".0"): 
             station = station[:-2]
-        if not station in processed:
+        if station not in processed:
             sd=station_data.loc[station]
             processed.append(station)
             cruise_locs.append((sd.x,sd.y,elapsed,sd.name,station))
-    
+
     with open(outfile,"w") as out:
         out.write("Cruise cast model requests\n%s\n" % len(cruise_locs))
         for i,loc in enumerate(cruise_locs):
@@ -311,9 +310,9 @@ def main(base_date,cruise_time,obs_file,model_file,station_file,xytfile):
     cruise_data =  process_cruise(filename)  
 
     casts = cruise_xyt(filename,station_data,base_date,xytfile)
-    model_data = process_xyt(model_file,casts,base_date)    
+    model_data = process_xyt(model_file,casts,base_date)
     fig, axes = plt.subplots(2,2,sharex=True)
-    
+
     #x,z,times,model_data = process_data(station_data,model_outfile)
     choices = ["657","649","2","3"]
     #choices = ["10","13","14","15"]
@@ -329,15 +328,15 @@ def main(base_date,cruise_time,obs_file,model_file,station_file,xytfile):
         station = station_data.loc[choice]
         model_profile = model_data[choice]
         #ax = axes[ichoice%2,ichoice/2]
-        title = station.name + "(%s km) " % np.round(station.dist_km)
+        title = station.name + f"({np.round(station.dist_km)} km) "
         ax.set_title(title)
         xlabel = "Salinity (psu)" if ichoice in (1,3) else None
         ylabel = "Depth (m)" if ichoice in (0,1) else None
-        print ("ichoice: %s %s" % (ichoice,xlabel))
+        print(f"ichoice: {ichoice} {xlabel}")
         #add_legend = (ichoice == (nchoice - 1))
         add_legend = (ichoice == 0)
         surrounding_profiles = [model_profile]
-        do_depth_plot(station,cruise_profile, surrounding_profiles,ax,xlabel,ylabel,add_legend)       
+        do_depth_plot(station,cruise_profile, surrounding_profiles,ax,xlabel,ylabel,add_legend)
     plt.show()
     
 
@@ -403,33 +402,32 @@ if __name__== "__main__":
 
 
     usgs_cruise_file_lst=[]
-    
-    
+
+
     aug_parser = create_arg_parser()
     args = aug_parser.parse_args()
     data_folder=args.data_path
     base_date=parser.parse(args.start)
     schism_output_folder=args.schism_output_path
-    
-    
+
+
     schism_vgrid_in=os.path.join(schism_output_folder,"vgrid.in")
     if not(os.path.exists(schism_vgrid_in)):
         raise FileNotFoundError( errno.ENOENT, os.strerror(errno.ENOENT), schism_vgrid_in)
     schism_output_in=os.path.join(schism_output_folder,"read_output_xyt.in")
     if not(os.path.exists(schism_output_in)):
         raise FileNotFoundError( errno.ENOENT, os.strerror(errno.ENOENT), schism_output_in)
-    
+
     station_file="usgs_cruise_stations.csv"
-    
+
     if not(os.path.exists(os.path.join(data_folder,station_file))):
         raise FileNotFoundError( errno.ENOENT, os.strerror(errno.ENOENT), os.path.join(data_folder,station_file))
-            
+
     usgs_cruise_match=re.compile("usgs_cruise_(?P<date>[0-9]{8}).csv")
     for file_name in os.listdir(data_folder):
-        match_re=usgs_cruise_match.match(file_name)
-        if match_re:
+        if match_re := usgs_cruise_match.match(file_name):
             print("processing crusier data "+file_name)
-            cruise_time=parser.parse(match_re.group("date"))
+            cruise_time = parser.parse(match_re["date"])
             xyt_file="station.xyt"
             gen_station_xyt(base_date,cruise_time,os.path.join(data_folder,file_name),os.path.join(data_folder,station_file),xyt_file)
             copyfile(xyt_file,os.path.join(schism_output_folder,xyt_file))
@@ -440,7 +438,7 @@ if __name__== "__main__":
             p.wait()
             if (p.returncode):
                 raise ChildProcessError("Fail to extract schism outputs")
-            model_salt="salt_"+match_re.group("date")
+            model_salt = "salt_" + match_re["date"]
             copyfile(os.path.join(schism_output_folder,"fort.18"),os.path.join(schism_output_folder,model_salt))
             gen_profile_plot(base_date,cruise_time,os.path.join(data_folder,file_name),os.path.join(schism_output_folder,model_salt),os.path.join(data_folder,station_file),os.path.join(schism_output_folder,xyt_file))
             

@@ -14,7 +14,7 @@ def combine_flux(infiles,outfile,prefer_last=False):
         try:
             filedata.append(np.loadtxt(f))
         except:
-            print("Problem reading file: {}".format(f))
+            print(f"Problem reading file: {f}")
             raise
     nfile = len(filedata)
     starts = np.array([fd[ 0,0] for fd in filedata])
@@ -24,11 +24,11 @@ def combine_flux(infiles,outfile,prefer_last=False):
     if np.any(np.not_equal(sorder,eorder)):
         raise ValueError("input files are ambiguously ordered (one lies inside another)")
     if np.any(sorder[1:]<sorder[:-1]):
-        raise ValueError("Files out of order. This is the apparent order of inputs: {}".format(sorder))
-    
-    nstation = filedata[0].shape[1] -1
-    writeformat = ["%16.6f"] + nstation*["%14.4e"]        
+        raise ValueError(
+            f"Files out of order. This is the apparent order of inputs: {sorder}"
+        )
 
+    nstation = filedata[0].shape[1] -1
     ndxlast = filedata[-1].shape[0]
     if prefer_last:
         sblock = np.full(len(filedata), 0, dtype=np.int64)
@@ -40,10 +40,12 @@ def combine_flux(infiles,outfile,prefer_last=False):
     blocks2merge = [d[s:e] for d,s,e in zip(filedata,sblock,eblock)]
     for m in blocks2merge: print(m.shape)
     merged = np.vstack(tuple(blocks2merge))
-    
+
     ddt = np.diff(merged[:,0],n=2)
     if np.max(ddt) > 1.e-4:
         raise ValueError("The continuity of time in the files is wrong. Successive time steps should differ by less than 1e-4")
+
+    writeformat = ["%16.6f"] + nstation*["%14.4e"]        
 
     np.savetxt(outfile,merged,delimiter=" ",fmt=writeformat)
 
@@ -57,13 +59,12 @@ def test_combine_flux():
     fnames=[]
     lines = full.readlines()
     for i,e in enumerate(breaks):
-        fname = "flux{}.dat.".format(i)
+        fname = f"flux{i}.dat."
         fnames.append(fname)
-        out = open(fname,"w")
-        for line in lines[b:(e+10)]:
-            out.write(line+"\n")
-        b=e
-        out.close()
+        with open(fname,"w") as out:
+            for line in lines[b:(e+10)]:
+                out.write(line+"\n")
+            b=e
     fout = "flux_comb.dat"
     combine_flux(fnames,fout,prefer_last=False)
 
@@ -86,10 +87,10 @@ def main():
     args = parser.parse_args()
     filelist = args.files
     inputs = [x.name for x in filelist]
-    prefer_last = args.prefer_last
     output = args.output
     if output in inputs:
         raise ValueError("Cannot overwrite input file names")
+    prefer_last = args.prefer_last
     combine_flux(filelist,output,prefer_last)
 
 

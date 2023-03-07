@@ -162,7 +162,7 @@ def create_source_sink(s, inputs, logger):
     fname = dict_ss.get('outputfile')
     if fname is not None:
         fname = os.path.expanduser(fname)
-        logger.info("Creating %s..." % fname)
+        logger.info(f"Creating {fname}...")
         s.create_source_sink_in(sources_sinks, fname)
 
 
@@ -188,7 +188,7 @@ def create_gr3_with_polygons(s, inputs, logger):
         fname = os.path.expanduser(fname)
         polygons = item.get('polygons', [])
         default = item.get('default')
-        logger.info("Creating %s..." % fname)
+        logger.info(f"Creating {fname}...")
         smooth = item.get('smooth')
         s.create_node_partitioning(fname, polygons, default, smooth)
 
@@ -215,7 +215,7 @@ def create_prop_with_polygons(s, inputs, logger):
         fname = os.path.expanduser(fname)
         polygons = item.get('polygons', [])
         default = item.get('default')
-        logger.info("Creating %s..." % fname)
+        logger.info(f"Creating {fname}...")
         s.create_prop_partitioning(fname, polygons, default)
 
 
@@ -252,7 +252,7 @@ def create_structures(s, inputs, logger):
     fname = dict_struct.get('outputfile')
     if fname is not None:
         fname = os.path.expanduser(fname)
-        logger.info("Creating %s..." % fname)
+        logger.info(f"Creating {fname}...")
         s.write_structures(fname)
 
 
@@ -273,11 +273,11 @@ def create_fluxflag(s, inputs, logger):
         logger.info("outputfile not given for flow_outputs. Using fluxflag.prop")
         fname = 'fluxflag.prop'
     fname = os.path.expanduser(fname)
-    logger.info("Creating %s..." % fname)
+    logger.info(f"Creating {fname}...")
     s.create_flux_regions(flowlines, fname)
     with open(fname, 'a') as f:
         for line in flowlines:
-            buf = '{}\n'.format(line['name'])
+            buf = f"{line['name']}\n"
             f.write(buf)
 
 
@@ -326,7 +326,7 @@ def update_temporal_inputs(s, inputs):
 
 
 def item_exist(inputs, name):
-    return True if name in inputs else False
+    return name in inputs
 
 
 def setup_logger():
@@ -372,31 +372,30 @@ def prepare_schism(args, use_logging=True):
     logger.info("Processing the top level...")
     check_and_suggest(list(inputs.keys()), keys_top_level, logger)
 
-    out_fname = os.path.splitext(in_fname)[0] \
-        + '_echo' + os.path.splitext(in_fname)[1]
+    out_fname = (
+        f'{os.path.splitext(in_fname)[0]}_echo{os.path.splitext(in_fname)[1]}'
+    )
     with open(out_fname, 'w') as f:
         f.write(schism_yaml.safe_dump(inputs))
 
-    # Mesh section
-    if item_exist(inputs, 'mesh'):
-        logger.info("Processing mesh section...")
-        mesh_items = inputs['mesh']
-        keys_mesh_section = ["mesh_inputfile", "dem_list",
-                             "open_boundaries","split_quad","small_areas",
-                             "depth_optimization","depth_enforcement",
-                             "gr3_outputfile", "ll_outputfile"] \
-            + schism_yaml.include_keywords
-        check_and_suggest(list(mesh_items.keys()), keys_mesh_section)
-        if item_exist(inputs['mesh'], 'mesh_inputfile'):
-            # Read the grid file to be processed
-            mesh_input_fpath = \
-                os.path.expanduser(mesh_items['mesh_inputfile'])
-            s = create_schism_setup(mesh_input_fpath, logger)
-            update_spatial_inputs(s, inputs, logger)
-        else:
-            raise ValueError("No mesh input file in the mesh section.")
-    else:
+    if not item_exist(inputs, 'mesh'):
         raise ValueError("No mesh section in the main input.")
+    logger.info("Processing mesh section...")
+    mesh_items = inputs['mesh']
+    keys_mesh_section = ["mesh_inputfile", "dem_list",
+                         "open_boundaries","split_quad","small_areas",
+                         "depth_optimization","depth_enforcement",
+                         "gr3_outputfile", "ll_outputfile"] \
+        + schism_yaml.include_keywords
+    check_and_suggest(list(mesh_items.keys()), keys_mesh_section)
+    if item_exist(inputs['mesh'], 'mesh_inputfile'):
+        # Read the grid file to be processed
+        mesh_input_fpath = \
+            os.path.expanduser(mesh_items['mesh_inputfile'])
+        s = create_schism_setup(mesh_input_fpath, logger)
+        update_spatial_inputs(s, inputs, logger)
+    else:
+        raise ValueError("No mesh input file in the mesh section.")
     logger.info("Done.")
 
 

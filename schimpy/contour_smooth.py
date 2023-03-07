@@ -63,10 +63,10 @@ def calc_f(t,data,width_shape):
     width = width_shape[0]
     shp = width_shape[1]
     dem = data.reshape(shp)
-    
+
     tt = t*10
     if abs(tt-np.round(tt))<1e-8:
-        print("Eval time = %s width = %s" % (t,width))
+        print(f"Eval time = {t} width = {width}")
     X = np.arange(-width,width+1.,1.)
     Y = np.arange(-width,width+1.,1.)
     X,Y = np.meshgrid(X,Y)
@@ -86,20 +86,20 @@ def calc_f(t,data,width_shape):
     abs_grad_face_x = np.sqrt( grad_face_x[1:nx,:]**2. + ((gradcent[1][0:(nx-1),:]+gradcent[1][1:nx,:])/2.)**2)
     abs_grad_face_y = np.sqrt( grad_face_y[:,1:ny]**2. + ((gradcent[0][:,0:(ny-1)]+gradcent[0][:,1:ny])/2.)**2)
 
-    
+
     grad_face_x[1:nx,:] = np.where(abs_grad_face_x > 0.,grad_face_x[1:nx,:]/abs_grad_face_x,0.)
     grad_face_y[:,1:ny] = np.where(abs_grad_face_y > 0.,grad_face_y[:,1:ny]/abs_grad_face_y,0.)
 
     kappa = grad_face_x[1:(nx+1),:] - grad_face_x[0:(nx+0),:]  + grad_face_y[:,1:(ny+1)] - grad_face_y[:,0:(ny+0)]    
 
-    
+
     absgrad = np.sqrt(gradcent[0]*gradcent[0] + gradcent[1]*gradcent[1])
     normgradx = np.where(absgrad>0.,gradcent[0]/absgrad,0.)
     normgrady = np.where(absgrad>0.,gradcent[1]/absgrad,0.)
     # set gradient to 0.0 for nan
     normgradx=np.where(np.isnan(normgradx),0.,normgradx)
     normgrady=np.where(np.isnan(normgrady),0.,normgrady)
-    
+
     ave = cv.convolve(dem, avefilter,mode='nearest')
     tangent = [normgrady,-normgradx]
 
@@ -108,17 +108,17 @@ def calc_f(t,data,width_shape):
     thresh = np.zeros_like(dem)
     xrange = np.arange(0.5,float(nx),1.0)
     yrange = np.arange(0.5,float(ny),1.0)
-    y,x = np.meshgrid(yrange,xrange)    
+    y,x = np.meshgrid(yrange,xrange)
     epsilon = 1e-4
 
-    
+
 # what if tangent is zero    
     for pdir in [1.0,-1.0]:
         # find the endpoints of the tangent vector of given width
         p0 = [pdir*dir_arr*width for dir_arr in tangent]
         xnew = p0[0]+  x
         ynew = p0[1] + y
-        
+
         # take care of special cases where the end point exceeds the mesh (0,nx) x (0,ny)
         # this is done by finding where the segment intersects the boundary and using that cell
         bad = xnew < 0        
@@ -131,32 +131,32 @@ def calc_f(t,data,width_shape):
         bad = ynew < 0        
         xnew[bad] = np.minimum(nx-epsilon,np.maximum(xnew[bad] + -pdir*(tangent[0][bad]/tangent[1][bad])*y[bad],0.))
         ynew[bad] = 0.
-        
+
         bad = ynew > ny - epsilon
         xnew[bad] = np.minimum(nx-epsilon,np.maximum(xnew[bad] + -pdir*(tangent[0][bad]/tangent[1][bad])*(ny-y[bad]),0.))
         ynew[bad] = ny - 0.5
-        
+
         inew0 = xnew.astype("i")
         jnew0 = ynew.astype("i")
         thresh += 0.5*dem[inew0,jnew0]
-    f = np.where(ave<thresh,np.where(kappa > 0.0,kappa,0.),np.where(kappa<0.0,kappa,0.))      
+    f = np.where(ave<thresh,np.where(kappa > 0.0,kappa,0.),np.where(kappa<0.0,kappa,0.))
     return f.flatten()
     
 def contour_smooth(input,scales,max_time,nstep,report_interval,fill_val=2.,**kwargs):
     """ Driver function for smoothing a DEM"""
-    print("input: %s" % input)
+    print(f"input: {input}")
     ds = RasterWrapper(input)
     outpathsplit = os.path.splitext(input)
-    outfile = outpathsplit[0]+"_smooth"+outpathsplit[1]
-    print("Out: %s" % outfile)
-    cols=ds.nx  
+    outfile = f"{outpathsplit[0]}_smooth{outpathsplit[1]}"
+    print(f"Out: {outfile}")
+    cols=ds.nx
     rows=ds.ny
     dem = ds.dem
     nd = ds.no_data
-    print("No data value: %s" % nd)
+    print(f"No data value: {nd}")
     #dem[np.equals(dem,nd)] = fill_val
     dem_shape = dem.shape
-    print("DEM shape: %s %s" % dem_shape)	
+    print("DEM shape: %s %s" % dem_shape)
     smoothed_dem = contour_smooth2d(dem,scales,max_time,nstep,report_interval)
     ds.write_copy(outfile,smoothed_dem)
     
@@ -165,12 +165,12 @@ def contour_smooth2d(dem,scales,max_time,nstep,report_interval):
     dem_shape = dem.shape
     mask_good = ~np.isnan(demold)
     demold[~mask_good] = np.nanmean(demold)
-    
+
     from nodepy import runge_kutta_method as rk
     from nodepy import ivp
     rkc = rk.RKC2(4,0.01)
     np.save("smoothed_0_0", dem)
-    t = 0. 
+    t = 0.
     for iscale in scales:
         t=0.0
         itime = 0
@@ -178,14 +178,14 @@ def contour_smooth2d(dem,scales,max_time,nstep,report_interval):
             stop_time = min (max_time, t + report_interval)
             prob = ivp.IVP(f=calc_f,u0=dem.flatten(),T=stop_time)
             out = rkc(prob,t0=t,N=nstep,x=(iscale,dem_shape))
-            t = stop_time            
+            t = stop_time
             dem = out[1][-1].reshape(dem_shape)
             differ = dem[mask_good] - demold[mask_good]
             diffinf = np.amax(np.abs(differ))
-            print("diff: %s %s" % (np.sqrt((differ*differ).mean()),diffinf))
+            print(f"diff: {np.sqrt((differ * differ).mean())} {diffinf}")
             demold = dem
             itime = itime + 1
-            np.save("smoothed_%s_%s" % (iscale,itime),dem)
+            np.save(f"smoothed_{iscale}_{itime}", dem)
 
     dem[~mask_good]=np.nan
     return dem
@@ -222,15 +222,15 @@ def view_smooth(file0,file1,levels,vmin,vmax,**kwargs):
 
 def save_smooth(dumpfile,original,outfile,**kwargs):
     print("Saving")
-    print("Original DEM file: %s" % original)
-    print("Array dump file: %s" % dumpfile)
-    print("Output: %s" % outfile)
+    print(f"Original DEM file: {original}")
+    print(f"Array dump file: {dumpfile}")
+    print(f"Output: {outfile}")
 
-    
+
     ds = gdal.Open( original, GA_ReadOnly )
     gt = ds.GetGeoTransform()
-    cols=ds.RasterXSize  
-    rows=ds.RasterYSize     
+    cols=ds.RasterXSize
+    rows=ds.RasterYSize
     rb = ds.GetRasterBand(1)
     demimg = rb.ReadAsArray()  #[:,104:]
     nd = rb.GetNoDataValue()
@@ -239,7 +239,9 @@ def save_smooth(dumpfile,original,outfile,**kwargs):
 
     dem = np.load(dumpfile)
     if (dem.shape != demimg.shape):
-        raise ValueError("Dumpfile %s, %sx and original %s, %s do not appear to be the same size." % (dumpfile,dem.shape,original,demimg.shape))
+        raise ValueError(
+            f"Dumpfile {dumpfile}, {dem.shape}x and original {original}, {demimg.shape} do not appear to be the same size."
+        )
     outdata = driver.CreateCopy(outfile,ds, 0)
     outband = outdata.GetRasterBand(1)
     outband.WriteArray(dem)

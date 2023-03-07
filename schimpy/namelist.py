@@ -46,7 +46,7 @@ def write(namelist_data):
         comment = namelist_values.get("comment")
         if comment and len(comment) != 0:
             lines.append("!{}".format(comment.replace("\n", "\n!")))
-        lines.append("&{}".format(namelist_name))
+        lines.append(f"&{namelist_name}")
         for key, value_data in namelist_values.items():
             if key == "comment":  # already taken care of above
                 continue
@@ -57,7 +57,7 @@ def write(namelist_data):
                         full_line_comment.replace("\n", "\n!")))
             if key == "full_line_comment":
                 continue  # took care of it above
-            lines.append("  {} = {}".format(key, value_data["value"]))
+            lines.append(f'  {key} = {value_data["value"]}')
             inline_comment = value_data.get("inline_comment")
             if inline_comment and len(inline_comment) != 0:
                 lines[-1] = lines[-1] + \
@@ -114,10 +114,7 @@ def map_to_dict(obj):
     If the value is an instance of the Namelist class, it recursively maps the Namelist object to a dictionary using the map_to_dict function. If the value is not an instance of the Namelist class, it simply adds the key-value pair to the dictionary.
     This way, you can easily map an object of type TopLevelNamelist back to a dictionary representation, preserving the structure of the original dictionary.
     """
-    d = {}
-    for k, v in vars(obj).items():
-        if isinstance(v, Namelist):
-            d[k] = map_to_dict(v)
-        else:
-            d[k] = v
-    return d
+    return {
+        k: map_to_dict(v) if isinstance(v, Namelist) else v
+        for k, v in vars(obj).items()
+    }

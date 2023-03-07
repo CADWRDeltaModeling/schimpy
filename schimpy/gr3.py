@@ -24,7 +24,7 @@ class Gr3IO(schimpy.base_io.BaseIO):
             If mode is 1, it does not read in boundary information.
         """
         if self._logger is not None:
-            self._logger.info("Reading in a gr3 file: %s ..." % gr3_fname)
+            self._logger.info(f"Reading in a gr3 file: {gr3_fname} ...")
         # Create a new mesh
         self._mesh = schism_mesh.SchismMesh()
         try:
@@ -48,7 +48,7 @@ class Gr3IO(schimpy.base_io.BaseIO):
         # self._mesh.build_edges_from_elems()
 
         # Boundary info
-        if not mode == 1:
+        if mode != 1:
             if self._logger is not None:
                 self._logger.info("Reading in boundaries...")
             self._read_boundaries(f)
@@ -77,27 +77,25 @@ class Gr3IO(schimpy.base_io.BaseIO):
         self._n_nodes = n_nodes
 
     def _read_nodes(self, f):
-        node_counter = 0
-        for i in range(self._n_nodes):
+        for node_counter, _ in enumerate(range(self._n_nodes)):
             tokens, ok = self._read_and_parse_line(f, 4)
             if not ok:
-                print("Line: {}".format(self.linecounter))
+                print(f"Line: {self.linecounter}")
                 raise ValueError("Node block is corrupt.")
             node_coords = list(map(float, tokens[1:4]))
             self._mesh.set_node(node_counter, node_coords)
-            node_counter += 1
 
     def _read_elems(self, f):
         for elem_i in range(self._n_elems):
             tkn = f.readline().split()
             self.linecounter += 1
             if len(tkn) < 5:
-                print("Line: {}".format(self.linecounter))
+                print(f"Line: {self.linecounter}")
                 raise ValueError("Element block is corrupt.")
             type_elem = int(tkn[1])
             if type_elem < 3 or type_elem > 4:
                 raise ValueError("Currently only triangular and " \
-                                 "quadrilateral are supported.")
+                                     "quadrilateral are supported.")
             # Zero-based connectivities
             if type_elem == 3:
                 connectivities = np.subtract(np.array(list(map(int, tkn[2:5]))), 1)
@@ -122,9 +120,9 @@ class Gr3IO(schimpy.base_io.BaseIO):
         # total # of open boundary nodes
         tokens, ok = self._read_and_parse_line(f, 1)
         if not ok:
-            print("Line: {}".format(self.linecounter))
+            print(f"Line: {self.linecounter}")
             raise Exception("The number of total open boundary nodes is not"\
-                            " correctly provided.")
+                                " correctly provided.")
         n_open_boundary_nodes = int(tokens[0])
 
         # open boundaries
@@ -132,9 +130,9 @@ class Gr3IO(schimpy.base_io.BaseIO):
             # # of nodes of this open boundary
             tokens, ok = self._read_and_parse_line(f, 1)
             if not ok:
-                print("Line: {}".format(self.linecounter))
+                print(f"Line: {self.linecounter}")
                 raise Exception("The number of nodes for a boundary is not"\
-                                " correctly provided.")
+                                    " correctly provided.")
             # Comment
             comment = None
             if len(tokens) > 1:
@@ -145,9 +143,9 @@ class Gr3IO(schimpy.base_io.BaseIO):
             for _ in range(n_nodes):
                 tokens, ok = self._read_and_parse_line(f, 1)
                 if not ok:
-                    print("Line: {}".format(self.linecounter))
+                    print(f"Line: {self.linecounter}")
                     raise ValueError("Node for boundary not"\
-                                     " correctly provided.")
+                                         " correctly provided.")
 
                 node = int(tokens[0]) - 1 # Zero based
                 nodes.append(node)
@@ -166,17 +164,17 @@ class Gr3IO(schimpy.base_io.BaseIO):
         # total # of land boundary nodes
         tokens, ok = self._read_and_parse_line(f, 1)
         if not ok:
-            print("Line: {}".format(self.linecounter))
+            print(f"Line: {self.linecounter}")
             raise Exception("The number of total land boundary nodes is " \
-                            "not provided properly.")
+                                "not provided properly.")
         # n_land_boundary_nodes = int(tokens[0])
         for _ in range(n_land_boundaries):
             # # of nodes of this open boundary
             (tokens, ok) = self._read_and_parse_line(f,1)
             if not ok:
-                print("Line: {}".format(self.linecounter))
+                print(f"Line: {self.linecounter}")
                 raise Exception("The number of nodes for a boundary is "\
-                                "not provided properly.")
+                                    "not provided properly.")
             # Comment
             comment = None
             if len(tokens) > 1:
@@ -187,7 +185,7 @@ class Gr3IO(schimpy.base_io.BaseIO):
             for _ in range(n_nodes):
                 (tokens, ok) = self._read_and_parse_line(f, 1)
                 if not ok:
-                    print("Line: {}".format(self.linecounter))
+                    print(f"Line: {self.linecounter}")
                     raise Exception("Node for a boundary not correctly provided.")
                 node = int(tokens[0]) - 1 # Zero based
                 nodes.append(node)
@@ -202,99 +200,90 @@ class Gr3IO(schimpy.base_io.BaseIO):
             it will not be appended.
         """
         if self._logger is not None:
-            self._logger.info("Writing an gr3 file: %s" % fname)
-        f = open(fname, 'w')
-        # Header
+            self._logger.info(f"Writing an gr3 file: {fname}")
+        with open(fname, 'w') as f:
+            # Header
 #         if mesh.comment is None:
-        buf = "%s\n" % os.path.basename(fname)
+            buf = "%s\n" % os.path.basename(fname)
 #         else:
 #             buf = "%s !modified by the preprocessing tool\n" \
 #                   % mesh.comment
 
-        f.write(buf)
-        n_elems = mesh.n_elems()
-        n_nodes = mesh.n_nodes()
-        buf = "%d %d ! # of elements and nodes \n" % (n_elems, n_nodes)
-        f.write(buf)
-        # Nodes
-        for i in range(n_nodes):
-            if not node_attr is None:
-                buf = "%d %18.8f %18.8f %18.8f\n" % (i + 1, \
-                                     mesh.nodes[i, 0], \
-                                     mesh.nodes[i, 1], \
-                                     node_attr[i])
+            f.write(buf)
+            n_elems = mesh.n_elems()
+            n_nodes = mesh.n_nodes()
+            buf = "%d %d ! # of elements and nodes \n" % (n_elems, n_nodes)
+            f.write(buf)
+                # Nodes
+            for i in range(n_nodes):
+                buf = (
+                    "%d %18.8f %18.8f %18.8f\n"
+                    % (i + 1, mesh.nodes[i, 0], mesh.nodes[i, 1], mesh.nodes[i, 2])
+                    if node_attr is None
+                    else "%d %18.8f %18.8f %18.8f\n"
+                    % (i + 1, mesh.nodes[i, 0], mesh.nodes[i, 1], node_attr[i])
+                )
+                f.write(buf)
 
-            else:
-                buf = "%d %18.8f %18.8f %18.8f\n" % (i + 1, \
-                                     mesh.nodes[i, 0], \
-                                     mesh.nodes[i, 1], \
-                                     mesh.nodes[i, 2])
-            f.write(buf)
+            # Elements
+            for elem_i in range(n_elems):
+                elem = mesh.elem(elem_i) + 1
+                n_nodes = len(elem)
+                buf = '%d %d' % (elem_i + 1, n_nodes)
+                fmt = ' %d' * n_nodes + '\n'
+                buf += fmt % tuple(elem)
+                f.write(buf)
 
-        # Elements
-        for elem_i in range(n_elems):
-            elem = mesh.elem(elem_i) + 1
-            n_nodes = len(elem)
-            buf = '%d %d' % (elem_i + 1, n_nodes)
-            fmt = ' %d' * n_nodes + '\n'
-            buf += fmt % tuple(elem)
-            f.write(buf)
-
-        # Boundaries
-        if boundary:
-            # Open
-            buf = "%d = Number of open boundaries\n" \
-                  % mesh.n_boundaries(BoundaryType.OPEN)
-            f.write(buf)
-            buf = "%d = Total number of open boundary nodes\n" \
-                  % mesh.n_boundary_nodes(BoundaryType.OPEN)
-            f.write(buf)
-            openbound_count = 0
-            for boundary in mesh.boundaries:
-                if boundary.btype == BoundaryType.OPEN:
-                    openbound_count += 1
-                    if boundary.comment is None:
-                        buf = "%d = Number of nodes for open boundary %d\n" % \
-                              (boundary.n_nodes(), openbound_count)
-                    else:
-                        buf = "%d %s\n" % (boundary.n_nodes(), boundary.comment)
-                    f.write(buf)
-                    buf = ""
-                    for node_i in boundary.nodes:
-                        buf += "%d\n" % (node_i + 1)
-                    f.write(buf)
+                # Boundaries
+            if boundary:
+                # Open
+                buf = "%d = Number of open boundaries\n" \
+                          % mesh.n_boundaries(BoundaryType.OPEN)
+                f.write(buf)
+                buf = "%d = Total number of open boundary nodes\n" \
+                          % mesh.n_boundary_nodes(BoundaryType.OPEN)
+                f.write(buf)
+                openbound_count = 0
+                for boundary in mesh.boundaries:
+                    if boundary.btype == BoundaryType.OPEN:
+                        openbound_count += 1
+                        if boundary.comment is None:
+                            buf = "%d = Number of nodes for open boundary %d\n" % \
+                                      (boundary.n_nodes(), openbound_count)
+                        else:
+                            buf = "%d %s\n" % (boundary.n_nodes(), boundary.comment)
+                        f.write(buf)
+                        buf = "".join("%d\n" % (node_i + 1) for node_i in boundary.nodes)
+                        f.write(buf)
 #             else:
 #                 raise Exception("Unsupported boundary type.")
 
-            # Land
-            buf = "%d = Number of land boundaries\n" \
-                  % (mesh.n_boundaries(BoundaryType.LAND))
-            f.write(buf)
-            buf = "%d = Total number of land boundary nodes\n" \
-                  % (mesh.n_boundary_nodes(BoundaryType.LAND))
-            f.write(buf)
-            landbound_count = 0
-            islandbound_count = 0
-            for boundary in mesh.boundaries:
-                if (boundary.btype == BoundaryType.LAND or
-                    boundary.btype== BoundaryType.ISLAND):
-                    landbound_count += 1
+                # Land
+                buf = "%d = Number of land boundaries\n" \
+                          % (mesh.n_boundaries(BoundaryType.LAND))
+                f.write(buf)
+                buf = "%d = Total number of land boundary nodes\n" \
+                          % (mesh.n_boundary_nodes(BoundaryType.LAND))
+                f.write(buf)
+                islandbound_count = 0
+                for landbound_count, boundary in enumerate(mesh.boundaries, start=1):
+                    if boundary.btype not in [
+                        BoundaryType.LAND,
+                        BoundaryType.ISLAND,
+                    ]:
+                        raise Exception("Unsupported boundary type.")
+
                     island_flag = 1 if BoundaryType.ISLAND else 0
-                    if boundary.comment is None:
-                        buf = "%d %d = Number of nodes for land boundary %d\n" % \
-                          (boundary.n_nodes(), island_flag, landbound_count)
-                    else:
-                        buf = "%d %d %s\n" % (boundary.n_nodes(), island_flag, boundary.comment)
+                    buf = (
+                        "%d %d = Number of nodes for land boundary %d\n"
+                        % (boundary.n_nodes(), island_flag, landbound_count)
+                        if boundary.comment is None
+                        else "%d %d %s\n"
+                        % (boundary.n_nodes(), island_flag, boundary.comment)
+                    )
                     f.write(buf)
-                    buf = ""
-                    for node_i in boundary.nodes:
-                        buf += "%d\n" % (node_i + 1)
+                    buf = "".join("%d\n" % (node_i + 1) for node_i in boundary.nodes)
                     f.write(buf)
-                else:
-                    raise Exception("Unsupported boundary type.")
-
-        f.flush()
-        f.close()
-
+            f.flush()
         if self._logger is not None:
             self._logger.info("Done writing a gr3 file.")

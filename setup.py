@@ -2,6 +2,7 @@
 
 """The setup script."""
 
+
 from setuptools import setup, find_packages
 import versioneer
 
@@ -61,10 +62,10 @@ setup(
             'station=schimpy.station:main',
             'create_hotstart=schimpy.schism_hotstart:main',
             'create_nudging=schimpy.schism_nudging:main',
-            'interpolate_structure=schimpy.interpolate_structure:main'
+            'interpolate_structure=schimpy.interpolate_structure:main',
         ],
     },
-    install_requires=requirements,
+    requirements=requirements,
     license="MIT license",
     long_description=readme + '\n\n' + history,
     include_package_data=True,

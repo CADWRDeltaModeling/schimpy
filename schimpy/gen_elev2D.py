@@ -105,20 +105,20 @@ class NetCDFTHWriter(THWriter):
         #todo: what is timestep all about? Did we invent this? Why variable rather than attribute?
         self.timestep = fout.createVariable("time_step","f4", ("one",))
         self.timestep[0] = dt
-        
+
         # create elevation time series data to be writen to netCDF file
         self.timeseries = fout.createVariable("time_series", "f4", ("time", "nOpenBndNodes", "nLevels", "nComponents"))
-    
+
         # variable attributes
         self.times.long_name = "simulation time in seconds"
-        self.times.units = "seconds since " +  str(starttime)
+        self.times.units = f"seconds since {str(starttime)}"
         self.timeseries.long_name = "water surface elevation at ocean boundary"
         self.timestep.long_name = "time step in seconds"
         self.timeseries.units = "meters NAVD88"
 
        # Global Attributes -- Metadata
         fout.description = "Water Surface Elevation Boundary Conditions at Ocean Boundary "
-        fout.history = "Created " + str(datetime.now())
+        fout.history = f"Created {str(datetime.now())}"
         fout.source = "gen_ elev2D.py"    
         
     def write_step(self,iter,time,vals):
@@ -153,15 +153,15 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
     stime = start
     etime = end
     fpath_out = outfile
-    
+
     #todo: hardwire 
     nnode = 83
-    
-    tbuf = days(16)              
+
+    tbuf = days(16)
     # convert start time string input to datetime       
     sdate = pd.Timestamp(stime)
 
-    if not etime is None:
+    if etime is not None:
         # convert start time string input to datetime
         edate = pd.Timestamp(etime)
         bufend = edate + tbuf
@@ -169,7 +169,7 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
         edate = None
         bufend = None
 
-   
+
 
     # UTM positions of Point Reyes, Monterey, SF
     pos_pr = np.array([502195.03, 4205445.47])
@@ -184,19 +184,19 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
     tangent = tangent / np.linalg.norm(tangent)  # Normalize
     # Rotate 90 cw to get normal vec
     normal = np.array([tangent[1], -tangent[0]])
-    print("tangent: {}".format(tangent))
-    print("normal: {}".format(normal))
+    print(f"tangent: {tangent}")
+    print(f"normal: {normal}")
 
     mt_rel = pos_mt - pos_pr
     x_mt = np.dot(tangent, mt_rel)  # In pr-mt direction
     y_mt = np.dot(normal, mt_rel)  # Normal to x-direction to the 
-    
+
     # Grid
     #todo: what is the difference between this and m = read_grid()??
     mesh = read_mesh(hgrid_fpath)
-    
+
     ocean_boundary = mesh.boundaries[0]  # First one is ocean
- 
+
     # Data
     print("Reading Point Reyes...")
     pt_reyes = read_noaa(pt_reyes_fpath, start=sdate - tbuf, end=bufend, force_regular=True)
@@ -204,8 +204,8 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
     if pt_reyes.isna().any(axis=None):
         raise ValueError("pt_reyes has gaps larger than fill limit")
     ts_pr_subtidal, ts_pr_diurnal, ts_pr_semi, noise = separate_species(pt_reyes,noise_thresh_min=150)
-        
-      
+
+
     del noise
 
     print("Reading Monterey...")
@@ -213,7 +213,7 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
     monterey.interpolate(limit=max_gap,inplace=True)
     if pt_reyes.isna().any(axis=None):
         raise ValueError("monterey has gaps larger than fill limit")
-    
+
     if pt_reyes.index.freq  != monterey.index.freq:
         raise ValueError(
             "Point Reyes and Monterey time step must be the same in gen_elev2D.py")
@@ -232,7 +232,7 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
     ts_pr_diurnal = ts_pr_diurnal.loc[sdate:edate]
     # interpolate_ts(ts_pr_semi.window(sdate,edate),step)
     ts_pr_semi = ts_pr_semi.loc[sdate:edate]
-    
+
     print("Interpolating and subsetting Monterey")
     # interpolate_ts(ts_mt_subtidal.window(sdate,edate),step)
     ts_mt_subtidal = ts_mt_subtidal.loc[sdate:edate]
@@ -247,10 +247,12 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
     elif fpath_out.endswith("nc"):
         thwriter = NetCDFTHWriter(fpath_out,nnode,sdate,dt)
     else:
-        raise ValueError("File extension for output not recognized in file: {}".format(fpath_out))    
-    
-    
-    
+        raise ValueError(
+            f"File extension for output not recognized in file: {fpath_out}"
+        )    
+            
+            
+
     # Grid
     boundaries = mesh.nodes[ocean_boundary.nodes]
     pos_rel = boundaries[:, :2] - pos_pr
@@ -338,7 +340,7 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
         if np.isnan(pr) or np.isnan(mt):
             raise ValueError("One of values is numpy.nan.")
         eta += pr * theta_y_comp + mt * theta_y + slr
-        
+
         # write data to netCDF file   
         thwriter.write_step(i,t,eta)
 

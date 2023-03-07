@@ -75,7 +75,7 @@ class GridOptimizer(object):
             solver: str
                 Name of a solver for the optimization
         """
-        if solver != 'L-BFGS-B' and solver != 'lsqr':
+        if solver not in ['L-BFGS-B', 'lsqr']:
             solver = 'L-BFGS-B'
             if self.logger is not None:
                 self.logger.info(
@@ -282,14 +282,10 @@ class GridOptimizer(object):
         damp_bnd = params['damp_shoreline']
         mat = vstack((vol_coeff * mat_elem, face_coeff * mat_face))
         vec = np.hstack((vol_coeff * vec_elem, face_coeff * vec_face))
-        if solver == 'lsqr':
-            if damp_bnd > 0.:
-                mat = vstack((mat, damp_bnd * mat_bnd))
-                vec = np.hstack((vec, damp_bnd * vec_bnd))
-        else:
-            if damp_bnd > 0.:
-                mat = vstack((mat, damp_bnd * mat_bnd))
-                vec = np.hstack((vec, damp_bnd * vec_bnd))
+        if damp_bnd > 0.:
+            mat = vstack((mat, damp_bnd * mat_bnd))
+            vec = np.hstack((vec, damp_bnd * vec_bnd))
+        if solver != 'lsqr':
             damp = params['damp']
             if damp > 0.:
                 mat_node = eye(self.mesh.n_nodes())
@@ -351,10 +347,11 @@ class GridOptimizer(object):
         edges = []
         for edge in self.mesh.edges:
             edge_type = edge[2]
-            if exclude_land_boundaries is True:
-                if edge_type <= EdgeType.OPEN:
-                    edges.append(edge[:2])
-            else:
+            if (
+                exclude_land_boundaries is True
+                and edge_type <= EdgeType.OPEN
+                or exclude_land_boundaries is not True
+            ):
                 edges.append(edge[:2])
         return np.array(edges)
 
@@ -568,8 +565,7 @@ class GridOptimizer(object):
         """
         elev_max = self.calculate_max_elevation_in_balls(self.mesh.nodes[:, 2])
         elev_ref = self.calculate_reference_surface(self.mesh.nodes)
-        elev = np.maximum(elev_max, elev_ref)
-        return elev
+        return np.maximum(elev_max, elev_ref)
 
     def calculate_max_elevation_in_balls(self, elev):
         """ Calculate maximum elevation in a ball from a node
@@ -584,11 +580,15 @@ class GridOptimizer(object):
             numpy.array
                 maximum elevation at nodes
         """
-        z_max = [np.max([np.max([elev[node_i]
-                                 for node_i in self.mesh.elem(elem_i)])
-                         for elem_i in elems])
-                 for elems in self.mesh.node2elems]
-        return z_max
+        return [
+            np.max(
+                [
+                    np.max([elev[node_i] for node_i in self.mesh.elem(elem_i)])
+                    for elem_i in elems
+                ]
+            )
+            for elems in self.mesh.node2elems
+        ]
 
     def calculate_reference_surface(self, coords):
         """ Define reference water surface at locations specified in nodes
@@ -756,9 +756,10 @@ class GridOptimizer(object):
                 Vector of integration over each edge
         """
         quadrature = GaussianQuadratureLine2(2)
-        volumes = [quadrature.integrate(self.mesh.nodes[node_idx], values[node_idx])
-                   for node_idx in edges]
-        return volumes
+        return [
+            quadrature.integrate(self.mesh.nodes[node_idx], values[node_idx])
+            for node_idx in edges
+        ]
 
 
 def create_arg_parser():

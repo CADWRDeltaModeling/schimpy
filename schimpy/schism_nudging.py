@@ -203,7 +203,7 @@ class nudging(object):
         values_comb = []
         imap_comb = []
         for p in self.info['polygons']:
-            print("creating nudging for polygon %s"%p['name'])
+            print(f"creating nudging for polygon {p['name']}")
             weights, values, imap = self.create_region_nudging(p)
             weights_comb.append(weights)
             values_comb.append(values)
@@ -221,23 +221,19 @@ class nudging(object):
             for l in imap_var[i]:
                 imap_merged = np.append(imap_merged, l)
             imap_merged = np.unique(imap_merged).astype(int)
-            
+
             # finding the corresponding indices for each region (map from imap_var to imap_merged)
             idx_list = np.zeros((len(imap_merged),len(self.info['polygons']))
                                 )*np.nan
             for j, im in enumerate(imap_merged):
                 for k, l in enumerate(imap_var[i]):
                     idx = np.where(l==im)[0]
-                    if len(idx)>0:
-                        idx_list[j,k] = int(idx[0])
-                    else:
-                        idx_list[j,k] = np.nan
-            
+                    idx_list[j,k] = int(idx[0]) if len(idx)>0 else np.nan
             # check to see if there is any overlap among the regions, if yes, 
             # take the weighted average  
             weights_merged = np.zeros_like(weights_var[0][0])
             values_merged = np.zeros((len(self.time),len(imap_merged),
-                                          self.nvrt)) 
+                                          self.nvrt))
             for im in range(len(imap_merged)):
                 idx_r = np.where(~np.isnan(idx_list[im,:]))[0].astype(int)
                 if len(idx_r)>1: # overlapping regions
@@ -263,52 +259,47 @@ class nudging(object):
                     r = idx_r[0]
                     weights_merged[imap_merged[im]]  = weights_var[i][r,imap_merged[im]]
                     values_merged[:,im,:] = values_var[i][r][:,int(idx_list[im,r]),:]
-            
+
             # for the last time, make sure that all nan values are set to -9999.0
             values_merged[np.isnan(values_merged)] = -9999.0
-                    
-            
-            if self.output_suffix is None:
-                suffix = ''
+
+
+            suffix = '' if self.output_suffix is None else self.output_suffix
+            if v == 'salinity':
+                nudging_fn = f"SAL_nu_{suffix}.nc"
+            elif v == 'temperature':
+                nudging_fn = f"TEM_nu_{suffix}.nc"
             else:
-                suffix = self.output_suffix 
-            
-            if v== 'temperature':
-                nudging_fn = "TEM_nu_%s.nc"%suffix     
-            elif v=='salinity':
-                nudging_fn = "SAL_nu_%s.nc"%suffix
-            else:
-                raise NotImplementedError(
-                    "write %s as nuding nc not implemented"%v)
-                           
+                raise NotImplementedError(f"write {v} as nuding nc not implemented")
+
             rootgrp_T = Dataset(nudging_fn, "w", format="NETCDF4")
             node_dim = rootgrp_T.createDimension("node", len(imap_merged))
             nv_dim = rootgrp_T.createDimension("nLevels", self.nvrt)
             one_dim = rootgrp_T.createDimension("one", 1)
             itime_dim = rootgrp_T.createDimension("time", len(self.time_seconds))
-            
+
             itime_id_T = rootgrp_T.createVariable("time","f",("time",))
             id_map_T = rootgrp_T.createVariable("map_to_global_node","i",
                                                 ("node",))
             ivar_T = rootgrp_T.createVariable("tracer_concentration","f",
                                             ("time","node","nLevels","one",))  
-                
+
             id_map_T[:] = np.array(imap_merged) +1  #in schism indices are 1 based   
             itime_id_T[:] = self.time_seconds            
-            
+
            # current var dimension [time, map_node, nlevel]
-            ivar_T[:,:,:,:] = values_merged[:,:,:,np.newaxis] 
+            ivar_T[:,:,:,:] = values_merged[:,:,:,np.newaxis]
             rootgrp_T.close()
-            print("%s file created"%nudging_fn)  
-            
+            print(f"{nudging_fn} file created")  
+
             if self.output_suffix is not None:
-                write_mesh(self.mesh, 
-                           fpath_mesh="%s_nudge.gr3"%v, 
-                           node_attr=weights_merged)
+                write_mesh(self.mesh, fpath_mesh=f"{v}_nudge.gr3", node_attr=weights_merged)
             else:
-                write_mesh(self.mesh, 
-                           fpath_mesh="%s_nudge_%s.gr3"%(v,self.output_suffix), 
-                       node_attr=weights_merged)
+                write_mesh(
+                    self.mesh,
+                    fpath_mesh=f"{v}_nudge_{self.output_suffix}.gr3",
+                    node_attr=weights_merged,
+                )
         #return values_merged, weights_merged, imap_merged
     
     def create_region_nudging(self, region_info):
@@ -318,8 +309,9 @@ class nudging(object):
         if region_info['type'] == 'roms':
             weights, values_list, imap, time = self.gen_nudge_roms(region_info)
             #values_list =  [vl[:,imap,:] for vl in values_list]
-            nvar = len(set([v['name'] for v in 
-                                region_info['interpolant']['variables']]))
+            nvar = len(
+                {v['name'] for v in region_info['interpolant']['variables']}
+            )
             weights_list = np.broadcast_to(weights,[nvar,len(weights)])
             imap_list = np.broadcast_to(imap,[nvar,len(imap)])
         elif 'obs' in region_info['type']:  # this is 2D interpolation
@@ -330,7 +322,7 @@ class nudging(object):
             values_list = [np.transpose(v,[1,2,0]) 
                            if np.any(v) else [] for v in values_list]
         else:
-            raise("region type not implemented:%s"%region_info['type'])
+            raise f"region type not implemented:{region_info['type']}"
         return weights_list, values_list, imap_list
     
     def gen_nudge_roms(self,region_info):

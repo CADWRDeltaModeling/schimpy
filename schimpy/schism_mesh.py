@@ -43,10 +43,7 @@ def find_intersection(s1, s2):
     v1 = s2[0, :] - intersection
     v2 = s2[1, :] - intersection
     sign2 = np.dot(v1, v2)
-    if sign1 > 0. or sign2 > 0.:
-        return None
-    else:
-        return intersection
+    return None if sign1 > 0. or sign2 > 0. else intersection
 
 
 class SchismBoundary(object):
@@ -140,8 +137,7 @@ class SchismMesh(TriQuadMesh):
         if btype is None:
             return len(self._boundaries)
         else:
-            return sum(1 for b in self._boundaries
-                       if b.btype == btype)
+            return sum(b.btype == btype for b in self._boundaries)
 
     def n_total_boundary_nodes(self, btype):
         """ Get the total node boundary of a given type
@@ -182,15 +178,14 @@ class SchismMesh(TriQuadMesh):
         """ Check if the given node is any of starting nodes of boundary
             node strings.
         """
-        for boundary in self._boundaries:
-            if btype is None:
-                if node_i == boundary.nodes[0]:
-                    return True
-            else:
-                if boundary.btype == btype:
-                    if node_i == boundary.nodes[0]:
-                        return True
-        return False
+        return any(
+            btype is None
+            and node_i == boundary.nodes[0]
+            or btype is not None
+            and boundary.btype == btype
+            and node_i == boundary.nodes[0]
+            for boundary in self._boundaries
+        )
 
     def _get_next_node_on_boundary_and_remove_edge(self, node_i,
                                                    not_assigned,
@@ -199,17 +194,18 @@ class SchismMesh(TriQuadMesh):
         for edge_i in edges_i:
             edge = self._edges[edge_i]
             if ccw:
-                if not edge[2] == EdgeType.INTERNAL and edge[0] == node_i:
+                if edge[2] != EdgeType.INTERNAL and edge[0] == node_i:
                     try:
                         not_assigned.remove(edge_i)
                         return edge[1]
                     except Exception as exc:
-                        print("Attempted to remove edge {} based on node {} which is not in not_assigned list".format(edge_i,node_i))
+                        print(
+                            f"Attempted to remove edge {edge_i} based on node {node_i} which is not in not_assigned list"
+                        )
                         raise
-            else:
-                if not edge[2] == EdgeType.INTERNAL and edge[1] == node_i:
-                    not_assigned.remove(edge_i)
-                    return edge[0]
+            elif edge[2] != EdgeType.INTERNAL and edge[1] == node_i:
+                not_assigned.remove(edge_i)
+                return edge[0]
         return None
 
     def _fill_land_boundaries(self):
@@ -217,31 +213,28 @@ class SchismMesh(TriQuadMesh):
         This function creates land boundaries that are adjacent to
         the open boundaries. The direction of the filling is CCW.
         """
-        if len(self._boundaries) == 0:  # No open boundary at all?
+        if len(self._boundaries) == 0:
             return
-        else:
-            for open_boundary in self._boundaries:
-                ns = []
-                last = open_boundary.nodes[-1]
+        for open_boundary in self._boundaries:
+            last = open_boundary.nodes[-1]
                 # Check if there is another boundary right next this
-                if not self._check_if_beginning_of_boundary(last):
-                    ns.append(last)
-                    done = False
-                    while not done:
-                        next_node = self._get_next_node_on_boundary(last)
-                        ns.append(next_node)
-                        if self._check_if_beginning_of_boundary(next_node):
-                            done = True
-                            self.add_boundary(ns, BoundaryType.LAND)
-                        else:
-                            last = next_node
+            if not self._check_if_beginning_of_boundary(last):
+                ns = [last]
+                done = False
+                while not done:
+                    next_node = self._get_next_node_on_boundary(last)
+                    ns.append(next_node)
+                    if self._check_if_beginning_of_boundary(next_node):
+                        done = True
+                        self.add_boundary(ns, BoundaryType.LAND)
+                    else:
+                        last = next_node
 
     def _fill_island_boundaries(self, not_assigned):
         """ This function fills missing island boundaries.
         """
-        ns = []
         first_node_i = self._edges[not_assigned[0]][0]
-        ns.append(first_node_i)
+        ns = [first_node_i]
         last_node_i = first_node_i
         done = False
         while not done:
@@ -257,15 +250,11 @@ class SchismMesh(TriQuadMesh):
     def _get_not_assigned_boundary_edges(self):
         """ Get all edges that are not assigned as boundaries
         """
-        notypes = []
-        i = 0
         if self._edges is None:
             self.build_edges_from_elems()
-        for edge in self._edges:
-            if edge[2] == EdgeType.BOUNDARY:
-                notypes.append(i)
-            i += 1
-        return notypes
+        return [
+            i for i, edge in enumerate(self._edges) if edge[2] == EdgeType.BOUNDARY
+        ]
 
     def fill_land_and_island_boundaries(self):
         """ Fill land and island boundaries for boundary edges not assigned
@@ -283,23 +272,21 @@ class SchismMesh(TriQuadMesh):
         """ Fill open boundaries for boundary edges not assigned
         to boundaries.
         """
-        if len(self._boundaries) == 0:  # No boundaries defined
+        if len(self._boundaries) == 0:
             raise ValueError('No boundaries are defined')
-        else:
-            for boundary in self._boundaries:
-                ns = []
-                last = boundary.nodes[-1]
+        for boundary in self._boundaries:
+            last = boundary.nodes[-1]
                 # Check if there is another boundary right next this
-                if not self._check_if_beginning_of_boundary(last):
-                    ns.append(last)
-                    while True:
-                        next_node = self._get_next_node_on_boundary(last)
-                        ns.append(next_node)
-                        if self._check_if_beginning_of_boundary(next_node):
-                            self.add_boundary(ns, BoundaryType.OPEN)
-                            break
-                        else:
-                            last = next_node
+            if not self._check_if_beginning_of_boundary(last):
+                ns = [last]
+                while True:
+                    next_node = self._get_next_node_on_boundary(last)
+                    ns.append(next_node)
+                    if self._check_if_beginning_of_boundary(next_node):
+                        self.add_boundary(ns, BoundaryType.OPEN)
+                        break
+                    else:
+                        last = next_node
 
     def find_two_neighboring_node_paths(self, line_segment):
         """
@@ -339,7 +326,7 @@ class SchismMesh(TriQuadMesh):
                 edges = np.roll(nodes, -i, axis=0)[:2]
                 intersection = find_intersection(_line, edges)
                 if intersection is not None:
-                    edge = set((nodes_i[i], nodes_i[(i + 1) % n_nodes]))
+                    edge = {nodes_i[i], nodes_i[(i + 1) % n_nodes]}
                     if edge not in intersected_edges:
                         intersected_edges.append(edge)
                         intersections.append(intersection)
@@ -409,8 +396,7 @@ class SchismMesh(TriQuadMesh):
         """
         dist = self._distance(nodes, x)
         sorted_indexes = np.argsort(dist)
-        sorted_ = list(nodes[i] for i in sorted_indexes)
-        return sorted_
+        return [nodes[i] for i in sorted_indexes]
 
     def _distance(self, nodes_i, x):
         """ Calculate a distance from a node[node_i] to a point x(x1, x2)
@@ -423,8 +409,7 @@ class SchismMesh(TriQuadMesh):
         nodes = tuple(self._nodes[i] for i in nodes_i)
         diffs = tuple(np.subtract(nodes[i][:2], x)
                       for i in range(len(nodes)))
-        dist = tuple(np.linalg.norm(diff) for diff in diffs)
-        return dist
+        return tuple(np.linalg.norm(diff) for diff in diffs)
 
     def _rearrange_boundary_nodes_in_ccw(self, nodes):
         """ Make sure the boundary nodes are in CCW ordering.
@@ -433,14 +418,11 @@ class SchismMesh(TriQuadMesh):
             return = reordered list of the node indexes
         """
         edge_i = self.find_edge(nodes[:2], True)
-        if edge_i is None:
-            new_nodes = []
-            for node in reversed(nodes):
-                new_nodes.append(node)
-            del nodes
-            return new_nodes
-        else:
+        if edge_i is not None:
             return nodes
+        new_nodes = list(reversed(nodes))
+        del nodes
+        return new_nodes
 
     def trim_to_left_of_mesh(self, line_segments):
         """ Trim mesh using line_segments.
@@ -463,7 +445,7 @@ class SchismMesh(TriQuadMesh):
         """
         # self._logger.info("Trimming the mesh...")
         paths = []
-        for _, l in enumerate(line_segments):
+        for l in line_segments:
             p = self.find_two_neighboring_node_paths(l)
             paths.append(p[0])
         self.trim_elems(paths)
@@ -658,10 +640,7 @@ class SchismMesh(TriQuadMesh):
         df['geometry'] = features
         gdf = gpd.GeoDataFrame(df,geometry='geometry')
 
-        if crs:
-            gdf.crs = crs
-        else:
-            gdf.crs = None
+        gdf.crs = crs or None
         if shp_fn:
             gdf.to_file(shp_fn)
         if create_gdf:
@@ -677,18 +656,16 @@ class SchismMesh(TriQuadMesh):
             raise ValueError("input var has different len compared to input elem")
         if inpoly is not None:
             xy = np.asarray(xy)[inpoly]
-            if var is not None:
-                if not plot_nan:
-                    vpoly = np.isnan(var) # do not plot nan data
-                    inpoly = np.logical_and(inpoly, ~vpoly)
+            if var is not None and not plot_nan:
+                vpoly = np.isnan(var) # do not plot nan data
+                inpoly = np.logical_and(inpoly, ~vpoly)
             coll = PolyCollection(xy,array=var[inpoly],**kwargs)
+        elif plot_nan:
+            coll = PolyCollection(xy,array=var,**kwargs)
         else:
-            if plot_nan:
-                coll = PolyCollection(xy,array=var,**kwargs)
-            else:
-                inpoly = ~np.isnan(var)
-                xy = np.asarray(xy)[inpoly]
-                coll = PolyCollection(xy,array=var[inpoly],**kwargs)
+            inpoly = ~np.isnan(var)
+            xy = np.asarray(xy)[inpoly]
+            coll = PolyCollection(xy,array=var[inpoly],**kwargs)
         if not ax:
             fig, ax = plt.subplots()
         ax.add_collection(coll)
@@ -701,9 +678,9 @@ class SchismMesh(TriQuadMesh):
         velem = np.asarray([var[el].mean(axis=0) for el in self.elems])
         if inpoly is not None:
             inpoly = np.asarray([np.all(inpoly[el]) for el in self.elems])
-        coll = self.plot_elems(var=velem,ax=ax,inpoly=inpoly,plot_nan=plot_nan,
-                               **kwargs)
-        return coll
+        return self.plot_elems(
+            var=velem, ax=ax, inpoly=inpoly, plot_nan=plot_nan, **kwargs
+        )
 
     def plot_edges(self,var,ax=None, size=500,inpoly=None,**kwargs):
         xy = np.array(self.get_centers_of_sides())
@@ -713,12 +690,10 @@ class SchismMesh(TriQuadMesh):
             fig, ax = plt.subplots()
         if inpoly is not None:
             xy = self.get_centers_of_sides()[inpoly][:2]
-            sca_plt = ax.scatter(xy[:,0], xy[:,1], c=var[inpoly], s=size,
-                                 **kwargs)
+            return ax.scatter(xy[:, 0], xy[:, 1], c=var[inpoly], s=size, **kwargs)
         else:
             xy = xy[:,:2]
-            sca_plt = ax.scatter(xy[:,0], xy[:,1], c=var, s=size,**kwargs)
-        return sca_plt
+            return ax.scatter(xy[:,0], xy[:,1], c=var, s=size,**kwargs)
 
     def plot_mesh_boundary(self,ax=None,edgecolor='k',**kwargs):
         """
@@ -792,8 +767,7 @@ class SchismMeshGr3Reader(SchismMeshReader):
         self._mesh.allocate(n_elems, n_nodes)  # Allocate memory
 
     def read_nodes(self, f):
-        node_counter = 0
-        for i in range(self._mesh.n_nodes()):
+        for node_counter, _ in enumerate(range(self._mesh.n_nodes())):
             line = f.readline()
             tkns = line.split()
             if len(tkns) < 4:
@@ -801,7 +775,6 @@ class SchismMeshGr3Reader(SchismMeshReader):
                 raise ValueError("Node block is corrupt.")
             node_coords = list(map(float, tkns[1:4]))
             self._mesh.set_node(node_counter, node_coords)
-            node_counter += 1
 
     def read_elems(self, f):
         for elem_i in range(self._mesh.n_elems()):
@@ -854,7 +827,7 @@ class SchismMeshGr3Reader(SchismMeshReader):
             if len(tkns) < 1:
                 self._logger.error("Error reading: %s", line)
                 raise ValueError("Boundary block is corrupt")
-            for i in range(n_open_boundaries):
+            for _ in range(n_open_boundaries):
                 line = f.readline()
                 tkns = line.split()
                 if len(tkns) < 1:
@@ -862,7 +835,7 @@ class SchismMeshGr3Reader(SchismMeshReader):
                     raise ValueError("Boundary block is corrupt")
                 n_nodes = int(tkns[0])
                 nodes = []
-                for j in range(n_nodes):
+                for _ in range(n_nodes):
                     line = f.readline()
                     tkns = line.split()
                     if len(tkns) < 1:
@@ -885,7 +858,7 @@ class SchismMeshGr3Reader(SchismMeshReader):
                 self._logger.error("Error reading: %s", line)
                 raise ValueError("Boundary block is corrupt")
             n_land_boundary_nodes = int(tkns[0])
-            for i in range(n_land_boundaries):
+            for _ in range(n_land_boundaries):
                 line = f.readline()
                 tkns = line.split()
                 if len(tkns) < 1:
@@ -893,7 +866,7 @@ class SchismMeshGr3Reader(SchismMeshReader):
                     raise ValueError("Boundary block is corrupt")
                 n_nodes = int(tkns[0])
                 nodes = []
-                for j in range(n_nodes):
+                for _ in range(n_nodes):
                     line = f.readline()
                     tkns = line.split()
                     if len(tkns) < 1:
@@ -923,9 +896,9 @@ class SchismMeshGr3Reader(SchismMeshReader):
                 read_boundary = arg
 
         if not os.path.exists(fpath_mesh):
-            raise ValueError('File not found:{}'.format(fpath_mesh))
+            raise ValueError(f'File not found:{fpath_mesh}')
         if self._logger is not None:
-            self._logger.debug("Reading in a gr3 file: %s ..." % fpath_mesh)
+            self._logger.debug(f"Reading in a gr3 file: {fpath_mesh} ...")
 
         self._mesh = SchismMesh()
         # Horizontal mesh
@@ -1090,16 +1063,14 @@ class SchismMeshGr3Writer(SchismMeshWriter):
                 openbound_count += 1
                 if bndry.comment is None:
                     buf = "%d = Number of nodes for open boundary %d\n" % \
-                          (bndry.n_nodes(), openbound_count)
+                              (bndry.n_nodes(), openbound_count)
                 else:
                     buf = "%d %s\n" % (bndry.n_nodes(), bndry.comment)
                 f.write(buf)
-                buf = ""
-                for node_i in bndry.nodes:
-                    buf += "%d\n" % (node_i + 1)
+                buf = "".join("%d\n" % (node_i + 1) for node_i in bndry.nodes)
                 f.write(buf)
-            # else:
-            #     raise ValueError("Unsupported boundary type.")
+                # else:
+                #     raise ValueError("Unsupported boundary type.")
 
         # Land & Island
         buf = "%d = Number of land boundaries\n" % (
@@ -1112,20 +1083,18 @@ class SchismMeshGr3Writer(SchismMeshWriter):
         f.write(buf)
         landbound_count = 0
         for bndry in mesh._boundaries:
-            if (bndry.btype == BoundaryType.LAND or
-                bndry.btype == BoundaryType.ISLAND):
+            if bndry.btype in [BoundaryType.LAND, BoundaryType.ISLAND]:
                 landbound_count += 1
                 island_flag = 0 if bndry.btype == BoundaryType.LAND else 1
-                if bndry.comment is None:
-                    buf = "%d %d = Number of nodes for land boundary %d\n" % \
-                        (bndry.n_nodes(), island_flag, landbound_count)
-                else:
-                    buf = "%d %d %s\n" % (bndry.n_nodes(), island_flag, bndry.comment)
+                buf = (
+                    "%d %d = Number of nodes for land boundary %d\n"
+                    % (bndry.n_nodes(), island_flag, landbound_count)
+                    if bndry.comment is None
+                    else "%d %d %s\n"
+                    % (bndry.n_nodes(), island_flag, bndry.comment)
+                )
                 f.write(buf)
-                buf = ""
-                for node_i in bndry.nodes:
-                    buf += "%d\n" % (node_i + 1)
-                f.write(buf)
+                f.write("".join("%d\n" % (node_i + 1) for node_i in bndry.nodes))
 
     def write(self, *args, **kwargs):
         """
@@ -1331,13 +1300,13 @@ class SchismMeshShapefileWriter(SchismMeshWriter):
         fpath_str = os.path.split(fpath)
         fdir = fpath_str[0]
         fname = fpath_str[1].replace('.shp', '')
-        fpath_poly = os.path.join(fdir, fname + '_polygon.shp')
-        fpath_point = os.path.join(fdir, fname + '_point.shp')
+        fpath_poly = os.path.join(fdir, f'{fname}_polygon.shp')
+        fpath_point = os.path.join(fdir, f'{fname}_point.shp')
 
         mesh.to_geopandas('polygon', crs, fpath_poly, create_gdf=False)
         mesh.to_geopandas('point', crs, fpath_point,
                           node_values, value_name=value_name, create_gdf=False)
-        logging.info("%s generated" % fpath)
+        logging.info(f"{fpath} generated")
 
 class SchismMeshNetcdfWriter(SchismMeshWriter):
 
@@ -1530,7 +1499,7 @@ class SchismMeshNetcdfWriter(SchismMeshWriter):
                 [ds, ds_node_bottom, ds_ele_bottom, ds_edge_bottom, ds_z])
 
         ds.to_netcdf(fpath)
-        logging.info("%s generated" % fpath)
+        logging.info(f"{fpath} generated")
 
 class SchismMeshIoFactory(object):
     """ A factory class for SchismMeshIo
@@ -1568,10 +1537,7 @@ def read_mesh(fpath_mesh, fpath_vmesh=None, old_vgrid=True,**kwargs):
     if fpath_mesh.endswith('.gr3'):
         reader = SchismMeshIoFactory().get_reader('gr3')
         mesh = reader.read(fpath_mesh)
-        if fpath_vmesh is not None:
-            vmesh = read_vmesh(fpath_vmesh,old_vgrid)
-        else:
-            vmesh = None
+        vmesh = read_vmesh(fpath_vmesh,old_vgrid) if fpath_vmesh is not None else None
         mesh._vmesh = vmesh
         if 'crs' in kwargs:
             mesh.crs = kwargs['crs']
@@ -1649,7 +1615,8 @@ def compare_mesh(mesh1, mesh2, dist_threshold=None):
 
     if dist_threshold is not None:
         dist = np.array(dist)
-        print("The overlapping nodes account for %s percent of total nodes"%
-              (len(dist[dist<=dist_threshold])/len(dist)*100))
+        print(
+            f"The overlapping nodes account for {len(dist[dist <= dist_threshold]) / len(dist) * 100} percent of total nodes"
+        )
 
     return indices, dist

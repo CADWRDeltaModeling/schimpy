@@ -71,10 +71,9 @@ class Polygon(object):
         inside = False
         ps = zip(self._p, np.roll(self._p, -1, axis=0))
         for p1, p2 in ps:
-            if (((p1[1] <= pt[1] and pt[1] < p2[1]) \
-               or (p2[1] <= pt[1] and pt[1] < p1[1])) \
-               and (pt[0] < (p2[0] - p1[0]) * (pt[1] - p1[1]) \
-                    / (p2[1] - p1[1]) + p1[0])):
+            if (p1[1] <= pt[1] < p2[1] or p2[1] <= pt[1] < p1[1]) and pt[0] < (
+                p2[0] - p1[0]
+            ) * (pt[1] - p1[1]) / (p2[1] - p1[1]) + p1[0]:
                 inside = not inside
         return inside
 

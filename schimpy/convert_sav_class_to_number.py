@@ -85,22 +85,22 @@ def main():
     colors = np.array([c['color'] for c in classes],dtype=[('R','<i4'),('G','<i4'),('B','<i4')])
     colarr = colors.view(np.int).reshape(colors.shape + (-1,))
     classval = np.array([c['class'] for c in classes],dtype='d')
-    order = np.argsort(colors,axis=0,order = ('R','G','B'))    
+    order = np.argsort(colors,axis=0,order = ('R','G','B'))
     refsort = colarr[order,:]
     valorder = classval[order]
 
     vals = allband.reshape(-1,3)
-    ndvi = -np.empty(vals.shape[0],dtype="d") 
+    ndvi = -np.empty(vals.shape[0],dtype="d")
     nclass = len(refsort)
     for iref in range(nclass):
-        print("Class: %s/%s" % (iref,nclass-1))
+        print(f"Class: {iref}/{nclass - 1}")
         vo = valorder[iref]
         imatch = np.where((vals == refsort[iref,:]).all(axis=1))
         ndvi[imatch] = vo
     assert np.all(ndvi>-1.)
     ndvi=ndvi.reshape(red.shape)
     ndvi = gfilt(ndvi, sigma=3, order=0)
-        
+
 
     gtiff_driver = gdal.GetDriverByName('GTiff')
     if gtiff_driver is None:

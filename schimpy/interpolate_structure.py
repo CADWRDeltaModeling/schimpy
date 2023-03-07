@@ -43,10 +43,7 @@ def interpolate_structure(template_th, output_th, dt=None, int_cols=["install", 
         int_cols : list
             List of column names that should be integers. This can be a superset, and it shouldn't change much if you name your template columns the standard way.
     """
-    if dt is None:
-        dt = hours(1)
-    else:
-        dt = pd.tseries.frequencies.to_offset(dt)
+    dt = hours(1) if dt is None else pd.tseries.frequencies.to_offset(dt)
     test_date_label_correct(template_th)
     th_orig = pd.read_csv(template_th, comment="#",
                           sep="\s+", header=0,
@@ -60,20 +57,14 @@ def interpolate_structure(template_th, output_th, dt=None, int_cols=["install", 
     #agg_rules = { "A": "mean", "B": "sum", "C": "first", "D": "last",}
     th = th_orig.resample(dt).mean()
     for c in cols:
-        if c in int_cols:
-            th[c] = th[c].ffill().astype(int)
-        else:
-            th[c] = th[c].interpolate()
+        th[c] = th[c].ffill().astype(int) if c in int_cols else th[c].interpolate()
     th = th.drop_duplicates(keep="first")
     th.to_csv("test.th", sep=" ", float_format="%.2f",
               date_format="%Y-%m-%dT%H:%M", header=True)
 
 
 def ensure_offset(arg):
-    if isinstance(arg, str):
-        return pandas.tseries.frequencies.to_offset()
-    else:
-        return arg
+    return pandas.tseries.frequencies.to_offset() if isinstance(arg, str) else arg
 
 
 def create_arg_parser():

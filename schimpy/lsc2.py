@@ -39,8 +39,7 @@ def szcoord(s, h, eta, theta, b, hc):
     thetavec = theta
     c = (1 - b) * np.sinh(thetavec * s) / np.sinh(thetavec)\
         + 0.5 * b * (np.tanh(thetavec * (s + 0.5)) - thetaterm) / thetaterm
-    z = eta * (1 + s) + hc * s + (h - hc) * c
-    return z
+    return eta * (1 + s) + hc * s + (h - hc) * c
 
 
 
@@ -62,8 +61,7 @@ class CubicLSC2MeshFunction(object):
 
     def depth(self,x,tlev):
         p = self.params
-        d = p[3]*tlev**4./4.+ p[2]*tlev**3./3. + p[1]*tlev**2./2. + p[0]*tlev
-        return d
+        return p[3]*tlev**4./4.+ p[2]*tlev**3./3. + p[1]*tlev**2./2. + p[0]*tlev
 
 
 
@@ -84,9 +82,8 @@ class BilinearMeshDensity(object):
         (a,b,c,d) = self.params
         m = (a + b*h)
         n = (c+d*h)
-        opnd = np.outer(t,n) 
-        retval = ((np.exp(opnd)-1)*m/n).T
-        return retval
+        opnd = np.outer(t,n)
+        return ((np.exp(opnd)-1)*m/n).T
 
 
 
@@ -104,11 +101,15 @@ def default_num_layers(x,eta, h0, minlayer, maxlayer,dz_target,meshfun,maxlev=10
     for inode in range(npoint):
         #hi_ndx is the index that is equal or greater
         nlayer[inode] = np.maximum(1,np.searchsorted(levdepths[inode,:],totaldepth[inode]))
-    print("Maximum reference depth: {} Unrestricted max layer: {}".format (np.max(totaldepth),np.max(nlayer)))
+    print(
+        f"Maximum reference depth: {np.max(totaldepth)} Unrestricted max layer: {np.max(nlayer)}"
+    )
     nlayer = np.minimum(np.maximum(
         minlayer, (nlayer).astype('i')), maxlayer) #.astype('f')    
-    print("# small minlayer = %s " % np.count_nonzero(minlayer<=1.))
-    print("Any small number layers: %s at index %s" % (np.amin(nlayer), np.argmin(nlayer)))   
+    print(f"# small minlayer = {np.count_nonzero(minlayer <= 1.0)} ")
+    print(
+        f"Any small number layers: {np.amin(nlayer)} at index {np.argmin(nlayer)}"
+    )
     return nlayer.astype("i")
 
 
@@ -136,10 +137,10 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
     
     print("Entering mesh_functino_depths")
     for inode in showlist:
-        print("inode={} depth={} nlayer={}".format(inode,depth[inode],nlayer[inode]))
-    
-    
-    
+        print(f"inode={inode} depth={depth[inode]} nlayer={nlayer[inode]}")
+            
+            
+
     npoint = len(nlayer)
     globalmaxlayer = np.max(nlayer)
     nlevel = nlayer + 1
@@ -167,6 +168,12 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
     hnv = np.zeros_like(dz1)         #
     hnv1 = hnv.copy()
     dh_meshfun = np.zeros_like(dz1)
+    # rule out cases where the bed is at above the lowest meshfun (which will become
+    # hybrid with sigma or sigma)
+    # rule out the exact case where the bed ifind out if lowest level falls below bottom (eliminating exact fit case)
+    # and if it does check if it is a sliver
+    sliver = 0.025
+
     for inode in range(npoint):
         # hnv is depth given by # vertical layers and mesh function
         # hnv1 is the depth of the level above
@@ -178,18 +185,13 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
         excess_depth = depth[inode] - hnv1[inode]
         dh_meshfun[inode] = hnv[inode] - hnv1[inode]
 
-        # rule out cases where the bed is at above the lowest meshfun (which will become
-        # hybrid with sigma or sigma)
-        # rule out the exact case where the bed ifind out if lowest level falls below bottom (eliminating exact fit case)
-        # and if it does check if it is a sliver
-        sliver = 0.025
-
         if excess_depth > 0.:
             if (excess_depth < sliver*dh_meshfun[inode]) and (nlayer[inode]>1):    # todo is this the right plae for nlayer check?
 
                 # sliver below bed that needs to be absorbed into layer above
                 # reduce nlevel and nlayer, readjust hnv. Mesh will be stretched later. hnv1[inode] is now invalidv
-                if inode in showlist: print("WATCH inode={}".format(inode))
+                if inode in showlist:
+                    print(f"WATCH inode={inode}")
                 nlayer[inode] -= 1
                 nlevel[inode] -= 1
                 meshfundepths[inode,nlevel[inode]-1] = depth[inode]
@@ -203,8 +205,8 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
 
                 if excess_depth < 0.3*dh_meshfun[inode]:
                     meshfundepths[inode,nlevel[inode]-2] -= 0.25*dh_meshfun[inode]
-            #else:
-            #    #print "excess at {}".format(inode)
+                    #else:
+                    #    #print "excess at {}".format(inode)
 
         sigmadepths[inode,0:nlevel[inode]] = np.arange(nlevel[inode],dtype='d')*dz1[inode]
         hsig[inode]=sigmadepths[inode,nlevel[inode]-1]
@@ -212,9 +214,11 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
 
         if inode in showlist:
             print("SHOWLIST")
-            print("inode={} depth={} nlevel={} nlayer={}".format(inode,depth[inode],nlevel[inode],nlayer[inode]))
+            print(
+                f"inode={inode} depth={depth[inode]} nlevel={nlevel[inode]} nlayer={nlayer[inode]}"
+            )
             print(meshfundepths[inode,:])
-    
+
 
 
     # hsig is the depth of a uniform sigma grid
@@ -229,7 +233,7 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
     # This will often be true ... it implies some stretching, which may be a lot or a little
     # For now (pre-stretch) use the coordinates as given by mesh function (min/max doesn't affect)
     is_expand = depth > hnv
-        
+
     # for hsig <= h < htrans the levels given by meshfun don't quite fit in the (shallower) water column, 
     # so transition to sigma coordinates with weight gamma
     print("gamma stuff")
@@ -238,7 +242,7 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
     #    print(hsig[inode])
     #    print(hnv[inode])
     #    print(meshfundepths[inode,:])
-    
+
     safe_divisor = hnv - hsig
     safe_divisor[hnv == hsig] = 1.
     # todo is this really safe?
@@ -255,30 +259,23 @@ def mesh_function_depths(nlayer, depth, mesh, meshfun):
     expandfac = np.ones(globalmaxlevel,dtype="d")
     for i in range(npoint):
         if is_expand[i]:
-            expandfac[0:nlevel[i]] = 1. + np.power(np.linspace(0.,1.,nlevel[i]),4.)*(stretch[i]-1.)
+            expandfac[: nlevel[i]] = 1.0 + np.power(
+                np.linspace(0.0, 1.0, nlevel[i]), 4.0
+            ) * (stretch[i] - 1.0)
             expandfac[nlevel[i]:] = expandfac[nlevel[i]-1]
-            htrans[i,:] = expandfac[0:]*htrans[i,:]
+            htrans[i,:] = expandfac[:] * htrans[i,:]
             dh_meshfun[i] *= stretch[i]
         # todo: this is new because it gives some behavior for sigma. This is reasonable for positive depth but
         # a bit funny for negative. The real issue of course is that the bed is above the reference
         if is_sigma[i]:
             htrans[i,0:nlevel[i]] = np.linspace(0,depth[i],nlevel[i])
         htrans[i,nlevel[i]:] = depth[i]
-    if False:
-        print("{{{{{{{}}}}}}}")
-        for i in showlist:
-            print("\ni={} depth ={} gamma={} nlayer={} hvn={}".format(i,depth[i],gamma[i],nlayer[i],hnv[i]))
-            print(htrans[i,0:nlevel[i]])
-            print("meshfundepths:")
-            print(meshfundepths[i,0:nlevel[i]])
-            print("sigmadepths")
-            print(sigmadepths[i,0:nlevel[i]])
     return htrans,is_sigma,nlayer,dh_meshfun
 
 
 def lowest_layer_height(htrans,nlevel,klev=0):
     npoint = htrans.shape[0]
-    print("npoint: %s" % npoint)
+    print(f"npoint: {npoint}")
     print(htrans.shape[1])
     llh = np.zeros(npoint,dtype=float)
     for ipoint in range(npoint):
@@ -304,8 +301,8 @@ def label_components(mesh,nlayer,thresh,exclude):
         # pick first seed that qualifies and that isn't labeled yet
 
         v = np.nonzero(qualified)[0][0]
-        stack = [v] 
-        while len(stack) > 0:
+        stack = [v]
+        while stack:
             v = stack.pop()
             if labels[v] > 0:
                 continue
@@ -313,10 +310,10 @@ def label_components(mesh,nlayer,thresh,exclude):
                 labels[v] = current_label
                 cc[current_label].append(v)
                 for v0 in mesh.get_neighbor_nodes(v):
-                    if not labels[v0]>0:
+                    if labels[v0] <= 0:
                         stack.append(v0)
         qualified = (nlayer > thresh) & (labels < 0)
-    print("Number of components: {}".format(len(cc)))
+    print(f"Number of components: {len(cc)}")
     return cc
 
 
@@ -329,7 +326,7 @@ def process_orphans2(mesh,nlayer,depth,hcor):
 
     for ilay in range(maxlayer,smallest_nlayer,-1):
         exclude, = np.where(nlayer<=ilay)
-        print("orphans {}".format(ilay))
+        print(f"orphans {ilay}")
         # find connected components that have this many or fewer layers
         cc = label_components(mesh,nlayer,ilay,exclude)
         sizes = np.array([len(c) for c in cc],dtype="i")
@@ -345,7 +342,7 @@ def process_orphans2(mesh,nlayer,depth,hcor):
                 #print inode
                 nlayer[inode] -= 1
                 hcor[inode,nlayer[inode]:]=depth[inode]
-        print("ilay={} norphan = {}".format(ilay,norphan))
+        print(f"ilay={ilay} norphan = {norphan}")
     return nlayer,hcor
 
 
@@ -363,7 +360,7 @@ def process_orphans(mesh,nlayer,depth,hcor):
             nlayer[ndx] = max_nlayer_neighbor
             hcor[ndx,nlayer[ndx]:] = depth[ndx]
             norphan+=1
-    print("# orphans = {}".format(norphan))
+    print(f"# orphans = {norphan}")
     return nlayer
 
 
@@ -398,8 +395,7 @@ def smooth_bed(mesh,eta,h,hcor,nlevel,speed):
     # Mind that the outcome from the previous step is in z coordinates, not depth
     # but the depth function works based on depth from reference eta
     hsmooth = eta - zsmooth
-    pseudo_bed_depth = hsmooth[:,0]
-    return pseudo_bed_depth
+    return hsmooth[:,0]
 
 
 

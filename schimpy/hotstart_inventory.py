@@ -25,7 +25,7 @@ def hotstart_inventory(start,dt=90):
     times = [start + dtm.timedelta(seconds=x*dt) for x in iters]
 
     for it,t in zip(iters,times):
-        print("{}: {}".format(it,t))
+        print(f"{it}: {t}")
 	
 
 

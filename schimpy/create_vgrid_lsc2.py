@@ -78,7 +78,8 @@ def main():
             lines = f.readlines()
             transectfiles = [line.strip() for line in lines if ("csv" in line) and (not line.startswith("#"))]
             for fname in transectfiles:
-                if not os.path.exists(fname): raise ValueError("Requested output transect file does not exist: {}".format(fname))
+                if not os.path.exists(fname):
+                    raise ValueError(f"Requested output transect file does not exist: {fname}")
 
 
     vgrid_gen(hgrid,vgrid_out,vgrid_version,eta,minmax_region,archive_nlayer,nlayer_gr3)
@@ -94,7 +95,7 @@ def main():
                        "frank_tract_sjr_5.csv"]
 
     #transectfiles = transect_franks
-    
+
     if transect is not None:
         vgrid_out = "vgrid.in"
         vgrid0_out = "vgrid.in"
@@ -105,10 +106,10 @@ def main():
 def vgrid_gen(hgrid,vgrid_out,vgrid_version, eta,
               minmaxlayerfile,archive_nlayer='out',nlayer_gr3='nlayer.gr3'):
     
-    if not vgrid_version in ['5.8','5.10']:
+    if vgrid_version not in ['5.8', '5.10']:
         raise ValueError(f"version of vgrid not recognized: {vgrid_version}")
     else:
-       print(f"Version of vgrid is {vgrid_version}")
+        print(f"Version of vgrid is {vgrid_version}")
 
     meshfun = BilinearMeshDensity()
 
@@ -160,7 +161,7 @@ def vgrid_gen(hgrid,vgrid_out,vgrid_version, eta,
         xdummy = 0.
         nlayer_default = default_num_layers(xdummy,eta, h0, minlayer, maxlayer, dztarget,meshfun)
         nlayer = nlayer_default
- 
+
         if archive_nlayer=="out":
             print("writing out number of layers")
             write_mesh(mesh,nlayer_gr3.replace(".gr3","_default.gr3"),node_attr=nlayer_default)
@@ -185,7 +186,7 @@ def vgrid_gen(hgrid,vgrid_out,vgrid_version, eta,
 
 
     sigma2,nlayer_revised = gen_sigma(nlayer, minlayer,maxlayer, eta, h0, mesh, meshfun)
-    print("Returned nlayer revised: {}".format(np.max(nlayer_revised)))
+    print(f"Returned nlayer revised: {np.max(nlayer_revised)}")
     nlayer = nlayer_revised
     nlevel = nlayer+1
 
@@ -216,14 +217,12 @@ def plot_vgrid(hgrid_file,vgrid0_file,vgrid_file,vgrid_version, eta,transectfile
     for transectfile in transectfiles:
         base = ospath.splitext(ospath.basename(transectfile))[0]
         transect = np.loadtxt(transectfile,skiprows=1,delimiter=",")
-        path = []        
-        transx = transect[:,1:3] 
-        for p in range(transx.shape[0]):
-            path.append( mesh.find_closest_nodes(transx[p,:]))        
+        transx = transect[:,1:3]
+        path = [mesh.find_closest_nodes(transx[p,:]) for p in range(transx.shape[0])]
         #zcorsub = zcor[path,:]
         xx = x[path]
         xpath = np.zeros(xx.shape[0])
-        
+
         for i in range (1,len(path)):
             dist = np.linalg.norm(xx[i,:] - xx[i-1,:])
             xpath[i] = xpath[i-1] + dist
@@ -235,10 +234,10 @@ def plot_vgrid(hgrid_file,vgrid0_file,vgrid_file,vgrid_version, eta,transectfile
             plot_mesh(ax1,xpath,zcor1[path,:],0,len(xpath),c="blue")
             ax0.plot(xpath,-h0[path],linewidth=2,c="black")
             ax1.plot(xpath,-h0[path],linewidth=2,c="black")
-            plt.savefig(ospath.join("images",base+".png"))
+            plt.savefig(ospath.join("images", f"{base}.png"))
             plt.show()
         except:
-            print("Plotting of grid failed for transectfile: {}".format(transectfile))
+            print(f"Plotting of grid failed for transectfile: {transectfile}")
 
 
 if __name__ == '__main__':

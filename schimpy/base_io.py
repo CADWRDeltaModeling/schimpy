@@ -37,10 +37,7 @@ class BaseIO(object):
         if len(line) == 0:
             return None, False
         tokens = line.split(None, expected_count)
-        if expected_count < 0:
+        if expected_count < 0 or len(tokens) >= expected_count:
             return tokens, True
-        elif len(tokens) < expected_count:
-            self._logger.error("Less than the expected count of items are read in.")
-            return tokens, False
-        else:
-            return tokens, True
+        self._logger.error("Less than the expected count of items are read in.")
+        return tokens, False

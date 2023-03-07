@@ -10,7 +10,7 @@ def time_block_report(message,told):
     """ This routine is for reporting incremental timing of parts of the script"""
     tnew=time.time()
     diff = tnew - told
-    print("%s : %s" % (message,diff))
+    print(f"{message} : {diff}")
     return tnew
     
 # For converting the Mercator projection of the data to lat/lon

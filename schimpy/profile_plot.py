@@ -59,45 +59,39 @@ def profile_plot(x,z,data,ax,context_label = None,add_labels = False,xlabel = No
     global z_part
 
 
-    
+
     matplotlib.rcParams['xtick.direction'] = 'out'
     matplotlib.rcParams['ytick.direction'] = 'out'
 
-         
+
     if (not max_depth):
         max_depth = data.shape[0]
-        
-    if (xmin):
-        min_station = x[0,:].searchsorted(xmin)
-    else:
-         min_station = 0
-    
-    if (xmax):
-        max_station = x[0,:].searchsorted(xmax)
-    else:
-        max_station = x.shape[1]
-        
-    set_index_bounds(min_station,max_station,max_depth)
-    
-    print("context label: %s" % context_label)
-    print("add label: %s" % add_labels)
 
-    print("min x dist %s max x dist %s" %(xmin,xmax))
-    print("min x station %s max x station %s max_depth %s" %(min_station,max_station,max_depth))
-    
+    min_station = x[0,:].searchsorted(xmin) if xmin else 0
+    max_station = x[0,:].searchsorted(xmax) if xmax else x.shape[1]
+    set_index_bounds(min_station,max_station,max_depth)
+
+    print(f"context label: {context_label}")
+    print(f"add label: {add_labels}")
+
+    print(f"min x dist {xmin} max x dist {xmax}")
+    print(
+        f"min x station {min_station} max x station {max_station} max_depth {max_depth}"
+    )
+
     x_part = x[0:max_depth,min_station:max_station]
     z_part = z[0:max_depth,min_station:max_station]
-    
+
     data_part = data[0:max_depth,min_station:max_station]
     data_part = np.ma.masked_where(np.isnan(data_part),data_part)
 
 
     norml = ThreePointLinearNorm(2,0,20) 
 
-    cmap=cm.get_cmap("RdBu_r").copy() 
+    cmap=cm.get_cmap("RdBu_r").copy()
     cmap.set_bad("white",0.0)
 
-    
+
     do_image=False
     if do_image:
         lev = [0.0,0.1,0.2,0.5,1.0,2.0,4.0,8.0,16.0,24.0,32.0]           
@@ -113,7 +107,7 @@ def profile_plot(x,z,data,ax,context_label = None,add_labels = False,xlabel = No
         cbi.set_label("Salinity (psu)", size = 14)
     else:
         im = None
-   
+
     do_line_contour = True
     if do_line_contour:
         lev = np.array([2.0, 4.0, 8.0, 16.0])
@@ -141,11 +135,11 @@ def profile_plot(x,z,data,ax,context_label = None,add_labels = False,xlabel = No
         filled_data_part = vertical_fill(data_part)
         bad_data = np.ma.masked_where(~data_part.mask, data_part.mask, copy=True) 
         maxz = np.argmax(bad_data,axis=0)
-        
+
         maxz[maxz == 0] = max_depth
         maxz = np.concatenate(([max_depth],maxz,[max_depth]))
         xstat = np.concatenate(([x_part[0,0]],x_part[0,:],[x_part[0,-1]]))
-        
+
         ax.set_ylim([max_depth,0])
         cs = ax.contourf(x_part,z_part,filled_data_part,levels = lev, cmap = cm.RdBu_r, 
                           norm = norml,extent=(x[0,min_station],x[0,max_station-1],max_depth,0))                          
@@ -169,7 +163,7 @@ def profile_plot(x,z,data,ax,context_label = None,add_labels = False,xlabel = No
             t = ax.text(dist, max_depth-2, location_labels[dist], ha="center", va="bottom", rotation=270,
                 size=12,
                 bbox=bbox_props)
-        
+
     if (add_cruise_loc and add_labels):
         font= FontProperties(color="white");
         leg = ax.legend(("USGS cast","Dayflow X2"),"center left",numpoints=1,frameon=False)

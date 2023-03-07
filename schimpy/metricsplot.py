@@ -46,10 +46,9 @@ def safe_window(ts, window):
 
     if (ts.last_valid_index() < window[0]) or (ts.first_valid_index() > window[1]):
         return None
-    else:
-        tssafe = ts[window[0]:window[1]]
-        tssafe.unit = unit
-        return tssafe
+    tssafe = ts[window[0]:window[1]]
+    tssafe.unit = unit
+    return tssafe
 
 
 def get_common_window(tss, window=None):
@@ -59,29 +58,26 @@ def get_common_window(tss, window=None):
     lower_bound = None
     upper_bound = None
     for ts in tss:
-        if not ts is None:
-            if lower_bound is None:
+        if ts is not None:
+            if (
+                lower_bound is not None
+                and lower_bound < ts.index[0]
+                or lower_bound is None
+            ):
                 lower_bound = ts.index[0]
-            else:
-                if lower_bound < ts.index[0]:
-                    lower_bound = ts.index[0]
-            if upper_bound is None:
+            if (
+                upper_bound is not None
+                and upper_bound > ts.index[-1]
+                or upper_bound is None
+            ):
                 upper_bound = ts.index[-1]
-            else:
-                if upper_bound > ts.index[-1]:
-                    upper_bound = ts.index[-1]
     if (lower_bound is None or upper_bound is None) \
         or (lower_bound > upper_bound):
         return None
-    else:
-        if window is not None:
-            if lower_bound < window[0]:
-                lower_bound = window[0]
-            if upper_bound > window[1]:
-                upper_bound = window[1]
-            return (lower_bound, upper_bound)
-        else:
-            return (lower_bound, upper_bound)
+    if window is not None:
+        lower_bound = max(lower_bound, window[0])
+        upper_bound = min(upper_bound, window[1])
+    return (lower_bound, upper_bound)
 
 
 def get_union_window(tss, window=None):
@@ -90,26 +86,23 @@ def get_union_window(tss, window=None):
     lower_bound = None
     upper_bound = None
     for ts in tss:
-        if not ts is None:
-            if lower_bound is None:
+        if ts is not None:
+            if (
+                lower_bound is not None
+                and lower_bound > ts.start
+                or lower_bound is None
+            ):
                 lower_bound = ts.start
-            else:
-                if lower_bound > ts.start:
-                    lower_bound = ts.start
-            if upper_bound is None:
+            if (
+                upper_bound is not None
+                and upper_bound < ts.end
+                or upper_bound is None
+            ):
                 upper_bound = ts.end
-            else:
-                if upper_bound < ts.end:
-                    upper_bound = ts.end
-    else:
-        if window is not None:
-            if lower_bound > window[0]:
-                lower_bound = window[0]
-            if upper_bound < window[1]:
-                upper_bound = window[1]
-            return (lower_bound, upper_bound)
-        else:
-            return (lower_bound, upper_bound)
+    if window is not None:
+        lower_bound = min(lower_bound, window[0])
+        upper_bound = max(upper_bound, window[1])
+    return (lower_bound, upper_bound)
 
 
 def filter_timeseries(tss, cutoff_period=hours(40)):
@@ -143,7 +136,7 @@ def fill_gaps(ts, max_gap_to_fill=None):
     try:
         limit = int(max_gap_to_fill/ts.index.freq)
     except:
-        raise ValueError("could not divide max_gap_to_fill by freq: {}".format(ts.index.freq))
+        raise ValueError(f"could not divide max_gap_to_fill by freq: {ts.index.freq}")
     if limit == 0:
         raise ValueError("max_gap_to_fill must be longer than time step")
     unit = ts.unit
@@ -241,20 +234,15 @@ def gen_simple_grid():
     """ Set a simple grid that only has instantaneous and filtered plots
         without metrics calculation
     """
-    grids = {}
     g = GridSpec(2, 1, height_ratios=[1, 1])
-    grids['inst'] = g[0, 0]
-    grids['avg'] = g[1, 0]
+    grids = {'inst': g[0, 0], 'avg': g[1, 0]}
     g.update(top=0.93, bottom=0.13, right=0.88, hspace=0.4, wspace=0.8)
     return grids
 
 
 def gen_metrics_grid():
-    grids = {}
     g = GridSpec(2, 2, width_ratios=[1.8, 1], height_ratios=[1, 1])
-    grids['inst'] = g[0, 0:2]
-    grids['avg'] = g[1, 0]
-    grids['scatter'] = g[1, 1]
+    grids = {'inst': g[0, 0:2], 'avg': g[1, 0], 'scatter': g[1, 1]}
     #g.update(top=0.93, bottom=0.2, right=0.88, hspace=0.4, wspace=0.8)
     g.update(top=0.90, bottom=0.2, right=0.88, hspace=0.4, wspace=0.8)
     return grids
@@ -263,13 +251,10 @@ def gen_metrics_grid():
 def plot_tss(ax, tss, window=None,cell_method='inst'):
     """ Simply plot lines from a list of time series
     """
-    if window is not None:
-        tss_plot = [safe_window(ts, window) for ts in tss]
-    else:
-        tss_plot = tss
+    tss_plot = tss if window is None else [safe_window(ts, window) for ts in tss]
     lines = []
     if check_if_all_tss_are_bad(tss_plot):
-        for ts in tss:
+        for _ in tss:
             l, = ax.plot([], [])
             lines.append(l)
     else:
@@ -304,14 +289,14 @@ def gen_metrics_string(metrics, names, unit=None):
             continue
         line_metrics = str()
         if names[i] is not None:
-            line_metrics = "%s: " % names[i]
+            line_metrics = f"{names[i]}: "
         if unit is not None:
             line_metrics += "RMSE=%.3f %s   " % (metric['rmse'], unit)
         else:
             line_metrics += "RMSE=%.3f      " % (metric['rmse'])
         lag = metric['lag']
         if lag is not None:
-            line_metrics += "Lag={}  ".format(lag)
+            line_metrics += f"Lag={lag}  "
             line_metrics += r"Bias$_\phi$={:.3f}   ".format(metric['bias'])
             line_metrics += r"NSE$_\phi$={:.3f}   ".format(metric['nse'])
             line_metrics += r"R$_\phi$={:.3f}   ".format(metric['corr'])
@@ -329,8 +314,8 @@ def write_metrics_string(ax, str_metrics, metrics_loc=None):
     """
     if metrics_loc is None:
         metrics_loc = (0.5, -1.75)
-    dy = 0.1
     if len(str_metrics) > 0:
+        dy = 0.1
         for i, txt in enumerate(str_metrics):
             if txt is not None:
                 top = metrics_loc[1] - dy * i
@@ -374,7 +359,7 @@ def plot_scatter(ax, tss):
     # if metrics['lag'] is None:
     #     ax.set_visible(False)
     #     return
-    if any([ts is None for ts in tss[:2]]):
+    if any(ts is None for ts in tss[:2]):
         ax.set_visible(False)
         return
 
@@ -389,15 +374,13 @@ def plot_scatter(ax, tss):
 
     artist = ax.scatter(ts_obs, ts_est)
 
-    #if self._have_regression is True:
-        #  self.add_regression_line(ts_base, ts_target)
     add_regression_line(ax, ts_obs, ts_est)
 
     set_scatter_color(artist)
     make_plot_isometric(ax)
 
     labels = ['Obs', 'Sim']
-    labels = [l + " ({})".format(unit) for l in labels]
+    labels = [l + f" ({unit})" for l in labels]
     ax.set_xlabel(labels[0])
     ax.set_ylabel(labels[1])
     rotate_xticks(ax, 25)
@@ -421,7 +404,7 @@ def calculate_lag_of_tss(tss, max_shift, period):
                 lag = calculate_lag(tss[0], tss[i+1],
                                     max_shift, period)
 
-                if lag == -max_shift or lag == max_shift:
+                if lag in [-max_shift, max_shift]:
                     lags.append(None)
                 else:
                     lags.append(lag)
@@ -511,7 +494,8 @@ def check_if_all_tss_are_bad(tss):
     """
     def bad(ts):
         return True if ts is None else ts.isnull().all()
-    return all([bad(ts) for ts in tss])
+
+    return all(bad(ts) for ts in tss)
 
 
 def plot_metrics(obs,tssim, **kwargs):
@@ -527,7 +511,7 @@ def plot_metrics(obs,tssim, **kwargs):
     matplotlib.pyplot.figure.Figure
     """
     if type(tssim) == tuple:
-        tss = tuple([obs] + [s for s in tssim])
+        tss = tuple([obs] + list(tssim))
     else:
         raise Exception("Unanticipated type")
     fig = set_figure()

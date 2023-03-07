@@ -61,12 +61,12 @@ class Output7bXYTReader(object):
             fpath = self._fname_station
         fname, ext = os.path.splitext(fpath)
         if ext == '.bp':
-            coords = list()
+            coords = []
             with open(fpath, 'r') as fin:
                 fin.readline()   # First line: comment
                 nxy = int(fin.readline().split()[0])  # 2nd: nxy
                 self._nxy = nxy
-                for xy_i in range(nxy):
+                for _ in range(nxy):
                     coord = list(map(float, fin.readline().split()[1:4]))
                     coords.append(coord)
             self._coords = coords
@@ -91,16 +91,16 @@ class Output7bXYTReader(object):
         if is3d is True:
             fpaths = (self._prefix + mid + '.out' for mid in ('_a', '_b'))
         else:
-            fpaths = (self._prefix + '.out',)
-        outputs = list()
+            fpaths = (f'{self._prefix}.out', )
+        outputs = []
         for fpath in fpaths:
-            data = list()
+            data = []
             with open(fpath, 'r') as fin:
-                for xy_i in range(self._nxy):
+                for _ in range(self._nxy):
                     # Ignore the first block because it is repeated later
-                    for nvrt_i in range(self._nvrt):
+                    for _ in range(self._nvrt):
                         fin.readline()
-                    for line_i in range(self._n_casts * self._nvrt):
+                    for _ in range(self._n_casts * self._nvrt):
                         line = fin.readline().strip()
                         # time, value, depth
                         tokens = (line.split()[i] for i in [3, 1, 2])
@@ -142,20 +142,20 @@ class Output7bXYTReader(object):
         nvrt = self._nvrt
         n_casts = self._n_casts
         # collect time stamp first
-        times = list()
+        times = []
         output = self._outputs[0]
         for cast_i in range(n_casts):
             i_begin = cast_i * nvrt
             time = time_basis + time_interval(days=output[i_begin, 0])
             times.append(time)
         # collect data
-        values = list()
+        values = []
         for output in self._outputs:
-            values_at_point = list()
-            depths_at_point = list()
+            values_at_point = []
+            depths_at_point = []
             for xy_i in range(self._nxy):
-                depths_at_cast = list()
-                values_at_cast = list()
+                depths_at_cast = []
+                values_at_cast = []
                 for cast_i in range(n_casts):
                     i_begin = cast_i * nvrt + xy_i * (n_casts * nvrt)
                     depth = -output[i_begin + nvrt - 1, 2]
@@ -210,7 +210,7 @@ def calculate_stokes_drift(timeseries):
             The return value is three numpy arrays: The first is SSD_x,
             the second is SSD_y, and the last SSD.
     """
-    ssds = list()
+    ssds = []
     for h, u in timeseries:
         uh_bar = numpy.mean(numpy.multiply(h.data, u.data), axis=0)
         u_bar = numpy.mean(u.data, axis=0)

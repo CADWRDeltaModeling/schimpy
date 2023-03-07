@@ -23,10 +23,7 @@ class LineString(shapely.geometry.LineString):
         -------
         """
         super(LineString, self).__init__(coordinates)
-        if prop is None:
-            self._prop = {}
-        else:
-            self._prop = copy.deepcopy(prop)
+        self._prop = {} if prop is None else copy.deepcopy(prop)
 
     @property
     def prop(self):
@@ -45,11 +42,13 @@ class LineStringYamlReader(LineStringIo):
     def read(self, fpath, **kwargs):
         with open(fpath, 'r') as f:
             data = schism_yaml.load(f)['linestrings']
-            linestrings = []
-            for row in data:
-                linestrings.append(LineString(coordinates=row['coordinates'],
-                                              prop=dict([(k, row[k]) for k in row if k != 'coordinates'])))
-            return linestrings
+            return [
+                LineString(
+                    coordinates=row['coordinates'],
+                    prop=dict([(k, row[k]) for k in row if k != 'coordinates']),
+                )
+                for row in data
+            ]
 
 
 class LineStringShapefileReader(LineStringIo):
@@ -65,23 +64,22 @@ class LineStringShapefileReader(LineStringIo):
             lines
                 list of LineStrings
         """
-        if os.path.exists(fpath):
-            datasource = Open(fpath)
-            layer = datasource.GetLayer(0)
-            feat = layer.GetFeature(0)
-            field_names = [feat.GetFieldDefnRef(i).GetName()
-                           for i in range(feat.GetFieldCount())]
-            lines = []
-            for feature in layer:
-                geom = feature.GetGeometryRef()
-                name_geom = geom.GetGeometryName()
-                if name_geom in ('LINESTRING',):
-                    line = LineString(loads(geom.ExportToWkb()),
-                    dict([(k, feature.GetField(i)) for i, k in enumerate(field_names)]))
-                    lines.append(line)
-            return lines
-        else:
+        if not os.path.exists(fpath):
             raise ValueError('File not found')
+        datasource = Open(fpath)
+        layer = datasource.GetLayer(0)
+        feat = layer.GetFeature(0)
+        field_names = [feat.GetFieldDefnRef(i).GetName()
+                       for i in range(feat.GetFieldCount())]
+        lines = []
+        for feature in layer:
+            geom = feature.GetGeometryRef()
+            name_geom = geom.GetGeometryName()
+            if name_geom in ('LINESTRING',):
+                line = LineString(loads(geom.ExportToWkb()),
+                dict([(k, feature.GetField(i)) for i, k in enumerate(field_names)]))
+                lines.append(line)
+        return lines
 
 
 class LineStringYamlWriter(LineStringIo):
@@ -89,11 +87,9 @@ class LineStringYamlWriter(LineStringIo):
     """
     def write(self, fpath, lines):
         with open(fpath, 'w') as f:
-            data = {}
-            data['linestrings'] = []
+            data = {'linestrings': []}
             for line in lines:
-                leaf = {}
-                leaf['coordinates'] = list([list(xy) for xy in line.coords])
+                leaf = {'coordinates': [list(xy) for xy in line.coords]}
                 for k in line.prop:
                     leaf[k] = line.prop[k]
                 data['linestrings'].append(leaf)
@@ -123,7 +119,7 @@ class LineStringShapefileWriter(LineStringIo):
             driver_name = 'ESRI Shapefile'
         driver = GetDriverByName(driver_name)
         if driver is None:
-            print('%s is not available.' % driver_name)
+            print(f'{driver_name} is not available.')
             raise RuntimeError()
         datasource = driver.CreateDataSource(fpath)
         if datasource is None:

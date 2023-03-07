@@ -73,14 +73,20 @@ class AWSGrib2Inventory:
                        f'/{self.product}/')
         data=[]
         for page in pages:
-            for obj in page['Contents']:
-                data.append(obj) 
-
+            data.extend(iter(page['Contents']))
         self.cycle=self.forecast_cycle.hour
         tz='t{:02d}z'.format(self.cycle)
-        self.file_metadata = list(sorted([
-            _['Key'] for _ in data if 'wrfsfcf' in _['Key'] and tz in _['Key'] and not 'idx' in _['Key']
-        ]))
+        self.file_metadata = list(
+            sorted(
+                [
+                    _['Key']
+                    for _ in data
+                    if 'wrfsfcf' in _['Key']
+                    and tz in _['Key']
+                    and 'idx' not in _['Key']
+                ]
+            )
+        )
 
         for key in self.file_metadata[1:record*24+1]:
             filename = pathlib.Path(self.tmpdir) / key

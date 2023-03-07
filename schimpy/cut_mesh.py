@@ -23,7 +23,7 @@ def read_lines(fpath):
             List of coordinates of cutting lines
     """
     with open(fpath, 'r') as f:
-        lines = list()
+        lines = []
         for line in f:
             line = line.strip()
             if len(line) > 0:
@@ -50,11 +50,11 @@ def read_lines_from_shapefile(fpath):
     driver = osgeo.ogr.GetDriverByName('ESRI Shapefile')
     datasource = driver.Open(fpath, 0)
     if datasource is None:
-        print('Could not open ' + fpath)
+        print(f'Could not open {fpath}')
         raise RuntimeError()
     layer = datasource.GetLayer()
     feature = layer.GetNextFeature()
-    lines = list()
+    lines = []
     while feature:
         geometry = feature.GetGeometryRef()
         line = geometry.GetPoints()
@@ -87,7 +87,7 @@ def cut_mesh(fpath_gr3_in, lines, fpath_gr3_out, cut_side='left'):
     """
     s = read_mesh(fpath_gr3_in)
     lines = np.array(lines).reshape(-1, 4)
-    print("{} line(s) to cut found".format(lines.shape[0]))
+    print(f"{lines.shape[0]} line(s) to cut found")
     if cut_side == 'right':
         # Switch ordering
         lines = np.hstack((lines[:, 2:], lines[:, :2]))
