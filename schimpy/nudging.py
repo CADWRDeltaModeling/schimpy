@@ -867,7 +867,7 @@ class nudging(object):
                                                  vals[vals<0])
                             if i==0: # only calculate tree and weights for the first time step
                                 tree = interp_2d.Invdisttree(obs_loc)
-                            node_xy = np.array([self.node_x[imap_v],
+                                node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
                                 tree.weights(node_xy,p=2)
                             # removing nan points are handeld within the interopolation
@@ -883,7 +883,7 @@ class nudging(object):
                                                  vals[vals<0])
                             if i==0: # only calculate tree and weights for the first time step
                                 tree = interp_2d.Invdisttree(obs_loc)
-                            node_xy = np.array([self.node_x[imap_v],
+                                node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
                                 tree.weights(node_xy,p=2)
                             # removing nan points are handeld within the interopolation
