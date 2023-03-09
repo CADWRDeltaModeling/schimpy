@@ -1,49 +1,21 @@
 # -*- coding: utf-8 -*-
-
 """ invdisttree.py: inverse-distance-weighted interpolation using KDTree
-    fast, solid, local
 """
-from __future__ import division
+
 import numpy as np
 from scipy.spatial import cKDTree as KDTree
 from shapely.geometry import LineString
-# http://docs.scipy.org/doc/scipy/reference/spatial.html
-
-__date__ = "2010-11-09 Nov"  # weights, doc
 
 class Invdisttree:
     """ Inverse-distance-weighted interpolation using KDTree
     
-    Examples
+    Example
     --------   
-    
-    >>> invdisttree = Invdisttree( X, z )  -- data points, values
-    >>> interpol = invdisttree( q, nnear=3, eps=0, p=1, weights=None, stat=0 )
-    # interpolates z from the 3 points nearest each query point q;
-    >>> interpol(q)
-    
-    Finds the 3 data points nearest point q, at distances d1 d2 d3
-    and returns the IDW average of the values z1 z2 z3    
-    .. math:: (z1/d1 + z2/d2 + z3/d3) / (1/d1 + 1/d2 + 1/d3) = .55 z1 + .27 z2 + .18 z3
-
-    How many nearest neighbors should one take?
-    1. start with 8 11 14 .. 28 in 2d 3d 4d .. 10d; see Wendel's formula
-    2. make 3 runs with nnear= e.g. 6 8 10, and look at the results
-    
-    There is also a parameter p that weights nearer points more, farther points less.
-    In 2d, the circles around query points have :math:`areas ~ distance^2`
-    So p=2 is essentially inverse-area weighting:
-    
-    .. math::
-    (z1/area1 + z2/area2 + z3/area3)/ (1/area1 + 1/area2 + 1/area3) = .74 z1 + .18 z2 + .08 z3
-    
-    Notes
-    -----
-        If the components of the X coordinates measure different things, Euclidean distance
-        can be way off.  For example, if X0 is in the range 0 to 1
-        but X1 0 to 1000, the X1 distances will swamp X0;
-        rescale the data, i.e. make X0.std() ~= X1.std() .
+    tree = interp_2d.Invdisttree(obs_xy) # initialize KDTree with observational points
+    tree.weights(node_xy)  # calculate weights for each node. 
+    values_v = tree.interp(obs.temperature.values)   # perform spatial interpolation with the calculated weights from the previous step
     """
+    
     def __init__(self, x, nnear=10, leafsize=10):
         """Constructor using coordinates and data
         
@@ -147,9 +119,3 @@ class Invdisttree:
         #assert (abs(nw.sum(axis=1)-1)<1e-4).all()  # make sure that it sums up to very close to one        
         val_interp = nw*val
         return val_interp.sum(axis=1)        
-
-#if __name__ == "__main__":
-    ## example usage: 
-    # tree = interp_2d.Invdisttree(obs_xy)
-    # tree.weights(node_xy)
-    # values_v = tree.interp(obs.temperature.values)   
