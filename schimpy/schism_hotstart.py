@@ -936,7 +936,7 @@ class VariableField(object):
         """
         obs_file includes Lat, Lon, and values for the variable.
         """
-        from . import Interp2D  # now onl 2D interpolation IDW is implemented.
+        from . import interp_2d  # now onl 2D interpolation IDW is implemented.
         if ini_meta:
             obs_file = ini_meta['data']
             variable = ini_meta['variable']
@@ -964,14 +964,16 @@ class VariableField(object):
         #print(obs_loc)
         vals = obs_data[variable].values
         #print(vals)
-        invdisttree = Interp2D.Invdisttree(obs_loc, vals,
-                                           leafsize=10, stat=1)
+
         if inpoly is not None:
             node_xy = self.hgrid[inpoly]
         else:
             node_xy = self.hgrid
-        #print(node_xy)
-        vmap = invdisttree(node_xy, nnear=4, p=2)
+        
+        tree = interp_2d.Invdisttree(obs_loc)
+        tree.weights(node_xy,p=2)
+        vmap = tree.interp(vals) 
+        
         if np.any(np.isnan(vmap)):
             raise ValueError("vmap has nan value in it.Check %s" % obs_file)
         v = self.map_to_3D(vmap, self.n_vgrid)

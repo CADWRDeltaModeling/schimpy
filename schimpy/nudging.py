@@ -18,7 +18,7 @@ from netCDF4 import Dataset
 from schimpy.schism_mesh import read_mesh, write_mesh
 from schimpy.geo_tools import ll2utm
 from shapely.geometry import Polygon
-from schimpy  import Interp2D
+from schimpy  import interp_2d
 import time as timer
 from vtools.data.vtime import hours,days
 
@@ -51,10 +51,9 @@ class nudging(object):
         self.rnday = nudging_info['rnday']
         self.end_date = self.start_date + datetime.timedelta(self.rnday) 
         self.datetime = pd.date_range(self.start_date, self.end_date,
-                                      freq=self.nudge_step)
+                                      freq=self.nudge_step)[:-1] # minus 1 step_nu_tr to keep the end_date within the last day.
         self.time = pd.to_datetime(self.datetime.values)- \
             pd.to_datetime(self.start_date)
-        self.time = self.time[:-1] # minus 1 step_nu_tr to keep the end_date within the last day. 
         self.time_seconds = self.time.total_seconds().astype(int)
         self.hgrid_fn = nudging_info['hgrid_input_file']
         self.vgrid_fn = nudging_info['vgrid_input_file']
@@ -293,13 +292,9 @@ class nudging(object):
             rootgrp_T.close()
             print("%s file created"%nudging_fn)  
             
-            if self.output_suffix is not None:
+            nudge_gr3_fn = "%s_nudge_%s.gr3"%(v,suffix)
                 write_mesh(self.mesh, 
-                           fpath_mesh="%s_nudge.gr3"%v, 
-                           node_attr=weights_merged)
-            else:
-                write_mesh(self.mesh, 
-                           fpath_mesh="%s_nudge_%s.gr3"%(v,self.output_suffix), 
+                       fpath_mesh=nudge_gr3_fn, 
                        node_attr=weights_merged)
         #return values_merged, weights_merged, imap_merged
     
@@ -700,15 +695,10 @@ class nudging(object):
                 # only save the nodes with valid values. 
                 tempout_in = [temp_t[imap[:npout]] for temp_t in tempout]
                 saltout_in = [salt_t[imap[:npout]] for salt_t in saltout]
-                # import pdb
-                # pdb.set_trace()
                 
                 temperature.append(tempout_in)
                 salinity.append(saltout_in)
                 output_day.append(dt.total_seconds()/86400)
-                # if output_day[-1] == 350.625:
-                #     import pdb
-                #     pdb.set_trace()
                 nudge_step = int(pd.Timedelta(self.nudge_step).total_seconds()/3600)
                 if len(output_day)>1:
                     if output_day[-1]-output_day[-2]>(nudge_step+0.1)/24:
@@ -872,32 +862,33 @@ class nudging(object):
                         i=0
                         for t in vdata.indexes['time']:
                             vals = vdata.sel(time=t).values
-                            obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
-                            vals = vals[~np.isnan(vals)]
                             if (vals<0).any():
                                 raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
-                            # removing all the nans.                            
-                            invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
-                                           leafsize=10, stat=1)
+                            if i==0: # only calculate tree and weights for the first time step
+                                tree = interp_2d.Invdisttree(obs_loc)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
-                            values_v[i]=invdisttree(node_xy, nnear=4, p=2)
+                                tree.weights(node_xy,p=2)
+                            # removing nan points are handeld within the interopolation
+                            values_v[i] = tree.interp(vals)
+                            
                             i+=1
                     else:
                         i=0
                         for t in vdata.index:
                             vals = vdata.loc[t].values
-                            obs_loc_t = obs_loc[~np.isnan(vals)] # removing nan points
-                            vals = vals[~np.isnan(vals)]     
                             if (vals<0).any():
                                 raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
-                            invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
-                                           leafsize=10, stat=1)
+                            if i==0: # only calculate tree and weights for the first time step
+                                tree = interp_2d.Invdisttree(obs_loc)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
-                            values_v[i]=invdisttree(node_xy, nnear=4, p=2)
+                                tree.weights(node_xy,p=2)
+                            # removing nan points are handeld within the interopolation
+                            values_v[i] = tree.interp(vals)
+                            
                             i+=1
                 else:
                      raise NotImplementedError                  
@@ -993,7 +984,7 @@ class nudging(object):
             obs.index.name = 'time'   
             obs = obs[(obs.index>=
                        pd.to_datetime(self.start_date)) &
-                      (obs.index<=
+                      (obs.index<
                        pd.to_datetime(self.end_date))]
             # time interpolation
             obs = obs.resample(self.nudge_step).nearest()
