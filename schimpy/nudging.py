@@ -293,9 +293,9 @@ class nudging(object):
             print("%s file created"%nudging_fn)  
             
             nudge_gr3_fn = "%s_nudge_%s.gr3"%(v,suffix)
-                write_mesh(self.mesh, 
-                       fpath_mesh=nudge_gr3_fn, 
-                       node_attr=weights_merged)
+            write_mesh(self.mesh, 
+                    fpath_mesh=nudge_gr3_fn, 
+                    node_attr=weights_merged)
         #return values_merged, weights_merged, imap_merged
     
     def create_region_nudging(self, region_info):
