@@ -9,7 +9,7 @@ import tempfile
 import itertools
 from copy import deepcopy
 import numpy as np
-import gdal
+from osgeo import gdal
 from shapely.geometry import Polygon
 import rasterstats
 

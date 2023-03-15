@@ -36,19 +36,22 @@ from scipy import interpolate
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import os
-# import from schimpy
+
 
 from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader, \
     compare_mesh
 from schimpy import geo_tools
 
+
 class SCHISMHotstart(object):
     """ Mock object """
     pass
 
+
 def read_hotstart():
     """Mock method to read existing hotstart"""
     pass
+
 
 class hotstart(object):
     """
@@ -56,7 +59,7 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, yaml_fn=None,modules=None,crs=None):
+    def __init__(self, yaml_fn=None, modules=None, crs=None):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
         # the modules to turn on.
@@ -64,30 +67,6 @@ class hotstart(object):
         self.nc_dataset = None
         self.modules = modules
         self.crs = crs
-        # if 'HYDRO' in modules:
-        #     modules.remove('HYDRO')
-        #     modules+=['TEM', 'SAL']
-        # self.modules = modules # modules can be none for barotropic runs.
-        # if 'param_nml' in kwargs:
-        #     self.param_nml = kwargs['param_nml']
-        # else:
-        #     if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in modules]): # these modules require param.nml
-        #         raise ValueError('param_nml needs to be defined in %s'%yaml_fn)
-        #     else: # for all other modules, param.nml will not be used.
-        #         self.param_nml = "param.nml"
-        # if crs is None:
-        #     self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.
-        # #    raise ValueError("crs must be specified")
-        # else:
-        #     print("crs is {}".format(crs))
-        #     self.crs = crs
-
-        # if self.modules:  # if modules is None for barotropic run, this step is not required.
-        #     self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
-        #         describe_tracers(self.param_nml, modules=self.modules)
-        # else:
-        #     self.ntracers = 0
-        #     self.tr_mname = []
 
     def read_yaml(self):
         """
@@ -102,11 +81,12 @@ class hotstart(object):
         self.vgrid_fn = hotstart_info['vgrid_input_file']
         variables = list(hotstart_info.keys())
         # remove these items from the list.
-        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date','vgrid_version',
-               'crs','param_nml','modules','output_fn']
+        rfl = ['hgrid_input_file', 'vgrid_input_file', 'date', 'vgrid_version',
+               'crs', 'param_nml', 'modules', 'output_fn']
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
-        self.vgrid_version = hotstart_info['vgrid_version']  # 5.8 and below is the old version
+        # 5.8 and below is the old version
+        self.vgrid_version = hotstart_info['vgrid_version']
 
         if 'output_fn' in hotstart_info.keys():
             self.output_fn = hotstart_info['output_fn']
@@ -115,25 +95,29 @@ class hotstart(object):
 
         if self.modules is None:
             if 'modules' not in hotstart_info.keys():
-                modules = 'HYDRO' # hydro is the minimum required module
+                modules = 'HYDRO'  # hydro is the minimum required module
             else:
                 modules = hotstart_info['modules']
             if 'HYDRO' in modules:
                 modules.remove('HYDRO')
-                modules+=['TEM', 'SAL']
-            self.modules = modules # modules can be none for barotropic runs.
+                modules += ['TEM', 'SAL']
+            self.modules = modules  # modules can be none for barotropic runs.
 
         if 'param_nml' in hotstart_info.keys():
             self.param_nml = hotstart_info['param_nml']
         else:
             if self.modules is not None:
-                if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in self.modules]): # these modules require param.nml
-                    raise ValueError('param_nml needs to be defined in %s'%self.yaml_fn)
-            self.param_nml = "param.nml" # for all other modules, param.nml will not be used.
+                # these modules require param.nml
+                if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in self.modules]):
+                    raise ValueError(
+                        'param_nml needs to be defined in %s' % self.yaml_fn)
+            # for all other modules, param.nml will not be used.
+            self.param_nml = "param.nml"
 
         if self.crs is None:
             if 'crs' not in hotstart_info.keys():
-                self.crs = 'EPSG:26910'  # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.
+                # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.
+                self.crs = 'EPSG:26910'
             #    raise ValueError("crs must be specified")
             else:
                 crs = hotstart_info['crs']
@@ -151,15 +135,14 @@ class hotstart(object):
         self.read_yaml()
         mesh = read_mesh(self.hgrid_fn, self.vgrid_fn, self.vgrid_version)
         self.mesh = mesh
-        self.depths = self.mesh.build_z() # this is required to get depths for elevation
-        #v = self.variables[1]
+        self.depths = self.mesh.build_z()  # this is required to get depths for elevation
         self.hotstart_ini = {}
         for v in self.variables:
             print("creating hotstart for %s" % v)
             initializer = self.info[v]['initializer']
 
             if ('hotstart_nc' in initializer) and \
-                (not self.hotstart_ini) :
+                    (not self.hotstart_ini):
                 self.hotstart_ini['hotstart_nc_hfn'] = initializer[
                     'hotstart_nc']['source_hgrid']
                 self.hotstart_ini['hotstart_nc_vfn'] = initializer[
@@ -167,11 +150,12 @@ class hotstart(object):
                 self.hotstart_ini['source_vgrid_version'] = initializer[
                     'hotstart_nc']['source_vgrid_version']
             elif 'patch_init' in initializer and \
-                (not self.hotstart_ini) :
-                patch_init =  [list(ini['initializer'].keys())[0]
-                               for ini in initializer['patch_init']['regions']]
+                    (not self.hotstart_ini):
+                patch_init = [list(ini['initializer'].keys())[0]
+                              for ini in initializer['patch_init']['regions']]
                 if 'hotstart_nc' in patch_init:
-                    idx_h = np.where(np.array(patch_init)=='hotstart_nc')[0][0]
+                    idx_h = np.where(np.array(patch_init)
+                                     == 'hotstart_nc')[0][0]
                     sub_init = initializer['patch_init'][
                         'regions'][idx_h]['initializer']['hotstart_nc']
                     self.hotstart_ini['hotstart_nc_hfn'] = sub_init['hgrid']
@@ -183,7 +167,7 @@ class hotstart(object):
                 hotstart_mesh = read_mesh(self.hotstart_ini['hotstart_nc_hfn'],
                                           self.hotstart_ini['hotstart_nc_vfn'],
                                           self.hotstart_ini['source_vgrid_version'])
-                indices, dist = compare_mesh(hotstart_mesh,self.mesh)
+                indices, dist = compare_mesh(hotstart_mesh, self.mesh)
                 self.hotstart_ini['hotstart_nc_indices'] = indices
                 self.hotstart_ini['hotstart_nc_dist'] = dist
 
@@ -196,30 +180,32 @@ class hotstart(object):
             self.nc_dataset = self.nc_dataset.merge(var)
         #  cumsum_eta is required by the most recent version of schism.
         self.nc_dataset = self.nc_dataset.assign(
-            cumsum_eta = self.nc_dataset.elevation)
-        if 'COSINE' in self.modules: #COS_mS2=COS_5, COS_mDN=COS_8, COS_mZ1 = COS_6, COS_mZ2 = COS_7
+            cumsum_eta=self.nc_dataset.elevation)
+        if 'COSINE' in self.modules:  # COS_mS2=COS_5, COS_mDN=COS_8, COS_mZ1 = COS_6, COS_mZ2 = COS_7
             self.nc_dataset = self.nc_dataset.assign(
-                COS_mS2 = self.nc_dataset.COS_5_el)
+                COS_mS2=self.nc_dataset.COS_5_el)
             self.nc_dataset = self.nc_dataset.assign(
-                COS_mDN = self.nc_dataset.COS_8_el)
+                COS_mDN=self.nc_dataset.COS_8_el)
             self.nc_dataset = self.nc_dataset.assign(
-                COS_mZ1 = self.nc_dataset.COS_6_el)
+                COS_mZ1=self.nc_dataset.COS_6_el)
             self.nc_dataset = self.nc_dataset.assign(
-                COS_mZ2 = self.nc_dataset.COS_7_el)
+                COS_mZ2=self.nc_dataset.COS_7_el)
             # for COS_sxx, these means the sum values and will be set to zero
             # 'COS_sS2  ','COS_sDN  ','COS_sZ1  ','COS_sZ2  ','COS_nstep'
-            self.nc_dataset['COS_sS2']=(
-                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
-            self.nc_dataset['COS_sDN']=(
-                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
-            self.nc_dataset['COS_sZ1']=(
-                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
-            self.nc_dataset['COS_sZ2']=(
-                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
-            self.nc_dataset['COS_nstep']=(
-                ('elem','nVert'),np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sS2'] = (
+                ('elem', 'nVert'), np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sDN'] = (
+                ('elem', 'nVert'), np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sZ1'] = (
+                ('elem', 'nVert'), np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_sZ2'] = (
+                ('elem', 'nVert'), np.zeros_like(self.nc_dataset.COS_1_el.values))
+            self.nc_dataset['COS_nstep'] = (
+                ('elem', 'nVert'), np.zeros_like(self.nc_dataset.COS_1_el.values))
         # correct wet/dry cells depending on water level (eta2 value):mostly not needed.
-        self.depth = self.mesh.build_z(elev=self.nc_dataset['elevation'].values) # compute depth again for the updated elevation.
+        # compute depth again for the updated elevation.
+        self.depth = self.mesh.build_z(
+            elev=self.nc_dataset['elevation'].values)
         self.wet_dry_check()
         self.map_to_schism()
         return self.nc_dataset
@@ -244,7 +230,7 @@ class hotstart(object):
         else:
             var = VariableField(v_meta, variable, self.mesh,
                                 self.depths, self.date, self.crs,
-                                self.tr_mname,self.hotstart_ini)
+                                self.tr_mname, self.hotstart_ini)
         return var.GenerateField()
 
     def initialize_netcdf(self, default_turbulence=True):
@@ -260,12 +246,8 @@ class hotstart(object):
                              'idry_e': ('elem', idry_e),
                              'idry_s': ('side', idry_s),
                              'idry': ('node', idry),
-                             'nsteps_from_cold':('one',[0])})
-            # coords={'one':range(1),
-            # 'elem':range(self.mesh.n_elems()),
-            # 'node':range(self.mesh.n_nodes()),
-            # 'side':range(self.mesh.n_edges())})
-            # Now apply default setting for  q2, xl, dfv,dfh,dfq1,dfq2,
+                             'nsteps_from_cold': ('one', [0])})
+            # apply default setting for  q2, xl, dfv,dfh,dfq1,dfq2,
             # SED3D_dp, SED3D_rough, SED3D_bed, SED3D_bedfrac
             if default_turbulence:
                 # Turbulent kinetic energy
@@ -273,8 +255,6 @@ class hotstart(object):
                 for name in ar_name:
                     ds_ar = xr.Dataset({name: (['node', 'nVert'],
                                                np.zeros((self.mesh.n_nodes(), self.mesh.n_vert_levels)))})
-                    # coords={'node':range(self.mesh.n_nodes()),
-                    # 'nVert':range(self.mesh.n_vert_levels)})
                     ds = ds.merge(ds_ar)
         self.nc_dataset = ds
 
@@ -282,10 +262,6 @@ class hotstart(object):
         """
         modify idry_e, idry, and idry_s based on eta2 and water depth.
         """
-#        if hasattr(self.nc_dataset,'eta2'):
-#            z = self.mesh.build_z(elev=self.nc_dataset['eta2'])
-#        else:
-#            z = self.mesh.build_z()
         self.nc_dataset['z'] = xr.DataArray(
             self.depths, dims=['node', 'nVert'])
         dry_nodes = np.where(self.depths.min(axis=1) >= 0)[0]
@@ -302,54 +278,7 @@ class hotstart(object):
             idry_e[idry_e != 0] = 1
             self.nc_dataset['idry_s'] = xr.DataArray(idry_s, dims=['side'])
             self.nc_dataset['idry'] = xr.DataArray(idry, dims=['node'])
-            self.nc_dataset['idry_e'] = xr.DataArray(idry_e, dims=['elem'])
-
-    # def compute_depths(self, elevation=None):
-    #     """ Calculate points in 3-D grid
-    #     """
-    #     mesh = self.mesh
-    #     vert_grid = mesh.vmesh
-    #     nvrt = vert_grid.param['nvrt']
-    #     depths = np.full([mesh.n_nodes(), nvrt], np.finfo(np.float32).min)
-
-    #     if vert_grid.ivcor == 1:
-    #         if nvrt < 3:
-    #             raise ValueError()
-
-    #         for i, node in enumerate(mesh.nodes):
-    #             if elevation is None:
-    #                 hmod2 = max(0.1, node[2])
-    #             else:
-    #                 hmod2 = max(0.1, node[2]+elevation[i])
-    #             kbps = vert_grid.kbps[i]
-    #             depths[i, kbps:] = hmod2 * vert_grid.sigma[i, :nvrt-kbps]
-    #             depths[i, :kbps] = depths[i, kbps]
-    #         self.depths = depths
-    #     elif vert_grid.ivcor == 2:
-    #         h_s = vert_grid.param['h_s']
-    #         h_c = vert_grid.param['h_c']
-    #         kz = vert_grid.param['kz']
-    #         c_s = vert_grid.c_s
-    #         for i, node in enumerate(mesh.nodes):
-    #             # TODO: Maybe add surface elevation?
-    #             if elevation is None:
-    #                 depth = node[2]
-    #             else:
-    #                 depth = node[2]+elevation[i]
-    #             # S-level
-    #             hmod2 = max(0.1, min(depth, h_s))
-    #             for k, s in enumerate(vert_grid.sigma):
-    #                 k_a = kz + k - 1
-    #                 if hmod2 <= h_c:
-    #                     depths[i, k_a] = s * hmod2
-    #                 else:
-    #                     depths[i, k_a] = h_c * s + (hmod2 - h_c) * c_s[k]
-    #             # Z-level
-    #             for k, d in enumerate(vert_grid.ztot[:-1]):
-    #                 depths[i, k] = d
-    #         self.depths = depths
-    #     else:
-    #         raise("Not supported ivcor")
+            self.nc_dataset['idry_e'] = xr.DataArray(idry_e, dims=['elem']) 
 
     def map_to_schism(self):
         """
@@ -363,7 +292,7 @@ class hotstart(object):
                                'sv2': 'velocity_v'}
         if self.modules:
             ntracers, ntrs, irange_tr, tr_mname = describe_tracers(
-                 param_nml, modules=self.modules)
+                param_nml, modules=self.modules)
             tr_mname_el = ["%s_el" % n for n in tr_mname]
             tr_mname_nd = ["%s_nd" % n for n in tr_mname]
             tr_mname_nd0 = ["%s_nd0" % n for n in tr_mname]
@@ -372,8 +301,7 @@ class hotstart(object):
             schism_hotstart_var['tr_nd0'] = tr_mname_nd0
 
         nc_dataset = self.nc_dataset
-        #v_keys =list(nc_dataset.data_vars)
-        if any([v in ['HYDRO','TEM','SAL'] for v in self.modules]):
+        if any([v in ['HYDRO', 'TEM', 'SAL'] for v in self.modules]):
             mapping_dict = {'temperature_nd': 'TEM_nd',
                             'temperature_nd0': 'TEM_nd0',
                             'temperature_el': 'TEM_el',
@@ -392,14 +320,8 @@ class hotstart(object):
                     [nc_dataset[var_values][v].values for v in var_values])
                 var_temp = np.transpose(var_temp, (1, 2, 0))
                 var_dim = nc_dataset[var_values[0]].dims
-                #dim_values = [nc_dataset[var_values[0]][dim].values for dim in var_dim]
                 var_dim = var_dim + ('ntracers',)
-                # dim_values.append(range(len(var_values)))
-                #coords = {}
-                # for vd,dv in zip(var_dim,dim_values):
-                #coords[vd] = dv
                 v1_sub = xr.Dataset({key: (var_dim, var_temp)})
-                # coords=coords)
                 nc_dataset = nc_dataset.merge(v1_sub)
                 nc_dataset = nc_dataset.drop(var_values)
 
@@ -417,12 +339,13 @@ class VariableField(object):
                  hotstart_ini=None, **kwargs):
         #self.centering = v_meta['centering']
         self.variable_name = vname
-        self.centering = self.var_centering() # the centering option is dependent on the varialbe name.
+        # the centering option is dependent on the varialbe name.
+        self.centering = self.var_centering()
         self.mesh = mesh
         self.depths = depths
         if self.centering == 'edge':
-            self.edge_depths = (depths[self.mesh.edges[:,0]] +
-                                depths[self.mesh.edges[:,1]])/2
+            self.edge_depths = (depths[self.mesh.edges[:, 0]] +
+                                depths[self.mesh.edges[:, 1]])/2
         elif self.centering == 'elem':
             self.elem_depths = [self.mesh.z[e].mean(axis=0) for e
                                 in self.mesh.elems]
@@ -433,7 +356,7 @@ class VariableField(object):
         self.n_elems = mesh.n_elems()
         self.n_vert_levels = mesh.n_vert_levels
         self.node = mesh.nodes[:, :2]
-        self.node_z = mesh.nodes[:,2]
+        self.node_z = mesh.nodes[:, 2]
         self.edge = mesh.get_centers_of_sides()[:, :2]
         self.elem = mesh.get_centers_of_elements()
         self.elems = mesh.elems
@@ -461,27 +384,29 @@ class VariableField(object):
 
     def var_centering(self):
         # built-in centering options for model input variables.
-        tr_key_list = ['tem','sal','age_','gen_','icm','sed_','cos_']
+        tr_key_list = ['tem', 'sal', 'age_', 'gen_', 'icm', 'sed_', 'cos_']
         if any([t in self.variable_name.lower() for t in tr_key_list]):
             variable_type = 'tracer'
         else:
             variable_type = self.variable_name
 
-        vc_mapping = {'elevation':'node2D',
-                      'velocity_u':'edge',
-                      'velocity_v':'edge',
-                      'velocity_w':'elem',
-                      'SED3D_dp':'node2D',
-                      'SED3D_rough':'node2D',
-                      'SED3D_bed':'bed',
-                      'SED3D_bedfrac':'bedfrac',
-                      'tracer':'prism',
-                      'tke':'node3D'
+        vc_mapping = {'elevation': 'node2D',
+                      'velocity_u': 'edge',
+                      'velocity_v': 'edge',
+                      'velocity_w': 'elem',
+                      'SED3D_dp': 'node2D',
+                      'SED3D_rough': 'node2D',
+                      'SED3D_bed': 'bed',
+                      'SED3D_bedfrac': 'bedfrac',
+                      'tracer': 'prism',
+                      'tke': 'node3D'
                       }
         if variable_type in vc_mapping.keys():
             return vc_mapping[variable_type]
         else:
-            raise ValueError("variable %s does not have a valid input centering option"%self.variable_name)
+            raise ValueError(
+                "variable %s does not have a valid input centering option" % self.variable_name)
+
     def get_grid(self):
         """Getting the number and coordinates of horizontal nodes/elems/edges for
         different centering options and return them as grid.
@@ -498,7 +423,7 @@ class VariableField(object):
                              'prism': {'node': (self.n_nodes, self.node),        # on prism center: mainly for tracers; first average from nodes to centers and then then average to prism center
                                        'nVert': (self.n_vert_levels, self.depths)},
                              'node2D': {'node': (self.n_nodes, self.node),
-                                        'surface': (1, self.node_z[:,np.newaxis])},
+                                        'surface': (1, self.node_z[:, np.newaxis])},
                              'bed': {'elem': (self.n_elems, self.elem),
                                      'Nbed': (self.Nbed, 0),
                                      'MBEDP': (3, ['layer thickness', 'layer age', 'layer porosity'])},
@@ -527,7 +452,6 @@ class VariableField(object):
             raise NotImplementedError('''centering option %s is not implemented
                                       availabel options are: ''' % self.centering +
                                       ",".join(options))
-        #mesh = read_mesh(hgrid_fn,vgrid_fn)
         mesh_node = mesh.nodes[:, :2]
         mesh_edge = mesh.get_centers_of_sides()[:, :2]
         mesh_elem = mesh.get_centers_of_elements()
@@ -538,7 +462,7 @@ class VariableField(object):
                              'prism': {'node': (mesh.n_nodes, mesh_node),        # on prism center: mainly for tracers; first average from nodes to centers and then then average to prism center
                                        'nVert': (mesh.n_vert_levels, mesh_depth)},
                              'node2D': {'node': (mesh.n_nodes, mesh_node),
-                                        'surface': (1, mesh_depth[:,0])},
+                                        'surface': (1, mesh_depth[:, 0])},
                              'bed': {'elem': (mesh.n_elems, mesh_elem),
                                      'Nbed': (self.Nbed, 0),
                                      'MBEDP': (3, ['layer thickness', 'layer age', 'layer porosity'])},
@@ -546,8 +470,8 @@ class VariableField(object):
                                          'Nbed': (self.Nbed, 0),
                                          'nsed': (3, 0)}}
         if self.centering == 'edge':
-            edge_depths = (mesh_depth[mesh.edges[:,0]] +
-                           mesh_depth[mesh.edges[:,1]])/2
+            edge_depths = (mesh_depth[mesh.edges[:, 0]] +
+                           mesh_depth[mesh.edges[:, 1]])/2
             centering_options['edge'] = {'side': (mesh.n_edges, mesh_edge),
                                          'nVert': (mesh.n_vert_levels, edge_depths)}
         elif self.centering == 'elem':
@@ -564,7 +488,7 @@ class VariableField(object):
         initializer = self.initializer
         options = ['text_init', 'simple_trend',
                    'patch_init', 'extrude_casts', 'obs_points',
-                   'hotstart_nc','schout_nc']
+                   'hotstart_nc', 'schout_nc']
         if initializer not in options:
             raise NotImplementedError('''initializer %s is not implimented
                                       available options are: ''' % initializer +
@@ -583,7 +507,7 @@ class VariableField(object):
         The input initializer overwrites self.initializer
         """
         options = ['text_init', 'simple_trend', 'extrude_casts', 'obs_points',
-                   'hotstart_nc','schout_nc']
+                   'hotstart_nc', 'schout_nc']
         if initializer not in options:
             raise NotImplementedError('''initializer %s is not implimented
                                       available options are: ''' % initializer +
@@ -597,12 +521,8 @@ class VariableField(object):
         return initializers[initializer]
 
     def GenerateField(self):
-        #initializer = globals()[self.initializer_options()]()
         initializer = self.initializer_options()
         var = initializer()
-        #if np.all(np.isnan(var)):
-        #    raise ValueError(
-        #        "%s field has nan value everywhere: check input data and variable name" % self.variable_name)
         da = self.create_dataarray(var)
         return da
 
@@ -655,17 +575,17 @@ class VariableField(object):
             return v_ini
         elif isinstance(value, str):
             if ('max' in value) & ('np.maximumm' not in value):
-                value = value.replace('max','np.maximum')
+                value = value.replace('max', 'np.maximum')
             if ('min' in value) & ('np.minimum' not in value):
-                value = value.replace('min','np.minimum')
+                value = value.replace('min', 'np.minimum')
             if inpoly is not None:
                 xy = self.hgrid[inpoly]
-                if not isinstance(self.vgrid, (float,int)):
-                    z = self.vgrid[inpoly,0]
+                if not isinstance(self.vgrid, (float, int)):
+                    z = self.vgrid[inpoly, 0]
             else:
                 xy = self.hgrid
-                if not isinstance(self.vgrid, (float,int)):
-                    z = self.vgrid[:,0]
+                if not isinstance(self.vgrid, (float, int)):
+                    z = self.vgrid[:, 0]
             x = xy[:, 0]
             y = xy[:, 1]
             if self.variable_name in ['SED3D_bed', 'SED3D_bedfrac']:
@@ -677,14 +597,14 @@ class VariableField(object):
             else:
                 # x and y based function where x and y are lat and lon.
                 vmap = eval(value)
-                if isinstance(vmap,(int,float)):
+                if isinstance(vmap, (int, float)):
                     vmap = np.ones_like(x)*vmap
                 if '2D' in self.centering:
                     return vmap
                 else:
                     return self.map_to_3D(vmap, self.n_vgrid)
         else:
-            raise("input value not recognised as float, int, or str")
+            raise ("input value not recognised as float, int, or str")
 
     def text_init(self, ini_meta=None, inpoly=None):
         """
@@ -775,7 +695,8 @@ class VariableField(object):
                                                 self.centering,
                                                 crs=self.crs)
         else:
-            raise NotImplementedError("Poly_fn can only be shapefile or ic file")
+            raise NotImplementedError(
+                "Poly_fn can only be shapefile or ic file")
 
         if self.ini_meta['smoothing']:
             raise NotImplementedError("Smoothing not implemented yet")
@@ -786,23 +707,22 @@ class VariableField(object):
             initializer_key = self.get_key(ini_meta)
             initializer = self.patch_initializer_options(initializer_key)
             ini_meta = self.get_value(ini_meta)
-            #inpoly = np.where(mapping == i+1)[0]  # mapping is one-based.
-            inpoly = np.where(mapping==r['region'])[0]
+            inpoly = np.where(mapping == r['region'])[0]
             v = initializer(ini_meta, inpoly)
             if np.any(np.isnan(v)):
                 raise ValueError("region %f has nan in %s field" %
                                  (r, self.variable_name))
             if self.variable_name == 'tke':
-                v_merge[:,inpoly,:] = v
+                v_merge[:, inpoly, :] = v
             else:
                 if type(v) == xr.core.dataarray.DataArray:
-                    v_merge[inpoly, :] = np.array(v)[:,np.newaxis] # for cases where hotstart is returning 2D array
+                    # for cases where hotstart is returning 2D array
+                    v_merge[inpoly, :] = np.array(v)[:, np.newaxis]
                 else:
                     try:
                         v_merge[inpoly, :] = v
                     except ValueError:
-                        v_merge[inpoly, :] = v[:,np.newaxis]
-            #print(i, r)
+                        v_merge[inpoly, :] = v[:, np.newaxis]
         return v_merge
 
     # USGS cast (2D observational points)
@@ -840,7 +760,7 @@ class VariableField(object):
                              (variable, data_fn))
 
         # find the corresponding station locations
-        stations = pd.read_csv(station_fn,sep=",",header=0)[
+        stations = pd.read_csv(station_fn, sep=",", header=0)[
             ['Station', 'y', 'x']]
         stations.set_index('Station', inplace=True)
         polaris_cast = polaris_cast.join(stations, on='Station', how='left')
@@ -854,8 +774,6 @@ class VariableField(object):
         # partition the grid domain by polaris stations based on horizontal distance
         grid_df = pd.DataFrame({})
         g_xy = self.hgrid[inpoly]
-        #if self.crs == 'EPSG:26910': # utm 10N
-        #    g_xy = geo_tools.utm2ll(g_xy.T).T  # conver to (lon, lat).
 
         for s in polaris_cast.index.unique():
             s_xy = [stations.loc[s].x, stations.loc[s].y]
@@ -863,7 +781,7 @@ class VariableField(object):
         grid_df['nearest'] = grid_df.idxmin(axis=1).astype(float).astype(int)
 
         if 'depth' not in polaris_cast.columns:
-            polaris_cast = polaris_cast.rename(columns={'depth (m)':'depth'})
+            polaris_cast = polaris_cast.rename(columns={'depth (m)': 'depth'})
 
         # loop through each station and perform vertical interpolations for the nearest grid
         # the depths computed are negative but polaris depths are positive
@@ -882,61 +800,12 @@ class VariableField(object):
                 "The interpolated %s field has nan in it" % variable)
         return v
 
-#    def extrude_casts(self,ini_meta=None,inpoly=None): # USGS cast (2D observational points)
-#        if not ini_meta:
-#            ini_meta = self.ini_meta
-#        station_fn = ini_meta['station']
-#        data_fn = ini_meta['data']
-#        variable = ini_meta['variable']
-#        date = pd.to_datetime(self.date)
-#        polaris_data = pd.read_csv(data_fn,skiprows=[1])
-#        # find the nearest date for the cruise
-#        polaris_data['datetime'] = pd.to_datetime(polaris_data.Date)
-#        polaris_date = pd.to_datetime(polaris_data.Date.unique())
-#        cast_date = polaris_date[np.argmin(abs(polaris_date-date))]
-#        polaris_cast = polaris_data[polaris_data.datetime == cast_date][['Station Number',variable,'Depth']]
-#        polaris_cast['Station'] = polaris_cast['Station Number'].astype(int)
-#        polaris_cast.set_index('Station',inplace=True)
-#        if variable.lower() in polaris_cast.columns.str.lower():
-#            polaris_cast.columns = map(str.lower,polaris_cast.columns) # change column to lower case
-#            indnan = np.where(np.isnan(polaris_cast[variable.lower()]))[0]
-#            if len(indnan)>0:
-#                polaris_cast = polaris_cast[~indnan]
-#        else:
-#            raise IndexError("The variable %s is not in %s"%(variable,data_fn))
-#
-#        # find the corresponding station locations
-#        stations = pd.read_csv(station_fn)[['Station','North_Lati','West_Longi']]
-#        stations.set_index('Station',inplace=True)
-#        polaris_cast = polaris_cast.join(stations,on='Station',how='left')
-#        polaris_cast['Point'] = [Point(x,y) for x,y in zip(polaris_cast.West_Longi,polaris_cast.North_Lati)]
-#        multi_points = MultiPoint(polaris_cast['Point'].values)
-#
-#        # loop through all cells
-#        if inpoly is not None:
-#            n_hgrid = len(inpoly)
-#        else:
-#            n_hgrid = self.n_hgrid
-#        v = np.zeros((n_hgrid,self.n_vgrid))
-#        for i, xy in enumerate(self.hgrid[inpoly]):
-#            x = xy[0]
-#            y = xy[1]
-#            p = Point((x,y))
-#            zc = polaris_cast.iloc[np.where(polaris_cast.Point ==
-#                                       nearest_points(p,multi_points)[1])[0]][[variable.lower(),'depth']]
-#            depths = self.vgrid[i,:]*-1.0 # the depths computed are negative but polaris depths are positive
-#            # interp- and extrapolate over depths.
-#            f = interpolate.interp1d(zc.depth,zc[variable.lower()],fill_value='extrapolate',kind='previous')
-#            v[i,:] = f(depths)
-#            if np.any(np.isnan(v)):
-#                raise ValueError("The interpolated %s field has nan in it"%variable)
-#        return v
 
     def obs_points(self, ini_meta=None, inpoly=None):  # 1D observational points
         """
         obs_file includes Lat, Lon, and values for the variable.
         """
-        from . import Interp2D  # now onl 2D interpolation IDW is implemented.
+        from . import interp_2d  # now onl 2D interpolation IDW is implemented.
         if ini_meta:
             obs_file = ini_meta['data']
             variable = ini_meta['variable']
@@ -958,20 +827,17 @@ class VariableField(object):
         obs_data = pd.read_csv(obs_file)
         obs_data = obs_data.dropna(subset=[variable])
         obs_loc = obs_data[['x', 'y']].values
-        #print(obs_loc)
-        #print(type(obs_loc))
-        #obs_loc = geo_tools.ll2utm([obs_loc[:,0],obs_loc[:,1]],self.crs).T
-        #print(obs_loc)
         vals = obs_data[variable].values
-        #print(vals)
-        invdisttree = Interp2D.Invdisttree(obs_loc, vals,
-                                           leafsize=10, stat=1)
+
         if inpoly is not None:
             node_xy = self.hgrid[inpoly]
         else:
             node_xy = self.hgrid
-        #print(node_xy)
-        vmap = invdisttree(node_xy, nnear=4, p=2)
+
+        tree = interp_2d.Invdisttree(obs_loc)
+        tree.weights(node_xy, p=2)
+        vmap = tree.interp(vals)
+
         if np.any(np.isnan(vmap)):
             raise ValueError("vmap has nan value in it.Check %s" % obs_file)
         v = self.map_to_3D(vmap, self.n_vgrid)
@@ -979,33 +845,33 @@ class VariableField(object):
 
     def hotstart_nc(self, ini_meta=None, inpoly=None):
         var = self.variable_name
-        if var=='temperature':
-            var='TEM'
-        elif var=='salinity':
-            var='SAL'
+        if var == 'temperature':
+            var = 'TEM'
+        elif var == 'salinity':
+            var = 'SAL'
         if not ini_meta:
             ini_meta = self.ini_meta
-        data_source = ini_meta['data_source']  #input hotstart file
-        yaml_var = {'elevation':'eta2',
+        data_source = ini_meta['data_source']  # input hotstart file
+        yaml_var = {'elevation': 'eta2',
                     'velocity_w': 'we',
-                    'velocity_u':'su2',
-                    'velocity_v':'sv2',
+                    'velocity_u': 'su2',
+                    'velocity_v': 'sv2',
                     'TEM': 'tr_nd',
-                    'SAL':'tr_nd',   #['tr_el','tr_nd','tr_nd0']
-                    'tke':['q2', 'xl', 'dfv', 'dfh', 'dfq1',
-                           'dfq2'],
-                    'SED3D_dp':'SED3D_dp',
-                    'SED3D_rough':'SED3D_rough',
-                    'SED3D_bed':'SED3D_bed',
-                    'SED3D_bedfrac':'SED3D_bedfrac'}
+                    'SAL': 'tr_nd',  # ['tr_el','tr_nd','tr_nd0']
+                    'tke': ['q2', 'xl', 'dfv', 'dfh', 'dfq1',
+                            'dfq2'],
+                    'SED3D_dp': 'SED3D_dp',
+                    'SED3D_rough': 'SED3D_rough',
+                    'SED3D_bed': 'SED3D_bed',
+                    'SED3D_bedfrac': 'SED3D_bedfrac'}
         if (var not in yaml_var) and (var in self.tr_mname):
             yamel_var[var] = 'tr_nd'
         if var in self.tr_mname:
-            self.tr_index = np.where(np.array(self.tr_mname)==var)[0][0]
+            self.tr_index = np.where(np.array(self.tr_mname) == var)[0][0]
 
         hotstart_data = xr.open_dataset(data_source)
 
-        if 'source_hgrid' not in ini_meta.keys(): #if the grids are exactly the same
+        if 'source_hgrid' not in ini_meta.keys():  # if the grids are exactly the same
             if self.tr_index is not None:
                 v = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
             else:
@@ -1020,14 +886,15 @@ class VariableField(object):
                                           dist=ini_meta['distance_threshold'],
                                           method=ini_meta['method'])
             else:
-                v = self.interp_from_mesh(ini_meta['source_hgrid'], vin, inpoly)
+                v = self.interp_from_mesh(
+                    ini_meta['source_hgrid'], vin, inpoly)
         elif ('source_hgrid' in ini_meta.keys()) and ('source_vgrid' in ini_meta.keys()):
             if self.tr_index is not None:
                 vin = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
             else:
                 vin = hotstart_data[yaml_var[var]]
             if 'distance_threshold' in ini_meta.keys():
-                 v = self.interp_from_mesh(ini_meta['source_hgrid'], vin,
+                v = self.interp_from_mesh(ini_meta['source_hgrid'], vin,
                                           ini_meta['source_vgrid'],
                                           inpoly=inpoly,
                                           dist_th=ini_meta['distance_threshold'],
@@ -1038,24 +905,14 @@ class VariableField(object):
                                           ini_meta['source_vgrid'],
                                           ini_meta['source_vgrid_version'],
                                           inpoly)
-        # if type(yaml_var[var]) is list:
-        #     ds = xr.Dataset()
-        #     for j, name in enumerate(yaml_var[var]):
-        #         ds_ar = xr.Dataset({name: (['node', 'nVert'],
-        #                                    v[j,:,:])})
-        #         # coords={'node':range(self.mesh.n_nodes()),
-        #         # 'nVert':range(self.mesh.n_vert_levels)})
-        #         ds = ds.merge(ds_ar)
-        # else:
-        #     ds = v
         return v
 
-    def interp_from_mesh(self, hgrid_fn, vin,vgrid_fn=None, vgrid_version=5.8,
+    def interp_from_mesh(self, hgrid_fn, vin, vgrid_fn=None, vgrid_version=5.8,
                          inpoly=None, dist_th=None, method=None):
         import rtree.index
-        mesh1 = read_mesh(hgrid_fn,vgrid_fn,vgrid_version)
+        mesh1 = read_mesh(hgrid_fn, vgrid_fn, vgrid_version)
 
-        grid1 = self.define_new_grid(mesh1) # mesh to be interpolated from
+        grid1 = self.define_new_grid(mesh1)  # mesh to be interpolated from
         hgrid1 = list(grid1.values())[0][1]
         vgrid1 = list(grid1.values())[1][1]
 
@@ -1063,13 +920,13 @@ class VariableField(object):
             hgrid2 = self.hgrid
             vgrid2 = self.vgrid
         else:
-            hgrid2 = self.hgrid[inpoly] # mesh to be interpolated into
-            vgrid2 = self.vgrid[inpoly,:]
+            hgrid2 = self.hgrid[inpoly]  # mesh to be interpolated into
+            vgrid2 = self.vgrid[inpoly, :]
 
         compare_mesh_flag = False
         if 'hotstart_nc_hfn' in self.hotstart_ini:
             if (self.hotstart_ini['hotstart_nc_hfn'] == hgrid_fn) and \
-            ('node' in self.centering or 'prism' in self.centering):
+                    ('node' in self.centering or 'prism' in self.centering):
                 compare_mesh_flag = True
 
         if compare_mesh_flag:
@@ -1082,105 +939,110 @@ class VariableField(object):
             mesh1_idx = rtree.index.Rtree()
             # Horizontal: nearest neighbor method
             for i, p in enumerate(hgrid1):
-                mesh1_idx.insert(i, np.append(p,p))
+                mesh1_idx.insert(i, np.append(p, p))
             dist = []
             indices = []
-            print("interpolating horizontal grid from %s"%(
-            hgrid_fn))
+            print("interpolating horizontal grid from %s" % (
+                hgrid_fn))
             for n2 in hgrid2:
                 idx = list(mesh1_idx.nearest(tuple(n2)))[0]
-                dist2 = (n2[0]-hgrid1[idx,0])**2 + (n2[1]-hgrid1[idx,1])**2
+                dist2 = (n2[0]-hgrid1[idx, 0])**2 + (n2[1]-hgrid1[idx, 1])**2
                 dist.append(np.sqrt(dist2))
                 indices.append(idx)
             print("horizontal interpolation completed!")
         dist = np.array(dist)
         indices = np.array(indices)
 
-        if dist_th is not None: # same points, apply nearest; different points, apply the method defined
-            same_points = np.where(dist<=dist_th)[0]
-            diff_points = np.where(dist>dist_th)[0]
+        if dist_th is not None:  # same points, apply nearest; different points, apply the method defined
+            same_points = np.where(dist <= dist_th)[0]
+            diff_points = np.where(dist > dist_th)[0]
             if self.mesh.n_vert_levels != mesh1.n_vert_levels:
-                raise("distance threshold should only be defined when the two grids have the same vertical layer numbers")
-            if isinstance(vin, xr.core.dataset.Dataset): # vin is array for variable from hotstart file
-                vout = np.zeros( (len(vin),np.shape(vgrid2)[0],
-                                  np.shape(vgrid2)[1]))
+                raise (
+                    "distance threshold should only be defined when the two grids have the same vertical layer numbers")
+            # vin is array for variable from hotstart file
+            if isinstance(vin, xr.core.dataset.Dataset):
+                vout = np.zeros((len(vin), np.shape(vgrid2)[0],
+                                 np.shape(vgrid2)[1]))
                 if method == 'nearest':
-                    for j,v in enumerate(list(vin.keys())):
+                    for j, v in enumerate(list(vin.keys())):
                         #vout[j,:] = vin[v][indices]
-                        vout[j,same_points] = vin[v][indices[same_points]]
+                        vout[j, same_points] = vin[v][indices[same_points]]
                     for p in diff_points:
                         z1 = vgrid1[indices[p]]
                         z2 = vgrid2[p]
-                        for j,v in enumerate(list(vin.keys())):
-                            f = interpolate.interp1d(z1, vin[v][indices[p]], 
-                                                    fill_value='extrapolate',
-                                                    kind='nearest')
+                        for j, v in enumerate(list(vin.keys())):
+                            f = interpolate.interp1d(z1, vin[v][indices[p]],
+                                                     fill_value='extrapolate',
+                                                     kind='nearest')
                             vout[j, p, :] = f(z2)
                     print("vertical grid interpolation completed!")
-                else: # nearest or equation
-                    x = hgrid2[diff_points,0]
-                    y = hgrid2[diff_points,1]
-                    z = vgrid2[diff_points,0]
-                    vout[:,diff_points,:] = eval(method)
-                    vout[:,same_points,:] = vin[:,indices[same_points],:]
+                else:  # nearest or equation
+                    x = hgrid2[diff_points, 0]
+                    y = hgrid2[diff_points, 1]
+                    z = vgrid2[diff_points, 0]
+                    vout[:, diff_points, :] = eval(method)
+                    vout[:, same_points, :] = vin[:, indices[same_points], :]
             else:
                 vout = np.zeros_like(vgrid2)
                 if method == 'nearest':
                     try:
-                       vout[same_points] = vin[indices[same_points]]
+                        vout[same_points] = vin[indices[same_points]]
                     except ValueError:
-                        vout[same_points] = vin[indices[same_points]].to_numpy()[:,np.newaxis]
+                        vout[same_points] = vin[indices[same_points]].to_numpy()[
+                            :, np.newaxis]
                     for p in diff_points:
                         z1 = vgrid1[indices[p]]
                         z2 = vgrid2[p]
-                        f = interpolate.interp1d(z1, vin[indices[p]], 
-                                                fill_value='extrapolate',
-                                                kind='nearest')
+                        f = interpolate.interp1d(z1, vin[indices[p]],
+                                                 fill_value='extrapolate',
+                                                 kind='nearest')
                         vout[p, :] = f(z2)
                     print("vertical grid interpolation completed!")
                 else:
-                    x = hgrid2[diff_points,0]
-                    y = hgrid2[diff_points,1]
-                    z = vgrid2[diff_points,0]
-                    vout[diff_points,:] = eval(method)[:,np.newaxis]
-                    if np.ndim(vin)<np.ndim(vout):
-                        vout[same_points,:] = vin[indices[same_points]].values[:,np.newaxis]
+                    x = hgrid2[diff_points, 0]
+                    y = hgrid2[diff_points, 1]
+                    z = vgrid2[diff_points, 0]
+                    vout[diff_points, :] = eval(method)[:, np.newaxis]
+                    if np.ndim(vin) < np.ndim(vout):
+                        vout[same_points, :] = vin[indices[same_points]
+                                                   ].values[:, np.newaxis]
                     else:
-                        vout[same_points,:] = vin[indices[same_points],:]
+                        vout[same_points, :] = vin[indices[same_points], :]
         else:
 
             if self.centering == 'node2D' or \
-                (self.mesh.n_vert_levels == mesh1.n_vert_levels and \
+                (self.mesh.n_vert_levels == mesh1.n_vert_levels and
                  ('vinterp' not in self.ini_meta or
                   self.ini_meta['vinterp'] is False)):
                 if isinstance(vin, xr.core.dataset.Dataset):
-                    vout = np.zeros( ((len(vin.keys())),len(indices),
-                                      len(vin.nVert)))
-                    for j,v in enumerate(list(vin.keys())):
-                        vout[j,:] = vin[v][indices]
+                    vout = np.zeros(((len(vin.keys())), len(indices),
+                                     len(vin.nVert)))
+                    for j, v in enumerate(list(vin.keys())):
+                        vout[j, :] = vin[v][indices]
                 else:
                     vout = vin[indices]
             else:
-                print("interpolating vertical grid from %s"%(
+                print("interpolating vertical grid from %s" % (
                     vgrid_fn))
                 if isinstance(vin, xr.core.dataset.Dataset):
-                    vout = np.zeros( (len(vin),np.shape(vgrid2)[0],
-                                      np.shape(vgrid2)[1]))
+                    vout = np.zeros((len(vin), np.shape(vgrid2)[0],
+                                     np.shape(vgrid2)[1]))
                 else:
                     vout = np.zeros_like(vgrid2)
                 for i, n2 in enumerate(hgrid2):
                     z1 = vgrid1[indices[i]]
                     z2 = vgrid2[i]
                     if isinstance(vin, xr.core.dataset.Dataset):
-                        for j,v in enumerate(list(vin.keys())):
+                        for j, v in enumerate(list(vin.keys())):
                             f = interpolate.interp1d(
-                            z1, vin[v][indices[i]], fill_value='extrapolate',
-                            kind='nearest')
+                                z1, vin[v][indices[i]
+                                           ], fill_value='extrapolate',
+                                kind='nearest')
                             vout[j, i, :] = f(z2)
                     else:
                         f = interpolate.interp1d(
-                        z1, vin[indices[i]], fill_value='extrapolate',
-                        kind='nearest')
+                            z1, vin[indices[i]], fill_value='extrapolate',
+                            kind='nearest')
                         vout[i, :] = f(z2)
                 print("vertical grid interpolation completed!")
         return vout
@@ -1205,9 +1067,6 @@ class VariableField(object):
             ds = xr.Dataset({'%s_nd' % name: (['node', 'nVert'], var),
                              '%s_nd0' % name: (['node', 'nVert'], var),
                              '%s_el' % name: (['elem', 'nVert'], var_el)})
-            # coords={'elem':range(self.n_elems),
-            # 'node':range(self.n_nodes),
-            # 'nVert':range(self.n_vert_levels)})
         elif self.centering == 'node2D':
             ds_var = xr.DataArray(np.squeeze(var),  # coords=[range(self.n_hgrid)],
                                   dims=[self.hgrid_name], name=self.variable_name)
@@ -1222,9 +1081,7 @@ class VariableField(object):
             ds = xr.Dataset()
             for j, name in enumerate(var_name):
                 ds_ar = xr.Dataset({name: (['node', 'nVert'],
-                                            var[j,:,:])})
-                # coords={'node':range(self.mesh.n_nodes()),
-                # 'nVert':range(self.mesh.n_vert_levels)})
+                                           var[j, :, :])})
                 ds = ds.merge(ds_ar)
         else:
             ds_var = xr.DataArray(var,  # coords=[range(self.n_hgrid),range(self.n_vgrid)],
@@ -1246,7 +1103,7 @@ def read_param_nml(nml_fn):
             line = line.strip().split('!')[0]
             if (line.startswith('#') or line.startswith('!') or
                 line.startswith('&') or line.startswith('/') or
-                not line):
+                    not line):
                 continue
             else:
                 try:
@@ -1301,7 +1158,7 @@ def describe_tracers(param_nml, modules=['HYDRO']):
     irange_tr_2.append(sum(ntrs))
 
     if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in modules]):
-            param = read_param_nml(param_nml)
+        param = read_param_nml(param_nml)
 
     if "GEN" in modules and 'ntracer_gen' in param.keys():
         irange_tr_1.append(sum(ntrs))
@@ -1312,7 +1169,7 @@ def describe_tracers(param_nml, modules=['HYDRO']):
 
     if "AGE" in modules and 'ntracer_age' in param.keys():
         irange_tr_1.append(sum(ntrs))
-        ntrs.append(int(param['ntracer_age']/2))
+        ntrs.append(int(param['ntracer_age']))
         for t in range(ntrs[-1]):
             tr_mname.append('AGE_%d' % int(t+1))
         irange_tr_2.append(sum(ntrs))
@@ -1387,7 +1244,7 @@ def describe_tracers(param_nml, modules=['HYDRO']):
 
 
 def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
-                         vgrid_fn='vgrid.in', vgrid_version = 5.8,
+                         vgrid_fn='vgrid.in', vgrid_version=5.8,
                          outname="hotstart_out.nc"):
     """
     convert hotstart.nc to schism output nc file format that can be read by VisIt.
@@ -1416,7 +1273,6 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
                     'hgrid_face_y': 'SCHISM_hgrid_face_y',
                     'hgrid_edge_x': 'SCHISM_hgrid_edge_x',
                     'hgrid_edge_y': 'SCHISM_hgrid_edge_y'}
-    # 'n_vgrid_layers':'nSCHISM_vgrid_layers'}
 
     if not os.path.exists("hgrid.nc"):
         mesh = read_mesh(hgrid_fn, vgrid_fn, vgrid_version)
@@ -1584,7 +1440,6 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
                                 "The data_horizontal_center option for %s is unavailable" % v)
 
                     hnc[vn].attrs['ivs'] = hgrid_nc.zcor.ivs
-    # hnc = hnc.drop(['SED3D_bed', 'SED3D_bedfrac'])
     output_nc = xr.merge([hgrid_nc, hnc])
 
     # additional variable attributes needed for VisIt to work: give them some dummy values
@@ -1638,15 +1493,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
     output_nc = xr.merge(
         [hgrid, output_nc, hc, tb, tf, mdepth, cs, csf, df, md])
 
-    # remove a few unnecessary variables that make the VisIt crush.
-#    output_nc = output_nc.drop(['hgrid_contour_x','hgrid_contour_y'])
-#    output_nc = output_nc.drop(['SED_1','SED_2','SED_0','SED3D_bed_thickness',
-#                                'SED3D_bed_age','SED3D_bed_porosity','SED3D_bedfrac_1',
-#                                'SED3D_bedfrac_2','SED3D_bedfrac_3',
-#                                'SED3D_dp','SED3D_rough'])
-
-    # maybe it doesn't like variables on edge?
-    output_nc = output_nc.drop(['q2', 'xl', 'su2', 'sv2'])
+     output_nc = output_nc.drop(['q2', 'xl', 'su2', 'sv2'])
 
     output_nc['time'].attrs['long_name'] = 'Time'
     #output_nc['time'].encoding['units'] = 'days since %s'%init_date
@@ -1667,35 +1514,44 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
 
     output_nc.to_netcdf(outname, format='NETCDF4_CLASSIC')
 
-def project_mesh(mesh,new_crs):  #the original mesh has to have attribute crs.
+
+# the original mesh has to have attribute crs.
+def project_mesh(mesh, new_crs):
     # lat, lon: 'EPSG:26910'
     # UTM10N: 'EPSG:26910'
-    if mesh.crs==new_crs:
+    if mesh.crs == new_crs:
         return mesh
     else:
         projection = geo_tools.project_fun(new_crs)
-        new_nodes = projection(mesh.nodes[:,0], mesh.nodes[:,1])
+        new_nodes = projection(mesh.nodes[:, 0], mesh.nodes[:, 1])
         new_nodes = np.asarray(new_nodes).T
-        new_nodes = np.append(new_nodes,mesh.nodes[:,2][:,np.newaxis],axis=1)
+        new_nodes = np.append(
+            new_nodes, mesh.nodes[:, 2][:, np.newaxis], axis=1)
         mesh.nodes = new_nodes
         return mesh
 
 
 def create_arg_parser():
     import argparse
-    parser = argparse.ArgumentParser(description="Create hotstart for a schism run")
-    parser.add_argument('--yaml_fn',type=str, help='yaml file for hotstart',required=True)
-    parser.add_argument('--modules','--list',nargs='+',help='modules activated in schism', default=None)
-    parser.add_argument('--crs',type=str,help='The projection system for the mesh',default=None)
-    parser.add_argument('--output_fn',type=str,help='Output hotstart filename.nc',default=None)
+    parser = argparse.ArgumentParser(
+        description="Create hotstart for a schism run")
+    parser.add_argument('--yaml_fn', type=str,
+                        help='yaml file for hotstart', required=True)
+    parser.add_argument('--modules', '--list', nargs='+',
+                        help='modules activated in schism', default=None)
+    parser.add_argument(
+        '--crs', type=str, help='The projection system for the mesh', default=None)
+    parser.add_argument('--output_fn', type=str,
+                        help='Output hotstart filename.nc', default=None)
     return parser
+
 
 def main():
     # User inputs override the yaml file inputs.
     parser = create_arg_parser()
     args = parser.parse_args()
 
-    h = hotstart(args.yaml_fn,module=args.modules,crs=args.crs,
+    h = hotstart(args.yaml_fn, module=args.modules, crs=args.crs,
                  output_fn=args.output_fn)
     if args.output_fn is not None:
         output_fn = args.output_fn
@@ -1704,6 +1560,7 @@ def main():
     h.create_hotstart()
     hnc = h.nc_dataset
     hnc.to_netcdf(output_fn)
+
 
 if __name__ == "__main__":
     main()

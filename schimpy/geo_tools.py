@@ -14,23 +14,25 @@ import geopandas as gpd
 from shapely.geometry import Point, Polygon, LineString, mapping, MultiPolygon
 from pyproj import Proj, CRS
 
-def shapely_to_geopandas(features,crs=None,shp_fn=None):
+
+def shapely_to_geopandas(features, crs=None, shp_fn=None):
     """
     convert shapely features to geopandas and generate shapefiles as needed
     """
     df = pd.DataFrame()
     df['geometry'] = features
-    gdf = gpd.GeoDataFrame(df,geometry='geometry')
+    gdf = gpd.GeoDataFrame(df, geometry='geometry')
     if crs:
         gdf.crs = crs
     else:
         gdf.crs = 'EPSG:26910'
     if shp_fn:
         gdf.to_file(shp_fn)
-        print("%s generated"%shp_fn)
+        print("%s generated" % shp_fn)
     return gdf
 
-def ic_to_gpd(fn,crs=None):
+
+def ic_to_gpd(fn, crs=None):
     """
     Read ic yaml file and convert the polygons to geopandas format
     """
@@ -42,18 +44,19 @@ def ic_to_gpd(fn,crs=None):
     methods = []
     polys = []
     pid = []
-    for i, p in enumerate(info['polygons']):        
+    for i, p in enumerate(info['polygons']):
         regions.append(p['name'])
-        methods.append(p['attribute'])    
+        methods.append(p['attribute'])
         polys.append(Polygon(p['vertices']))
         pid.append(i)
-    df = pd.DataFrame({'id':pid, 'region':regions,'method':methods,
-                       'geometry':polys})           
-    gdf = gpd.GeoDataFrame(df,geometry='geometry')
+    df = pd.DataFrame({'id': pid, 'region': regions, 'method': methods,
+                       'geometry': polys})
+    gdf = gpd.GeoDataFrame(df, geometry='geometry')
     gdf.crs = crs
     return gdf
 
-def partition_check(mesh,poly_fn,centering='node',crs=None):
+
+def partition_check(mesh, poly_fn, centering='node', crs=None):
     """
     Check if the schism mesh division by the polygon features in poly_fn is unique and complete.
     The partition check is based on either node or element, and the function checks
@@ -63,35 +66,36 @@ def partition_check(mesh,poly_fn,centering='node',crs=None):
     if poly_fn.endswith('shp'):
         poly_gpd = gpd.read_file(poly_fn)
     else:
-        poly_gpd = ic_to_gpd(poly_fn,crs)
-        
+        poly_gpd = ic_to_gpd(poly_fn, crs)
+
     if centering == 'elem':
-        mesh_gpd = mesh.to_geopandas(feature_type = 'polygon',crs=crs)
+        mesh_gpd = mesh.to_geopandas(feature_type='polygon', crs=crs)
         # if the centroid falls in a polygon, the mesh grid is in the polygon
         mesh_gpd['geometry'] = mesh_gpd['geometry'].centroid
     elif centering == 'edge':
-        mesh_gpd = mesh.to_geopandas(feature_type = 'edge',crs=crs)
+        mesh_gpd = mesh.to_geopandas(feature_type='edge', crs=crs)
     else:
-        mesh_gpd = mesh.to_geopandas(feature_type = 'point',crs=crs)
-    
-    if (poly_gpd.crs is not None) & (mesh_gpd.crs is not None): # only perform projection if crs for both poly_gpd and mesh_gpd are provided
+        mesh_gpd = mesh.to_geopandas(feature_type='point', crs=crs)
+
+    # only perform projection if crs for both poly_gpd and mesh_gpd are provided
+    if (poly_gpd.crs is not None) & (mesh_gpd.crs is not None):
         poly_gpd_crs = CRS.from_user_input(poly_gpd.crs)
         mesh_gpd_crs = CRS.from_user_input(mesh_gpd.crs)
-    
-        if not poly_gpd_crs.is_exact_same(mesh_gpd_crs):
-            poly_gpd = poly_gpd.to_crs(mesh_gpd.crs) # project to the mesh crs. 
-        #poly_gpd.set_index('id',inplace=True)
-        #poly_gpd.sort_index(inplace=True)
-    for id_n, poly in enumerate(poly_gpd['geometry']):
-        id_name = "id_%s"%str(id_n) # make it one-based.
-        mesh_gpd[id_name] = mesh_gpd.within(poly)
-    other_id = "id_%s"%str(id_n+1)
 
-    ID_keys = mesh_gpd.keys()[ ['id_' in k for k in mesh_gpd.keys()] ]
+        if not poly_gpd_crs.is_exact_same(mesh_gpd_crs):
+            # project to the mesh crs.
+            poly_gpd = poly_gpd.to_crs(mesh_gpd.crs)
+
+    for id_n, poly in enumerate(poly_gpd['geometry']):
+        id_name = "id_%s" % str(id_n)  # make it one-based.
+        mesh_gpd[id_name] = mesh_gpd.within(poly)
+    other_id = "id_%s" % str(id_n+1)
+
+    ID_keys = mesh_gpd.keys()[['id_' in k for k in mesh_gpd.keys()]]
     ID_df = mesh_gpd[ID_keys]
     # check if there is at least one id that each cell belongs to
-    orphaned_cells = np.where(~np.any(ID_df,axis=1))[0]
- 
+    orphaned_cells = np.where(~np.any(ID_df, axis=1))[0]
+
     if len(orphaned_cells) == len(mesh_gpd):
         raise Exception("coordinate system mismatch: the default for the mesh \
                         is utm-xy. Either specify crs for both grid and the \
@@ -100,12 +104,12 @@ def partition_check(mesh,poly_fn,centering='node',crs=None):
     elif len(orphaned_cells) >= len(mesh_gpd)/2:
         ID_df[other_id] = False
         ID_df[other_id].loc[orphaned_cells] = True
-    elif len(orphaned_cells) >=1:
+    elif len(orphaned_cells) >= 1:
         string = ",".join(orphaned_cells.astype(str))
-        raise Exception("Orphaned nodes or cells found at %s"%string)
+        raise Exception("Orphaned nodes or cells found at %s" % string)
     # check if there are cells that belong to multiple polygons
-    multi_labeled_cells = np.where(np.count_nonzero(ID_df,axis=1)>1)[0]
-    if len(multi_labeled_cells) >=1:
+    multi_labeled_cells = np.where(np.count_nonzero(ID_df, axis=1) > 1)[0]
+    if len(multi_labeled_cells) >= 1:
         df_multi = ID_df.loc[multi_labeled_cells]
         npoly = len(poly_gpd)
         for i in range(len(df_multi)):
@@ -117,66 +121,76 @@ def partition_check(mesh,poly_fn,centering='node',crs=None):
 
         string = ",".join(multi_labeled_cells.astype(str))
         print('''These cells or nodes belong to mulitple polygons %s: 
-              categorized as the last True poly'''%string)
+              categorized as the last True poly''' % string)
     # otherwise the domain is contiguous.
     logging.info("The domain divisino is contiguous!")
-    mapping = np.where(ID_df.values)[1]+1 # change to one-based indices
-    regions = np.append(poly_gpd.region.values,'other') # this is only used when the number of orphaned cells exceed half of the original cells
+    mapping = np.where(ID_df.values)[1]+1  # change to one-based indices
+    # this is only used when the number of orphaned cells exceed half of the original cells
+    regions = np.append(poly_gpd.region.values, 'other')
     mapping = regions[mapping-1]
     return mapping
 
+
 def Polylen(poly):
     # find the number of polygons in a polygon feature
-    if isinstance(poly,Polygon):
+    if isinstance(poly, Polygon):
         poly_len = 1
     elif isinstance(poly, MultiPolygon):
         poly_len = len(poly)
     return poly_len
 
+
 def FindMultiPoly(poly_array):
     # find the indices for multipolygons in a list or array of polygons
-    plens =[]
+    plens = []
     for poly in poly_array:
         poly_len = Polylen(poly)
         plens.append(poly_len)
 
-    ind = np.where(np.array(plens)>1)[0]
+    ind = np.where(np.array(plens) > 1)[0]
     return ind
+
 
 def project_fun(crs=None):
     if crs:
         projection = Proj(crs)
     else:
-        projection = Proj("+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs") # this is utm zone 10.
+        # this is utm zone 10.
+        projection = Proj("+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs")
     return projection
 
-def ll2utm(lonlat,crs=None):
+
+def ll2utm(lonlat, crs=None):
     """
     lonlat can be numpy arrays. lonlat = np.asarray([lon,lat])
     default crs = "+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs"
     """
     projection = project_fun(crs)
     utm_x, utm_y = projection(lonlat[0], lonlat[1])
-    return np.asarray([utm_x,utm_y])
+    return np.asarray([utm_x, utm_y])
 
-def utm2ll(utm_xy,crs=None):
+
+def utm2ll(utm_xy, crs=None):
     """
     utm_xy can be numpy arrays. utm_xy = np.asarray([utm_x,utm_y])
     default crs = "+proj=utm +zone=10, +datum=WGS84 +units=m +no_defs"
     """
     projection = project_fun(crs)
-    lon, lat = projection(utm_xy[0],utm_xy[1],inverse=True)
-    return np.asarray([lon,lat])
+    lon, lat = projection(utm_xy[0], utm_xy[1], inverse=True)
+    return np.asarray([lon, lat])
+
 
 def geometry2coords(geo_obj):
     coords = list(mapping(geo_obj['geometry'])['coordinates'])
-    coords = json.loads(json.dumps(coords))  #nestted tuper to list    
+    coords = json.loads(json.dumps(coords))  # nestted tuper to list
     return coords
+
 
 def geometry2coords_points(geo_obj):
     return list(mapping(geo_obj['geometry'])['coordinates'][0:2])
 
-def shp2yaml(shp_fn, yaml_fn=None, crs=None):  
+
+def shp2yaml(shp_fn, yaml_fn=None, crs=None):
     """
     Convert a shapefile to yaml file
     Parameters
@@ -187,7 +201,7 @@ def shp2yaml(shp_fn, yaml_fn=None, crs=None):
         Output yaml filename
     crs : STRING, optional
         Output projection. The default is None.
-        
+
     Returns
     -------
     None.
@@ -197,61 +211,62 @@ def shp2yaml(shp_fn, yaml_fn=None, crs=None):
     gdf = gdf.dropna()
     if crs:
         gdf = gdf.to_crs(crs)
-    gdf.reset_index(drop=True,inplace=True)
-    stype = gdf.geometry.type[0]    
+    gdf.reset_index(drop=True, inplace=True)
+    stype = gdf.geometry.type[0]
     if stype == 'LineString':
         stype = 'linestrings'
-        gdf['coordinates'] = gdf.apply(geometry2coords,axis=1)
+        gdf['coordinates'] = gdf.apply(geometry2coords, axis=1)
         df = gdf.drop(columns='geometry')
         df_yaml = df.to_dict('records')
         df_yaml = {stype: df_yaml}
     elif stype == 'Polygon':
         stype = 'polygons'
-        gdf['vertices'] = gdf.apply(geometry2coords,axis=1)
+        gdf['vertices'] = gdf.apply(geometry2coords, axis=1)
         df = gdf.drop(columns='geometry')
         df_yaml = df.to_dict('records')
         df_yaml = {stype: df_yaml}
-    else:  # if points, no stype needs to be specified in the yaml file. 
+    else:  # if points, no stype needs to be specified in the yaml file.
         stype = shp_fns[sf]
-        gdf['coordinates'] = gdf.apply(geometry2coords,axis=1)
+        gdf['coordinates'] = gdf.apply(geometry2coords, axis=1)
         df = gdf.drop(columns='geometry')
-        df.set_index('name',inplace=True) 
+        df.set_index('name', inplace=True)
         df_yaml = df.T.to_dict('records')
-        df_yaml = {stype: df_yaml}    
+        df_yaml = {stype: df_yaml}
     if not yaml_fn:
-        yaml_fn = '%s.yaml'%os.path.splitext(shp_fn)[0]        
-    with open(yaml_fn, 'w') as file:                      
-        yaml_data = yaml.safe_dump(df_yaml, file) 
+        yaml_fn = '%s.yaml' % os.path.splitext(shp_fn)[0]
+    with open(yaml_fn, 'w') as file:
+        yaml_data = yaml.safe_dump(df_yaml, file)
 
-def yaml2shp(fn,shp_fn=None, crs=None):
-    with open(fn,'r') as f:
+
+def yaml2shp(fn, shp_fn=None, crs=None):
+    with open(fn, 'r') as f:
         yaml_data = yaml.load(f)
-    stype = list(set(['polygons','linestrings','points']).intersection(
+    stype = list(set(['polygons', 'linestrings', 'points']).intersection(
         yaml_data.keys()))[0]
     yaml_df = pd.DataFrame(yaml_data[stype])
-    if stype == 'linestrings':            
+    if stype == 'linestrings':
         features = [LineString(yc) for yc in yaml_df['coordinates']]
-        yaml_df['geometry'] = features              
-        gdf = gpd.GeoDataFrame(yaml_df,geometry='geometry')
-        gdf = gdf.drop('coordinates',axis=1)
+        yaml_df['geometry'] = features
+        gdf = gpd.GeoDataFrame(yaml_df, geometry='geometry')
+        gdf = gdf.drop('coordinates', axis=1)
     elif stype == 'polygons':
         features = [Polygon(np.squeeze(yc)) for yc in yaml_df['vertices']]
-        yaml_df['geometry'] = features              
-        gdf = gpd.GeoDataFrame(yaml_df,geometry='geometry')    
-        gdf = gdf.drop('vertices',axis=1)
-    elif stype == 'points': # this only applies dicu
+        yaml_df['geometry'] = features
+        gdf = gpd.GeoDataFrame(yaml_df, geometry='geometry')
+        gdf = gdf.drop('vertices', axis=1)
+    elif stype == 'points':  # this only applies dicu
         yaml_df = yaml_df.T
         features = [Point(yc) for yc in yaml_df.values]
-        yaml_df['geometry'] = features              
-        gdf = gpd.GeoDataFrame(yaml_df,geometry='geometry')    
-        gdf = gdf.drop([0,1],axis=1) 
+        yaml_df['geometry'] = features
+        gdf = gpd.GeoDataFrame(yaml_df, geometry='geometry')
+        gdf = gdf.drop([0, 1], axis=1)
         gdf['name'] = gdf.index
-    if not crs: 
+    if not crs:
         gdf.crs = "EPSG:26910"
     else:
         gdf.crs = crs
-    gdf = gdf.rename(columns={'name':'region'})
+    gdf = gdf.rename(columns={'name': 'region'})
     if not shp_fn:
-        #try to infer shapefile name from the yaml file
-        shp_fn = '%s.shp'%os.path.splitext(fn)[0]
+        # try to infer shapefile name from the yaml file
+        shp_fn = '%s.shp' % os.path.splitext(fn)[0]
     gdf.to_file(shp_fn)
