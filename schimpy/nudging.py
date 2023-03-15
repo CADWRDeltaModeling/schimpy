@@ -865,12 +865,15 @@ class nudging(object):
                                 raise Exception("negative values detected in %s for %s: " % (v['data'], name),
                                                 vals[vals < 0])
                             if i == 0:  # only calculate tree and weights for the first time step
-                                tree = interp_2d.Invdisttree(obs_loc)
+                                maxnans = vdata.isnull().sum(axis=1).max()  # maximum number of nans at any time slice
+                                ninterp=6 #the default spatial interpolation points
+                                nnear = ninterp + maxnans 
+                                tree = interp_2d.Invdisttree(obs_loc, nnear=nnear)
                                 node_xy = np.array([self.node_x[imap_v],
                                                     self.node_y[imap_v]]).T
                                 tree.weights(node_xy, p=2)
                             # removing nan points are handeld within the interopolation
-                            values_v[i] = tree.interp(vals)
+                            values_v[i] = tree.interp(vals,ninterp)
 
                             i += 1
                     else:
@@ -881,12 +884,15 @@ class nudging(object):
                                 raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
                             if i==0: # only calculate tree and weights for the first time step
-                                tree = interp_2d.Invdisttree(obs_loc, nnear=len(obs_loc))
+                                maxnans = vdata.isnull().sum(axis=1).max()  # maximum number of nans at any time slice
+                                ninterp=6 #the default spatial interpolation points
+                                nnear = ninterp + maxnans 
+                                tree = interp_2d.Invdisttree(obs_loc, nnear=nnear)
                                 node_xy = np.array([self.node_x[imap_v],
                                                     self.node_y[imap_v]]).T
                                 tree.weights(node_xy, p=2)
                             # removing nan points are handeld within the interopolation
-                            values_v[i] = tree.interp(vals)
+                            values_v[i] = tree.interp(vals,ninterp)
 
                             i += 1
                 else:
