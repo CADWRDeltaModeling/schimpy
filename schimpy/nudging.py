@@ -882,7 +882,7 @@ class nudging(object):
                                 raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
                             if i==0: # only calculate tree and weights for the first time step
-                                tree = interp_2d.Invdisttree(obs_loc)
+                                tree = interp_2d.Invdisttree(obs_loc, nnear=len(obs_loc))
                                 node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
                                 tree.weights(node_xy,p=2)
