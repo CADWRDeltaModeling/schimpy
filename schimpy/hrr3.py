@@ -57,7 +57,7 @@ class AWSGrib2Inventory:
     def __init__(
             self,
             start_date: datetime = None,
-            record = 2,
+            record = 1,
             pscr = None, #tmpdir to save grib files
             product='conus',
     ):
@@ -127,7 +127,7 @@ class AWSGrib2Inventory:
 
 class HRRR:
 
-    def __init__(self, start_date=None, rnday=None, pscr=None, record=2, bbox=None):
+    def __init__(self, start_date=None, rnday=None, pscr=None, record=1, bbox=None):
 
         start_date = nearest_cycle() if start_date is None else start_date 
         #self.bbox = bbox
