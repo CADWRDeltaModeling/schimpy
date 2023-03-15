@@ -1314,7 +1314,7 @@ def describe_tracers(param_nml, modules=['HYDRO']):
 
     if "AGE" in modules and 'ntracer_age' in param.keys():
         irange_tr_1.append(sum(ntrs))
-        ntrs.append(int(param['ntracer_age']/2))
+        ntrs.append(int(param['ntracer_age']))
         for t in range(ntrs[-1]):
             tr_mname.append('AGE_%d' % int(t+1))
         irange_tr_2.append(sum(ntrs))
