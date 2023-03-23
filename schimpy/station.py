@@ -4,6 +4,7 @@ import os
 import sys
 import pandas as pd
 from schimpy.unit_conversions import *
+from dms_datastore.dstore_config import *
 
 
 if sys.version_info[0] < 3:
@@ -586,7 +587,7 @@ def station_subset_multidir(dirs,staoutfile,run_start,locs,extract_freq,convert,
 
 
 
-def convert_db_station_in(outfile="station.in",stationdb="stations_utm.csv",sublocdb="station_subloc.csv",station_request="all",default=-0.5):
+def convert_db_station_in(outfile="station.in",stationdb=None,sublocdb=None,station_request="all",default=-0.5):
     stations_utm = read_station_dbase(stationdb)
     ssubloc = read_station_subloc(sublocdb)
     stations_in = merge_station_subloc(stations_utm,ssubloc,default_z=-0.5)
@@ -597,10 +598,10 @@ def create_arg_parser():
     """ Create an argument parser
     """
     parser = argparse.ArgumentParser(description="Create station.in file from station database (stations_utm.csv) and station subloc listing station_subloc.csv")
-    parser.add_argument('--station_db', default = "stations_utm.csv",
-                        help="station database, often stations_utm.csv")
-    parser.add_argument('--subloc_db', default = "station_subloc.csv",
-                        help="subloc listings for stations (otherwise default subloc)")
+    parser.add_argument('--station_db', default = None,
+                        help="station database, otherwise station_dbase as configured in dms_datastore dstore_config file")
+    parser.add_argument('--subloc_db', default = None,
+                        help="subloc listings for stations (otherwise default subloc from dms_datastore dstore_config file)")
     parser.add_argument('--request', default='all',nargs="+",help="requested variables or 'all' for all of them. Possibilities are: {}".format(",".join(station_variables)))
     parser.add_argument('--default_zcor',default='-0.5',
                         help="z coordinate used when there is no listing for station id (z coordinate, not subloc from surface)")
@@ -619,7 +620,12 @@ def main():
     default = args.default_zcor
     request = args.request
     outfile = args.out
-    print(request)
+    if stationdb is None:
+        stationdb = config_file("station_dbase")
+    if sublocdb is None:
+        sublocdb = config_file("sublocations")
+
+
     convert_db_station_in(outfile,stationdb,sublocdb,request,default)
 
 if __name__ == '__main__':
