@@ -142,7 +142,8 @@ class hotstart(object):
             initializer = self.info[v]['initializer']
 
             if ('hotstart_nc' in initializer) and \
-                    (not self.hotstart_ini):
+                    (not self.hotstart_ini) and \
+                    ('source_hgrid' in initializer['hotstart_nc']):
                 self.hotstart_ini['hotstart_nc_hfn'] = initializer[
                     'hotstart_nc']['source_hgrid']
                 self.hotstart_ini['hotstart_nc_vfn'] = initializer[
@@ -158,10 +159,11 @@ class hotstart(object):
                                      == 'hotstart_nc')[0][0]
                     sub_init = initializer['patch_init'][
                         'regions'][idx_h]['initializer']['hotstart_nc']
-                    self.hotstart_ini['hotstart_nc_hfn'] = sub_init['hgrid']
-                    self.hotstart_ini['hotstart_nc_vfn'] = sub_init['vgrid']
-                    self.hotstart_ini['source_vgrid_version'] = sub_init[
-                        'source_vgrid_version']
+                    if 'source_hgrid' in sub_init:
+                        self.hotstart_ini['hotstart_nc_hfn'] = sub_init['source_hgrid']
+                        self.hotstart_ini['hotstart_nc_vfn'] = sub_init['source_vgrid']
+                        self.hotstart_ini['source_vgrid_version'] = sub_init[
+                            'source_vgrid_version']
 
             if self.hotstart_ini:
                 hotstart_mesh = read_mesh(self.hotstart_ini['hotstart_nc_hfn'],
@@ -689,11 +691,22 @@ class VariableField(object):
             if not poly_fn:
                 raise EOFError(
                     "regional polygon file is needed for pathch_ini implementation")
+        if 'allow_overlap' not in self.ini_meta.keys():
+            allow_overlap = False
+        else:
+            allow_overlap = self.ini_meta['allow_overlap']
+        if 'allow_incomplete' not in self.ini_meta.keys():
+            allow_incomplete = False
+        else:
+            allow_incomplete = self.ini_meta['allow_incomplete']
         if poly_fn.endswith('shp') or poly_fn.endswith('ic'):
             # perform contiguity check and return a mapping array if successful.
             mapping = geo_tools.partition_check(self.mesh, poly_fn,
-                                                self.centering,
-                                                crs=self.crs)
+                                               self.ini_meta['regions'],
+                                                self.centering,                                                
+                                                self.crs,
+                                                allow_overlap,
+                                                allow_incomplete)
         else:
             raise NotImplementedError(
                 "Poly_fn can only be shapefile or ic file")
@@ -734,7 +747,7 @@ class VariableField(object):
         variable = ini_meta['variable']
         date = pd.to_datetime(self.date)
 
-        polaris_data = pd.read_csv(data_fn, skiprows=[1])
+        polaris_data = pd.read_csv(data_fn)
         # find the nearest date for the cruise
         polaris_data['datetime'] = pd.to_datetime(polaris_data.Date)
         polaris_date = pd.to_datetime(polaris_data.Date.unique())
@@ -899,7 +912,7 @@ class VariableField(object):
                                           inpoly=inpoly,
                                           dist_th=ini_meta['distance_threshold'],
                                           method=ini_meta['method'],
-                                          vgrid_version=ini_meta['vgrid_version'])
+                                          vgrid_version=ini_meta['source_vgrid_version'])
             else:
                 v = self.interp_from_mesh(ini_meta['source_hgrid'], vin,
                                           ini_meta['source_vgrid'],
@@ -988,8 +1001,7 @@ class VariableField(object):
                     try:
                         vout[same_points] = vin[indices[same_points]]
                     except ValueError:
-                        vout[same_points] = vin[indices[same_points]].to_numpy()[
-                            :, np.newaxis]
+                        vout[same_points] = vin[indices[same_points]].to_dataframe()
                     for p in diff_points:
                         z1 = vgrid1[indices[p]]
                         z2 = vgrid2[p]
@@ -1079,9 +1091,9 @@ class VariableField(object):
         elif self.variable_name == 'tke':
             var_name = ['q2', 'xl', 'dfv', 'dfh', 'dfq1', 'dfq2']
             ds = xr.Dataset()
-            for j, name in enumerate(var_name):
+            for name in var_name:
                 ds_ar = xr.Dataset({name: (['node', 'nVert'],
-                                           var[j, :, :])})
+                                           var[name])})
                 ds = ds.merge(ds_ar)
         else:
             ds_var = xr.DataArray(var,  # coords=[range(self.n_hgrid),range(self.n_vgrid)],
@@ -1493,7 +1505,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
     output_nc = xr.merge(
         [hgrid, output_nc, hc, tb, tf, mdepth, cs, csf, df, md])
 
-     output_nc = output_nc.drop(['q2', 'xl', 'su2', 'sv2'])
+    output_nc = output_nc.drop(['q2', 'xl', 'su2', 'sv2'])
 
     output_nc['time'].attrs['long_name'] = 'Time'
     #output_nc['time'].encoding['units'] = 'days since %s'%init_date
