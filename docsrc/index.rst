@@ -36,6 +36,8 @@ Contents
    Working with SMS <sms>
    Model time <model_time>
    Populating Elevation/Depth Data <depth>
+   Creating hotstart <hotstart>
+   Creating nudging <nudging>
    Post-processing <postprocessing>
    Evaluating Model Performance <performance>
    Using Python Pre-processing Script Programatically <direct_use>
