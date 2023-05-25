@@ -312,7 +312,8 @@ class BatchMetrics(object):
         """
         # NOTE: No vert_pos...
         #todo: pandas
-        datum = db_obs.loc[(station_id, variable, subloc), 'vdatum']
+        
+        datum = db_obs.loc[(station_id, subloc,variable,), 'vdatum']
         if datum == '' or datum == 'STND':
             self.logger.info("Adjusting obs ts automatically...")
             window = get_common_window((ts_obs, ts_sim))
@@ -320,10 +321,12 @@ class BatchMetrics(object):
             ts_sim_common = safe_window(ts_sim, window)
             if ts_obs_common is None or ts_sim_common is None:
                 return ts_obs, 0.
-            if (np.all(np.isnan(ts_obs_common.data)) or
-                    np.all(np.isnan(ts_sim_common.data))):
+            # if (np.all(np.isnan(ts_obs_common.values)) or
+            #         np.all(np.isnan(ts_sim_common.values))):
+            if ((ts_obs_common.isnull().all()) or (ts_sim_common.isnull().all())):
                 return ts_obs, 0.
-            adj = np.average(ts_sim.data) - np.nanmean(ts_obs.data)
+            #adj = np.average(ts_sim.values) - np.nanmean(ts_obs.values)
+            adj=ts_sim.mean()-ts_obs.mean()
             ts_obs += adj
             return ts_obs, adj
         else:
@@ -381,7 +384,7 @@ class BatchMetrics(object):
                 params['max_gap_to_fill'])
         else:
             max_gap_to_fill = hours(1)
-
+        
         # Prepare readers of simulation outputs
         sim_outputs = self.read_simulation_outputs(variable,
                                                    outputs_dir,
@@ -514,6 +517,7 @@ class BatchMetrics(object):
                                                     tss_sim[0],
                                                     station_id,
                                                     variable,
+                                                    subloc,
                                                     db_obs)
                 adj_obs += adj
             if ts_obs is not None and fill_gap is True:
