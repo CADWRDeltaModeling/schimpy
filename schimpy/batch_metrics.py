@@ -257,7 +257,7 @@ class BatchMetrics(object):
             self.logger.info("Converting the unit of obs ts from ft to m.")
             ts = ft_to_m(ts)
             ts.unit = 'm'
-        elif unit in ('m', 'meter'):
+        elif unit in ('m', 'meter','meters'):
             ts.unit = 'm'
         elif unit in ['cfs', 'ft^3/s']:
             self.logger.info("Converting the unit of obs ts from cfs to cms.")
