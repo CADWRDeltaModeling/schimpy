@@ -76,7 +76,7 @@ class LineStringShapefileReader(LineStringIo):
                 geom = feature.GetGeometryRef()
                 name_geom = geom.GetGeometryName()
                 if name_geom in ('LINESTRING',):
-                    line = LineString(loads(geom.ExportToWkb()),
+                    line = LineString(loads(bytes(geom.ExportToWkb())),
                     dict([(k, feature.GetField(i)) for i, k in enumerate(field_names)]))
                     lines.append(line)
             return lines
