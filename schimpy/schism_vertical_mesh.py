@@ -440,8 +440,8 @@ def write_vmesh(vmesh, fpath_vmesh='vgrid.in',vgrid_version=None):
     else:
         raise ValueError('Unsupported vgrid type')
 
-def convert_vmesh(vmesh_in, vmesh_out, input_vgrid=5.8, 
-                  output_vgrid=5.9):
+def convert_vmesh(vmesh_in, vmesh_out, input_vgrid="5.8",
+                  output_vgrid="5.10"):
     """conversion between old and new style of vgrid.in
     """
     vgrid = read_vmesh(vmesh_in,input_vgrid) 
