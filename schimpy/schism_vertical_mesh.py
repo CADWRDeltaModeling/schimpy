@@ -312,7 +312,7 @@ class SchismLocalVerticalMeshReader(object):
         if theta_f <= 0.:
             raise ValueError("Wrong theta_f: theta_f <= 0.")
 
-    def read(self, fpath='vgrid.in',vgrid_version=None):
+    def read(self, fpath='vgrid.in', vgrid_version=None):
         """ Read vgrid.in
         """
         vgrid = SchismLocalVerticalMesh()
@@ -325,7 +325,8 @@ class SchismLocalVerticalMeshReader(object):
             vgrid.param['nvrt'] = nvrt
             sigmas = list()
             kbps = list()
-            if vgrid_version=="5.8": # this is the old style of vgrid input            
+            # this is the old style of vgrid input
+            if vgrid_version == "5.8":
                 while True:
                     tkns = fin.readline().strip().split()
                     if len(tkns) < 1:
@@ -337,22 +338,23 @@ class SchismLocalVerticalMeshReader(object):
                     sigmas.append(sigma)
                 vgrid.sigma = np.array(sigmas)
                 vgrid.kbps = np.array(kbps)
-            elif vgrid_version=="5.10": # this is the new style of vgrid input (from Dec 2021)
+            # this is the new style of vgrid input (from Dec 2021)
+            elif vgrid_version == "5.10":
                 kbps = fin.readline().strip().split()
                 for k in range(nvrt):
                     tkns = fin.readline().strip().split()
                     sigma = np.array(tkns[1:]).astype(float)
-                    sigma[sigma==-9.0] = np.nan
+                    sigma[sigma == -9.0] = np.nan
                     sigmas.append(sigma)
                 sigmas = np.array(sigmas).T
-                kbps = np.array(kbps).astype(int) -1 # to conform to the old style  
-                sigma_sort = np.ones_like(sigmas)*np.nan
-                for k,s in enumerate(sigmas):
-                    sigma_sort[k,:nvrt - kbps[k]] = s[kbps[k]:]
+                kbps = np.array(kbps).astype(int) - 1
+                sigma_sort = np.ones_like(sigmas) * np.nan
+                for k, s in enumerate(sigmas):
+                    sigma_sort[k, :nvrt - kbps[k]] = s[kbps[k]:]
                 vgrid.sigma = np.array(sigma_sort)
                 vgrid.kbps = kbps
             else:
-                raise ValueError(f"vgrid version not recongnized: {vgrid_version}")
+                raise ValueError(f"vgrid version not recognized: {vgrid_version}")
         return vgrid
 
 
@@ -361,13 +363,13 @@ class SchismLocalVerticalMeshWriter(object):
     def __init__(self, logger=None):
         self.logger = logger
 
-    def write(self, vmesh, fpath='vgrid.in',vgrid_version=None):
+    def write(self, vmesh, fpath='vgrid.in', vgrid_version=None):
         """ Write vgrid.in
         """
-        if vgrid_version is None or not isinstance(vgrid_version,str):
+        if vgrid_version is None or not isinstance(vgrid_version, str):
             raise ValueError("vgrid_version input is required and must be string.")
         else:
-            print("vgrid_version=",vgrid_version)
+            print("vgrid_version=", vgrid_version)
         if vgrid_version == '5.8':
             with open(fpath, 'w') as f:
                 buf = "{}\n".format(vmesh.ivcor)
@@ -411,19 +413,21 @@ class SchismLocalVerticalMeshWriter(object):
         else:
             raise ValueError(f"Unknown vgrid format: {vgrid_version}")
 
-def read_vmesh(fpath_vmesh,vgrid_version):
+def read_vmesh(fpath_vmesh, vgrid_version=None):
     """ Read a vgrid file
     """
     if fpath_vmesh is None:
         raise ValueError("File not given")
     if not os.path.exists(fpath_vmesh):
         raise ValueError("File not found: %s" % fpath_vmesh)
+    if vgrid_version is None:
+        vgrid_version = "5.10"
     with open(fpath_vmesh, 'r') as f:
         ivcor = int(f.readline().strip().split()[0])
 
     if ivcor == 1:
         reader = SchismVerticalMeshIoFactory().get_reader('local')
-        return reader.read(fpath_vmesh,vgrid_version)
+        return reader.read(fpath_vmesh, vgrid_version)
     elif ivcor == 2:
         reader = SchismVerticalMeshIoFactory().get_reader('sz')
         return reader.read(fpath_vmesh)
@@ -431,23 +435,25 @@ def read_vmesh(fpath_vmesh,vgrid_version):
         raise ValueError('Unsupported vgrid type')
 
 
-def write_vmesh(vmesh, fpath_vmesh='vgrid.in',vgrid_version=None):
+def write_vmesh(vmesh, fpath_vmesh='vgrid.in', vgrid_version="5.10"):
     if vgrid_version is None:
-        raise ValueErorr("vgrid_version is a required input!") 
+        raise ValueError("vgrid_version is a required input!")
     if vmesh.ivcor == 1:
         writer = SchismVerticalMeshIoFactory().get_writer('local')
-        writer.write(vmesh, fpath_vmesh,vgrid_version)
+        writer.write(vmesh, fpath_vmesh, vgrid_version)
     else:
         raise ValueError('Unsupported vgrid type')
 
-def convert_vmesh(vmesh_in, vmesh_out, input_vgrid="5.8",
-                  output_vgrid="5.10"):
+
+def convert_vmesh(vmesh_in, vmesh_out, input_vgrid_version="5.10",
+                  output_vgrid_version="5.10"):
     """conversion between old and new style of vgrid.in
     """
-    vgrid = read_vmesh(vmesh_in,input_vgrid) 
-    write_vmesh(vgrid,vmesh_out,output_vgrid) 
-        
-def compare_vmesh(v1,v2):
+    vgrid = read_vmesh(vmesh_in, input_vgrid_version)
+    write_vmesh(vgrid, vmesh_out, output_vgrid_version)
+
+
+def compare_vmesh(v1, v2):
     """
     Comparing two vertical meshes and check if the values are equal in the two meshes
     Parameters
@@ -463,19 +469,17 @@ def compare_vmesh(v1,v2):
 
     """
     equal = True
-    if v1.param['nvrt']!=v2.param['nvrt']:
+    if v1.param['nvrt'] != v2.param['nvrt']:
         equal = False
         print("The number of vertical layers are not equal between the two meshes")
-    
-    if (np.abs((v1.kbps - v2.kbps)>0)).any():
+
+    if (np.abs((v1.kbps - v2.kbps) > 0)).any():
         equal = False
         print("kbps are not equal between the two meshes")
-        
-    if (np.abs((v1.sigma - v2.sigma)>0)).any():
+
+    if (np.abs((v1.sigma - v2.sigma) > 0)).any():
         equal = False
         print("sigma are not equal between the two meshes")
-    
+
     if equal:
         print("the two meshes are equal")
-    
-    
