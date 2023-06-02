@@ -17,6 +17,19 @@ class SchismPolygon(Polygon):
     This class has extra information
     """
 
+    # Updated for Shapely 2 following this issue comment:
+    # https://github.com/shapely/shapely/issues/1233#issuecomment-977837620
+    _id_to_attrs = {}
+    __slots__ = Polygon.__slots__
+
+    def __new__(cls, shell=None, holes=None, prop=None):
+        p = super().__new__(cls, shell, holes)
+        p.__class__ = cls
+        return p
+
+    def __del__(self):
+        del self._id_to_attrs[id(self)]
+
     def __init__(self, shell=None, holes=None, prop=None):
         """
         Constructor
@@ -31,8 +44,7 @@ class SchismPolygon(Polygon):
         props: dict
             property dict. Keys as properties are name, type and attribute.
         """
-        super(SchismPolygon, self).__init__(shell, holes)
-        self._prop = {} if prop is None else prop
+        self._id_to_attrs[id(self)] = dict(prop=prop)
 
     @property
     def attribute(self):
@@ -60,20 +72,20 @@ class SchismPolygon(Polygon):
 
     @property
     def prop(self):
-        return self._prop
+        return self._id_to_attrs[id(self)]["prop"]
 
     @prop.setter
     def prop(self, val):
-        self._prop = val
+        self._id_to_attrs[id(self)]["prop"] = val
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
-        return (self._prop == other._prop and
+        return (self.prop == other.prop and
                 super(self.__class__, self).__eq__(other))
 
     def __repr__(self):
-        return "{}".format(self._prop)
+        return "{}".format(self.prop)
 
     def contains(self, point):
         """ Check the polygon contains the point
@@ -136,7 +148,7 @@ class SchismPolygonDictConverter(SchismPolygonIo):
 
 
 class SchismPolygonYamlReader(SchismPolygonIo):
-    """ Read polygons from a SCHSIM YAML polygon file
+    """ Read polygons from a SCHISM YAML polygon file
     """
 
     def read(self, fpath):
@@ -211,7 +223,7 @@ class SchismPolygonYamlWriter(SchismPolygonIo):
                 leaf['name'] = p.name
                 leaf['vertices'] = list([list(xy) for xy in p.exterior.coords])
                 if p.type is not None:
-                    leaf['type'] = p.type 
+                    leaf['type'] = p.type
                 else: leaf['type'] = 'none'
                 if not p.attribute is None:
                     if p.attribute.lower() != 'none':
@@ -237,9 +249,9 @@ class SchismPolygonShapefileWriter(SchismPolygonIo):
             default: ESRI Shapefile
         """
         if spatial_reference is None:
-            # Not sure if this changed. it should be EPSG 26910 
+            # Not sure if this changed. it should be EPSG 26910
             #spatial_reference = '+proj=utm +zone=10N +ellps=NAD83 +datum=NAD83 +units=m'
-            spatial_reference= '+proj=utm +zone=10 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
+            spatial_reference = '+proj=utm +zone=10 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
         if isinstance(spatial_reference, str):
             spatial_reference_obj = SpatialReference()
             try:
@@ -320,4 +332,4 @@ def write_polygons(fpath, polygons):
     elif fpath.endswith('.shp'):
         return SchismPolygonIoFactory().get_writer('shp').write(fpath, polygons)
     else:
-        raise ValueErroreError("Not supported file type")
+        raise ValueError("Not supported file type")
