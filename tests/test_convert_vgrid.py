@@ -21,10 +21,14 @@ def test_convert_vmesh(datadir):
     output_grid_fn1 = 'vgrid1.in.3d'
     output_grid_fn2 = 'vgrid2.in.3d'
     # converting from old to new vgrid
-    convert_vmesh(old_vgrid_fn, output_grid_fn1)
+    convert_vmesh(old_vgrid_fn,
+                  output_grid_fn1,
+                  input_vgrid_version="5.8",
+                  output_vgrid_version="5.10")
     # converting from new to old vgrid.
     convert_vmesh(new_vgrid_fn, output_grid_fn2,
-                  input_vgrid="5.10", output_vgrid="5.8")
+                  input_vgrid_version="5.10",
+                  output_vgrid_version="5.8")
     # check if they are still identify with the original grid.
     mesh1 = read_vmesh(old_vgrid_fn, vgrid_version="5.8")
     mesh2 = read_vmesh(output_grid_fn1, vgrid_version="5.10")

@@ -29,18 +29,18 @@ class TestSchismVerticalMesh(unittest.TestCase):
     def test_read_vmesh_lsc2(self):
         fpath_vmesh = os.path.join(self.dir_cur,
                                    'testdata/testmesh/vgrid_lsc2_1.in')
-        vmesh = read_vmesh(fpath_vmesh)
+        vmesh = read_vmesh(fpath_vmesh, vgrid_version="5.8")
         self.check_vmesh_lsc2_1(vmesh)
 
     def test_write_vmesh_lsc2(self):
         fpath_vmesh_in = os.path.join(self.dir_cur,
                                       'testdata/testmesh/vgrid_lsc2_1.in')
-        vmesh_in = read_vmesh(fpath_vmesh_in)
+        vmesh_in = read_vmesh(fpath_vmesh_in, vgrid_version="5.8")
         fpath_vmesh_out = os.path.join(self.dir_cur,
                                        'testdata/testmesh/vgrid_lsc2_1_testout.in')
         try:
             write_vmesh(vmesh_in, fpath_vmesh_out)
-            vmesh_out = read_vmesh(fpath_vmesh_out)
+            vmesh_out = read_vmesh(fpath_vmesh_out, vgrid_version="5.10")
             self.check_vmesh_lsc2_1(vmesh_out)
         finally:
             pass
@@ -50,7 +50,7 @@ class TestSchismVerticalMesh(unittest.TestCase):
     def test_build_vertical_mesh_from_sigma_lsc2(self):
         fpath_vmesh = os.path.join(self.dir_cur,
                                    'testdata/testmesh/vgrid_lsc2_1.in')
-        vmesh_in = read_vmesh(fpath_vmesh)
+        vmesh_in = read_vmesh(fpath_vmesh, vgrid_version="5.8")
         vmesh_new = SchismLocalVerticalMesh(vmesh_in.sigma)
         self.check_vmesh_lsc2_1(vmesh_new)
 
@@ -59,7 +59,7 @@ class TestSchismVerticalMesh(unittest.TestCase):
                                   'testdata/testmesh/testmesh.gr3')
         fpath_vmesh = os.path.join(self.dir_cur,
                                    'testdata/testmesh/vgrid.in')
-        mesh = read_mesh(fpath_mesh, fpath_vmesh)
+        mesh = read_mesh(fpath_mesh, fpath_vmesh, vgrid_version="5.8")
         z = mesh.build_z()
         desired = np.arange(-100.0, 0.1, 10.0)
         np.testing.assert_allclose(z[0], desired)
