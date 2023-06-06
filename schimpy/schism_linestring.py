@@ -13,6 +13,20 @@ import copy
 class LineString(shapely.geometry.LineString):
     """
     """
+
+    # Updated for Shapely 2 following this issue comment:
+    # https://github.com/shapely/shapely/issues/1233#issuecomment-977837620
+    _id_to_attrs = {}
+    __slots__ = shapely.geometry.LineString.__slots__
+
+    def __new__(cls, coordinates=None, prop=None):
+        p = super().__new__(cls, coordinates)
+        p.__class__ = cls
+        return p
+
+    def __del__(self):
+        del self._id_to_attrs[id(self)]
+
     def __init__(self, coordinates=None, prop=None):
         """
         Constructor
@@ -22,15 +36,15 @@ class LineString(shapely.geometry.LineString):
         Returns
         -------
         """
-        super(LineString, self).__init__(coordinates)
-        if prop is None:
-            self._prop = {}
-        else:
-            self._prop = copy.deepcopy(prop)
+        self._id_to_attrs[id(self)] = dict(prop=prop)
 
     @property
     def prop(self):
-        return self._prop
+        return self._id_to_attrs[id(self)]["prop"]
+
+    @prop.setter
+    def prop(self, val):
+        self._id_to_attrs[id(self)]["prop"] = val
 
 
 class LineStringIo(object):
