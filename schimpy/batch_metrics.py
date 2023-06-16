@@ -105,6 +105,7 @@ class BatchMetrics(object):
                 sim_out = station.read_staout(datafname, station_infile,
                                               reftime=time_basis, ret_station_in=False,
                                               multi=True)
+
                 # todo: case
                 sim_out.columns = sim_out.columns.set_levels(
                     sim_out.columns.levels[0].str.lower(), level=0)
@@ -392,6 +393,9 @@ class BatchMetrics(object):
                                                    stations_input)
         assert len(sim_outputs) > 0
         assert sim_outputs[0] is not None
+        
+        metric_out=open( os.path.join(dest_dir, 'meterics.txt'),"w")
+        metric_out.writelines("station RMSE lag bias NSE Correlation\n")
 
         # Iterate through the stations in the first simulation outputs
         for stn in sim_outputs[0].columns:
@@ -537,7 +541,6 @@ class BatchMetrics(object):
             title = None
             if type(tss_sim) == list:
                 tss_sim = tuple(tss_sim)
-
             # labels
             labels_to_plot = deepcopy(labels)
             if adj_obs != 0.:
@@ -553,11 +556,13 @@ class BatchMetrics(object):
                                       labels=labels_to_plot,
                                       title=title)
             else:
-                fig = plot_metrics(ts_obs, tss_sim,
+                fig,metrics = plot_metrics(ts_obs, tss_sim,
                                    window_inst=(start_inst, end_inst),
                                    window_avg=(start_avg, end_avg),
                                    labels=labels_to_plot,
                                    title=title)
+                if(metrics[0]):
+                    metric_out.write(station_id+' %s %s %s %s %s\n'%(metrics[0]["rmse"],metrics[0]["lag"],metrics[0]["bias"],metrics[0]["nse"],metrics[0]["corr"]))
             fname_output = self.set_fname_out(alias,
                                               variable,
                                               station_id,
@@ -566,6 +571,7 @@ class BatchMetrics(object):
             fig.suptitle(figtitle, fontsize=14)
             fig.savefig(fpath_output, dpi=300)
             self.logger.info("Done for the station.")
+        metric_out.close()
 
 
 def create_arg_parser():

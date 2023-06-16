@@ -194,7 +194,7 @@ def plot_metrics_to_figure(fig, tss,
 
     str_metrics = gen_metrics_string(metrics, labels[1:], unit)
     write_metrics_string(axes['inst'], str_metrics)
-    return fig
+    return fig, metrics
 
 
 def plot_inst_and_avg(axes, tss, window_inst, window_avg, labels, label_loc, legend_size):
@@ -531,8 +531,8 @@ def plot_metrics(obs,tssim, **kwargs):
     else:
         raise Exception("Unanticipated type")
     fig = set_figure()
-    fig = plot_metrics_to_figure(fig, tss, **kwargs)
-    return fig
+    fig ,metrics= plot_metrics_to_figure(fig, tss, **kwargs)
+    return fig,metrics
 
 
 def plot_comparison(*args, **kwargs):
