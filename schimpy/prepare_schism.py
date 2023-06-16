@@ -324,6 +324,12 @@ def update_temporal_inputs(s, inputs):
         for l in p.stderr:
             print(l)
 
+def check_nested_match(node):
+    for key, item in node.items():
+        if isinstance(item, dict):
+            if key in item.keys():
+                node[key] = item[key]
+            check_nested_match(item)
 
 def item_exist(inputs, name):
     return True if name in inputs else False
@@ -371,6 +377,9 @@ def prepare_schism(args, use_logging=True):
         + schism_yaml.include_keywords
     logger.info("Processing the top level...")
     check_and_suggest(list(inputs.keys()), keys_top_level, logger)
+
+    logger.info("Checking for matching nested keys...")
+    check_nested_match(inputs)
 
     out_fname = os.path.splitext(in_fname)[0] \
         + '_echo' + os.path.splitext(in_fname)[1]

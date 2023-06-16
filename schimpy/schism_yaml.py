@@ -127,9 +127,20 @@ class SubstituteConstructor(SafeConstructor):
         if isinstance(node, yaml.ScalarNode):
             return self.extractFile(self.construct_scalar(node))
         elif isinstance(node, yaml.SequenceNode):
-            result = []
-            for filename in self.construct_sequence(node):
-                result += self.extractFile(filename)
+            fns = self.construct_sequence(node)
+            if '.yaml' in fns[0]:
+                result = {} # create dictionary to store all values in .yaml list
+                for filename in self.construct_sequence(node):
+                    tmp_rslt = self.extractFile(filename)
+                    for key in tmp_rslt.keys():
+                        if key in result.keys():
+                            result[key] = result[key] + tmp_rslt[key]
+                        else:
+                            result[key] = tmp_rslt[key]
+            else:
+                result = []
+                for filename in self.construct_sequence(node):
+                    result += self.extractFile(filename)
             return result
         elif isinstance(node, yaml.MappingNode):
             result = {}
