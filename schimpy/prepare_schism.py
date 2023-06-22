@@ -35,6 +35,14 @@ def create_arg_parser():
                         help='main input file name')
     return parser
 
+def ensure_outdir(outdir,fname):
+    if outdir in fname:
+        outname = fname
+    else:
+        fname_new = os.path.join(outdir,fname)
+    return outname
+
+
 
 def create_hgrid(s, inputs, logger):
     """ Preprocess the hgrid file
@@ -112,14 +120,14 @@ def create_hgrid(s, inputs, logger):
         option_name = 'gr3_outputfile'
         if option_name in section:
             logger.info("Writing hgrid file...")
-            hgrid_out_fpath = os.path.expanduser(section[option_name])
+            hgrid_out_fpath = ensure_outdir(output_dir,section[option_name])
             s.write_hgrid(hgrid_out_fpath,boundary=True)
 
         # Write hgrid.ll
         option_name = 'll_outputfile'
         if option_name in section:
             logger.info("Creating hgrid.ll file...")
-            hgrid_ll_fpath = os.path.expanduser(section[option_name])
+            hgrid_ll_fpath = ensure_outdir(output_dir,section[option_name])
             s.write_hgrid_ll(hgrid_ll_fpath,boundary=True)
 
 
@@ -140,7 +148,8 @@ def create_vgrid(s,inputs,logger):
             elif 'mesh_inputfile' in msection:
                 logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
                 hgrid  = msection['mesh_inputfile']
-        
+        vgrid_out = section['vgrid_out']
+        section['vgrid_out'] = ensure_outdir(inputs['output_dir'],vgrid_out)
         vgrid_gen(hgrid,**section)
 
 def create_source_sink(s, inputs, logger):
@@ -160,8 +169,10 @@ def create_source_sink(s, inputs, logger):
     if sinks is not None:
         sources_sinks['sinks'] = sinks
     fname = dict_ss.get('outputfile')
+    
     if fname is not None:
-        fname = os.path.expanduser(fname)
+        output_dir = inputs['output_dir']
+        fname = ensure_outdir(output_dir,fname)
         logger.info("Creating %s..." % fname)
         s.create_source_sink_in(sources_sinks, fname)
 
@@ -183,9 +194,9 @@ def create_gr3_with_polygons(s, inputs, logger):
                 check_and_suggest(polygon, polygon_items)
     for fname, item in dict_gr3.items():
         if fname is None:
-            logger.warning("No filename is given in one of gr3")
+            logger.warning("No filename is given in one of the gr3 specs")
             continue
-        fname = os.path.expanduser(fname)
+        fname = ensure_outdir(inputs['output_dir'],fname)
         polygons = item.get('polygons', [])
         default = item.get('default')
         logger.info("Creating %s..." % fname)
@@ -212,7 +223,7 @@ def create_prop_with_polygons(s, inputs, logger):
         if fname is None:
             logger.warning("No filename is given in one of prop")
             continue
-        fname = os.path.expanduser(fname)
+        fname = ensure_outdir(inputs['output_dir'],fname)
         polygons = item.get('polygons', [])
         default = item.get('default')
         logger.info("Creating %s..." % fname)
@@ -250,6 +261,7 @@ def create_structures(s, inputs, logger):
             check_and_suggest(conf, configuration_items)
     s.create_structures(structures, nudging)
     fname = dict_struct.get('outputfile')
+    fname = ensure_outdir(inputs['output_dir'],fname)
     if fname is not None:
         fname = os.path.expanduser(fname)
         logger.info("Creating %s..." % fname)
@@ -272,7 +284,7 @@ def create_fluxflag(s, inputs, logger):
     if fname is None:
         logger.info("outputfile not given for flow_outputs. Using fluxflag.prop")
         fname = 'fluxflag.prop'
-    fname = os.path.expanduser(fname)
+    fname = ensure_outdir(inputs['output_dir'],fname)
     logger.info("Creating %s..." % fname)
     s.create_flux_regions(flowlines, fname)
     with open(fname, 'a') as f:
