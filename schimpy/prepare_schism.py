@@ -24,6 +24,7 @@ import os
 import argparse
 import logging
 import warnings
+import shutil
 
 
 __all__ = ['prepare_schism']
@@ -408,7 +409,7 @@ def prepare_schism(args, use_logging=True):
 
     keys_top_level = ["output_dir","mesh", "gr3","vgrid",
                       "prop", "hydraulics",
-                      "sources_sinks", "flow_outputs"] \
+                      "sources_sinks", "flow_outputs","copy_resources"] \
         + schism_yaml.include_keywords
     logger.info("Processing the top level...")
     check_and_suggest(list(inputs.keys()), keys_top_level, logger)
@@ -443,6 +444,18 @@ def prepare_schism(args, use_logging=True):
             raise ValueError("No mesh input file in the mesh section.")
     else:
         raise ValueError("No mesh section in the main input.")
+    
+    if item_exist(inputs, 'copy_resources'):
+        logger.info("Copying resources to output dir")
+        copy_spec = inputs['copy_resources']
+        for key,item in copy_spec.items():
+            outpath = os.path.join(outdir,item)
+            if os.path.normpath(key) == os.path.normpath(outpath): 
+                continue
+            logger.info(f"copy_resources: copying {key} to {outpath}")
+            shutil.copyfile(key,outpath)
+            
+
     logger.info("Done.")
 
 
