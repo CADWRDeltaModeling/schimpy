@@ -23,6 +23,7 @@ import subprocess
 import os
 import argparse
 import logging
+import warnings
 
 
 __all__ = ['prepare_schism']
@@ -39,7 +40,7 @@ def ensure_outdir(outdir,fname):
     if outdir in fname:
         outname = fname
     else:
-        fname_new = os.path.join(outdir,fname)
+        outname = os.path.join(outdir,fname)
     return outname
 
 
@@ -303,12 +304,12 @@ def update_spatial_inputs(s, inputs, logger):
         inputs: dict
             inputs from an input file
     """
-    create_hgrid(s, inputs, logger)
+    create_hgrid(s, inputs,  logger)
     create_vgrid(s, inputs, logger)
-    create_gr3_with_polygons(s, inputs, logger)
-    create_source_sink(s, inputs, logger)
-    create_prop_with_polygons(s, inputs, logger)
-    create_structures(s, inputs, logger)
+    create_gr3_with_polygons(s, inputs,  logger)
+    create_source_sink(s, inputs,  logger)
+    create_prop_with_polygons(s, inputs,  logger)
+    create_structures(s, inputs,  logger)
     create_fluxflag(s, inputs, logger)
 
 
@@ -347,11 +348,11 @@ def item_exist(inputs, name):
     return True if name in inputs else False
 
 
-def setup_logger():
+def setup_logger(outdir):
     """ Set up a logger
     """
     logging_level = logging.INFO
-    logging_fname = 'prepare_schism.log'
+    logging_fname = os.path.join(outdir,'prepare_schism.log')
     logging.basicConfig(level=logging_level, filename=logging_fname,
                         filemode='w')
     console = logging.StreamHandler()
@@ -369,21 +370,43 @@ def main():
     prepare_schism(args)
 
 
+def process_output_dir(inputs):
+    """Identify or create dir for results and diagnostics and returns the name"""
+    if "output_dir" in inputs:
+        outdir = inputs["output_dir"]
+        force = True
+    else: 
+        warnings.warn( "No output_dir specification. This will not be allowed in the future. \n" +
+            "Using '.' but specification of a separate directory recommended.",FutureWarning)
+        outdir = '.'
+        inputs['output_dir']=outdir
+    if os.path.exists(outdir):
+        created=False
+    else:
+        if force:
+            os.mkdir(outdir)
+        else:
+            raise ValueError("Output directory (output_dir) does not exist")
+    return outdir
+
 def prepare_schism(args, use_logging=True):
+    in_fname = args.main_inputfile
+    if not os.path.exists(in_fname):
+        raise ValueError("Main input file not found")
+    with open(in_fname, 'r') as f:
+        inputs = schism_yaml.load(f)
+        outdir = process_output_dir(inputs)
+
     if use_logging is True:
-        setup_logger()
+        setup_logger(outdir)
         logger = logging.getLogger('SCHISM')
     else:
         logger = logging.getLogger('')
     logger.info("Start pre-processing SCHISM inputs...")
     in_fname = args.main_inputfile
 
-    if not os.path.exists(in_fname):
-        logger.error("The main input file, %s, not found", in_fname)
-        raise ValueError("Main input file not found")
-    with open(in_fname, 'r') as f:
-        inputs = schism_yaml.load(f)
-    keys_top_level = ["mesh", "gr3","vgrid",
+
+    keys_top_level = ["output_dir","mesh", "gr3","vgrid",
                       "prop", "hydraulics",
                       "sources_sinks", "flow_outputs"] \
         + schism_yaml.include_keywords
@@ -395,6 +418,8 @@ def prepare_schism(args, use_logging=True):
 
     out_fname = os.path.splitext(in_fname)[0] \
         + '_echo' + os.path.splitext(in_fname)[1]
+
+    out_fname = os.path.join(inputs['output_dir'],out_fname)
     with open(out_fname, 'w') as f:
         f.write(schism_yaml.safe_dump(inputs))
 
