@@ -22,8 +22,7 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                     mask_value=None,
                     fill_value=None,
                     band=1):
-    """ Calculate the means of raster values of the element balls
-        around the nodes.
+    """ Calculate the means of raster values of the element balls.
 
         When an element is completely outside of the raster data, zero will be
         assigned for the it.
@@ -40,39 +39,24 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
         will be swapped with the fill_value before binning the data. This
         masking will work only when the bins are provided.
 
-        An example of this function in the pre-processor yaml is below:
-
-        gr3:
-          sav_N.gr3:
-            default: 0.
-            polygons:
-              - attribute: raster_to_nodes.raster_to_nodes(mesh, nodes_sel, 'NDVI.tif', bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)
-                imports: schimpy.raster_to_nodes
-                type: none
-                vertices:
-                ...
-
-        The variables "mesh" and "node_sel" in the example above are
-        'magic words' that the pre-processor understands.
-        "mesh" and "node_sel" mean the SCHISM mesh and the selected node indices
-        by a polygon.
-        The exmaple bins (or classifies) the raster values from 0.0001 to 0.3
-        to 0. and so forth. The outside of the bins are binned to -999.
-        Also raster points with the value of -10. will be switched to 0.2 first
-        before binning, so they will be mapped to 40.
-
         Parameters
         ----------
+        
         mesh: schimpy.SchismMesh
             The base mesh to work on
+        
         nodes_sel: array-like
             The array or list of the nodes to process
+        
         path_raster: string-like
             File fath to the raster data
+        
         bins: array-like, optional
             Array of bins. It has to be 1-dimensional and monotonic
+        
         mapped_values: array-like, optional
            The values of the classes. It should be bigger by one than the bins.
+        
         band: int, optional
             The band index to use from the raster data.
             The default value is 1.
@@ -81,7 +65,33 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
         -------
         numpy.array
             means of raster values of the element balls around the nodes
+
+        Notes
+        -----
+        An example of this function in the pre-processor yaml is below:
+        
+        .. code-block:: yaml
+           
+           gr3:
+             sav_N.gr3:
+              default: 0.
+              polygons:
+                - attribute: raster_to_nodes.raster_to_nodes(mesh, nodes_sel, 'NDVI.tif', bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)
+                  imports: schimpy.raster_to_nodes
+                  type: none
+                  vertices:
+                  #...
+
+        The values `mesh` and `node_sel`  mean the SCHISM mesh and the selected node indices
+        by a polygon. The exaple bins (or classifies) the raster values from 0.0001 to 0.3
+        to 0. and so forth. The outside of the bins are binned to -999.
+        Also raster points with the value of -10. will be switched to 0.2 first
+        before binning, so they will be mapped to 40.
+
+        
+
     """
+    
     if bins is not None:
         if mapped_values is None:
             raise ValueError(

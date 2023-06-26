@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 19 15:50:34 2019
-@author: zzhang
-"""
 
 import os
 import yaml
@@ -16,8 +12,7 @@ from pyproj import Proj, CRS
 
 
 def shapely_to_geopandas(features, crs=None, shp_fn=None):
-    """
-    convert shapely features to geopandas and generate shapefiles as needed
+    """ Convert shapely features to geopandas and generate shapefiles as needed
     """
     df = pd.DataFrame()
     df['geometry'] = features
@@ -33,8 +28,7 @@ def shapely_to_geopandas(features, crs=None, shp_fn=None):
 
 
 def ic_to_gpd(fn, crs=None):
-    """
-    Read ic yaml file and convert the polygons to geopandas format
+    """ Read ic yaml file and convert the polygons to geopandas format
     """
     with open(fn) as file:
         info = yaml.load(file, Loader=yaml.FullLoader)
@@ -58,11 +52,12 @@ def ic_to_gpd(fn, crs=None):
 
 def partition_check(mesh, poly_fn, regions, centering='node', crs=None,
                     allow_overlap=False, allow_incomplete=False):
-    """
-    Check if the schism mesh division by the polygon features in poly_fn is unique and complete.
-    The partition check is based on either node or element, and the function checks
-    1) if there are any orphaned nodes, and
-    2) if any nodes/elems were assigned to multiple polygons.
+    """ Check if the schism mesh division by the polygon features in poly_fn is unique and complete.
+    The partition check is based on either node or element, and the function checks:
+    
+    * if there are any orphaned nodes, and
+    * if any nodes/elems were assigned to multiple polygons.
+    
     """
     if poly_fn.endswith('shp'):
         poly_gpd = gpd.read_file(poly_fn)
@@ -179,9 +174,8 @@ def project_fun(crs=None):
 
 
 def ll2utm(lonlat, crs=None):
-    """
-    lonlat can be numpy arrays. lonlat = np.asarray([lon,lat])
-    default crs = "+proj=utm +zone=10 +datum=WGS84 +units=m +no_defs"
+    """ lonlat can be numpy arrays. lonlat = np.asarray([lon,lat])
+    default crs = epsg:26910
     """
     projection = project_fun(crs)
     utm_x, utm_y = projection(lonlat[0], lonlat[1])
@@ -191,7 +185,7 @@ def ll2utm(lonlat, crs=None):
 def utm2ll(utm_xy, crs=None):
     """
     utm_xy can be numpy arrays. utm_xy = np.asarray([utm_x,utm_y])
-    default crs = "+proj=utm +zone=10, +datum=WGS84 +units=m +no_defs"
+    default crs = epsg:26910
     """
     projection = project_fun(crs)
     lon, lat = projection(utm_xy[0], utm_xy[1], inverse=True)
@@ -209,15 +203,15 @@ def geometry2coords_points(geo_obj):
 
 
 def shp2yaml(shp_fn, yaml_fn=None, crs=None):
-    """
-    Convert a shapefile to yaml file
+    """ Convert a shapefile to yaml file
+    
     Parameters
     ----------
-    shp_fn : STRING
+    shp_fn : str
         Input shape filename
-    yaml_fn : STRING
+    yaml_fn : str
         Output yaml filename
-    crs : STRING, optional
+    crs : str, optional
         Output projection. The default is None.
 
     Returns

@@ -829,8 +829,17 @@ class TriMesh(object):
 
     def is_elem_on_boundary(self, elem_i):
         """ Check if the given element with index elem_i is on the boundary
-                elem_i = element index
-            return = True if the element is on the boundary, otherwise False
+                
+            Parameters
+            ----------            
+            elem_i : int
+                element index
+            
+            Returns
+            -------
+            is_on_boundary : bool
+            
+            True if the element is on the boundary, otherwise False
         """
         is_on_boundary = False
         for edge_i in self.element2edges(elem_i):

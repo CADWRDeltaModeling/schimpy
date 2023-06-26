@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-import ogr
+
 
 def read_keyfile(keyfile):
     """ Reads a file pairing labels and values"""

@@ -220,8 +220,9 @@ class GaussianQuadratureLine2(GaussianQuadrature):
             Returns
             -------
             numpy.array
-                matrix of shape function derivative wrt xi value at (*, eta)
+                matrix of shape function derivative wrt xi value at (\*, eta)
         """
+        
         return np.array([[-0.5, 0.5] for _ in range(len(pts))])
 
     def jacobian_det(self, vertices):
@@ -356,7 +357,7 @@ class GaussianQuadratureQuad4(GaussianQuadrature):
             Returns
             -------
             numpy.array
-                matrix of shape function derivative wrt xi value at (*, eta)
+                matrix of shape function derivative wrt xi value at (\*, eta)
         """
         derivative = np.stack((np.array([-0.25 * (1.0 - pts[:, 1]),
                                          0.25 * (1.0 - pts[:, 1]),
@@ -476,7 +477,7 @@ class GaussianQuadratureTri3(GaussianQuadrature):
             Returns
             -------
             numpy.array
-                matrix of shape function derivative wrt xi value at (*, eta)
+                matrix of shape function derivative wrt xi value at (\*, eta)
         """
         return np.array([[[-1., 1., 0.],
                           [-1., 0., 1.]] for _ in range(pts.shape[0])])

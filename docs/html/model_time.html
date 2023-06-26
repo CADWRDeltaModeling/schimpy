@@ -6,15 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Model time conversion &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
+    <title>Model time conversion &#8212; schimpy 1.6.1+1.g8c4c2f5.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -56,20 +54,20 @@
 <li><a class="reference internal" href="#">Model time conversion</a><ul>
 <li><a class="reference internal" href="#model-time-py">model_time.py</a><ul>
 <li><a class="reference internal" href="#subcommands">subcommands</a></li>
-<li><a class="reference internal" href="#Sub-commands:">Sub-commands:</a><ul>
+<li><a class="reference internal" href="#Sub-commands">Sub-commands</a><ul>
 <li><a class="reference internal" href="#to_elapsed">to_elapsed</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#to_date">to_date</a><ul>
-<li><a class="reference internal" href="#Positional Arguments_repeat1">Positional Arguments</a></li>
-<li><a class="reference internal" href="#Named Arguments_repeat1">Named Arguments</a></li>
+<li><a class="reference internal" href="#positional-arguments_repeat1">Positional Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments_repeat1">Named Arguments</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#clip">clip</a><ul>
-<li><a class="reference internal" href="#Positional Arguments_repeat2">Positional Arguments</a></li>
-<li><a class="reference internal" href="#Named Arguments_repeat2">Named Arguments</a></li>
+<li><a class="reference internal" href="#positional-arguments_repeat2">Positional Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments_repeat2">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -148,25 +146,24 @@ $ model_time.py subcommand –help</p>
 </dd>
 </dl>
 </section>
-<section id="Sub-commands:">
-<h3>Sub-commands:<a class="headerlink" href="#Sub-commands:" title="Permalink to this heading">¶</a></h3>
+<section id="Sub-commands">
+<h3>Sub-commands<a class="headerlink" href="#Sub-commands" title="Permalink to this heading">¶</a></h3>
 <section id="to_elapsed">
 <h4>to_elapsed<a class="headerlink" href="#to_elapsed" title="Permalink to this heading">¶</a></h4>
 <p>Convert input datetime string or <a href="#system-message-1"><span class="problematic" id="problematic-1">*</span></a>.th file with datetime column to equivalent output in elapsed seconds.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">to_elapsed</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">start</span> <span class="n">START</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">annotate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">step</span> <span class="p">[</span><span class="n">STEP</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_nan</span> <span class="n">SKIP_NAN</span><span class="p">]</span>
-                      <span class="n">dated_input</span> <span class="p">[</span><span class="n">dated_input</span> <span class="o">...</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">to_elapsed</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">start</span> <span class="n">START</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">annotate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">step</span> <span class="p">[</span><span class="n">STEP</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">skip_nan</span> <span class="n">SKIP_NAN</span><span class="p">]</span> <span class="n">dated_input</span> <span class="p">[</span><span class="n">dated_input</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>dated_input</kbd></dt>
 <dd><p>One or more dates to be converted in ISO-like format 2009-03-12T00:00:00 (time can be ommitted) or the name of a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with the time column in this format.</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--start</kbd></dt>
 <dd><p>Starting date and time basis for output if the input is a file. Allows a larger database with readable times to be clipped</p>
@@ -190,21 +187,19 @@ $ model_time.py subcommand –help</p>
 <section id="to_date">
 <h4>to_date<a class="headerlink" href="#to_date" title="Permalink to this heading">¶</a></h4>
 <p>Convert input elapsed seconds or <a href="#system-message-1"><span class="problematic" id="problematic-1">*</span></a>.th file with elapsed seconds as the time column to equivalent output with a datetime or annotated with datetimes.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">to_date</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">--</span><span class="n">start</span> <span class="n">START</span> <span class="p">[</span><span class="o">--</span><span class="n">step</span> <span class="p">[</span><span class="n">STEP</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">elapsed_unit</span> <span class="n">ELAPSED_UNIT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">time_format</span> <span class="n">TIME_FORMAT</span><span class="p">]</span>
-                   <span class="p">[</span><span class="o">--</span><span class="n">annotate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span>
-                   <span class="n">elapsed_input</span> <span class="p">[</span><span class="n">elapsed_input</span> <span class="o">...</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">to_date</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">--</span><span class="n">start</span> <span class="n">START</span> <span class="p">[</span><span class="o">--</span><span class="n">step</span> <span class="p">[</span><span class="n">STEP</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">elapsed_unit</span> <span class="n">ELAPSED_UNIT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">time_format</span> <span class="n">TIME_FORMAT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">annotate</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="n">elapsed_input</span> <span class="p">[</span><span class="n">elapsed_input</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat1">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat1" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments_repeat1">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat1" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>elapsed_input</kbd></dt>
 <dd><p>One or more numbers representing elapsed seconds since the start argument or the name of a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with the time column in elapsed seconds.</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat1">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat1" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat1">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat1" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--start</kbd></dt>
 <dd><p>Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.</p>
@@ -235,16 +230,16 @@ $ model_time.py subcommand –help</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_time</span> <span class="n">clip</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">--</span><span class="n">start</span> <span class="n">START</span> <span class="o">--</span><span class="n">clip_start</span> <span class="n">CLIP_START</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="n">elapsed_input</span> <span class="p">[</span><span class="n">elapsed_input</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Positional Arguments_repeat2">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments_repeat2" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments_repeat2">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments_repeat2" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>elapsed_input</kbd></dt>
 <dd><p>One or more numbers representing elapsed seconds since the start argument or the name of a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file with the time column in elapsed seconds.</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat2">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat2" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat2">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat2" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--start</kbd></dt>
 <dd><p>Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.</p>
@@ -292,7 +287,7 @@ $ model_time.py subcommand –help</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

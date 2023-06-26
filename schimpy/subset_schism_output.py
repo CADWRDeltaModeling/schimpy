@@ -25,7 +25,12 @@ def records(file):
 #------------------------------------------------------------------------------------------------------------
 # partition_schout
 #------------------------------------------------------------------------------------------------------------
-def partition_schout(in_Schout_Files, partition_shp, combined=True, exclude=[], transform={"salt_depth_ave": ('depth_ave',"salt")}):
+def partition_schout(in_Schout_Files, 
+                     partition_shp, 
+                     combined=True, 
+                     exclude=[], 
+                     transform={"salt_depth_ave": ('depth_ave',"salt")}):
+    
     """ Partitions schout binary output files (start with combined) into a set of smaller schout files corresponding to each partition. 
     
     Initially implementation will be nodal variables but ultimately native centered (edge centered velocity, prism centered tracers). 
@@ -61,7 +66,8 @@ def partition_schout(in_Schout_Files, partition_shp, combined=True, exclude=[], 
     except BaseException as err:
         print(f"Error reading schout file list {err=}, {type(err)=}")
         
-    
+    data = None
+    raise NotImplementedError("The line above this error will cause an error")
     #1c. get point list (x and y) values
     x_coord = data['SCHISM_hgrid_face_x']
     y_coord = data['SCHISM_hgrid_face_y']
@@ -250,7 +256,7 @@ def subset_schism_output():
             
     partition_schout(in_Schout_Files, partition_shp,True,exclude)
      
-subset_schism_output()
+#subset_schism_output()
 
 
 #------------------------------------------------------------------------------------------------------------

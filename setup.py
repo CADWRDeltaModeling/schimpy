@@ -11,10 +11,11 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-install_requires = ['geopandas', 'vtools3',
+install_requires = ['geopandas', 'vtools3','gdal','libgdal',
                     'xarray', 'netcdf4', 'scipy',
                     'matplotlib', 'statsmodels',
                     'palettable', 'pyyaml',
+                    'boto3',                # only used for download_hrrr
                     'scikit-learn','statsmodels',
                     'beautifulsoup4','pyproj', 'nodepy',
                     'shapely>2.0','rasterstats','param']

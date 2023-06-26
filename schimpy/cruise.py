@@ -1,5 +1,5 @@
 import datetime as dtm
-from profile_plot import profile_plot
+from schimpy.profile_plot import profile_plot
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import fontManager, FontProperties
 from matplotlib import ticker, cm

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Module contains routines to perform grid optimization with two options:
-  1. lsqr without constraint to solve Ax=b (scipy.sparse.linalg.lsqr)
-  2.  minimize function 1/2*||Ax-b||^2 using the L-BFGS-B algorithm (scipy.optimize.fmin_l_bfgs_b)
+  1. lsqr without constraint to solve :math:`Ax=b` (scipy.sparse.linalg.lsqr)
+  2.  minimize function :math`1/2*||Ax-b||^2` using the L-BFGS-B algorithm (scipy.optimize.fmin_l_bfgs_b)
 
 x is depth at nodes with respect to a nominal reference surface (which may be greater than sea level in upstream locations).
 
@@ -17,7 +17,6 @@ Notes:
  * The function "cal_z_ref" only applies to the Bay Delta grid and need to be modified for other grids.
  * This script create an optimized gr3 file (_opt.gr3) only when one set of optimization parameters is specified.
 
-First version, completed on 9/11/2013
 """
 from .gaussian_quadrature import GaussianQuadratureQuad4, GaussianQuadratureTri3, GaussianQuadratureLine2
 from .stacked_dem_fill import stacked_dem_fill
@@ -42,7 +41,7 @@ def object_func(x, A, b):
 def fprime(x, A, b):
     """ The gradient of the objective function with respect to the heights (x).
         This gradient is a vector the same size as x.
-        A^T (Ax-b)
+        :math:`A^T (Ax-b)`
     """
     return A.transpose() * (A * x - b)
 

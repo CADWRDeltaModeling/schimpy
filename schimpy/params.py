@@ -183,6 +183,9 @@ class Opt(param.Parameterized):
     iprecip_off_bnd = param.Integer(default=1, bounds=(0, 1), doc="Turn off precipitation in dry cells? (0: no, 1: yes)")
 
 class OutControls(param.Parameterized):
+    """ Parameters controlling output
+    """
+    
     def get_iof_array_names(self):
         out_params = self.param.params().values()
         out_var_names = [param.name for param in out_params]
@@ -208,9 +211,9 @@ class OutControls(param.Parameterized):
 
 
 class HydroOutput(OutControls):
+    """ Class to specify which variables to output from the SCHISM model
     """
-    Class to specify which variables to output from the SCHISM model
-    """
+    
     dry_flag_node = param.Boolean(True, doc="Whether to output dry flag nodes.", constant=True)
     elevation = param.Boolean(False, doc="Whether to output water surface elevation.")
     air_pressure = param.Boolean(False, doc="Whether to output air pressure.")
@@ -245,8 +248,7 @@ class HydroOutput(OutControls):
     barotropic_pres_grad_xy = param.Boolean(False, doc="Whether to output barotropic pressure gradient in x,y direction.")
 
 class WindWaveOutput(OutControls):
-    """
-    A collection of parameters that define the wind wave outputs.
+    """  A collection of parameters that define the wind wave outputs.
     """
     sig_wave_height = param.Boolean(default=True, doc="Flag to output significant wave height")
     mean_wave_period = param.Boolean(default=True, doc="Flag to output mean wave period")
@@ -373,7 +375,7 @@ def coerce_to_type(schema, value):
         raise BaseException(f'Unknown typename {typename}')
 
 def get_value_dict(map, cls):
-    ''' Create a dict from namelist from name: value elements and coerce to the type in the schema'''
+    """ Create a dict from namelist from name: value elements and coerce to the type in the schema"""
     xdict = {key:map[key]['value'] for key in map if key != 'comment'}
     tdict = cls.param.schema() # get_type_dict(cls)
     xkdict = {} # keep only those defined in the class
@@ -398,9 +400,8 @@ def create_params(namelists):
 
 
 def build_iof_dict(iof_name, vdict, cls): 
-    """
-    builds a dictionary of names from the class cls and the values that have the form :-
-    iof_name(n) = 0 or 1
+    """ Builds dictionary of names from the class cls and the values 
+    that have the form  iof_name(n) = 0 or 1
     where n is an integer and the values are 0 or 1 which map onto False (0) or True (1)
     """
     vars = list(cls.param.schema().keys())[1:] # first one is always name

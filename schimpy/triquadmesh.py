@@ -2,7 +2,7 @@
 """
 This is a class to hold an unstructured triangular and quad mesh
 for SCHISM copied and modified
-from Rusty Chris Collerman's trigrid.
+from Rusty Holleman's trigrid.
 
 Prerequisite: Numpy, rtree package, and libspatialindex for rtree
 """
@@ -118,6 +118,8 @@ class TriQuadMesh(object):
         return self._node2elems
 
     def node(self, node_i):
+        """ Selects a single node"""
+        
         return self._nodes[node_i]
 
     def elem(self, elem_i):
@@ -994,8 +996,18 @@ class TriQuadMesh(object):
 
     def is_elem_on_boundary(self, elem_i):
         """ Check if the given element with index elem_i is on the boundary
-                elem_i = element index
-            return = True if the element is on the boundary, otherwise False
+        
+            Parameters
+            ----------
+            
+            elem_i : int
+                element index
+            
+            Returns
+            -------
+            is_on_boundary : bool
+            True if the element is on the boundary, otherwise False
+            
         """
         is_on_boundary = False
         for edge_i in self.element2edges(elem_i):

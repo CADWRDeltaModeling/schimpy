@@ -1,15 +1,18 @@
 """ Functions to cut certain parts in the mesh by cutting lines.
 """
 ## Author: Kijin Nam, knam@water.ca.gov
-## June, 2014
+
 from schimpy.schism_mesh import read_mesh, write_mesh
 import numpy as np
 import os
 
 def read_lines(fpath):
     """ Read coordinates of cutting line segments from a plain text file.
+        
         The expected format is:
+
         x1 y1 x2 y2
+        
         in each line.
 
         Parameters
@@ -18,7 +21,7 @@ def read_lines(fpath):
             Name of a file containing coordinates of cutting lines
 
         Returns
-        --------
+        -------
         list
             List of coordinates of cutting lines
     """
@@ -42,7 +45,7 @@ def read_lines_from_shapefile(fpath):
             Name of a file containing coordinates of cutting lines
 
         Returns
-        --------
+        -------
         list
             List of coordinates of cutting lines
     """
@@ -67,6 +70,7 @@ def cut_mesh(fpath_gr3_in, lines, fpath_gr3_out, cut_side='left'):
     """ Remove elements of a mesh in one side of cutting polyline segments.
         A mesh is read in from a gr3, and a result mesh is written in another
         gr3 file.
+
         A user needs to be careful that line segments forms a closed division.
         Otherwise, all elements would be deleted.
 

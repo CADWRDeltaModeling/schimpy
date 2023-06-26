@@ -4,14 +4,6 @@ schimpy package
 Submodules
 ----------
 
-schimpy.Interp2D module
------------------------
-
-.. automodule:: schimpy.Interp2D
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 schimpy.adjust\_source\_sink module
 -----------------------------------
 
@@ -36,10 +28,10 @@ schimpy.batch\_metrics module
    :undoc-members:
    :show-inheritance:
 
-schimpy.bay\_delta\_hotstart module
------------------------------------
+schimpy.bctide module
+---------------------
 
-.. automodule:: schimpy.bay_delta_hotstart
+.. automodule:: schimpy.bctide
    :members:
    :undoc-members:
    :show-inheritance:
@@ -164,6 +156,14 @@ schimpy.cut\_mesh module
    :undoc-members:
    :show-inheritance:
 
+schimpy.download\_hrrr module
+-----------------------------
+
+.. automodule:: schimpy.download_hrrr
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.embed\_raster module
 ----------------------------
 
@@ -180,18 +180,10 @@ schimpy.gaussian\_quadrature module
    :undoc-members:
    :show-inheritance:
 
-schimpy.gen\_elev2D module
+schimpy.gen\_elev2d module
 --------------------------
 
-.. automodule:: schimpy.gen_elev2D
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-schimpy.gen\_elev2D1 module
----------------------------
-
-.. automodule:: schimpy.gen_elev2D1
+.. automodule:: schimpy.gen_elev2d
    :members:
    :undoc-members:
    :show-inheritance:
@@ -224,6 +216,22 @@ schimpy.hotstart\_inventory module
 ----------------------------------
 
 .. automodule:: schimpy.hotstart_inventory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.hrr3 module
+-------------------
+
+.. automodule:: schimpy.hrr3
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.interp\_2d module
+-------------------------
+
+.. automodule:: schimpy.interp_2d
    :members:
    :undoc-members:
    :show-inheritance:
@@ -276,18 +284,34 @@ schimpy.model\_time module
    :undoc-members:
    :show-inheritance:
 
-schimpy.plot\_default\_formats module
--------------------------------------
+schimpy.namelist module
+-----------------------
 
-.. automodule:: schimpy.plot_default_formats
+.. automodule:: schimpy.namelist
    :members:
    :undoc-members:
    :show-inheritance:
 
-schimpy.polygons module
------------------------
+schimpy.nudging module
+----------------------
 
-.. automodule:: schimpy.polygons
+.. automodule:: schimpy.nudging
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.params module
+---------------------
+
+.. automodule:: schimpy.params
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.plot\_default\_formats module
+-------------------------------------
+
+.. automodule:: schimpy.plot_default_formats
    :members:
    :undoc-members:
    :show-inheritance:

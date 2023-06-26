@@ -7,8 +7,7 @@ import copy
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
-import gdal
-import ogr
+from osgeo import gdal
 from schimpy.schism_mesh import read_mesh, write_mesh
 from schimpy.schism_polygon import read_polygons, Polygon, Point
 from scipy.ndimage import gaussian_filter as gfilt

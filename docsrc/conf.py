@@ -54,7 +54,7 @@ autosummary_generate = False
 autodoc_member_order = 'alphabetical'
 autodoc_mock_imports = ["numpy","nodepy"]
 autosummary_mock_imports = ["numpy","nodepy"]
-numpydoc_show_class_members = True 
+numpydoc_class_members_toctree = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -95,7 +95,7 @@ release = schimpy.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

@@ -1,4 +1,4 @@
-from three_point_linear_norm import *
+from schimpy.three_point_linear_norm import *
 
 
 location_labels = {54: "Martinez",

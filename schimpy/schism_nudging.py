@@ -17,7 +17,7 @@ from netCDF4 import Dataset
 from schimpy.schism_mesh import read_mesh, write_mesh
 from schimpy.geo_tools import utm2ll
 from shapely.geometry import Polygon
-from schimpy  import Interp2D
+from schimpy  import interp_2d
 import time as timer
 from vtools.data.vtime import hours,days
 import os
@@ -1109,7 +1109,7 @@ class nudging(object):
                                 raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
                             # removing all the nans.                            
-                            invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
+                            invdisttree = interp_2d.Invdisttree(obs_loc_t, vals,
                                            leafsize=10, stat=1)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
@@ -1124,7 +1124,7 @@ class nudging(object):
                             if (vals<0).any():
                                 raise Exception("negative values detected in %s for %s: "%(v['data'],name),
                                                  vals[vals<0])
-                            invdisttree = Interp2D.Invdisttree(obs_loc_t, vals,
+                            invdisttree = interp_2d.Invdisttree(obs_loc_t, vals,
                                            leafsize=10, stat=1)
                             node_xy = np.array([self.node_x[imap_v],
                                                 self.node_y[imap_v]]).T
@@ -1201,7 +1201,7 @@ class nudging(object):
         #                 values_v = []
         #                 for t in vdata.time:
         #                     vals = vdata.sel(time=t).values
-        #                     invdisttree = Interp2D.Invdisttree(obs_loc, vals,
+        #                     invdisttree = interp_2d.Invdisttree(obs_loc, vals,
         #                                    leafsize=10, stat=1)
         #                     node_xy = np.array([self.node_x[imap_v],
         #                                         self.node_y[imap_v]]).T

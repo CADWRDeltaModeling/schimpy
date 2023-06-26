@@ -6,15 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Contributing &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
+    <title>Contributing &#8212; schimpy 1.6.1+1.g8c4c2f5.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -157,38 +155,38 @@ are welcome :)</p></li>
 <ol class="arabic">
 <li><p>Fork the <cite>schimpy</cite> repo on GitHub.</p></li>
 <li><p>Clone your fork locally:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:your_name_here/schimpy.git
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:your_name_here/schimpy.git
 </pre></div>
 </div>
 </li>
 </ol>
 <p>3. Install your local copy into a conda enviornment. Assuming you have conda installed,
 this is how you set up your fork for local development:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># run commands in setup_devenv.bat on command line</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="c1"># run commands in setup_devenv.bat on command line</span>
 <span class="c1"># you now have a dev_schimpy conda environment</span>
-$ <span class="nb">cd</span> schimpy/
-$ conda activate dev_schimpy
-$ pip install -e . <span class="c1"># Do this last as you don&#39;t want pip pulling in any dependencies</span>
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>schimpy/
+$<span class="w"> </span>conda<span class="w"> </span>activate<span class="w"> </span>dev_schimpy
+$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span><span class="c1"># Do this last as you don&#39;t want pip pulling in any dependencies</span>
 </pre></div>
 </div>
 <ol class="arabic" start="4">
 <li><p>Create a branch for local development:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git checkout -b name-of-your-bugfix-or-feature
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>name-of-your-bugfix-or-feature
 </pre></div>
 </div>
 <p>Now you can make your changes locally.</p>
 </li>
 <li><p>When you’re done making changes, check that your changes pass the
 tests:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> tests
-$ pytest
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>tests
+$<span class="w"> </span>pytest
 </pre></div>
 </div>
 </li>
 <li><p>Commit your changes and push your branch to GitHub:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git add .
-$ git commit -m <span class="s2">&quot;Your detailed description of your changes.&quot;</span>
-$ git push origin name-of-your-bugfix-or-feature
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>add<span class="w"> </span>.
+$<span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Your detailed description of your changes.&quot;</span>
+$<span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>name-of-your-bugfix-or-feature
 </pre></div>
 </div>
 </li>
@@ -215,7 +213,7 @@ feature to the list in README.rst.</p></li>
 <section id="tips">
 <h2>Tips<a class="headerlink" href="#tips" title="Permalink to this heading">¶</a></h2>
 <p>To run a subset of tests:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ pytest tests.test_schimpy
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pytest<span class="w"> </span>tests.test_schimpy
 </pre></div>
 </div>
 </section>
@@ -224,9 +222,9 @@ feature to the list in README.rst.</p></li>
 <p>A reminder for the maintainers on how to deploy.
 Make sure all your changes are committed (including an entry in HISTORY.rst).
 Then run:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$ git tag -a major.minor.patch
-$ git push
-$ git push --tags
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>tag<span class="w"> </span>-a<span class="w"> </span>major.minor.patch
+$<span class="w"> </span>git<span class="w"> </span>push
+$<span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>--tags
 </pre></div>
 </div>
 <p>Jenkins build will deploy to cadwr-dms channel within the hour</p>
@@ -263,7 +261,7 @@ $ git push --tags
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

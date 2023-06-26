@@ -6,19 +6,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Assigning Bathymetry &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
+    <title>Assigning Bathymetry &#8212; schimpy 1.6.1+1.g8c4c2f5.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Post-processing" href="postprocessing.html" />
+    <link rel="next" title="SCHISM hotstart" href="hotstart.html" />
     <link rel="prev" title="Model time conversion" href="model_time.html" /> 
   </head><body>
 
@@ -36,7 +34,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="postprocessing.html" title="Post-processing"
+          <a href="hotstart.html" title="SCHISM hotstart"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="model_time.html" title="Model time conversion"
@@ -54,29 +52,29 @@
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Assigning Bathymetry</a><ul>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 <li><a class="reference internal" href="#assigning-depths-from-prioritized-dems">Assigning depths from prioritized DEMs</a><ul>
 <li><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a class="reference internal" href="#smoother-for-complex-topography">Smoother for complex topography</a><ul>
 <li><a class="reference internal" href="#subcommands">subcommands</a></li>
-<li><a class="reference internal" href="#Sub-commands:">Sub-commands:</a><ul>
+<li><a class="reference internal" href="#Sub-commands">Sub-commands</a><ul>
 <li><a class="reference internal" href="#smooth">smooth</a><ul>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#view">view</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li><a class="reference internal" href="#Named Arguments_repeat1">Named Arguments</a></li>
+<li><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments_repeat1">Named Arguments</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#save">save</a><ul>
-<li><a class="reference internal" href="#Named Arguments_repeat2">Named Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments_repeat2">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -84,8 +82,8 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#optimizing-depths-for-volume">Optimizing depths for volume</a><ul>
-<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
-<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+<li><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -100,8 +98,8 @@
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="postprocessing.html"
-                          title="next chapter">Post-processing</a></p>
+    <p class="topless"><a href="hotstart.html"
+                          title="next chapter">SCHISM hotstart</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -130,14 +128,14 @@
             
   <section id="assigning-bathymetry">
 <h1>Assigning Bathymetry<a class="headerlink" href="#assigning-bathymetry" title="Permalink to this heading">¶</a></h1>
-<p>Converting a 2dm file to gr3 or between gr3/2dm and shapefile</p>
+<p>Converting a 2dm file to gr3 or between gr3 or 2dm and shapefile</p>
 <p><p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">proj4</span> <span class="n">PROJ4</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">crs</span> <span class="n">CRS</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h2>
+<section id="named-arguments">
+<h2>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h2>
 <dl class="option-list">
 <dt><kbd>--input</kbd></dt>
 <dd><p>Input mesh file</p>
@@ -145,22 +143,24 @@
 <dt><kbd>--output</kbd></dt>
 <dd><p>Output mesh file</p>
 </dd>
-<dt><kbd>--proj4</kbd></dt>
-<dd><p>Proj4 string for the projection</p>
+<dt><kbd>--crs</kbd></dt>
+<dd><p>crs string for the projection</p>
 </dd>
 </dl>
 </section>
 <section id="assigning-depths-from-prioritized-dems">
 <h2>Assigning depths from prioritized DEMs<a class="headerlink" href="#assigning-depths-from-prioritized-dems" title="Permalink to this heading">¶</a></h2>
+<p>These tools are used by the preprocessor but also work with functions that can
+be used generically and consistently with SCHISM.</p>
 <section id="stacked-dem-fill">
 <h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Permalink to this heading">¶</a></h3>
 <p><p>Fill node elevations in a <a href="#id1"><span class="problematic" id="id2">*</span></a>.2dm SMS mesh or gr3 file using a prioritized list of DEMs.</p>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outfile</span> <span class="n">OUTFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
 </pre></div>
 </div>
-<section id="Positional Arguments">
-<h4>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h4>
+<section id="positional-arguments">
+<h4>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
 <dt><kbd>filename</kbd></dt>
 <dd><p>name of 2dm or gr3 file</p>
@@ -170,12 +170,9 @@
 </dd>
 </dl>
 </section>
-<section id="Named Arguments">
-<h4>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h4>
+<section id="named-arguments">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h4>
 <dl class="option-list">
-<dt><kbd>--outfile</kbd></dt>
-<dd><p>Name of output if input is csv</p>
-</dd>
 <dt><kbd>--elev2depth</kbd></dt>
 <dd><p>Convert elevation to depth by flipping sign. This is typical when using gr3 format, less so with 2dm.</p>
 <p>Default: False</p>
@@ -191,8 +188,8 @@
 <section id="smoother-for-complex-topography">
 <h2>Smoother for complex topography<a class="headerlink" href="#smoother-for-complex-topography" title="Permalink to this heading">¶</a></h2>
 <p>Often it is necessary to incorporate inudated marshy areas where elevations
-are poorly sampled and contours are tortuous. The script <em>contour_smooth.py</em>
-uses min-max curvature flow (Malladi and Sethian) to impose a minimum length scale
+are poorly sampled and contours are tortuous. The script contour_smooth.py
+uses minmax curvature flow (Malladi and Sethian) to impose a minimum length scale
 of change for contours, essentially unraveling the features that are most contorted.</p>
 <p><p>Uses the min-max curvature flow algorithm of Malladi and Sethian to simplify DEM topograph
 The script requires a subcommand like: $ contour_smooth.py smooth
@@ -215,17 +212,16 @@ $ model_time.py subcommand –help</p>
 </dd>
 </dl>
 </section>
-<section id="Sub-commands:">
-<h3>Sub-commands:<a class="headerlink" href="#Sub-commands:" title="Permalink to this heading">¶</a></h3>
+<section id="Sub-commands">
+<h3>Sub-commands<a class="headerlink" href="#Sub-commands" title="Permalink to this heading">¶</a></h3>
 <section id="smooth">
 <h4>smooth<a class="headerlink" href="#smooth" title="Permalink to this heading">¶</a></h4>
 <p>Smooth the input DEM.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">smooth</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scales</span> <span class="p">[</span><span class="n">SCALES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">nstep</span> <span class="n">NSTEP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">max_time</span> <span class="n">MAX_TIME</span><span class="p">]</span>
-                      <span class="p">[</span><span class="o">--</span><span class="n">report_interval</span> <span class="n">REPORT_INTERVAL</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">smooth</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scales</span> <span class="p">[</span><span class="n">SCALES</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">nstep</span> <span class="n">NSTEP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">max_time</span> <span class="n">MAX_TIME</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">report_interval</span> <span class="n">REPORT_INTERVAL</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--input</kbd></dt>
 <dd><p>Input file name, file in tiff format.</p>
@@ -255,8 +251,8 @@ $ model_time.py subcommand –help</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">view</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">levels</span> <span class="p">[</span><span class="n">LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">vmin</span> <span class="n">VMIN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vmax</span> <span class="n">VMAX</span><span class="p">]</span> <span class="n">file0</span> <span class="n">file1</span>
 </pre></div>
 </div>
-<section id="Positional Arguments">
-<h5>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h5>
+<section id="positional-arguments">
+<h5>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>file0</kbd></dt>
 <dd><p>First file in .npy format.</p>
@@ -266,8 +262,8 @@ $ model_time.py subcommand –help</p>
 </dd>
 </dl>
 </section>
-<section id="Named Arguments_repeat1">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat1" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat1">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat1" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--levels</kbd></dt>
 <dd><p>Contour levels</p>
@@ -290,8 +286,8 @@ $ model_time.py subcommand –help</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">save</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dumpfile</span> <span class="n">DUMPFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">original</span> <span class="n">ORIGINAL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outfile</span> <span class="n">OUTFILE</span><span class="p">]</span>
 </pre></div>
 </div>
-<section id="Named Arguments_repeat2">
-<h5>Named Arguments<a class="headerlink" href="#Named Arguments_repeat2" title="Permalink to this heading">¶</a></h5>
+<section id="named-arguments_repeat2">
+<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat2" title="Permalink to this heading">¶</a></h5>
 <dl class="option-list">
 <dt><kbd>--dumpfile</kbd></dt>
 <dd><p>Dump file from smoothing (npy format)</p>
@@ -309,15 +305,20 @@ $ model_time.py subcommand –help</p>
 </section>
 <section id="optimizing-depths-for-volume">
 <h2>Optimizing depths for volume<a class="headerlink" href="#optimizing-depths-for-volume" title="Permalink to this heading">¶</a></h2>
-<p>A mesh draped over noisy bathymetry data does not necessarily represent important moments (volumes and vertical face areas) smoothly and realistically. To better represent these facets
-of the geometry, we compare the volumetric quantities that come from SCHISM’s shape functions (which are much like a TIN) to a higher order quadrature using the DEM with bilinear interpolation. The quadrature is more accurate, and also incorporates more sample points.</p>
+<p>A mesh draped over noisy bathymetry data does not necessarily represent important moments
+such as volumes and vertical face areas smoothly and realistically.
+To better represent these facets of the geometry,
+we compare the volumetric quantities that come from SCHISM shape functions
+(which are much like a TIN) to a higher order quadrature using the DEM
+with bilinear interpolation. The quadrature is more accurate, and also
+incorporates more sample points.</p>
 <p><p>Perform grid optimization with a <a href="#id3"><span class="problematic" id="id4">*</span></a>.2dm SMS mesh or gr3 file. An optimized gr3 file with extension _opt.gr3 will be created if only one set of optimization parameter specified.</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">grid_opt</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">optfile</span> <span class="n">OPTFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">solver</span> <span class="n">SOLVER</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span> <span class="n">optparm</span>
 </pre></div>
 </div>
-<section id="Positional Arguments">
-<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this heading">¶</a></h3>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>filename</kbd></dt>
 <dd><p>name of 2dm or gr3 file</p>
@@ -330,8 +331,8 @@ of the geometry, we compare the volumetric quantities that come from SCHISM’s 
 </dd>
 </dl>
 </section>
-<section id="Named Arguments">
-<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this heading">¶</a></h3>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Permalink to this heading">¶</a></h3>
 <dl class="option-list">
 <dt><kbd>--optfile</kbd></dt>
 <dd><p>name for the gr3 file for the optimized results</p>
@@ -362,7 +363,7 @@ of the geometry, we compare the volumetric quantities that come from SCHISM’s 
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="postprocessing.html" title="Post-processing"
+          <a href="hotstart.html" title="SCHISM hotstart"
              >next</a> |</li>
         <li class="right" >
           <a href="model_time.html" title="Model time conversion"
@@ -375,7 +376,7 @@ of the geometry, we compare the volumetric quantities that come from SCHISM’s 
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

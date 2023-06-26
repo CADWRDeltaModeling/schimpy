@@ -5,7 +5,7 @@
 .. _tools-home:
 
 SCHIMPY Toolset
-========================
+=================
 
 The *schimpy* toolset is designed to help to pre- and post-process SCHISM
 simulations more easily. In particular, the tools allow you

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 23 12:30:52 2021
 
-@author: zzhang
-"""
 
 import pandas as pd
 import numpy as np
@@ -11,16 +7,18 @@ import yaml
 from schimpy.schism_setup import create_schism_setup
 
 def read_source_sink_yaml(yaml_fn):
-    """
+    """ Read source sink yaml file
+    
     Parameters
     ----------
-    yaml_fn : STR
+    yaml_fn : str
         source_sink.yaml filename.
 
     Returns
     -------
     df_sources : PANDAS dataframe
         For sources
+        
     df_sinks : PANDAS dataframe
         For sinks
     """
@@ -39,7 +37,8 @@ def read_source_sink_yaml(yaml_fn):
     return df_sources, df_sinks
 
 def write_source_sink_yaml(df_sources,df_sinks,yaml_fn):
-    """
+    """ Write source sink to yaml
+    
     Parameters
     ----------
     df_sources : PANDAS dataframe
@@ -84,9 +83,11 @@ def write_source_sink_csv(th, csv_fn):
     th.to_csv(csv_fn,sep=' ',index=False)
 
 def unsorted_unique(a):
-    """
-    np.unique automatically sorts the elements. This function performs unique
+    """ Find unique elements with no sorting
+    
+    `np.unique` automatically sorts the elements. This function performs unique
     without sorting. 
+    
     Parameters
     ----------
     a : List or array
@@ -97,6 +98,7 @@ def unsorted_unique(a):
     a_unique : array
         Unsorted unique array
     """
+
     indexes = np.unique(a, return_index = True)[1]
     a_unique = np.array(a)[sorted(indexes)]
     return a_unique
@@ -157,7 +159,9 @@ def concat_msource_csv(csv_fn1,csv_fn2,merged_source_sink_in,
 
 def concat_vsource_sink_csv(csv_fn1,csv_fn2,merged_source_sink_in,
                             csv_type,csv_merged,freq='infer',how='left'):
-    """
+    
+    """ Concatenate source and sink files
+    
     Parameters
     ----------
     csv_fn1 : STR
@@ -216,11 +220,12 @@ def concat_vsource_sink_csv(csv_fn1,csv_fn2,merged_source_sink_in,
     write_source_sink_csv(th_merged,csv_merged)   
     
 def read_source_sink_th(th_fn, source_or_sink_df):
-    """
+    """ Read source_sink.th file
+    
     Parameters
     ----------
     th_fn : STR
-        *.th file
+        \*.th file
     source_or_sink_df : PANDAS DATAFRAME
         source_df or sink_df produced by read_source_sink_in.
 
@@ -248,7 +253,8 @@ def read_source_sink_th(th_fn, source_or_sink_df):
     return th  
 
 def read_source_sink_in(source_sink_in):  
-    """  
+    """ Parse source sink.in file 
+    
     Parameters
     ----------
     source_sink_in : STR
@@ -314,8 +320,7 @@ def read_source_sink_in(source_sink_in):
     
 def write_source_sink_in(source_sink_yaml, hgrid_fn, 
                          source_sink_in='source_sink.in'):
-    """
-    Create source_sink.in based on hgrid and source_sink.yaml using the 
+    """ Create source_sink.in based on hgrid and source_sink.yaml using the 
     create_source_sink_in function in schimpy preprocessor
     
     Parameters
@@ -338,8 +343,8 @@ def write_source_sink_in(source_sink_yaml, hgrid_fn,
     s.create_source_sink_in(source_sink,source_sink_in)
 
 def yaml2csv(source_yaml,source_csv): 
-    """
-    Converting from source yaml file to source csv file
+    """ Converting source yaml file to source csv file
+    
     Parameters
     ----------
     source_yaml :YAML FILENAME 
@@ -365,18 +370,19 @@ def yaml2csv(source_yaml,source_csv):
     df.to_csv(source_csv)
 
 def csv2yaml(source_csv,source_yaml):
-    """
-    Converting from source csv to source yaml file
+    """ Converting from source csv to source yaml file
+    
     Parameters
     ----------
     source_csv : CSV FILENAME
         DESCRIPTION.
+        
     source_yaml : YAML FILENAME
         DESCRIPTION.
 
     Returns
     -------
-    None.
+    None
 
     """
     csv_data = pd.read_csv(source_csv)

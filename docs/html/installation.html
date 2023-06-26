@@ -6,15 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Installation &#8212; schimpy 1.4.2+0.g2629342.dirty documentation</title>
+    <title>Installation &#8212; schimpy 1.6.1+1.g8c4c2f5.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -102,7 +100,7 @@
 <h2>Stable release<a class="headerlink" href="#stable-release" title="Permalink to this heading">¶</a></h2>
 <p>We recommend conda for installing schimpy. The simplest way to install
 schimpy is to run this command in your terminal:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda install -c cadwr-dms schimpy
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>cadwr-dms<span class="w"> </span>schimpy
 </pre></div>
 </div>
 <p>For greater flexibility and a set of tools that are commonly used with SCHISM, however,
@@ -114,18 +112,18 @@ schism_environment.yml file that is in the parent directory of
 <h2>From sources<a class="headerlink" href="#from-sources" title="Permalink to this heading">¶</a></h2>
 <p>The sources for schimpy can be downloaded from the <a class="reference external" href="https://github.com/CADWRDeltaModeling/schimpy">Github repo</a>.</p>
 <p>You can either clone the public repository:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git clone https://github.com/CADWRDeltaModeling/schimpy
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/CADWRDeltaModeling/schimpy
 </pre></div>
 </div>
 <p>Or download the <a class="reference external" href="https://github.com/CADWRDeltaModeling/schimpy/tarball/master">tarball</a>:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>curl -OJL https://github.com/CADWRDeltaModeling/schimpy/tarball/master
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>curl<span class="w"> </span>-OJL<span class="w"> </span>https://github.com/CADWRDeltaModeling/schimpy/tarball/master
 </pre></div>
 </div>
 <p>Once you have a copy of the source, you can install it with:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>make sure all dependencies from setup_devenv.bat are installed by conda
-<span class="gp">$ </span>setup_devenv.bat <span class="c1"># or copy and paste the commands into shell</span>
-<span class="gp">$ </span>conda activate dev_schimpy
-<span class="gp">$ </span>pip install --no-deps -e .
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>make<span class="w"> </span>sure<span class="w"> </span>all<span class="w"> </span>dependencies<span class="w"> </span>from<span class="w"> </span>setup_devenv.bat<span class="w"> </span>are<span class="w"> </span>installed<span class="w"> </span>by<span class="w"> </span>conda
+<span class="gp">$ </span>setup_devenv.bat<span class="w"> </span><span class="c1"># or copy and paste the commands into shell</span>
+<span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>dev_schimpy
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>--no-deps<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
@@ -161,7 +159,7 @@ schism_environment.yml file that is in the parent directory of
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, California Department of Water Resources.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
     </div>
   </body>
 </html>

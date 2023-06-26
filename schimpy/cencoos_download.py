@@ -1,6 +1,5 @@
 from netCDF4 import *
 import pyproj 
-import ogr, osr
 import numpy as np
 import time
 import datetime as dtm

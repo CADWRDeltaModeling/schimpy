@@ -10,7 +10,7 @@ from shapely.geometry import LineString
 class Invdisttree:
     """ Inverse-distance-weighted interpolation using KDTree
 
-    Example
+    Examples
     --------   
     tree = interp_2d.Invdisttree(obs_xy) # initialize KDTree with observational points
     tree.weights(node_xy)  # calculate weights for each node. 

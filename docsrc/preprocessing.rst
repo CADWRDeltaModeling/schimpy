@@ -128,13 +128,14 @@ each region.:
     t_nudge.gr3: nudge.yaml
     diffmin.gr3: diffmin.yaml
 
-Similar to the previous section 'gr3 with constant,' this section creates gr3 files that have the same mesh structure and horizontal coordinates as the final output mesh but with modified depth values specified in polygon files. A polygon file can have multiple polygons with constants or equations. See the format of the :ref:`polygon_input` for further information.
+
+Similar to the previous section 'gr3 with constant' this section creates gr3 files that have the same mesh structure and horizontal coordinates as the final output mesh but with modified depth values specified in polygon files. A polygon file can have multiple polygons with constants or equations. See the format of the :ref:`polygon_input` for further information.
 
 
 Generate prop with Polygons
 '''''''''''''''''''''''''''''
 
-The \*.prop file differs from the *.gr3 file in that it is element centered. The 'prop with polygons' section
+The \*.prop file differs from the \*.gr3 file in that it is element centered. The 'prop with polygons' section
 generates these files from regions delineated by polygons:
 
 .. code-block::yaml

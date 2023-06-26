@@ -3,7 +3,9 @@
 Module for creating a schism hotstart file
 
 Options:
+
 1. Centering:
+
     * node2D: node (2D surface)
     * node3D: node at whole level
     * edge: edge center at whole level (mainly for horizontal velocty)
@@ -12,8 +14,10 @@ Options:
     * tr_el need to be generated for the hotstart.nc file.
         *  tr_nd = tr_nd0 (on nodes)
         *  tr_el (on element at middle level)
+
 2. Initializer:
-    * text_init: 2D map input from either *.prop or *.ic files; require input text file.
+
+    * text_init: 2D map input from either \*.prop or \*.ic files; require input text file.
     * simple_trend: can either be a number or an equation that depends on x (lat) and y(lon). e.g,: 0.97 + 1.e-5*x
     * patch_init: regional-based method. Polygon shapefile input required.
     * extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects.
@@ -26,6 +30,7 @@ Required data files:
     * hgrid.gr3
     * vgrid.in
     * hotstart.yaml and input files defined in the yaml file.
+    
 """
 
 import yaml
@@ -1140,18 +1145,21 @@ def describe_tracers(param_nml, modules=['HYDRO']):
     """ return the number of tracers, the sequence of the tracers and a list
     of tracer names based on the input list of modules and corresponding
     input files.
+    
     Availabel modules are:
-!     1: T (default)
-!     2: S (default)
-!     3: GEN
-!     4: AGE
-!     5: SED3D: SED
-!     6: EcoSim: ECO
-!     7: ICM: ICM and/or ICM_PH
-!     8: CoSiNE: COSINE
-!     9: Feco: FIB
-!    10: TIMOR
-!    11: FABM
+    
+      #. T (default)
+      #. S (default)
+      #. GEN
+      #. AGE
+      #. SED3D: SED
+      #. EcoSim: ECO
+      #. ICM: ICM and/or ICM_PH
+      #. CoSiNE: COSINE
+      #. Feco: FIB
+      #. TIMOR
+      #. FABM
+    
     The script is mainly translated from schism_ini.F90
     """
     ntrs = []  # number of tracers for each module
