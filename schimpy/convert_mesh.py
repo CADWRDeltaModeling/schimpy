@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 """ Mesh converter
 """
 from schimpy.schism_mesh import read_mesh, write_mesh
@@ -22,6 +23,7 @@ def main():
 
 
 def convert_mesh(args):
+    """ Converts mesh files to new format (shape file, gr3 etc) """
     mesh = read_mesh(args.input)
     write_mesh(mesh, args.output, crs=args.crs)
 

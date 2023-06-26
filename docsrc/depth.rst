@@ -33,8 +33,6 @@ are poorly sampled and contours are tortuous. The script contour_smooth.py
 uses minmax curvature flow (Malladi and Sethian) to impose a minimum length scale
 of change for contours, essentially unraveling the features that are most contorted.
 
-.. contour_smooth.png
-
 .. argparse::
     :module: schimpy.contour_smooth
     :func: create_arg_parser

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Working with SMS &#8212; schimpy 1.6.1+1.g8c4c2f5.dirty documentation</title>
+    <title>Working with SMS &#8212; schimpy 1.6.1+2.g8bfbb64.dirty documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -248,16 +248,19 @@ that were designed to help with this problem: <cite>clip_dems.py</cite> and <cit
 </section>
 <p>The script clip_dems.py is used to create mini-DEMs on the fly that are small
 enough to be brought into the SMS environment as rasters without slowing it down too much.
-The same The:ref:<cite>dem_list_file</cite> is used here as elsewhere in the pre-processor.</p>
+The same The <a class="reference internal" href="preprocessing.html#dem-list-file"><span class="std std-ref">DEM List File</span></a> is used here as elsewhere in the pre-processor.</p>
 <p>The normal pattern of work is to zoom into the area of interst in SMS, save the
 work area as a jpeg image and use it as the <cite>image</cite> argument to <cite>clip_dems.py</cite>.
 One cut DEM will be produced for each DEM on the <cite>dem_list</cite> file that intersects the
 work area, using file names in order of priority (0 highest). The cut DEMs would then
-be imported and visualized in SMS, ideally using contours as the viewing choice and a carefully crafted color map designed to focus on the elevations that are locally most important.</p>
+be imported and visualized in SMS, ideally using contours as the
+viewing choice and a carefully crafted color map designed to focus on the
+elevations that are locally most important.</p>
 </section>
 <section id="stacked-dem-fill">
 <h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Permalink to this heading">¶</a></h3>
-<p><p>Fill node elevations in a <a href="#id1"><span class="problematic" id="id2">*</span></a>.2dm SMS mesh or gr3 file using a prioritized list of DEMs.</p>
+<p>The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.</p>
+<p><p>Fill node elevations in a .2dm SMS mesh or gr3 file using a prioritized list of DEMs.</p>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
 </pre></div>
@@ -286,8 +289,6 @@ be imported and visualized in SMS, ideally using contours as the viewing choice 
 </dd>
 </dl>
 </section>
-<p>The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.
-It can be used on a 2dm file in which case the</p>
 </section>
 </section>
 </section>

@@ -3,11 +3,12 @@
 
 """ This module contains tools for a smoother for DEMs (currently tiff format) based on curvature flow
     The algorithm is based on one by Malladi and Sethian, and results in a simplification of contours while allowing
-    sharp gradients as long as they are persistent. So it is *not* a cure for pressure gradient errors a la Hannah.
+    sharp gradients as long as they are persistent. So it is not a cure for pressure gradient errors a la Hannah.
     The script shows some artefacts of a time when it wasn't particularly stable and could run out of memory. 
-    In particular, the algorithm dumps out intermediate arrays as it goes along and these have to be visualized or saved
-    using the appropriate subcommands or functions. Stability is no longer an issue -- it has been good for quite a while.
-    Not so sure about memory. I've not tested a big problem yet on a big DEM on 64bit python.
+    In particular, the algorithm dumps out intermediate arrays as it goes along and 
+    these have to be visualized or saved using the appropriate subcommands or functions. 
+    Stability is no longer an issue. it has been good for quite a while.
+    Not so sure about memory. We've not tested a big problem yet on a big DEM on 64bit python.
 """
 
 
@@ -59,7 +60,7 @@ class RasterWrapper(object):
         outband.FlushCache()
     
 def calc_f(t,data,width_shape):
-    """ This is the right hand side of the semi-discretized operator (in space) so that it can be integrated in time"""
+    """ Right hand side of the semi-discretized operator (in space) so that it can be integrated in time"""
     width = width_shape[0]
     shp = width_shape[1]
     dem = data.reshape(shp)
@@ -267,7 +268,7 @@ def create_arg_parser():
       """
       Uses the min-max curvature flow algorithm of Malladi and Sethian to simplify DEM topograph
       The script requires a subcommand like: $ contour_smooth.py smooth
-      The most basic subcommand is "smooth". 
+      The most basic subcommand is `smooth`. 
       Given limited efficiency at the moment, the script is generally run on a small area 
       and dumps intermediate points in the processing as numpy arrays so you can 
       view the differences using the contour_smooth.py view subcommand.

@@ -13,6 +13,7 @@ The script that converts SMS mesh to SCHISM gr3 format is available as a standal
 
 convert_mesh
 ^^^^^^^^^^^^
+
 schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files
 
 .. argparse::
@@ -59,23 +60,24 @@ clip_dems
 
 The script clip_dems.py is used to create mini-DEMs on the fly that are small 
 enough to be brought into the SMS environment as rasters without slowing it down too much. 
-The same The:ref:`dem_list_file` is used here as elsewhere in the pre-processor.
+The same The :ref:`dem_list_file` is used here as elsewhere in the pre-processor.
 
 The normal pattern of work is to zoom into the area of interst in SMS, save the
 work area as a jpeg image and use it as the `image` argument to `clip_dems.py`.
 One cut DEM will be produced for each DEM on the `dem_list` file that intersects the 
 work area, using file names in order of priority (0 highest). The cut DEMs would then 
-be imported and visualized in SMS, ideally using contours as the viewing choice and a carefully crafted color map designed to focus on the elevations that are locally most important.
+be imported and visualized in SMS, ideally using contours as the 
+viewing choice and a carefully crafted color map designed to focus on the 
+elevations that are locally most important.
 
 stacked_dem_fill
 ^^^^^^^^^^^^^^^^
+
+The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.
+
 
 .. argparse::
     :module: schimpy.stacked_dem_fill
     :func: create_arg_parser
     :prog: stacked_dem_fill
-
-The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.
-It can be used on a 2dm file in which case the 
-
 

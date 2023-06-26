@@ -1,21 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-Module contains routines to perform grid optimization with two options:
-  1. lsqr without constraint to solve :math:`Ax=b` (scipy.sparse.linalg.lsqr)
-  2.  minimize function :math`1/2*||Ax-b||^2` using the L-BFGS-B algorithm (scipy.optimize.fmin_l_bfgs_b)
+""" Routines to perform grid optimization for volumetric consistency with finer DEM
 
-x is depth at nodes with respect to a nominal reference surface (which may be greater than sea level in upstream locations).
+    There are two methods:
 
-Regularization:
+      1. lsqr without constraint to solve :math:`Ax=b` (scipy.sparse.linalg.lsqr)
+      2.  minimize function :math:`1/2*||Ax-b||^2` using the L-BFGS-B algorithm (scipy.optimize.fmin_l_bfgs_b)
 
-  1.  close to the original values for all nodes: damp
-  2.  minimize the 1st derivative of node elevation along land boundaries: damp_shoreline
+    where
 
-Notes:
+    x is depth at nodes with respect to a nominal reference surface (which may be greater than sea level in upstream locations).
 
- * The function "cal_z_ref" only applies to the Bay Delta grid and need to be modified for other grids.
- * This script create an optimized gr3 file (_opt.gr3) only when one set of optimization parameters is specified.
+    Regularization:
+
+      1.  close to the original values for all nodes: damp
+      2.  minimize the 1st derivative of node elevation along land boundaries: damp_shoreline
+
+    Notes:
+
+     * The function `cal_z_ref` only applies to the Bay Delta grid and need to be modified for other grids.
+     * This script create an optimized gr3 file (_opt.gr3) only when one set of optimization parameters is specified.
 
 """
 from .gaussian_quadrature import GaussianQuadratureQuad4, GaussianQuadratureTri3, GaussianQuadratureLine2
@@ -39,9 +43,8 @@ def object_func(x, A, b):
 
 
 def fprime(x, A, b):
-    """ The gradient of the objective function with respect to the heights (x).
+    """ The gradient of the objective function with respect to the heights.
         This gradient is a vector the same size as x.
-        :math:`A^T (Ax-b)`
     """
     return A.transpose() * (A * x - b)
 
@@ -53,11 +56,6 @@ class GridOptimizer(object):
     def __init__(self, **kwargs):
         """ Constructor
 
-            Parameters
-            ----------
-
-            Returns
-            -------
         """
         self.mesh = kwargs['mesh']
         self.demfiles = kwargs['demfiles']
@@ -96,8 +94,7 @@ class GridOptimizer(object):
             self.logger.info(msg)
 
     def collect_element_quadrature_points_for_dem(self):
-        """ Collect all quadrature points to calculate volumes of elements
-            with DEM
+        """ Collect all quadrature points to calculate volumes of elements  with DEM
 
             Returns
             -------
@@ -160,7 +157,7 @@ class GridOptimizer(object):
 
             Returns
             -------
-            list of numpy.array
+            list : np.ndarray
                 list of elevation vectors
         """
         pts = np.vstack(list_of_points)
@@ -176,8 +173,9 @@ class GridOptimizer(object):
         """ Perform a grid optimization
 
             Two solvers are available:
-            (1) L-BFGS-B (default): minimize function 1/2*||Ax-b||^2
-            (2) linear least square solver (Ax=b).
+            
+            #. L-BFGS-B (default): minimize function :math:`1/2*||Ax-b||^2`
+            #. linear least square solver (Ax=b).
 
             Parameters
             ----------
@@ -555,10 +553,12 @@ class GridOptimizer(object):
     def calculate_reference_surface_maximum(self):
         """ Create reference surface elevation at individual nodes
 
-            step 1: derive max elevation within connected elements
-            step 2: compare with the reference calculated by
-            calculate_reference_surface() and use the higher value
-            between the two
+            Steps:
+            
+            #. derive max elevation within connected elements
+            
+            #. compare with the reference calculated by calculate_reference_surface() 
+               and use the higher value between the two
 
             Returns
             -------
@@ -592,8 +592,9 @@ class GridOptimizer(object):
     def calculate_reference_surface(self, coords):
         """ Define reference water surface at locations specified in nodes
             based on the assumptions, which only applicable to Bay Delta grid
-            (1) The surface elevation increases linearly from west (ocean) to east
-            (2) east of (x_old_river, y_old_river), the elevation increases linearly towards the south
+            
+            #. The surface elevation increases linearly from west (ocean) to east
+            #. east of (x_old_river, y_old_river), the elevation increases linearly towards the south
 
             NOTE: This is Bay-Delta Specific. Coordinates for the calculation are hard-wired.
 
@@ -761,11 +762,11 @@ class GridOptimizer(object):
 
 
 def create_arg_parser():
-    """ Create a argparse.ArgumentParser
+    """ Create argument parser
 
     """
     parser = argparse.ArgumentParser(
-        description='Perform grid optimization with a *.2dm SMS mesh or gr3 file. An optimized gr3 file with extension _opt.gr3 will be created if only one set of optimization parameter specified.')
+        description='Perform grid optimization with a \*.2dm SMS mesh or gr3 file. An optimized gr3 file with extension _opt.gr3 will be created if only one set of optimization parameter specified.')
     parser.add_argument('filename',
                         default=None,
                         help='name of 2dm or gr3 file')
@@ -777,23 +778,6 @@ def create_arg_parser():
                         help='file containing optimization parameters: damp, damp_shoreline, face_coeff, volume_coeff')
     parser.add_argument('--optfile',
                         help='name for the gr3 file for the optimized results')
-    # parser.add_argument('--detailed_outputs',
-    #                     action='store_true',
-    #                     default=False,
-    #                     help='whether to write detailed optimization results to files, default=False')
-    # parser.add_argument('--prefix',
-    #                     default='',
-    #                     help='prefix used for output files when --detailed_outputs flag is set')
-    # parser.add_argument('--boundary_list',
-    #                     default='',
-    #                     help='boundary node list information (in csv format) when missing from .2dm or .gr3 file, generated from Kijin''s script')
-    # parser.add_argument('--remove_boundary_faces',
-    #                     action='store_true',
-    #                     default=False,
-    #                     help='whether to remove faces along the land boundaries, default=False')
-    # parser.add_argument('--polygon_file',
-    #                     default='None',
-    #                     help='polygon definition file used to specify the area for partial grid optimization')
     parser.add_argument('--solver',
                         default='L-BFGS-B',
                         help='solver used for optimization, either L-BFGS-B (default) or lsqr')
@@ -801,8 +785,6 @@ def create_arg_parser():
 
 
 def init_logger():
-    """ Create a logger
-    """
     logging_level = logging.INFO
     logging_fname = 'grid_opt.log'
     logging.basicConfig(level=logging_level,

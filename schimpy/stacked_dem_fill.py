@@ -1,9 +1,7 @@
-'''
-Module contains routines to fill elevation (or other scalar) values at points from a prioritized list of rasters
 
-Depends on GDAL for loading values. 
+""" Routines to fill elevation (or other scalar) values at points from a prioritized list of rasters
 
-'''
+"""
 
 try:
    from osgeo import gdal
@@ -20,22 +18,23 @@ DEFAULT_NA_FILL = 2.0
 
 
 def stacked_dem_fill(files, points, values=None, negate=False, require_all=True, na_fill=None):
-    '''    Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
-    This routine controls prioritization of the dems, gradually filling points that are still marked "nan"
+    """ Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
+    This routine controls prioritization of the dems, gradually filling points 
+    that are still marked `nan`
 
     Parameters
     ----------
     files:  list[str]
         list of files. Existence is checked and ValueError for bad file
     points: np.ndarray
-        this is a numpy array of points, nrow = # points and ncol = 2 (x,y).
+        this is a numpy array of points, nrow = num of points and ncol = 2 (x,y).
     values: np.ndarray
         values at each point -- this is an output, but this gives an opportunity to use an existing data structure to receive
     negate: bool 
         if True, values will be inverted (from elevation to depth)
     require_all: bool
         if True, a ValueError is raised if the list of DEMs does not cover all the points. In either case (True/False)
-        a file is created or overwritten ("dem_misses.txt") that will show all the misses.
+        a file is created or overwritten (`dem_misses.txt`) that will show all the misses.
     na_fill: float
         value to substitute at the end for values that are NA after all DEMs are processed.
         If require_all = True na_fill must be None
@@ -45,7 +44,7 @@ def stacked_dem_fill(files, points, values=None, negate=False, require_all=True,
     values : np.ndarray
         Values at the nodes
     
-    '''
+    """
     if values is None:
         values = np.full(points.shape[0], np.nan)
     else:
@@ -108,11 +107,12 @@ def ParseType(type):
 
 
 def bilinear(points, gt, raster):
-    '''Bilinear interpolated point at (px, py) using data on raster
+    """Bilinear interpolated point  using data on raster
        points: npoint x 3 array of (x,y,z points)
        gt: geotransform information from gdal
        raster: the data
-    '''
+    """
+    
     px = points[:, 0]
     py = points[:, 1]
     ny, nx = raster.shape
@@ -182,10 +182,9 @@ def test_main():
 
 
 def filelist_main(demlistfile, pointlistfile, sep=""):
-    '''
-    higher level driver routine that parses the names of the DEMs from demfilelist
+    """ higher level driver routine that parses the names of the DEMs from demfilelist
     points ( x,y or x,y,z ) from pointlistfile
-    '''
+    """
 
     filelist = [f.strip()
                 for f in open(demlistfile, "r").readlines() if f and len(f) > 1]
@@ -268,7 +267,7 @@ def fill_gr3(infile, outfile, files, elev2depth=True,na_fill=DEFAULT_NA_FILL):
 def create_arg_parser():
     import argparse
     parser = argparse.ArgumentParser(
-        description='Fill node elevations in a *.2dm SMS mesh or gr3 file using a prioritized list of DEMs.')
+        description="Fill node elevations in a .2dm SMS mesh or gr3 file using a prioritized list of DEMs.")
     parser.add_argument(
         dest='filename', default=None, help='name of 2dm or gr3 file')
     parser.add_argument(

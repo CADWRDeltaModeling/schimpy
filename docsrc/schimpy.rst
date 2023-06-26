@@ -300,14 +300,6 @@ schimpy.nudging module
    :undoc-members:
    :show-inheritance:
 
-schimpy.params module
----------------------
-
-.. automodule:: schimpy.params
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 schimpy.plot\_default\_formats module
 -------------------------------------
 
