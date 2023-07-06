@@ -1,11 +1,14 @@
-name: schimpy              # This environment is 
+# This environment is a functional analysis environment for schimpy.
+# However the standard monolity for Bay-Delta SCHISM is schism_env.yml in the BayDeltaSCHISM package 
+# https://github.com/CADWRDeltaModeling/BayDeltaSCHISM
+name: schimpy              
 channels:
   - conda-forge            # Note: the order listed in yaml is not enforced by conda
   - defaults               # For predictable behavior, set your conda config
   - cadwr-dms
 dependencies:
   - python>=3.9,<3.10
-  - schimpy>=1.6.4         # Recommended for compatibiltiy with current code
+  - schimpy>=1.6.4         # Recommended for compatibiltiy with current code. Please coordinate with schism_env.yml
   - vtools3
   - dms-datastore>=0.0.16
   - pandas>=1.5            # Below here minimum versions are to reduce solve space
