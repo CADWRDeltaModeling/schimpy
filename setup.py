@@ -21,7 +21,7 @@ install_requires = ['geopandas',
                     'statsmodels',
                     'beautifulsoup4',
                     'pyproj', 
-                    'nodepy','sympy'        # sympy is dependency of nodepy
+                    'nodepy','sympy',        # sympy is dependency of nodepy
                     'shapely>=2.0','rasterstats','param']
 
 requirements = install_requires
