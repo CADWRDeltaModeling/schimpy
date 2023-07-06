@@ -1,30 +1,36 @@
-name: schimpy_env
+name: schimpy              # This environment is 
 channels:
-  - defaults
+  - conda-forge            # Note: the order listed in yaml is not enforced by conda
+  - defaults               # For predictable behavior, set your conda config
   - cadwr-dms
-  - conda-forge
 dependencies:
-  - pandas              # start of packages for analysis
-  - xarray
+  - python>=3.9,<3.10
+  - schimpy>=1.6.4         # Recommended for compatibiltiy with current code
+  - vtools3
+  - dms-datastore>=0.0.16
+  - pandas>=1.5            # Below here minimum versions are to reduce solve space
+  - numpy>=1.20
+  - xarray>=2022.11
+  - netcdf4>=1.5.7
+  - dask>=2022.11
+  - numba>=0.56
+  - scipy>=1.8
+  - statsmodels>=0.13.2
+  - pip>=22.2 
+  - geopandas>0.9
   - cfunits
-  - rtree
-  - gdal
-  - geopandas
-  - shapely
-  - netcdf4
-  - numpy
-  - scipy
-  - matplotlib
-  - seaborn
+  - nodepy  
   - sympy
-  - geopandas
-  - pytest-runner
-  - sphinx
-  - beautifulsoup4
-  - xlrd
-  - nbsphinx
-  - numpydoc
-  - sphinx-argparse
-  - ipykernel               # needed for jupyter in base + kernel approach
-  - spyder-kernels>=1.9     # needed for spyder under base + kernel spyder 4.1.0+
-  #- conda-build   # you will want this eventually but currently it is buggy
+  - palettable
+  - openpyxl
+  - ipykernel
+# Note, though these are listed below as if conda would use pip
+# we do not recommend that you uncomment and use conda to install them via pip. 
+# Instead, if you want a developer install, leave these libraries above
+# which helps ensure that conda rather than pip handles the dependencies of each. 
+# Then do a github clone, go to the parent directory and run `pip install --no-deps -e .`  
+#  - pip:
+#    - "--editable=git+https://github.com/CADWRDeltaModeling/vtools3#egg=vtools3"
+#    - "--editable=git+https://github.com/CADWRDeltaModeling/schimpy#egg=schimpy"
+#    - "--editable=git+https://github.com/CADWRDeltaModeling/dms_datastore#egg=dms_datastore"
+
