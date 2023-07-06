@@ -18,7 +18,7 @@ install_requires = ['geopandas', 'vtools3','gdal','libgdal',
                     'boto3',                # only used for download_hrrr
                     'scikit-learn','statsmodels',
                     'beautifulsoup4','pyproj', 'nodepy',
-                    'shapely>2.0','rasterstats','param']
+                    'shapely>=2.0','rasterstats','param']
 
 requirements = install_requires
 

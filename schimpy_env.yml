@@ -1,0 +1,30 @@
+name: schimpy_env
+channels:
+  - defaults
+  - cadwr-dms
+  - conda-forge
+dependencies:
+  - pandas              # start of packages for analysis
+  - xarray
+  - cfunits
+  - rtree
+  - gdal
+  - geopandas
+  - shapely
+  - netcdf4
+  - numpy
+  - scipy
+  - matplotlib
+  - seaborn
+  - sympy
+  - geopandas
+  - pytest-runner
+  - sphinx
+  - beautifulsoup4
+  - xlrd
+  - nbsphinx
+  - numpydoc
+  - sphinx-argparse
+  - ipykernel               # needed for jupyter in base + kernel approach
+  - spyder-kernels>=1.9     # needed for spyder under base + kernel spyder 4.1.0+
+  #- conda-build   # you will want this eventually but currently it is buggy
