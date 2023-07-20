@@ -78,10 +78,9 @@ class Params(object):
                 raise ValueError("Output interval not divisible by dt")
             else:
                 nspool = round(nspool)
-                print(nspool)
         else: 
             raise ValueError("Entry must be string or offset or something that is convertible to offset")
-        self[name] = nspool
+        self[name] = int(nspool)
 
     def get_interval(self,name):
         dt = self['dt']
@@ -98,15 +97,19 @@ class Params(object):
         ----------
         freq 
 
-        Pandas offset or string that evaluates as offset. If None, frequency will be set using default (or 1 Hour) and station output disabled
+        If None, frequency will be set using default (or 1 Hour) and station output disabled
         """
-        self.setspool('nhot_write',freq)
+        if freq is None:
+            self['nhot'] = 0
+            return
+        else:
+            self['nhot'] = 1
+            self.set_interval('nhot_write',freq)
 
     def get_hotstart_freq(self):
         return self.get_interval('nhot_write')
 
     hotstart_freq = property(get_hotstart_freq, set_hotstart_freq)
-
 
 
     def set_nc_out_freq(self,freq):
@@ -130,26 +133,61 @@ class Params(object):
     nc_stack = property(get_nc_stack, set_nc_stack)
 
 
-
     def set_station_out_freq(self,freq):
         """Set station output frequency 
         
         Parameters
         ----------
-        freq 
+        freq : offset or string
 
-        Pandas offset or string that evaluates as offset. If None, frequency will be set using default (or 1 Hour) and station output disabled
+            Sets output interval for staout files and ensures that output is enabled.
+            If None, frequency will be set using default (or 1 Hour) and station output disabled
 
         """
-        self.set_interval('nspool_sta',freq)
+        if  freq is None:
+            self['iout_sta'] = 0
+        else:
+            self.set_interval('nspool_sta',freq)
+            self['iout_sta'] = 1 
 
     def get_station_out_freq(self):
         return self.get_interval('nspool_sta')
 
     station_out_freq = property(get_station_out_freq, set_station_out_freq)
     
+    def sections(self,defaults=False):
+        sections = self._namelist.keys()
+        if defaults and self.default is not None:
+            added=[]
+            for item in self.defaults.keys():
+                if item not in sections:
+                    added.append(item)
+            sections.extend(added)
+        return sections
+        
 
-    def diff(self,other,defaults=True):
+    def to_dataframe(self,defaults=None):
+        sections = self.sections(defaults)
+        print(sections)
+        indices=[]
+        values=[]
+
+        for key in sections:
+            items = self._namelist[key]
+            for subkey in items.keys():
+                if not isinstance(items[subkey],dict): 
+                    continue
+                indices.append((key,subkey))                
+                values.append(items[subkey]['value'])
+        index = pd.MultiIndex.from_tuples(indices, names=["section", "name"])        
+        df = pd.DataFrame(index=index,data=values)
+        df.columns=['values']
+        return df
+
+
+
+
+    def diff(self,other,defaults=False):
         """Compare to another instance of Params 
         
         Parameters
@@ -166,15 +204,22 @@ class Params(object):
         diff : pd.DataFrame
             Data with multi index for section and parameter, including only parameters that 
             are different, including possibly one being absent from one Param set
-
-
         
         """
-        raise NotImplementedError("Not sure what is most useful yet")
+        if defaults:
+            raise NotImplementedError("Diffing with defaults not supported at this time")
+        this = self.to_dataframe(None)
+        this.columns=['this']
+        otherdf = other.to_dataframe(None).convert_dtypes()
+        otherdf.columns=['other']
+        joined = this.merge(otherdf,how='outer',left_index=True,right_index=True) 
+        joined = joined.loc[joined.this != joined.other]
+        return joined
+
 
     def copy(self):
         """Return a copy of this Params set"""
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
     def update(self,other,defaults=False):
@@ -189,8 +234,6 @@ class Params(object):
         defaults : bool 
             Search includes defaults
 
-
-        
         """
         raise NotImplementedError("Not sure what is most useful yet")
 
@@ -245,11 +288,13 @@ class Params(object):
 def param_from_template(name):
     """Returns param based on named template files"""
 
+
 def read_params(fname,default=None):
     with open(fname,"r") as fin:
         content=fin.read()
     p = Params(content,default)
     return p
+
 
 def  test_param():
     test_param_file="C:/Delta/BayDeltaSCHISM/templates/bay_delta/param.nml.clinic"
@@ -269,7 +314,29 @@ def  test_param():
     print(parms["ihfskip"])
     print(parms.nc_out_freq)
     print(parms.station_out_freq)
+    parms.station_out=None
+    print(parms.station_out_freq)
+    print(parms['iout_sta'])
+    parms.station_out_freq = '15T'   
+    print(parms.station_out_freq)
+    print(parms['iout_sta'])
+
     print(parms.hotstart_freq)
+    print(parms['nhot'])
+    parms.hotstart_freq='10D'
+    print(parms['nhot'])
+    print(parms.hotstart_freq)
+    parms.hotstart_freq=None
+    print(parms['nhot'])    
+    parms.hotstart_freq='5D'
+    print(parms['nhot'])
+    
+    print(parms.sections())
+
+    other_param_file="C:/Delta/BayDeltaSCHISM/templates/bay_delta/param.nml.tropic"
+    otherparms = read_params(other_param_file)
+    df = parms.diff(otherparms)
+    print(df)
 
 
 if __name__== '__main__':
