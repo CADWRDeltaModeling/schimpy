@@ -10,8 +10,8 @@ def test_namelist_parser():
     VAR4 = 4
     /"""
 
-    from schimpy import namelist
-    namelists = namelist.parse(file_content)
+    from schimpy import nml
+    namelists = nml.parse(file_content)
     print(namelists)
 
     expected_namelists = {'NAMELIST1': {'comment': "",
@@ -24,7 +24,7 @@ def test_namelist_parser():
     assert namelists == expected_namelists
 
 def test_write_namelist():
-    from schimpy import namelist
+    from schimpy import nml
     namelist_data = {
         "first_namelist": {
             "comment": "This is the first namelist",
@@ -45,7 +45,7 @@ def test_write_namelist():
         }
     }
     expected_output = "!This is the first namelist\n&first_namelist\n  first_value = 1 !This is the first value\n  second_value = 2\n/\n!This is the second namelist\n&second_namelist\n  third_value = 3 !This is the third value\n/"
-    output = namelist.write(namelist_data)
+    output = nml.write(namelist_data)
     assert output == expected_output, f"Expected: {expected_output}\nGot: {output}"
 
     namelist_data = {
@@ -64,7 +64,7 @@ def test_write_namelist():
         }
     }
     expected_output = "&first_namelist\n  first_value = 1\n  second_value = 2\n/\n&second_namelist\n  third_value = 3\n/"
-    output = namelist.write(namelist_data)
+    output = nml.write(namelist_data)
     assert output == expected_output, f"Expected: {expected_output}\nGot: {output}"
 
 def test_sample_param_nml():
@@ -73,24 +73,24 @@ def test_sample_param_nml():
     with urllib.request.urlopen(url) as response:
         content = response.read().decode("utf-8")
     with open('param-original.nml','w') as fh: fh.write(content)
-    from schimpy import namelist
-    params = namelist.parse(content)
-    with open('param.nml','w') as fh: fh.write(namelist.write(params))
+    from schimpy import nml
+    params = nml.parse(content)
+    with open('param.nml','w') as fh: fh.write(nml.write(params))
     with open('param.nml','r') as fh:
-        params2 = namelist.parse(fh.read())
-    with open('param2.nml','w') as fh: fh.write(namelist.write(params2))
+        params2 = nml.parse(fh.read())
+    with open('param2.nml','w') as fh: fh.write(nml.write(params2))
     import filecmp
     assert filecmp.cmp('param.nml','param2.nml'), 'Reading and writing from parser to writer is resulting in differences!'
 
 
 def test_mapping():
-    from schimpy import namelist
+    from schimpy import nml
     namelist_dict = {'group1': {'var1': 1, 'var2': 2}, 'group2': {'var3': 3, 'var4': 4}}
-    obj = namelist.map_to_object(namelist_dict)
+    obj = nml.map_to_object(namelist_dict)
     assert obj.group1.var1 == 1
     assert obj.group1.var2 == 2
     assert obj.group2.var3 == 3
     assert obj.group2.var4 == 4
-    round_trip_dict = namelist.map_to_dict(obj)
+    round_trip_dict = nml.map_to_dict(obj)
     assert namelist_dict == round_trip_dict
 
