@@ -71,7 +71,7 @@ class Params(object):
             freq=pd.tseries.frequencies.to_offset(freq)
             dt=pd.tseries.frequencies.to_offset(f"{dt}S")
             nspool = freq/dt           
-        elif type(freq)== pd.tseries.offsets.DateOffset:
+        elif isinstance(freq, pd.offsets.DateOffset):
             dt=pd.tseries.frequencies.to_offset(f"{dt}S")
             nspool = freq/dt
             if abs(nspool - round(nspool)) > 0.01: 
@@ -79,6 +79,7 @@ class Params(object):
             else:
                 nspool = round(nspool)
         else: 
+            print(type(freq))
             raise ValueError("Entry must be string or offset or something that is convertible to offset")
         self[name] = int(nspool)
 
@@ -275,6 +276,15 @@ class Params(object):
         # If we get here, the key is not present in either this ParamSet or default
         raise IndexError(f"Key {key} not found in namespace")
 
+    def validate(self):
+        """Validation tests"""
+        nhotwrite = self['nhot_write']
+        ihfskip = self['ihfskip']
+        ratio = nhotwrite/ihfskip
+        if abs(ratio - round(ratio)) > 0.001:
+             raise ValueError("nhot_write not divisible by ihfskip")    
+
+
     def __getitem__(self, key):
         item = self.searchfor(key)
         return item['value']
@@ -282,6 +292,12 @@ class Params(object):
     def __setitem__(self, key, val):
         section, item = self.searchfor(key,section=True)
         self._namelist[section][key]['value']=val
+
+    def write(self,fname):
+        self.validate()
+        txt=nml.write(self._namelist)
+        with open(fname,'w') as outfile:
+            outfile.write(txt)
 
 
 
@@ -294,6 +310,10 @@ def read_params(fname,default=None):
         content=fin.read()
     p = Params(content,default)
     return p
+
+
+
+
 
 
 def  test_param():
@@ -336,7 +356,10 @@ def  test_param():
     other_param_file="C:/Delta/BayDeltaSCHISM/templates/bay_delta/param.nml.tropic"
     otherparms = read_params(other_param_file)
     df = parms.diff(otherparms)
-    print(df)
+    
+    parms.nc_stack = pd.tseries.frequencies.to_offset('1D')
+    parms.validate()
+    parms.write("./junk.nml")
 
 
 if __name__== '__main__':
