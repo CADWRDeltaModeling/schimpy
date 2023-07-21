@@ -21,7 +21,7 @@ def hotstart_inventory(run_start=None,
                        ):
     """ Create an inventory of existing hotstarts or expected hotstarts
 
-    Existing vs expected depends on whether run in an outputs or study dir, which is detected.
+    Existing vs expected depends on whether workdir is an outputs or study dir.
     
     Parameters
     ----------
@@ -126,10 +126,10 @@ def create_arg_parser():
     parser = argparse.ArgumentParser("Lookup station metadata by partial string match on id or name")
     parser.add_argument('--dt',default=90,type=int,help="Time step in seconds of model")
     parser.add_argument('--run_start',default="",help = 'Start time in iso-like format, e.g. 2013-12-03')
-    parser.add_argument('--nday',default=0,type=int,help = 'Start time in iso-like format, e.g. 2013-12-03')
-    parser.add_argument('--workdir',default='.',type=str,help="Time step in seconds of model")
-    parser.add_argument('--paramfile',default="",type=str,help = 'Start time in iso-like format, e.g. 2013-12-03')
-    parser.add_argument('--hot_freq',default=None,help = 'Start time in iso-like format, e.g. 2013-12-03')
+    parser.add_argument('--nday',default=0,type=int,help = 'Number of days in simulation (rnday) or maximum to catalog')
+    parser.add_argument('--workdir',default='.',type=str,help="working directory, which may be a launch or outputs dir")
+    parser.add_argument('--paramfile',default="",type=str,help = 'Name of param.nml file if file is used to infer runtime')
+    parser.add_argument('--hot_freq',default=None,help = "`Hotstart frequency in pandas freq terms (e.g. '5D')")
     return parser    
 
 
