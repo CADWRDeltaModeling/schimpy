@@ -17,6 +17,7 @@ import xarray as xr
 from netCDF4 import Dataset
 from schimpy.schism_mesh import read_mesh, write_mesh
 from schimpy.geo_tools import ll2utm
+from schimpy.geo_tools import utm2ll
 from shapely.geometry import Polygon
 from schimpy import interp_2d
 import time as timer
@@ -320,6 +321,13 @@ class nudging(object):
                            if np.any(v) else [] for v in values]
             values_list = [np.transpose(v, [1, 2, 0])
                            if np.any(v) else [] for v in values_list]
+        elif region_info['type'] == 'roms':
+            weights, values_list, imap, time = self.gen_nudge_roms(region_info)
+            #values_list =  [vl[:,imap,:] for vl in values_list]
+            nvar = len(set([v['name'] for v in
+                                region_info['interpolant']['variables']]))
+            weights_list = np.broadcast_to(weights,[nvar,len(weights)])
+            imap_list = np.broadcast_to(imap,[nvar,len(imap)])
         else:
             raise NotImplementedError(
                 "region type not implemented:%s" % region_info['type'])
@@ -907,6 +915,636 @@ class nudging(object):
             values_list.append(values_v)
             imap_list.append(imap_v)
         return weights_list, values_list, imap_list
+
+    def gen_nudge_roms(self,region_info):
+
+        write_to_log("---gen_nudge_roms---\n")
+
+        rjunk = 9998 #!Define junk value for sid; the test is abs()>rjunk
+        hr_char = ['03','09','15','21'] #each day has 4 starting hours in ROMS
+        small1 = 1.e-2 #used to check area ratios
+        weights, obs_df = self.gen_region_weight(region_info['attribute'],
+                                                 region_info['vertices'])
+        istart = pd.to_datetime(self.start_date)
+        istart_year = istart.year
+        istart_mon = istart.month
+        istart_day = istart.day
+        nndays = (self.end_date - self.start_date).days
+        dtout = region_info['interpolant']['dt'] #time step in .nc
+        nt_out = int(pd.Timedelta(self.nudge_step)/pd.Timedelta(dtout)) #output stride
+        variable_info = region_info['interpolant']['variables']
+        for vi in variable_info:
+            if vi['name'] == 'temperature':
+                tem_outside = float(vi['none_values'])
+                if 'offset' in vi.keys():
+                    tem_offset = float(vi['offset'])
+            if vi['name'] == 'salinity':
+                sal_outside = float(vi['none_values'])
+        ncfile1 = region_info['interpolant']['data']
+        ncfile1 = ncfile1.replace("'","")  # remove the quotation marks if they exist
+        irecout = 0
+        irecout2 = 0
+        #Define limits for variables for sanity checks
+        tempmin=0
+        tempmax=30
+        saltmin=0
+        saltmax=37
+        vmag_max=10 #max. |u| or |v|
+        ssh_max=8   #max. of |SSH|
+        imap = np.nan*np.zeros(self.nnode)
+        nodes = np.where(weights>0)[0]
+
+        # # instead of reading lat, lon from hgrid.ll, I can also convert
+        # # hgrid.gr3 to lat, lon.
+        # with open('hgrid.ll','r') as reader:
+        #     lines = reader.readlines()
+        # xl=[]
+        # yl=[]
+        # for i in range(self.nnode):
+        #     llist = lines[2+i].split()
+        #     xl.append(float(llist[1]))
+        #     yl.append(float(llist[2]))
+
+        utm_xy = np.array([self.node_x,self.node_y])
+        lonlat= utm2ll(utm_xy,self.crs) #roms grid has lat, lon coordinates.
+        xl = lonlat[0]
+        yl = lonlat[1]
+
+        # the 'include2' variable is replaced by 'weights'
+        # include indicates if spatial interpolation should be applied
+        # include2=0 means skipping interpolation
+        # with open('include.gr3','r') as reader:
+        #     lines = reader.readlines()
+        # include2 = []
+        # for i in range(self.nnode):
+        #     llist = lines[2+i].split()
+        #     include2.append(float(llist[-1]))
+
+        temperature = []
+        salinity = []
+        output_day = []
+        var_name = {'temperature':'temp',
+                    'salinity': 'salt',
+                    'velocity_u':'uvel',
+                    'velocity_v':'vvel',
+                    'elevation':'ssh'}
+        #var_list = [var_name[v] for v in region_info['interpolant']['variable']]
+
+        #start = timer.time()
+        for d in range(nndays+1):
+            date = datetime.date(istart_year,istart_mon,istart_day) + \
+                datetime.timedelta(d)
+            day = (datetime.date(istart_year,istart_mon,istart_day) -
+                self.start_date).days + d
+            write_to_log('Time out (days)=%d\n'%day)
+            for hr in hr_char:
+                ncfile = "%s%4d%02d%02d%s.nc"%(ncfile1,date.year,date.month,
+                                            date.day,hr)
+                ncdata = xr.open_dataset(ncfile)
+                #print("time1=%f"%(timer.time() - start))
+
+                if d ==0 and hr == hr_char[0]:
+                    # lon, lat = np.meshgrid(ncdata['lon'].values,
+                    #                        ncdata['lat'].values)
+                    lat, lon = np.meshgrid(ncdata['lat'].values,
+                                           ncdata['lon'].values)
+                    hnc = ncdata['depth']
+                    lon=lon-360e0 # convert to our long
+                    #Compute z-coord. (assuming eta=0)
+                    #WARNING: In zm(), 1 is bottom; ilen is surface (SELFE convention)
+                    zm = -hnc[-1::-1].values
+                    ixlen = np.shape(lat)[0]
+                    iylen = np.shape(lat)[1]
+                    ilen = len(zm)
+
+                if d==0 and hr==hr_char[0]:
+                    ilo = 5 #5th record is 00:00 PST UCT-8
+                else:
+                    ilo = 1 #there is an overlap between files
+
+                time = ncdata['time'].values
+
+
+                if time[0] != np.datetime64(date) + np.timedelta64(int(hr),'h'):
+                    print("Initial time in %s does not match the filename: %s: modification will be applied "%(ncfile,time[0]))
+                    dt_adj = np.datetime64(date) + np.timedelta64(int(hr),'h') - time[0]
+                    ncdata['time'] = ncdata['time'] + dt_adj
+                    time = ncdata.time.values
+
+                if time[-1]< np.datetime64(self.start_date)+ \
+                    np.timedelta64(8,'h'):
+                    continue
+                elif time[0]> np.datetime64(self.end_date) + \
+                    np.timedelta64(8,'h'):
+                    break
+
+
+                for t in time[ilo:]:
+                    ctime = pd.to_datetime(t)
+                    dt = ctime-pd.to_datetime(self.start_date)
+                    dt_in_days = dt.total_seconds()/86400.
+                    write_to_log(f"Time out at hr stage (days)={ctime}, dt ={dt_in_days}\n")
+                    irecout += 1
+
+                    #Make sure it2=ilo is output (output at precisely the time interval)
+                    # Read T,S,u,v,SSH
+                    # WARNING! Make sure the order of vertical indices is 1
+                    # at bottom, ilen at surface; revert if necessary!
+                    if (irecout-1)%nt_out !=0:
+                        continue
+
+                    irecout2 += 1
+                    write_to_log("irecount: %d\n"%irecout)
+
+                    #if  'temp' in var_list:
+                    temp = ncdata['temp'].sel(time=t).transpose(
+                        'lon','lat','depth').values[:,:,-1::-1]
+                    #if 'salt' in var_list:
+                    salt = ncdata['salt'].sel(time=t).transpose(
+                        'lon','lat','depth').values[:,:,-1::-1]
+                    # if 'uvel' in var_list:
+                    #     uvel = ncdata['uvel'].sel(time=t).transpose(
+                    #         'lon','lat','depth').values[:,:,-1::-1]
+                    # if 'vvel' in var_list:
+                    #     vvel = ncdata['vvel'].sel(time=t).transpose(
+                    #         'lon','lat','depth').values[:,:,-1::-1]
+                    # if 'ssh' in var_list:
+                    #     ssh = ncdata['ssh'].sel(time=t).transpose(
+                    #         'lon','lat')
+
+                    kbp=np.ones((ixlen,iylen))  #wet or dry flag
+
+                    dry_xy = np.where( (abs(salt[:,:,-1])>rjunk) |
+                                    (np.isnan(salt[:,:,-1])) )
+                    kbp[dry_xy[0],dry_xy[1]] = -1
+                    wet_xy = np.where(kbp==1)
+
+
+                    klev0 = [np.where(~np.isnan(salt[ix,iy,:]))[0][0] for
+                             (ix,iy) in zip(wet_xy[0],wet_xy[1])]
+
+                    #print("time2=%f"%(timer.time() - start))
+                    for wi in range(len(klev0)):
+                        salt[wet_xy[0][wi],wet_xy[1][wi],:klev0[wi]] = \
+                            salt[wet_xy[0][wi],wet_xy[1][wi],klev0[wi]]
+                        temp[wet_xy[0][wi],wet_xy[1][wi],:klev0[wi]] = \
+                            temp[wet_xy[0][wi],wet_xy[1][wi],klev0[wi]]
+
+
+                    # for i in range(ixlen):
+                    #     for j in range(iylen):
+                    #         if (abs(salt[i,j,-1]>rjunk)) or np.isnan(salt[i,j,-1]):
+                    #             kbp[i,j]=-1 #dry
+                    #         if kbp[i,j]==1:
+                    #             #extend to the bottom
+                    #             klev0 = np.where(~np.isnan(salt[i,j,:]))[0][0]
+                    #             salt[i,j,:klev0] = salt[i,j,klev0]
+                    #             temp[i,j,:klev0] = temp[i,j,klev0]
+                                # if 'uvel' in var_list:
+                                #     uvel[i,j,:klev0] = uvel[i,j,klev0]
+                                # if 'vvel' in var_list:
+                                #     uvel[i,j,:klev0] = uvel[i,j,klev0]
+
+                            # double check to make sure there are no out of bound values
+                            # if any(salt[i,j,:]<saltmin) or \
+                            #     any(salt[i,j,:]>saltmax) or \
+                            #     any(temp[i,j,:]<tempmin) or \
+                            #     any(temp[i,j,:]>tempmax):
+                            #     # any(abs(uvel[i,j,:]))>vmag_max or \
+                            #     # any(abs(vvel[i,j,:]))>vmag_max or \
+                            #     # abs(ssh[i,j])>ssh_max
+                            #     print("Fatal: no valid values:%s,%d,%d for salt or temp at"
+                            #           (ncfile,i,j))
+
+                    # Compute S,T etc@ invalid pts based on nearest neighbor
+                    # Search around neighborhood of a pt
+                    dryij = np.where(kbp==-1)
+                    dryi = dryij[0]
+                    dryj = dryij[1]
+                    wetij = np.where(kbp==1)
+                    weti = wetij[0]
+                    wetj = wetij[1]
+
+                    if wetij[0].size==0:
+                        write_to_log("no ROMS data available for: %s\n"%str(ctime))
+                        salt = -9999.0*np.ones_like(salt)
+                        temp = -9999.0*np.ones_like(temp)
+                    else:
+                        for i, j in zip(dryi,dryj):
+                            distij = np.abs(weti-i) + np.abs(wetj-j)
+                            #m = np.where(distij==min(distij))[0][0]
+                            m = np.argmin(distij)
+                        # salt[dryi,dryj,:] = salt[weti[m],wetj[m],:]
+                        # temp[dryi,dryj,:] = temp[weti[m],wetj[m],:]
+                            salt[i,j,:]=salt[weti[m],wetj[m],:]
+                            temp[i,j,:]=temp[weti[m],wetj[m],:]
+                            #uvel(i,j,:ilen)=uvel(weti[m],wetj[m],:ilen)
+                            #vvel(i,j,:ilen)=vvel(weti[m],wetj[m],:ilen)
+                            #ssh(i,j)=ssh(weti[m],wetj[m])
+
+                        # for i in range(ixlen):
+                        #     for j in range(iylen):
+                        #         if kbp[i,j]==-1:   # invalid pts (dry)
+                        #             #Compute max possible tier # for neighborhood
+                        #             mmax=max(i,ixlen-i-1,j,iylen-j-1)
+
+                        #             m = 0
+                        #             i3 = np.nan
+                        #             j3 = np.nan
+                        #             #while True: #starting from (i,j) and search on both sides
+                        #             for m in range(0,mmax+1):
+                        #                 for ii in range(max(-m,-i),
+                        #                                 min(m,ixlen-i-1)):
+                        #                     i3 = max(0,min(ixlen-1,i+ii))
+                        #                     for jj in range(max(-m,-j),
+                        #                                     min(m,iylen-j-1)):
+                        #                         j3=max(0,min(iylen-1,j+jj))
+                        #                         if kbp[i3,j3]==1:
+                        #                             i1=i3
+                        #                             j1=j3
+                        #                             break
+                        #                     if kbp[i3,j3]==1:
+                        #                          break
+                        #                 if ~np.isnan(i3) and ~np.isnan(j3):
+                        #                     if kbp[i3,j3]==1:
+                        #                          break
+                        #                 if m == mmax:
+                        #                     print("Max. exhausted:%d,%d,%d"%(
+                        #                         i,j,mmax))
+                        #                     print('kbp')
+                        #                     for ii in range(ixlen):
+                        #                         for jj in range(iylen):
+                        #                             print(ii,jj,kbp(ii,jj))
+                        #                     raise("Max. exhausted!")
+                        #                 #m += 1
+
+                        #             salt[i,j,:ilen]=salt[i1,j1,:ilen]
+                        #             temp[i,j,:ilen]=temp[i1,j1,:ilen]
+                                    # double check to make sure there are no out of bound values
+                                    # if any(salt[i,j,:]<saltmin) or \
+                                    #     any(salt[i,j,:]>saltmax) or \
+                                    #     any(temp[i,j,:]<tempmin) or \
+                                    #     any(temp[i,j,:]>tempmax):
+                                    #     print("Fatal: no valid values:%s,%d,%d for salt or temp at"
+                                    #           (ncfile,i,j))
+                        write_to_log("dealing with horizontal nan values!\n")
+                        #print("time3=%f"%(timer.time() - start))
+
+                    if d ==0 and hr == hr_char[0] and t==time[ilo]:
+                        ixy=np.zeros((self.nnode,3))*np.nan
+                        wild = np.zeros(2)
+                        wild2 = np.zeros((4,2))
+                        arco = np.zeros((4,self.nnode))
+
+                        x1 = lon[0:-1,0:-1]
+                        x2 = lon[1:,0:-1]
+                        x3 = lon[1:,1:]
+                        x4 = lon[0:-1,1:]
+                        y1 = lat[0:-1,0:-1]
+                        y2 = lat[1:,0:-1]
+                        y3 = lat[1:,1:]
+                        y4 = lat[0:-1,1:]
+                        b1=abs(self.signa(x1,x2,x3,y1,y2,y3))
+                        b2=abs(self.signa(x1,x3,x4,y1,y3,y4))
+
+                        for i in range(self.nnode):
+                        #for i in nodes:
+                            if weights[i]!=0.0:  # the following code applies a spatial interpolation
+
+                                a1=abs(self.signa(xl[i],x1,x2,yl[i],y1,y2))
+                                a2=abs(self.signa(xl[i],x2,x3,yl[i],y2,y3))
+                                a3=abs(self.signa(xl[i],x3,x4,yl[i],y3,y4))
+                                a4=abs(self.signa(xl[i],x4,x1,yl[i],y4,y1))
+                                rat=abs(a1+a2+a3+a4-b1-b2)/(b1+b2)
+                                xy = np.where(rat<small1)
+                                ixy[i,0] = xy[0][0]
+                                ixy[i,1] = xy[1][0]
+                                x1i = x1[int(ixy[i,0]),int(ixy[i,1])]
+                                x2i = x2[int(ixy[i,0]),int(ixy[i,1])]
+                                x3i = x3[int(ixy[i,0]),int(ixy[i,1])]
+                                x4i = x4[int(ixy[i,0]),int(ixy[i,1])]
+                                y1i = y1[int(ixy[i,0]),int(ixy[i,1])]
+                                y2i = y2[int(ixy[i,0]),int(ixy[i,1])]
+                                y3i = y3[int(ixy[i,0]),int(ixy[i,1])]
+                                y4i = y4[int(ixy[i,0]),int(ixy[i,1])]
+                                a1i = a1[int(ixy[i,0]),int(ixy[i,1])]
+                                a2i = a2[int(ixy[i,0]),int(ixy[i,1])]
+                                a3i = a3[int(ixy[i,0]),int(ixy[i,1])]
+                                a4i = a4[int(ixy[i,0]),int(ixy[i,1])]
+
+                                # Find a triangle
+                                intri=0  #flag: inside the triangle
+                                for l in range(2): #split quad
+                                  ap=abs(self.signa(xl[i],x1i,x3i,yl[i],y1i,y3i))
+                                  if l==0:  #nodes 1,2,3
+                                      bb=abs(self.signa(x1i,x2i,x3i,y1i,y2i,y3i))
+                                      wild[l]=abs(a1i+a2i+ap-bb)/bb
+                                      if wild[l]<small1*5:
+                                          intri=1
+                                          arco[0,i]=max(0.,min(1.,a2i/bb))
+                                          arco[1,i]=max(0.,min(1.,ap/bb))
+                                          break
+                                  else: #nodes 1,3,4
+                                      bb=abs(self.signa(x1i,x3i,x4i,y1i,y3i,y4i))
+                                      wild[l]=abs(a3i+a4i+ap-bb)/bb
+                                      if wild[l]<small1*5:
+                                          intri=2
+                                          arco[0,i]=max(0.,min(1.,a3i/bb))
+                                          arco[1,i]=max(0.,min(1.,a4i/bb))
+                                          break
+
+                                if(intri==0):
+                                    raise('Cannot find a triangle:', wild)
+
+                                ixy[i,2]=intri
+                                arco[2,i]=max(0.,min(1.,1-arco[0,i]-arco[1,i]))
+
+                                # for ix in range(ixlen-1):
+                                #     for iy in range(iylen-1):
+                                #         x1=lon[ix,iy]
+                                #         x2=lon[ix+1,iy]
+                                #         x3=lon[ix+1,iy+1]
+                                #         x4=lon[ix,iy+1]
+                                #         y1=lat[ix,iy]
+                                #         y2=lat[ix+1,iy]
+                                #         y3=lat[ix+1,iy+1]
+                                #         y4=lat[ix,iy+1]
+                                #         a1=abs(self.signa(xl[i],x1,x2,yl[i],y1,y2))
+                                #         a2=abs(self.signa(xl[i],x2,x3,yl[i],y2,y3))
+                                #         a3=abs(self.signa(xl[i],x3,x4,yl[i],y3,y4))
+                                #         a4=abs(self.signa(xl[i],x4,x1,yl[i],y4,y1))
+                                #         b1=abs(self.signa(x1,x2,x3,y1,y2,y3))
+                                #         b2=abs(self.signa(x1,x3,x4,y1,y3,y4))
+                                #         rat=abs(a1+a2+a3+a4-b1-b2)/(b1+b2)
+                                #         if rat<small1:
+                                #           ixy[i,0]=ix
+                                #           ixy[i,1]=iy
+                                #           # Find a triangle
+                                #           intri=0  #flag: inside the triangle
+                                #           for l in range(2): #split quad
+                                #             ap=abs(self.signa(xl[i],x1,x3,yl[i],y1,y3))
+                                #             if l==0:  #nodes 1,2,3
+                                #                 bb=abs(self.signa(x1,x2,x3,y1,y2,y3))
+                                #                 wild[l]=abs(a1+a2+ap-bb)/bb
+                                #                 if wild[l]<small1*5:
+                                #                     intri=1
+                                #                     arco[0,i]=max(0.,min(1.,a2/bb))
+                                #                     arco[1,i]=max(0.,min(1.,ap/bb))
+                                #                     break
+                                #             else: #nodes 1,3,4
+                                #                 bb=abs(self.signa(x1,x3,x4,y1,y3,y4))
+                                #                 wild[l]=abs(a3+a4+ap-bb)/bb
+                                #                 if wild[l]<small1*5:
+                                #                     intri=2
+                                #                     arco[0,i]=max(0.,min(1.,a3/bb))
+                                #                     arco[1,i]=max(0.,min(1.,a4/bb))
+                                #                     break
+
+                                #           if(intri==0):
+                                #               raise('Cannot find a triangle:', wild)
+
+                                #           ixy[i,2]=intri
+                                #           arco[2,i]=max(0.,min(1.,1-arco[0,i]-arco[1,i]))
+                        # the following step was calculated at every time step
+                        # in the original code but can significanltyly slow down
+                        # the python script.
+                        # so it is only calculated once with the exception that
+                        # the dry cells are filled at every time step
+                        i_out = np.where(np.isnan(ixy[:,0]))[0]
+                        i_in = np.where(~np.isnan(ixy[:,0]))[0]
+                        npout = len(i_in)
+                        imap = i_in
+                        ix = ixy[i_in,0].astype(int)
+                        iy = ixy[i_in,1].astype(int)
+                        intri = ixy[i_in,2].astype(int)
+
+                        lev = np.ones((npout,self.nvrt))*-99
+                        vrat = np.zeros((npout,self.nvrt))*-99
+                        for il, ii in enumerate(i_in):
+                            for k in range(self.nvrt):
+                                if(kbp[ix[il],iy[il]]==-1): #ROMS dry cell
+                                    lev[il,k] = int(ilen-1-1)  #
+                                    vrat[il,k] = 1
+                                elif self.z[ii,k]<=zm[int(kbp[ix[il],iy[il]])]:
+                                    lev[il,k] = int(kbp[ix[il],iy[il]]-1)
+                                    vrat[il,k] = 0
+                                elif self.z[ii,k]>=zm[ilen-1]:
+                                    lev[il,k] = ilen-1-1
+                                    vrat[il,k] = 1
+                                else:
+                                    lev[il,k] = -99 #flag
+                                    for kk in range(ilen-1):
+                                        if (self.z[ii,k]>=zm[kk] and
+                                            self.z[ii,k]<=zm[kk+1]):
+                                            lev[il,k] = kk
+                                            vrat[il,k] = (zm[kk]-self.z[ii,k])/(zm[kk]-zm[kk+1])
+                                            break
+                                if lev[il,k] == -99:
+                                    raise('Cannot find a level:', ii,k,
+                                          self.z[ii,k],
+                                          zm)
+                        kbp = kbp.astype(int)
+                        lev = lev.T.astype(int)
+                        vrat = vrat.T
+
+                        wild2 = np.zeros((self.nvrt, npout, 4,2))   #initialize interpolation coefficients
+                        ix = np.broadcast_to(ix,(self.nvrt, npout))
+                        iy = np.broadcast_to(iy,(self.nvrt, npout))
+                        intri1 = np.where(intri==1)[0]
+                        intri2 = np.where(intri==2)[0]
+                        i_in_1 = i_in[intri1]
+                        i_in_2 = i_in[intri2]
+                        #print("time=%f"%(timer.time() - start))
+
+                        #tempout=-999*np.ones((self.nvrt, self.nnode))
+                        #saltout=-999*np.ones((self.nvrt, self.nnode))
+                        tempout=np.empty((self.nvrt, self.nnode))
+                        saltout=np.empty((self.nvrt, self.nnode))
+                        tempout[:,i_out] = tem_outside
+                        saltout[:,i_out] = sal_outside
+
+                    id_dry = np.where(kbp[ix,iy]==-1)[0] #ROMS dry cell
+                    lev[:,id_dry] = int(ilen-1-1)
+                    vrat[:,id_dry] = 1
+                    # id_deeper = np.where(self.z[i_in,:]<zm[kbp[ix,iy]]) #deeper than ROMS
+                    # lev[id_deeper] = int(kbp[ix,iy]-1)
+                    # vrat[id_deeper] = 0
+                    # id_shallower = np.where(self.z[i_in,:]>=zm[ilen-1) #shallower than ROMS
+                    # lev[id_shallower] = ilen-1-1
+                    # vrat[id_shallower] = 1
+
+                    wild2[:,:,0,0]=temp[ix,iy,lev]*(1-vrat)+temp[ix,iy,lev+1]*vrat
+                    wild2[:,:,0,1]=salt[ix,iy,lev]*(1-vrat)+salt[ix,iy,lev+1]*vrat
+                    wild2[:,:,1,0]=temp[ix+1,iy,lev]*(1-vrat)+temp[ix+1,iy,lev+1]*vrat
+                    wild2[:,:,1,1]=salt[ix+1,iy,lev]*(1-vrat)+salt[ix+1,iy,lev+1]*vrat
+                    wild2[:,:,2,0]=temp[ix+1,iy+1,lev]*(1-vrat)+temp[ix+1,iy+1,lev+1]*vrat
+                    wild2[:,:,2,1]=salt[ix+1,iy+1,lev]*(1-vrat)+salt[ix+1,iy+1,lev+1]*vrat
+                    wild2[:,:,3,0]=temp[ix,iy+1,lev]*(1-vrat)+temp[ix,iy+1,lev+1]*vrat
+                    wild2[:,:,3,1]=salt[ix,iy+1,lev]*(1-vrat)+salt[ix,iy+1,lev+1]*vrat
+
+                    tempout[:,i_in[intri1]] = wild2[:,intri1,0,0]*arco[0,i_in_1] + \
+                        wild2[:,intri1,1,0]*arco[1,i_in_1] + \
+                        wild2[:,intri1,2,0]*arco[2,i_in_1]
+
+                    saltout[:,i_in[intri1]] = wild2[:,intri1,0,1]*arco[0,i_in_1] + \
+                        wild2[:,intri1,1,1]*arco[1,i_in_1] + \
+                        wild2[:,intri1,2,1]*arco[2,i_in_1]
+
+                                    #             if intri==1:
+                    #                 tempout[k,i] = wild2[0,0]*arco[0,i] + \
+                    #                               wild2[1,0]*arco[1,i] + \
+                    #                               wild2[2,0]*arco[2,i]
+                    #                 saltout[k,i] = wild2[0,1]*arco[0,i] + \
+                    #                               wild2[1,1]*arco[1,i] + \
+                    #                               wild2[2,1]*arco[2,i]
+                    #             else:
+                    #                 tempout[k,i] = wild2[0,0]*arco[0,i] + \
+                    #                               wild2[2,0]*arco[1,i] + \
+                    #                               wild2[3,0]*arco[2,i]
+                    #                 saltout[k,i] = wild2[0,1]*arco[0,i] + \
+                    #                               wild2[2,1]*arco[1,i] + \
+                    #                               wild2[3,1]*arco[2,i]
+
+                    tempout[:,i_in[intri2]] = wild2[:,intri2,0,0]*arco[0,i_in_2] + \
+                        wild2[:,intri2,2,0]*arco[1,i_in_2] + \
+                        wild2[:,intri2,3,0]*arco[2,i_in_2]
+
+                    saltout[:,i_in[intri2]] = wild2[:,intri2,0,1]*arco[0,i_in_2] + \
+                        wild2[:,intri2,2,1]*arco[1,i_in_2] + \
+                        wild2[:,intri2,3,1]*arco[2,i_in_2]
+
+                    #print("time4=%f"%(timer.time() - start))
+
+                    #Correct near surface T bias
+                    idST = np.where( (kbp[ix,iy]!=-1) & (self.z[i_in,:].T>-10))
+                    tempout[idST[0],i_in[idST[1]]]=tempout[idST[0],i_in[idST[1]]]-1
+
+                    #if i==23293 and k == self.nvrt-1:
+                    # if npout==0 and k == self.nvrt-1 and irecout2==100:
+                    #     import pdb
+                    #     pdb.set_trace()
+                    # Check
+                    # if (tempout[k,i]<tempmin or tempout[k,i]>tempmax or \
+                    #     saltout[k,i]<saltmin or saltout[k,i]>saltmax):
+                    #     raise("Interpolated values invalid:",i,k,
+                    #       tempout[k,i],saltout[k,i])
+
+                    # for i in range(self.nnode):
+                    # #for i in nodes:
+                    #     if np.isnan(ixy[i,0]) or np.isnan(ixy[i,1]):
+                    #         #print("Cannot find a parent element:",i)
+                    #         tempout[:,i]=tem_outside
+                    #         saltout[:,i]=sal_outside
+                    #         if weights[i]!=0.:
+                    #             print("This node is not covered by the data", i)
+                    #     else:
+                    #         npout+=1
+                    #         imap[npout]=i
+                    #         ix=int(ixy[i,0])
+                    #         iy=int(ixy[i,1])
+                    #         intri=int(ixy[i,2])
+                    #         #Find vertical level
+                    #         tempout[:,i]=-999
+
+                    #         for k in range(self.nvrt):
+                    #             if(kbp[ix,iy]==-1): #ROMS dry cell
+                    #                 lev=ilen-1-1  #
+                    #                 vrat=1
+                    #             elif self.z[i,k]<=zm[int(kbp[ix,iy])]:
+                    #                 lev=int(kbp[ix,iy])-1
+                    #                 vrat=0
+                    #             elif self.z[i,k]>=zm[ilen-1]:
+                    #                 lev=ilen-1-1
+                    #                 vrat=1
+                    #             else:
+                    #                 lev=-99 #flag
+                    #                 for kk in range(ilen-1):
+                    #                     if (self.z[i,k]>=zm[kk] and
+                    #                         self.z[i,k]<=zm[kk+1]):
+                    #                         lev=kk
+                    #                         vrat=(zm[kk]-self.z[i,k])/(zm[kk]-zm[kk+1])
+                    #                         break
+                    #             if lev==-99:
+                    #                 raise('Cannot find a level:', i,k, self.z[i,k],
+                    #                       zm)
+
+                    #             wild2 = np.zeros((4,2))
+                    #             wild2[0,0]=temp[ix,iy,lev]*(1-vrat)+temp[ix,iy,lev+1]*vrat
+                    #             wild2[0,1]=salt[ix,iy,lev]*(1-vrat)+salt[ix,iy,lev+1]*vrat
+                    #             wild2[1,0]=temp[ix+1,iy,lev]*(1-vrat)+temp[ix+1,iy,lev+1]*vrat
+                    #             wild2[1,1]=salt[ix+1,iy,lev]*(1-vrat)+salt[ix+1,iy,lev+1]*vrat
+                    #             wild2[2,0]=temp[ix+1,iy+1,lev]*(1-vrat)+temp[ix+1,iy+1,lev+1]*vrat
+                    #             wild2[2,1]=salt[ix+1,iy+1,lev]*(1-vrat)+salt[ix+1,iy+1,lev+1]*vrat
+                    #             wild2[3,0]=temp[ix,iy+1,lev]*(1-vrat)+temp[ix,iy+1,lev+1]*vrat
+                    #             wild2[3,1]=salt[ix,iy+1,lev]*(1-vrat)+salt[ix,iy+1,lev+1]*vrat
+
+                    #             if intri==1:
+                    #                 tempout[k,i] = wild2[0,0]*arco[0,i] + \
+                    #                               wild2[1,0]*arco[1,i] + \
+                    #                               wild2[2,0]*arco[2,i]
+                    #                 saltout[k,i] = wild2[0,1]*arco[0,i] + \
+                    #                               wild2[1,1]*arco[1,i] + \
+                    #                               wild2[2,1]*arco[2,i]
+                    #             else:
+                    #                 tempout[k,i] = wild2[0,0]*arco[0,i] + \
+                    #                               wild2[2,0]*arco[1,i] + \
+                    #                               wild2[3,0]*arco[2,i]
+                    #                 saltout[k,i] = wild2[0,1]*arco[0,i] + \
+                    #                               wild2[2,1]*arco[1,i] + \
+                    #                               wild2[3,1]*arco[2,i]
+                    #             #if i==23293 and k == self.nvrt-1:
+                    #             # if npout==0 and k == self.nvrt-1 and irecout2==100:
+                    #             #     import pdb
+                    #             #     pdb.set_trace()
+                    #             # Check
+                    #             # if (tempout[k,i]<tempmin or tempout[k,i]>tempmax or \
+                    #             #     saltout[k,i]<saltmin or saltout[k,i]>saltmax):
+                    #             #     raise("Interpolated values invalid:",i,k,
+                    #             #       tempout[k,i],saltout[k,i])
+
+                    #             #Correct near surface T bias
+                    #             if kbp[ix,iy]!=-1 and self.z[i,k]>-10:
+                    #                 tempout[k,i]=tempout[k,i]-1
+
+                    #             #Enforce lower bound for temp. for eqstate
+                    #             tempout[k,i]=max(0.,tempout[k,i])
+                    write_to_log("applying spatial interpolation!\n")
+                    write_to_log(f"outputting at day , {dt.total_seconds()/86400}, {npout}\n")
+
+                    # only save the nodes with valid values.
+                    tempout_in = [temp_t[imap[:npout]] for temp_t in tempout]
+                    saltout_in = [salt_t[imap[:npout]] for salt_t in saltout]
+                    temperature.append(tempout_in)
+                    salinity.append(saltout_in)
+                    output_day.append(dt.total_seconds()/86400)
+                    # if output_day[-1] == 350.625:
+                    #     import pdb
+                    #     pdb.set_trace()
+                    nudge_step = int(pd.Timedelta(self.nudge_step).total_seconds()/3600)
+                    if len(output_day)>1:
+                        if output_day[-1]-output_day[-2]>(nudge_step+0.1)/24:
+                            print(f"Current time step {output_day[-1]} and previous {output_day[-2]} file{ncfile}")
+                            raise ValueError('The difference between current and previous time step is greater than assigned stride')
+                    #print("time5=%f"%(timer.time() - start))
+        # return weights, output_day, [temperature, salinity], \
+        #     imap[:npout].astype(int)+1   #schism is one-based
+        temperature = np.array(temperature)
+        salinity = np.array(salinity)
+        temperature = np.transpose(temperature,(0,2,1)) # [var,time,node_map, nvrt]
+        salinity = np.transpose(salinity,(0,2,1))
+        #Enforce lower bound for temp. for eqstate
+        temperature[temperature<0]== 0
+        write_to_log("reorganizing matrix!\n")
+        #print("time=%f"%(timer.time() - start))
+        max_time = self.time[-1].total_seconds()/3600/24+8/24
+        output_day = np.array(output_day)
+        if max_time<output_day[-1]:
+            temperature = temperature[output_day<=max_time,:,:]
+            salinity = salinity[output_day<=max_time,:,:]
+            output_day = output_day[output_day<=max_time]
+
+        return weights, [temperature, salinity], \
+            imap[:npout].astype(int), output_day   #schism is one-based
 
     def read_data(self, data):
         if data.endswith('csv'):
