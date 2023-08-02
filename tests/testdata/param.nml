@@ -705,6 +705,7 @@
 !-----------------------------------------------------------------------
   iout_sta = 0
   nspool_sta = 10 !needed if iout_sta/=0; mod(nhot_write,nspool_sta) must=0
+  
 !-----------------------------------------------------------------------
 ! Global output options
 ! The variable names that appear in nc output are shown in {}

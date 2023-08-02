@@ -118,14 +118,14 @@ def create_hgrid(s, inputs, logger):
         option_name = 'gr3_outputfile'
         if option_name in section:
             logger.info("Writing hgrid file...")
-            hgrid_out_fpath = ensure_outdir(output_dir,section[option_name])
+            hgrid_out_fpath = ensure_outdir(inputs['output_dir'],section[option_name])
             s.write_hgrid(hgrid_out_fpath,boundary=True)
 
         # Write hgrid.ll
         option_name = 'll_outputfile'
         if option_name in section:
             logger.info("Creating hgrid.ll file...")
-            hgrid_ll_fpath = ensure_outdir(output_dir,section[option_name])
+            hgrid_ll_fpath = ensure_outdir(inputs['output_dir'],section[option_name])
             s.write_hgrid_ll(hgrid_ll_fpath,boundary=True)
 
 
