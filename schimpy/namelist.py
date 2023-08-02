@@ -31,6 +31,13 @@ def parse(file_content):
             key, value = key_value_pair.split("=")
             key = key.strip()
             value = value.strip()
+            try:
+                value = int(value)
+            except:
+                try:
+                    value=float(value)
+                except:
+                    pass
             namelists[current_namelist][key] = {
                 "value": value, "full_line_comment": full_line_comment, "inline_comment": inline_comment}
             full_line_comment = ""

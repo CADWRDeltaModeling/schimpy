@@ -114,6 +114,7 @@ def create_hgrid(s, inputs, logger):
         
 
         # Write hgrid.gr3
+        output_dir = inputs['output_dir']
         option_name = 'gr3_outputfile'
         if option_name in section:
             logger.info("Writing hgrid file...")
@@ -135,6 +136,7 @@ def create_vgrid(s,inputs,logger):
     section_name = 'vgrid'
     section = inputs.get(section_name)
     if section is not None:
+        output_dir = inputs['output_dir']
         if 'hgrid' in section:
             hgrid = section['hgrid']
         else: 
@@ -182,6 +184,7 @@ def create_gr3_with_polygons(s, inputs, logger):
         return
     logger.info("Processing gr3 outputs...")
     expected_items = ('polygons', 'default','smooth')
+    output_dir = inputs['output_dir']
     for fname, item in dict_gr3.items():
         check_and_suggest(item, expected_items)
         polygons = item.get('polygons', [])
@@ -209,6 +212,7 @@ def create_prop_with_polygons(s, inputs, logger):
         return
     logger.info("Processing prop outputs...")
     expected_items = ('default', 'polygons')
+    output_dir = inputs['output_dir']
     for fname, item in dict_prop.items():
         check_and_suggest(item, expected_items)
         polygons = item.get('polygons', [])
@@ -235,6 +239,7 @@ def create_structures(s, inputs, logger):
         return
     logger.info("Processing structures...")
     expected_items = ('nudging', 'structures', 'outputfile')
+    output_dir = inputs['output_dir']
     check_and_suggest(dict_struct, expected_items)
     structures = dict_struct.get('structures')
     if structures is None:
@@ -273,6 +278,7 @@ def create_fluxflag(s, inputs, logger):
         return
     logger.info("Processing fluxflag outputs...")
     expected_items = ('linestrings', 'outputfile')
+    output_dir = inputs['output_dir']
     check_and_suggest(dict_flow, expected_items)
     flowlines = dict_flow.get('linestrings')
     if flowlines is None:
@@ -313,6 +319,7 @@ def update_temporal_inputs(s, inputs):
     """ Create temporal inputs. Under development
     """
     # create in interpolated tide file
+    output_dir = inputs['output_dir']
     sf_tide_out_fpath = os.path.join(output_dir, sf_tide_out_fname)
     s.interpolate_tide(time_start, time_end, dt,
                        sf_tide_in_fpath, sf_tide_out_fpath)
