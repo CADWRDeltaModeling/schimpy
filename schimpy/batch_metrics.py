@@ -52,11 +52,11 @@ class BatchMetrics(object):
     """ A class to plot metrics in a batch mode
     """
     VAR_2D = ('elev', )
-    VAR_3D = ('salt', 'temp')
+    VAR_3D = ('salt', 'temp', 'sed')
     MAP_VAR_FOR_STATIONDB = {'flow': 'flow', 'elev': 'stage', 'salt': 'wq',
-                             'temp': 'wq'}
+                             'temp': 'wq', 'sed': 'wq'}
     variable_units = {'flow': 'cms', 'elev': 'm', 'salt': 'PSU',
-                      'temp': 'deg C'}
+                      'temp': 'deg C', 'sed': 'g/L'}
 
     def __init__(self, params=None):
         """ Constructor
