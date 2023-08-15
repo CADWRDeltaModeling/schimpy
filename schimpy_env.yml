@@ -8,7 +8,7 @@ channels:
   - cadwr-dms
 dependencies:
   - python>=3.9,<3.10
-  - schimpy>=1.6.4         # Recommended for compatibiltiy with current code. Please coordinate with schism_env.yml
+  - schimpy>=1.6.5         # Recommended for compatibiltiy with current code. Please coordinate with schism_env.yml
   - vtools3
   - dms-datastore>=0.0.16
   - pandas>=1.5            # Below here minimum versions are to reduce solve space

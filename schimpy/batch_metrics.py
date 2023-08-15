@@ -3,7 +3,7 @@
 
 """ Create metrics plots in batch mode
 """
-from schimpy.unit_conversions import cfs_to_cms, ft_to_m, ec_psu_25c, fahrenheit_to_celsius
+from vtools.functions.unit_conversions import cfs_to_cms, ft_to_m, ec_psu_25c, fahrenheit_to_celsius
 from copy import deepcopy
 import logging
 import re
@@ -222,7 +222,11 @@ class BatchMetrics(object):
                 try:
                     ts_obs = read_ts(fpath_obs)
                     if ts_obs.shape[1] > 1:
-                        raise Exception(
+                        if ts_obs.shape[1]==2 and 'user_flag' in ts_obs.columns:
+                            ts_obs['value']=ts_obs.value.mask(ts_obs.user_flag==1)
+                            ts_obs = ts_obs.value
+                        else:
+                            raise Exception(
                             "Multiple column series received. Need to implement selector")
                     ts_obs = ts_obs.squeeze()
                 except ValueError as e:
