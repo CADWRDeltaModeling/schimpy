@@ -398,7 +398,7 @@ class BatchMetrics(object):
         assert len(sim_outputs) > 0
         assert sim_outputs[0] is not None
         
-        metric_out=open( os.path.join(dest_dir, 'meterics.csv'),"w")
+        metric_out=open( os.path.join(dest_dir, 'metrics.csv'),"w")
         metric_out.writelines("station, RMSE, lag, bias, NSE, Correlation\n")
 
         # Iterate through the stations in the first simulation outputs
