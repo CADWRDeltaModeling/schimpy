@@ -15,11 +15,11 @@ def test_namelist_parser():
     print(namelists)
 
     expected_namelists = {'NAMELIST1': {'comment': "",
-            'VAR1': {'value': '1', 'full_line_comment': ' a full line comment', 'inline_comment': ' a line comment'},
-            'VAR2': {'value': '2', 'full_line_comment': "", 'inline_comment': ' another comment'}},
+            'VAR1': {'value': 1, 'full_line_comment': ' a full line comment', 'inline_comment': ' a line comment'},
+            'VAR2': {'value': 2, 'full_line_comment': "", 'inline_comment': ' another comment'}},
         'NAMELIST2': {'comment': "",
-            'VAR3': {'value': '3', 'full_line_comment': "", 'inline_comment': ""},
-        'VAR4': {'value': '4', 'full_line_comment': "", 'inline_comment': ""}}}
+            'VAR3': {'value': 3, 'full_line_comment': "", 'inline_comment': ""},
+        'VAR4': {'value': 4, 'full_line_comment': "", 'inline_comment': ""}}}
 
     assert namelists == expected_namelists
 
