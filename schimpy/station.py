@@ -304,7 +304,7 @@ def flux_stations_from_yaml(inp):
             content = yaml.full_load(f)
     else:
         content = inp
-        if not "linestrings" in content: raise ValueError("Could not fine 'linestrings' key. Was the input a string or filename? Valid file?")
+        if not "linestrings" in content: raise ValueError("Could not fine 'linestrings' key. Was the input a string or filename? Valid file? For FLOW, make sure there is 'flow_station_input' parameter")
     names =[]
     linestrings = content["linestrings"]
     for ls in linestrings:
