@@ -280,6 +280,8 @@ class BatchMetrics(object):
             ts.unit = 'deg C'
         elif unit in ('degC', 'deg C', 'deg_c'):
             ts.unit = 'deg C'
+        elif unit in ('mg/L', 'mg/l', 'mg / L', 'mg / l'):
+            ts.unit = 'mg/L'
         elif unit is None:
             ts.unit = None
             self.logger.warning("No unit in the time series")
