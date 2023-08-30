@@ -147,6 +147,8 @@ temp_axis_labels = [[None, DEG_C_LABEL],
 temp_filtered_axis_labels = [[None, FILTERED_DEG_C_LABEL],
                              [None, FILTERED_DEG_F_LABEL]]
 
+MGL_LABEL = 'SSC (mg/L)'
+FILTERED_MGL_LABEL = 'Tidal Avg SSC (mg/L)'
 
 def set_dual_axes(ax, ts, cell_method = 'inst'):
     """ Create a dual y-axis with unit information in the given time series.
@@ -193,6 +195,9 @@ def set_dual_axes(ax, ts, cell_method = 'inst'):
             else:
                 ax.set_ylabel(DEG_C_LABEL)
                 ax2.set_ylabel(DEG_F_LABEL)
+            return ax2
+        elif unit == 'mg/L':
+            ax2 = set_dual_axes_ssc(ax, filtered=filtered)
             return ax2
     else:
         raise ValueError("No unit provided for output and not inferred")
@@ -306,6 +311,23 @@ def set_dual_axes_salt(ax1, filtered=False):
     else:
         ax1.set_ylabel(PSU_LABEL)
         ax2.set_ylabel(EC_LABEL)
+    return ax2
+
+
+def set_dual_axes_ssc(ax1, filtered=False):
+    """ Set a dual y-axis for ssc.
+
+        Parameters
+        ----------
+        ax: Matplotlib axes
+    """
+    ax2 = create_second_axis(ax1)
+    if filtered:
+        ax1.set_ylabel(FILTERED_MGL_LABEL)
+        ax2.set_ylabel(FILTERED_MGL_LABEL)
+    else:
+        ax1.set_ylabel(MGL_LABEL)
+        ax2.set_ylabel(MGL_LABEL)
     return ax2
 
 
