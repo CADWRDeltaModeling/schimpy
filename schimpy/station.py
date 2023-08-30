@@ -17,7 +17,7 @@ import argparse
 from vtools.data.timeseries import *
 
 station_variables = ["elev", "air pressure", "wind_x", "wind_y",
-                     "temp", "salt", "u", "v", "w", "sed"]
+                     "temp", "salt", "u", "v", "w", "ssc"]
 
 def staout_name(var):
     try:
