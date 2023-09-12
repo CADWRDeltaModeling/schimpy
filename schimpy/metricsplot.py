@@ -4,7 +4,7 @@
 import pandas as pd
 from schimpy.plot_default_formats import set_color_cycle_dark2, set_scatter_color,\
                                          make_plot_isometric, set_dual_axes, set_xaxis_dateformat,\
-                                         rotate_xticks,brewer_colors
+                                         rotate_xticks,brewer_colors,set_line_cycle
 from vtools.functions.filter import cosine_lanczos
 #, interpolate_ts, interpolate_ts_nan, LINEAR, shift
 from vtools.functions.skill_metrics import rmse, median_error, mean_error, skill_score, corr_coefficient
@@ -21,7 +21,6 @@ __all__ = ['plot_metrics', 'plot_comparison']
 
 #def calculate_lag_old(a, b, max_shift, period=None,
 #                  resolution=time_interval(minutes=1), interpolate_method=None):
-
 
 
 
@@ -353,7 +352,8 @@ def add_regression_line(axes, d1, d2):
 
     x = np.array([d1.min(), d1.max()])
     y = result[1] * x + result[0]
-    bc1 = brewer_colors[1]
+    #bc1 = brewer_colors[1]
+    bc1="k"
     l, = axes.plot(x, y, color=bc1)
     # Text info
     if result[1] >= 0.:
@@ -494,14 +494,16 @@ def calculate_metrics(tss, lags, interpolate_method='linear'):
     return metrics, tss_for_scatter
 
 
-def set_figure():
+def set_figure(style_id):
     """ Set a Matplotlib figure and return it
     """
+   
     fig = plt.gcf()
     fig.clear()
     # fig = plt.figure()
     fig.set_size_inches(12, 7.5)
-    set_color_cycle_dark2()
+    set_line_cycle(style_id)
+    #set_color_cycle_dark2()
     return fig
 
 
@@ -514,7 +516,7 @@ def check_if_all_tss_are_bad(tss):
     return all([bad(ts) for ts in tss])
 
 
-def plot_metrics(obs,tssim, **kwargs):
+def plot_metrics(obs,tssim, style_palette="dwr_accessible1",**kwargs):
     """
     Create a metrics plot
 
@@ -530,12 +532,12 @@ def plot_metrics(obs,tssim, **kwargs):
         tss = tuple([obs] + [s for s in tssim])
     else:
         raise Exception("Unanticipated type")
-    fig = set_figure()
+    fig = set_figure(style_palette)
     fig ,metrics= plot_metrics_to_figure(fig, tss, **kwargs)
     return fig,metrics
 
 
-def plot_comparison(*args, **kwargs):
+def plot_comparison(*args, style_palette="dwr_accessible1", **kwargs):
     """
     Create a simple comparison plot without metrics calculation
 
@@ -547,6 +549,6 @@ def plot_comparison(*args, **kwargs):
     -------
     matplotlib.pyplot.figure.Figure
     """
-    fig = set_figure()
+    fig = set_figure(style_palette)
     fig = plot_comparison_to_figure(fig, args, **kwargs)
     return fig

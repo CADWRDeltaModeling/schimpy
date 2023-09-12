@@ -25,7 +25,6 @@ import xarray as xr
 
 import pytz
 
-
 def localize_datetime(d):
     # datetime is naïve iff:
     if d.tzinfo is None or d.tzinfo.utcoffset(d) is None:
@@ -81,7 +80,7 @@ class AWSGrib2Inventory:
         self.file_metadata = list(sorted([
             _['Key'] for _ in data if 'wrfsfcf' in _['Key'] and tz in _['Key'] and not 'idx' in _['Key']
         ]))
-
+        
         for key in self.file_metadata[1:record*24+1]:
             filename = pathlib.Path(self.tmpdir) / key
             filename.parent.mkdir(parents=True, exist_ok=True)
@@ -135,7 +134,7 @@ class HRRR:
         self.bbox_xmax=bbox[2]
         self.bbox_ymin=bbox[1]
         self.bbox_ymax=bbox[3]
-
+        
         end_date = start_date + timedelta(days=rnday)
         logger.info(f'start_date is {start_date}, end_date is {end_date}')
         

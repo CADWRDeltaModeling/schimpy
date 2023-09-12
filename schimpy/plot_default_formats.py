@@ -4,9 +4,8 @@
 
 
 import vtools.data.timeseries
-from vtools.functions.unit_conversions import m_to_ft, cms_to_cfs,\
-                                    celsius_to_fahrenheit,\
-                                    psu_ec_25c, psu_ec_25c_scalar, ec_sea
+from schimpy.unit_conversions import m_to_ft, cms_to_cfs, celsius_to_fahrenheit,\
+                                    psu_ec_25c, psu_ec_25c_scalar, ec_sea,ec_psu_25c
 import palettable
 from matplotlib.ticker import AutoLocator, ScalarFormatter
 import matplotlib.gridspec as gridspec
@@ -22,6 +21,10 @@ font = { # 'family': '',
         'size': 12,}
 brewer_colors = [palettable.colorbrewer.qualitative.Dark2_5.mpl_colors[i]
                  for i in [1, 0, 2, 3, 4]]
+dwr_accessiable1_style_cycler=(cycler(color=["#323232","#D55E00","#0173B2"])*cycler(linestyle=['-']))
+
+palette_cycler={"dwr_accessible1":dwr_accessiable1_style_cycler}
+
 line_thickness = 1.
 
 # Metrics format dictionary
@@ -64,6 +67,11 @@ def get_color_cycle():
             list of the colors
     """
     return brewer_colors
+
+def set_line_cycle(line_palette_id):
+    """Set linetype cycle of solid line style types with 3 color dwr acceissble color    
+    """
+    mpl.rcParams['axes.prop_cycle'] =palette_cycler[line_palette_id]
 
 
 ##############################################################################

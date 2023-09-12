@@ -551,18 +551,21 @@ class BatchMetrics(object):
                 else:
                     labels_to_plot[0] += " - {:g}".format(-adj_obs)
 
+            style_palette=params["palette"]
             if plot_format == 'simple':
                 fig = plot_comparison(ts_obs, tss_sim,
                                       window_inst=(start_inst, end_inst),
                                       window_avg=(start_avg, end_avg),
                                       labels=labels_to_plot,
-                                      title=title)
+                                      title=title,
+                                       style_palette=style_palette)
             else:
                 fig,metrics = plot_metrics(ts_obs, tss_sim,
                                    window_inst=(start_inst, end_inst),
                                    window_avg=(start_avg, end_avg),
                                    labels=labels_to_plot,
-                                   title=title)
+                                   title=title,
+                                   style_palette=style_palette)
                 if(metrics[0]):
                     metric_out.write(station_id+', %s, %s, %s, %s, %s\n'%(metrics[0]["rmse"],metrics[0]["lag"],metrics[0]["bias"],metrics[0]["nse"],metrics[0]["corr"]))
             fname_output = self.set_fname_out(alias,
