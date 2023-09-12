@@ -89,10 +89,6 @@ class BatchMetrics(object):
                 datafname = os.path.join(working_dir, "flux.out")
                 sim_out = station.read_flux_out(
                     datafname, station_in, reftime=time_basis)
-                if ('old' in sim_out.columns):
-                    sim_out['old'] = -sim_out['old']
-                else:
-                    raise ValueError("Couldn't find")
                 sim_outputs.append(sim_out)
         else:
             for i, working_dir in enumerate(outputs_dir):
