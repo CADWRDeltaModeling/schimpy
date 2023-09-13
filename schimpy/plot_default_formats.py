@@ -4,7 +4,7 @@
 
 
 import vtools.data.timeseries
-from schimpy.unit_conversions import m_to_ft, cms_to_cfs, celsius_to_fahrenheit,\
+from  vtools.functions.unit_conversions import m_to_ft, cms_to_cfs, celsius_to_fahrenheit,\
                                     psu_ec_25c, psu_ec_25c_scalar, ec_sea,ec_psu_25c
 import palettable
 from matplotlib.ticker import AutoLocator, ScalarFormatter

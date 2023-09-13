@@ -551,7 +551,12 @@ class BatchMetrics(object):
                 else:
                     labels_to_plot[0] += " - {:g}".format(-adj_obs)
 
-            style_palette=params["palette"]
+            if ("palette" in params.keys()):
+                style_palette=params["palette"]
+            else:
+                style_palette="dwr_accessible1"
+                self.logger.info("No style palette is given, default used.")
+                 
             if plot_format == 'simple':
                 fig = plot_comparison(ts_obs, tss_sim,
                                       window_inst=(start_inst, end_inst),
