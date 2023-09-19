@@ -204,7 +204,7 @@ def plot_inst_and_avg(axes, tss, window_inst, window_avg, labels, label_loc, leg
 
     lines = plot_tss(axes['inst'], tss, window_inst,cell_method='inst')
     if labels is not None:
-        axes['inst'].legend(lines, labels, prop={'size': legend_size}, loc=label_loc)
+        axes['inst'].legend(lines, labels, prop={'size': legend_size}, loc=label_loc,bbox_to_anchor=(1.1, 1.3),frameon=False)
 
     if window_avg is None:
         window_avg = get_union_window(tss)
@@ -255,7 +255,7 @@ def gen_metrics_grid():
     grids['avg'] = g[1, 0]
     grids['scatter'] = g[1, 1]
     #g.update(top=0.93, bottom=0.2, right=0.88, hspace=0.4, wspace=0.8)
-    g.update(top=0.90, bottom=0.2, right=0.88, hspace=0.4, wspace=0.8)
+    g.update(top=0.90, bottom=0.2, right=0.88, hspace=0.4, wspace=0.2)
     return grids
 
 
@@ -286,7 +286,7 @@ def plot_tss(ax, tss, window=None,cell_method='inst'):
             if not hasattr(ts_plotted,"unit"):
                 raise Exception("No unit in time series")
             set_dual_axes(ax, ts_plotted,cell_method)
-            set_xaxis_dateformat(ax, date_format="%m/%d/%Y", rotate=25)
+            set_xaxis_dateformat(ax, date_format="%m/%Y", rotate=25)
         else:
             raise Exception("W$%RTE$#R")
     return lines
