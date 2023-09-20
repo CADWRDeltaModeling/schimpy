@@ -18,3 +18,4 @@ labels: # Three labels for field data and two runs
 # selected_stations: CCS
 # excluded_stations: CLC
 # plot_format: simple
+palette: dwr_accessible1

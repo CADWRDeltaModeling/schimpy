@@ -250,12 +250,12 @@ def gen_simple_grid():
 
 def gen_metrics_grid():
     grids = {}
-    g = GridSpec(2, 2, width_ratios=[1.8, 1], height_ratios=[1, 1])
+    g = GridSpec(2, 2, width_ratios=[2.8, 0.9], height_ratios=[1, 1])
     grids['inst'] = g[0, 0:2]
     grids['avg'] = g[1, 0]
     grids['scatter'] = g[1, 1]
     #g.update(top=0.93, bottom=0.2, right=0.88, hspace=0.4, wspace=0.8)
-    g.update(top=0.90, bottom=0.2, right=0.88, hspace=0.4, wspace=0.2)
+    g.update(top=0.90, bottom=0.2, right=0.9, hspace=0.4, wspace=0.42)
     return grids
 
 
@@ -534,6 +534,7 @@ def plot_metrics(obs,tssim, style_palette="dwr_accessible1",**kwargs):
         raise Exception("Unanticipated type")
     fig = set_figure(style_palette)
     fig ,metrics= plot_metrics_to_figure(fig, tss, **kwargs)
+    fig.tight_layout(w_pad=2)
     return fig,metrics
 
 
