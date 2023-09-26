@@ -286,7 +286,7 @@ def plot_tss(ax, tss, window=None,cell_method='inst'):
             if not hasattr(ts_plotted,"unit"):
                 raise Exception("No unit in time series")
             set_dual_axes(ax, ts_plotted,cell_method)
-            set_xaxis_dateformat(ax, date_format="%m/%Y", rotate=25)
+            set_xaxis_dateformat(ax, date_format="%m/%d/%Y", rotate=25)
         else:
             raise Exception("W$%RTE$#R")
     return lines
@@ -534,7 +534,6 @@ def plot_metrics(obs,tssim, style_palette="dwr_accessible1",**kwargs):
         raise Exception("Unanticipated type")
     fig = set_figure(style_palette)
     fig ,metrics= plot_metrics_to_figure(fig, tss, **kwargs)
-    fig.tight_layout(w_pad=2)
     return fig,metrics
 
 
