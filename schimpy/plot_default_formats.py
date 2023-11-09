@@ -21,7 +21,7 @@ font = { # 'family': '',
         'size': 12,}
 brewer_colors = [palettable.colorbrewer.qualitative.Dark2_5.mpl_colors[i]
                  for i in [1, 0, 2, 3, 4]]
-dwr_accessiable1_style_cycler=(cycler(color=["#323232","#D55E00","#0173B2"])*cycler(linestyle=['-']))
+dwr_accessiable1_style_cycler=(cycler(linestyle=['-','--'])*cycler(color=["#323232","#D55E00","#0173B2"]))
 
 palette_cycler={"dwr_accessible1":dwr_accessiable1_style_cycler}
 

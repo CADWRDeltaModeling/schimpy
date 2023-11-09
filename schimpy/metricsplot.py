@@ -7,7 +7,7 @@ from schimpy.plot_default_formats import set_color_cycle_dark2, set_scatter_colo
                                          rotate_xticks,brewer_colors,set_line_cycle
 from vtools.functions.filter import cosine_lanczos
 #, interpolate_ts, interpolate_ts_nan, LINEAR, shift
-from vtools.functions.skill_metrics import rmse, median_error, mean_error, skill_score, corr_coefficient
+from vtools.functions.skill_metrics import rmse, median_error, mean_error, skill_score, corr_coefficient,willmott_score
 import statsmodels.formula.api as sm
 from vtools.functions.lag_cross_correlation import calculate_lag
 from vtools.data.vtime import days, hours, minutes
@@ -313,11 +313,13 @@ def gen_metrics_string(metrics, names, unit=None):
             line_metrics += "Lag={}  ".format(lag)
             line_metrics += r"Bias$_\phi$={:.3f}   ".format(metric['bias'])
             line_metrics += r"NSE$_\phi$={:.3f}   ".format(metric['nse'])
+            line_metrics += r"Willmott_score$_\phi$={:.3f}   ".format(metric['willmott_skill'])
             line_metrics += r"R$_\phi$={:.3f}   ".format(metric['corr'])
         else:
             line_metrics += "Lag=N/A  "
             line_metrics += r"Bias$_\phi$=N/A  "
             line_metrics += r"NSE$_\phi$=N/A  "
+            line_metrics += r"Willmott\_score$_\phi$=N/A  "
             line_metrics += r"R$_\phi$=N/A"
         str_metrics.append(line_metrics)
     return str_metrics
@@ -486,9 +488,10 @@ def calculate_metrics(tss, lags, interpolate_method='linear'):
             ts2_interpolated = ts2
         bias = mean_error(ts2_interpolated, ts1,0.01)
         nse = skill_score(ts2_interpolated, ts1)
+        willmott=willmott_score(ts2_interpolated, ts1)
         corr = corr_coefficient(ts2_interpolated, ts1)
         metrics.append({'rmse': rmse_, 'bias': bias,
-                        'nse': nse, 'corr': corr, 'lag': lags[i]})
+                        'nse': nse, 'corr': corr, 'lag': lags[i],'willmott_skill':willmott})
         if i == 0 and lags[0] is not None:
             tss_for_scatter = (ts1, ts2_interpolated)
     return metrics, tss_for_scatter
@@ -512,7 +515,7 @@ def check_if_all_tss_are_bad(tss):
         'Not good' means that a time series is None or all np.nan
     """
     def bad(ts):
-        return True if ts is None else ts.isnull().all()
+        return True if ts is None else ts.isnull().all()   
     return all([bad(ts) for ts in tss])
 
 

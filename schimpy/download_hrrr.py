@@ -18,7 +18,7 @@ def create_arg_parser():
                        Download Download NOAA High-Resolution Rapid Refresh (HRRR) Model using AWS bucket service.
                        
                      Usage:
-                           download_hrr.py 01/01/2023  g:\\temp 15  37.3  39.0 -123.15 -121.1
+                           download_hrrr 01/01/2023  g:\\temp 15  37.3  39.0 -123.15 -121.1
                      """)
     parser.add_argument('start_date', default=None,
                         help='starting date of HRRR data, must be format like 09/19/2018')

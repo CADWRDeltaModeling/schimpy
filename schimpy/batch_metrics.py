@@ -397,7 +397,7 @@ class BatchMetrics(object):
         assert sim_outputs[0] is not None
         
         metric_out=open( os.path.join(dest_dir, 'metrics.csv'),"w")
-        metric_out.writelines("station, RMSE, lag, bias, NSE, Correlation\n")
+        metric_out.writelines("station, RMSE, lag, bias, NSE, Willmott_skill, Correlation\n")
 
         # Iterate through the stations in the first simulation outputs
         for stn in sim_outputs[0].columns:
@@ -572,7 +572,7 @@ class BatchMetrics(object):
                                    title=title,
                                    style_palette=style_palette)
                 if(metrics[0]):
-                    metric_out.write(station_id+', %s, %s, %s, %s, %s\n'%(metrics[0]["rmse"],metrics[0]["lag"],metrics[0]["bias"],metrics[0]["nse"],metrics[0]["corr"]))
+                    metric_out.write(station_id+' '+subloc+', %s, %s, %s, %s,%s, %s\n'%(metrics[0]["rmse"],metrics[0]["lag"],metrics[0]["bias"],metrics[0]["nse"],metrics[0]["willmott_skill"],metrics[0]["corr"]))
             fname_output = self.set_fname_out(alias,
                                               variable,
                                               station_id,
