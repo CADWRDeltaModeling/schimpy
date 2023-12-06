@@ -1321,7 +1321,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
         hgrid_nc['SCHISM_hgrid_%s_y' % c] = gy
 
     # add time dimension to all variable elements
-    time = [np.datetime64(init_date)]
+    time = [dt.datetime.strptime(init_date, "%Y-%m-%d")]
 
     # if 'time' variable already in hnc, drop it.
     if 'time' in list(hnc.variables):
