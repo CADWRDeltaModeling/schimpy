@@ -25,7 +25,7 @@ from vtools.data.vtime import hours, days
 log_file = "log_nudging.out"
 
 
-class nudging(object):
+class Nudging(object):
     """
     A class to create schism nudging
     """
@@ -1061,10 +1061,10 @@ def main():
     parser = create_arg_parser()
     args = parser.parse_args()
 
-    nudging = nudging(args.yaml_fn, crs=args.crs,
+    nudge = Nudging(args.yaml_fn, crs=args.crs,
                       suffix=suffix)
-    nudging.read_yaml()
-    nudging.create_nudging()
+    nudge.read_yaml()
+    nudge.create_nudging()
 
 
 if __name__ == "__main__":
