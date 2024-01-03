@@ -531,7 +531,7 @@ class SchismSetup(object):
                 name = linestring.get('Name')
             npoint = len(line)
             attribute = linestring.get("attribute")
-            #optype = linestring.get("type")
+            optype = linestring.get("type")
             if attribute == 'local_min':
                 op = np.min
             elif attribute == 'local_max':
@@ -544,6 +544,9 @@ class SchismSetup(object):
                 try:
                     opval=float(attribute)
                     op = lambda x: opval
+                    # TODO: implement deprecation warning
+                    # if optype is not None:
+                    #     raise Warning("Using type min/max for linestring depth enforcement will soon be deprecated. write the logic you'd like in the attribute field.")
                 except:
                     ValueError("Linestring attribute was not a known value (e.g. local_min, local_med) or a float")
                      
@@ -574,7 +577,13 @@ class SchismSetup(object):
                 for inode in node_local_nds:
                     support_nodes = list(node_local_nds[inode])
                     orig = mesh.nodes[support_nodes,2]
-                    valreplace=op(orig)
+                    # TODO: implement deprecation warning, eventually delete the following if/elseif
+                    if optype == "min":
+                        valreplace=max(opval, mesh.nodes[inode,2])
+                    elif optype == "max":
+                        valreplace=min(opval, mesh.nodes[inode,2])
+                    else:
+                        valreplace=op(orig)
                     attr[inode]=valreplace
         return attr
 
