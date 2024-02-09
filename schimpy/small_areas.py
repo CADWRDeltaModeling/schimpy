@@ -15,7 +15,7 @@ def create_arg_parser():
     parser.add_argument('--fail',type=float,default=4.,help = 'Threshold for failure (areas smaller)')
     return parser
 
-def small_areas(mesh,warn=10.,fail=1.,logger=None):
+def small_areas(mesh,warn=10.,fail=1.,logger=None, write_out_smalls=False):
     if logger is not None:
         logger.info("Checking for elements with small areas. Thresholds: warn={}, fail={}".format(warn,fail))
     if isinstance(mesh,str):
@@ -39,8 +39,25 @@ def small_areas(mesh,warn=10.,fail=1.,logger=None):
             logger.warning(item)
         
     if areas_sorted[0] < fail:
-        raise ValueError("Mesh contains areas smaller than the failure threshold. Consult the log or printout above for areas and warnings")
+        if write_out_smalls:
+            import shapefile as shp
+
+            sm_centroids = centroids[areas<fail]
+            sm_areas = areas[areas<fail]
+            
+            w = shp.Writer("small_area_centroids.shp",shp.POINT)
+            w.autoBalance = 1 # ensures gemoetry and attributes match
+            w.field("FID","N")
+            w.field("x","F",10,8)
+            w.field("y","F",10,8)
+            w.field("area","F",10,8)
+            for i, smc in enumerate(sm_centroids):
+                w.point(smc[0], smc[1]) # write the geometry
+                w.record(i, smc[0], smc[1], sm_areas[i])
+            w.close()
         
+        raise ValueError("Mesh contains areas smaller than the failure threshold. Consult the log or printout above for areas and warnings")
+    
     return
         
 
