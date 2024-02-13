@@ -544,9 +544,8 @@ class SchismSetup(object):
                 try:
                     opval=float(attribute)
                     op = lambda x: opval
-                    # TODO: implement deprecation warning
-                    # if optype is not None:
-                    #     raise Warning("Using type min/max for linestring depth enforcement will soon be deprecated. write the logic you'd like in the attribute field.")
+                    if optype is not None:
+                        raise ValueError("Using type=min/max for linestring depth enforcement is be deprecated. Write the logic you'd like in the attribute field.")
                 except:
                     ValueError("Linestring attribute was not a known value (e.g. local_min, local_med) or a float")
                      
