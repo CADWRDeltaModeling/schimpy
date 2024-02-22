@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assigning Bathymetry &mdash; schimpy 0+untagged.1.gbfa029e documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=00299257"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SCHISM hotstart" href="hotstart.html" />
+    <link rel="prev" title="Model time conversion" href="model_time.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/dwr_logo_small.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial.html">Spatial data in SCHISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sms.html">Working with SMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_time.html">Model time</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Populating Elevation/Depth Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#assigning-depths-from-prioritized-dems">Assigning depths from prioritized DEMs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#smoother-for-complex-topography">Smoother for complex topography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optimizing-depths-for-volume">Optimizing depths for volume</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hotstart.html">Creating hotstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nudging.html">Creating nudging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Post-processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Evaluating Model Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="direct_use.html">Using Python Pre-processing Script Programatically</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license_and_disclaimer.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Project README</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">schimpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Assigning Bathymetry</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/depth.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
+        <a href="model_time.html" class="btn btn-neutral float-left" title="Model time conversion" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hotstart.html" class="btn btn-neutral float-right" title="SCHISM hotstart" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="assigning-bathymetry">
+<h1>Assigning Bathymetry<a class="headerlink" href="#assigning-bathymetry" title="Link to this heading"></a></h1>
+<p>Converting a 2dm file to gr3 or between gr3 or 2dm and shapefile</p>
+<section id="assigning-depths-from-prioritized-dems">
+<h2>Assigning depths from prioritized DEMs<a class="headerlink" href="#assigning-depths-from-prioritized-dems" title="Link to this heading"></a></h2>
+<p>These tools are used by the preprocessor but also work with functions that can
+be used generically and consistently with SCHISM.</p>
+<section id="stacked-dem-fill">
+<h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="smoother-for-complex-topography">
+<h2>Smoother for complex topography<a class="headerlink" href="#smoother-for-complex-topography" title="Link to this heading"></a></h2>
+<p>Often it is necessary to incorporate inudated marshy areas where elevations
+are poorly sampled and contours are tortuous. The script contour_smooth.py
+uses minmax curvature flow (Malladi and Sethian) to impose a minimum length scale
+of change for contours, essentially unraveling the features that are most contorted.</p>
+</section>
+<section id="optimizing-depths-for-volume">
+<h2>Optimizing depths for volume<a class="headerlink" href="#optimizing-depths-for-volume" title="Link to this heading"></a></h2>
+<p>A mesh draped over noisy bathymetry data does not necessarily represent important moments
+such as volumes and vertical face areas smoothly and realistically.
+To better represent these facets of the geometry,
+we compare the volumetric quantities that come from SCHISM shape functions
+(which are much like a TIN) to a higher order quadrature using the DEM
+with bilinear interpolation. The quadrature is more accurate, and also
+incorporates more sample points.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="model_time.html" class="btn btn-neutral float-left" title="Model time conversion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hotstart.html" class="btn btn-neutral float-right" title="SCHISM hotstart" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, California Department of Water Resources.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

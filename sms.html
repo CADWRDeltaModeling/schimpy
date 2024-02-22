@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Working with SMS &mdash; schimpy 0+untagged.1.gbfa029e documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=00299257"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Model time conversion" href="model_time.html" />
+    <link rel="prev" title="Preprocessing" href="preprocessing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/dwr_logo_small.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial.html">Spatial data in SCHISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Working with SMS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#converting-an-sms-mesh-2dm-file-to-gr3">Converting an SMS mesh (2dm) file to gr3</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#convert-mesh">convert_mesh</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-sms-polygons-for-preprocessor">Getting SMS Polygons for Preprocessor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#material-poly">material_poly</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#visualizing-detailed-bathymetry-inside-sms">Visualizing detailed bathymetry inside SMS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#clip-dems">clip_dems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_time.html">Model time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depth.html">Populating Elevation/Depth Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotstart.html">Creating hotstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nudging.html">Creating nudging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Post-processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Evaluating Model Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="direct_use.html">Using Python Pre-processing Script Programatically</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license_and_disclaimer.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Project README</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">schimpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Working with SMS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/sms.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
+        <a href="preprocessing.html" class="btn btn-neutral float-left" title="Preprocessing" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="model_time.html" class="btn btn-neutral float-right" title="Model time conversion" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="working-with-sms">
+<h1>Working with SMS<a class="headerlink" href="#working-with-sms" title="Link to this heading"></a></h1>
+<p>The preprocessing toolkit has some utilities that can help when working with
+Aquaveo SMS, the main form of mesh generation we use until we are
+able to distrubute a sufficient open source mesh generator.</p>
+<section id="converting-an-sms-mesh-2dm-file-to-gr3">
+<h2>Converting an SMS mesh (2dm) file to gr3<a class="headerlink" href="#converting-an-sms-mesh-2dm-file-to-gr3" title="Link to this heading"></a></h2>
+<p>The script that converts SMS mesh to SCHISM gr3 format is available as a standalone script.</p>
+<section id="convert-mesh">
+<h3>convert_mesh<a class="headerlink" href="#convert-mesh" title="Link to this heading"></a></h3>
+<p>schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files</p>
+</section>
+</section>
+<section id="getting-sms-polygons-for-preprocessor">
+<h2>Getting SMS Polygons for Preprocessor<a class="headerlink" href="#getting-sms-polygons-for-preprocessor" title="Link to this heading"></a></h2>
+<p>SMS is able to create mesh coverages that are not mesh generation hints, including
+spatial properties maps whose polygons have &quot;material properties&quot;. If you save the
+coverage as a polygon shapefile, the script can help convert the
+resulting shapefile to the preprocessor yaml format. At the time of writing we do
+not have a tutorial example of this process.</p>
+<section id="material-poly">
+<h3>material_poly<a class="headerlink" href="#material-poly" title="Link to this heading"></a></h3>
+<p><p>Convert shapefile from SMS into polygon format for preprocessor</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">material_poly</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">keyfile</span> <span class="n">KEYFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">type</span> <span class="n">TYPE</span><span class="p">]</span>
+                     <span class="p">[</span><span class="o">--</span><span class="n">default</span> <span class="n">DEFAULT</span><span class="p">]</span>
+                     <span class="n">shapefile</span> <span class="n">dset</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h4>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>shapefile</kbd></dt>
+<dd><p>name of shapefile</p>
+</dd>
+<dt><kbd>dset</kbd></dt>
+<dd><p>name of dataset inside shapefile</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>--keyfile</kbd></dt>
+<dd><p>file mapping material property names to numerical values (space separated).</p>
+</dd>
+<dt><kbd>--out</kbd></dt>
+<dd><p>Output polygon file.</p>
+</dd>
+<dt><kbd>--type</kbd></dt>
+<dd><p>Polygon attribute type (min/max)</p>
+<p>Default: “min”</p>
+</dd>
+<dt><kbd>--default</kbd></dt>
+<dd><p>Global default in polygon specs</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+<section id="visualizing-detailed-bathymetry-inside-sms">
+<h2>Visualizing detailed bathymetry inside SMS<a class="headerlink" href="#visualizing-detailed-bathymetry-inside-sms" title="Link to this heading"></a></h2>
+<p>Earlier versions (before 11.2) of SMS had bugs causing incorrect georefercing of DEMs
+and very poor memory management. That is fixed but for efficiency reasons it continues to be impossible
+to efficiently assign elevations within the software for a large mesh. We have two scripts
+that were designed to help with this problem: <cite>clip_dems.py</cite> and <cite>stacked_dem_fill.py</cite>.</p>
+<section id="clip-dems">
+<h3>clip_dems<a class="headerlink" href="#clip-dems" title="Link to this heading"></a></h3>
+<p>The script clip_dems.py is used to create mini-DEMs on the fly that are small
+enough to be brought into the SMS environment as rasters without slowing it down too much.
+The same The <a class="reference internal" href="preprocessing.html#dem-list-file"><span class="std std-ref">DEM List File</span></a> is used here as elsewhere in the pre-processor.</p>
+<p>The normal pattern of work is to zoom into the area of interst in SMS, save the
+work area as a jpeg image and use it as the <cite>image</cite> argument to <cite>clip_dems.py</cite>.
+One cut DEM will be produced for each DEM on the <cite>dem_list</cite> file that intersects the
+work area, using file names in order of priority (0 highest). The cut DEMs would then
+be imported and visualized in SMS, ideally using contours as the
+viewing choice and a carefully crafted color map designed to focus on the
+elevations that are locally most important.</p>
+</section>
+<section id="stacked-dem-fill">
+<h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Link to this heading"></a></h3>
+<p>The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="preprocessing.html" class="btn btn-neutral float-left" title="Preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="model_time.html" class="btn btn-neutral float-right" title="Model time conversion" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, California Department of Water Resources.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

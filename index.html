@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCHIMPY Toolset &mdash; schimpy 0+untagged.1.gbfa029e documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=00299257"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#">
+            
+              <img src="_static/dwr_logo_small.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spatial.html">Spatial data in SCHISM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sms.html">Working with SMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_time.html">Model time</a></li>
+<li class="toctree-l1"><a class="reference internal" href="depth.html">Populating Elevation/Depth Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hotstart.html">Creating hotstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nudging.html">Creating nudging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Post-processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Evaluating Model Performance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="direct_use.html">Using Python Pre-processing Script Programatically</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license_and_disclaimer.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Project README</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">schimpy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SCHIMPY Toolset</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+  </div>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="schimpy-toolset">
+<span id="tools-home"></span><h1>SCHIMPY Toolset<a class="headerlink" href="#schimpy-toolset" title="Link to this heading"></a></h1>
+<p>The <em>schimpy</em> toolset is designed to help to pre- and post-process SCHISM
+simulations more easily. In particular, the tools allow you
+to specify things like boundaries and hydraulic structures using
+geophysical coordinates rather than node/element numbers … this
+can greatly simplify the work involved when the mesh is revised.</p>
+<p>Please direct questions, suggestions or bug reports to
+<a class="reference external" href="mailto:Eli&#46;Ateljevich&#37;&#52;&#48;water&#46;ca&#46;gov">Eli<span>&#46;</span>Ateljevich<span>&#64;</span>water<span>&#46;</span>ca<span>&#46;</span>gov</a> or <a class="reference external" href="mailto:Kijin&#46;Nam&#37;&#52;&#48;water&#46;ca&#46;gov">Kijin<span>&#46;</span>Nam<span>&#64;</span>water<span>&#46;</span>ca<span>&#46;</span>gov</a>.</p>
+</section>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<p>To use schimpy in a project:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">schimpy</span>
+</pre></div>
+</div>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spatial.html">Spatial data in SCHISM</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spatial.html#formats">Formats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html#invoking-the-preprocessor">Invoking the preprocessor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocessing.html#input-files">Input Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sms.html">Working with SMS</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sms.html#converting-an-sms-mesh-2dm-file-to-gr3">Converting an SMS mesh (2dm) file to gr3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sms.html#getting-sms-polygons-for-preprocessor">Getting SMS Polygons for Preprocessor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sms.html#visualizing-detailed-bathymetry-inside-sms">Visualizing detailed bathymetry inside SMS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_time.html">Model time</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model_time.html#model-time-py">model_time.py</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="depth.html">Populating Elevation/Depth Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="depth.html#assigning-depths-from-prioritized-dems">Assigning depths from prioritized DEMs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="depth.html#smoother-for-complex-topography">Smoother for complex topography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="depth.html#optimizing-depths-for-volume">Optimizing depths for volume</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hotstart.html">Creating hotstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hotstart.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hotstart.html#steps">Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="nudging.html">Creating nudging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="postprocessing.html">Post-processing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="postprocessing.html#station-output">Station Output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="postprocessing.html#extracting-data-from-binary-outputs">Extracting Data from Binary outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="performance.html">Evaluating Model Performance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="performance.html#subcycling-analysis">Subcycling analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="direct_use.html">Using Python Pre-processing Script Programatically</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="direct_use.html#reading-a-mesh-in-gr3">Reading a Mesh in GR3</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html">schimpy package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id1">0.1.1 (2020-04-06)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="history.html#id2">0.1.0 (2020-04-06)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license_and_disclaimer.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#types-of-contributions">Types of Contributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#pull-request-guidelines">Pull Request Guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#tips">Tips</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authors.html#development-lead">Development Lead</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authors.html#contributors">Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Project README</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="readme.html#credits">Credits</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, California Department of Water Resources.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
