@@ -40,7 +40,7 @@ import schimpy
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['nbsphinx', 'sphinx.ext.mathjax',
-          'sphinx.ext.autodoc', 'sphinx.ext.viewcode',
+          'sphinx.ext.autodoc', #'sphinx.ext.viewcode',
           'matplotlib.sphinxext.mathmpl',
           'matplotlib.sphinxext.plot_directive',
           'IPython.sphinxext.ipython_directive',
@@ -49,6 +49,11 @@ extensions = ['nbsphinx', 'sphinx.ext.mathjax',
           'sphinxarg.ext',
           'sphinx.ext.doctest',
           'numpydoc']
+
+# Figure configuration
+numfig = True
+numfig_number_figures = True
+numfig_figure_caption_prefix = "Figure"
 
 autosummary_generate = False
 autodoc_member_order = 'alphabetical'
@@ -116,16 +121,21 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-#html_theme = 'alabaster'
-#html_theme_options = {
-#    'logo': 'dwrsmall.jpg'}
-html_theme = 'sphinxdoc'
+
+import sphinx_rtd_theme
+
+html_theme = 'sphinx_rtd_theme'
+html_logo = "./_static/dwr_logo_small.png"
+html_theme_options = {
+    'logo_only': True,
+    'display_version': False,
+    'prev_next_buttons_location': 'both'
+}
+
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
-#
-# html_theme_options = {}
-# html_logo = 'dwrsmall.jpg'
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
