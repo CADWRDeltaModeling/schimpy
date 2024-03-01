@@ -40,13 +40,12 @@ import schimpy
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['nbsphinx', 'sphinx.ext.mathjax',
-          'sphinx.ext.autodoc', #'sphinx.ext.viewcode',
+          'sphinx.ext.autodoc','sphinxarg.ext', #'sphinx.ext.viewcode',
           'matplotlib.sphinxext.mathmpl',
           'matplotlib.sphinxext.plot_directive',
           'IPython.sphinxext.ipython_directive',
           'IPython.sphinxext.ipython_console_highlighting',
           'sphinx.ext.intersphinx',
-          'sphinxarg.ext',
           'sphinx.ext.doctest',
           'numpydoc']
 

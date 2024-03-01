@@ -14,7 +14,6 @@ It is usually invoked using a command like this::
 	
 The contents of main_bay_delta.yaml are discussed below. Industrial strength samples, used as the point of departure for most applied projects, are available in the `templates` directory of BayDeltaSCHISM distribution.
 
-
 prepare_schism
 ^^^^^^^^^^^^^^
 
