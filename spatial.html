@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SCHISM Spatial Data &mdash; schimpy 0+untagged.1.gbdf22ea documentation</title>
+  <title>SCHISM Spatial Data &mdash; schimpy 0+untagged.1.gf7aa895 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=debbdbc0"></script>
+        <script src="_static/documentation_options.js?v=9aafd18a"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -91,8 +91,8 @@
 <h1>SCHISM Spatial Data<a class="headerlink" href="#schism-spatial-data" title="Link to this heading"></a></h1>
 <section id="formats">
 <h2>Formats<a class="headerlink" href="#formats" title="Link to this heading"></a></h2>
-<p>SCHISM requires numerous distributed spatial inputs, including node and element-centered properties, hydraulic structures specifications, output locations and so on.</p>
-<p>Under the native SCHISM input system, many spatial inputs are specified based on node or cell indices rather than geophysical coordinates. The user must reinterpret geophysical information. Whenever changes are made in the model mesh, the corresponding node and cell indices changes. Doing this input conversion of spatial input information manually from geophysical coordinates to node and cell indices in a large mesh is not only very cumbersome but error-prone. Our preprocessing system, as well as VIMS pyschism, address these issues.</p>
+<p>SCHISM requires numerous distributed spatial inputs, including node and element-centered properties, hydraulic structures specifications, output locations.</p>
+<p>Under the native SCHISM input system, these spatial inputs are often specified based on node or cell indices rather than geophysical coordinates. This means user must reinterpret geophysical information and whenever changes are made in the model mesh that job has to get re-done. Doing this input conversion of spatial input information manually from geophysical coordinates to node and cell indices in a large mesh is not only very cumbersome but error-prone. Our preprocessing system, as well as VIMS pyschism, address these issues.</p>
 <p>This is the main job addressed by the schimpy Python library, but there are some input and output processing tools as well. For instance, the model_time module converts inputs from geophysical timestamps to elapsed time. The nudging and hotstart modules facilitate the creation of files for data assimilation (nudging or Newtonian relaxation) and initial conditions respectively.</p>
 </section>
 </section>
