@@ -16,7 +16,7 @@ install_requires = [
     "geopandas",
     'vtools3>=3.8',         # moved unit_conversions to vtools, so dependent on the version where we did that
     "gdal",
-    "libgdal",  # libgdal is for calling gdal_translate in clip_dems
+    #"libgdal",  # libgdal is for calling gdal_translate in clip_dems
     "xarray",
     "netcdf4",
     "scipy",

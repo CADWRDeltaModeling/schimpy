@@ -1,7 +1,7 @@
 # This environment is a functional analysis environment for schimpy.
 # However the standard monolity for Bay-Delta SCHISM is schism_env.yml in the BayDeltaSCHISM package 
 # https://github.com/CADWRDeltaModeling/BayDeltaSCHISM
-name: schimpy              
+name: schimpy         
 channels:
   - conda-forge            # Note: the order listed in yaml is not enforced by conda
   - defaults               # For predictable behavior, set your conda config
@@ -36,4 +36,3 @@ dependencies:
 #    - "--editable=git+https://github.com/CADWRDeltaModeling/vtools3#egg=vtools3"
 #    - "--editable=git+https://github.com/CADWRDeltaModeling/schimpy#egg=schimpy"
 #    - "--editable=git+https://github.com/CADWRDeltaModeling/dms_datastore#egg=dms_datastore"
-
