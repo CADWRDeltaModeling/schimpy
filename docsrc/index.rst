@@ -23,9 +23,9 @@ To use schimpy tools in a project::
 
     import schimpy
 	
-Many schimpy utilities can be invoked as command line utilities and the most common of these is the `prepare_schism` command for the `preprocessor`_ ::
+Many schimpy utilities can be invoked as command line utilities and the most common of these is the `prepare_schism` command for the `preprocessor`_ invoked like this::
 
-	$ prepare_schism main_bay_delta.yaml 
+    $ prepare_schism main_bay_delta.yaml 
 
 where `main_bay_delta.yaml` is the main yaml input file for your project.
 

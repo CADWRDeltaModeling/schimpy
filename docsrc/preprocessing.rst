@@ -2,13 +2,21 @@
 .. _preprocessor:
 
 Preprocessing
-==============
+=============
 
 Invoking the preprocessor
 -------------------------
 
-prepare_SCHISM.py
-^^^^^^^^^^^^^^^^^
+The preprocessor can prepare and manipulate many components of the SCHISM input. 
+It is usually invoked using a command like this::
+
+    $ prepare_schism main_bay_delta.yaml
+	
+The contents of main_bay_delta.yaml are discussed below. Industrial strength samples, used as the point of departure for most applied projects, are available in the `templates` directory of BayDeltaSCHISM distribution.
+
+
+prepare_schism
+^^^^^^^^^^^^^^
 
 .. argparse::
     :module: schimpy.prepare_schism
