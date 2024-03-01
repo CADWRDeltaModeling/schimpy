@@ -1,5 +1,5 @@
 
-_preprocessor:
+.. _preprocessor:
 
 Preprocessing
 ==============
