@@ -19,10 +19,15 @@ Eli.Ateljevich@water.ca.gov or Kijin.Nam@water.ca.gov.
 Usage
 =====
 
-To use schimpy in a project::
+To use schimpy tools in a project::
 
     import schimpy
+	
+Many schimpy utilities can be invoked as command line utilities and the most common of these is the `prepare_schism` command:
 
+	$ prepare_schism main_bay_delta.yaml 
+
+where `main_bay_delta.yaml` is the main yaml input file for your project.
 
 Contents
 ---------
