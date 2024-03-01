@@ -1,6 +1,6 @@
 
-Working with SMS
-================
+Utilities for Working with SMS
+==============================
 
 The preprocessing toolkit has some utilities that can help when working with 
 Aquaveo SMS, the main form of mesh generation we use until we are
@@ -31,8 +31,8 @@ coverage as a polygon shapefile, the script can help convert the
 resulting shapefile to the preprocessor yaml format. At the time of writing we do
 not have a tutorial example of this process.
 
-material_poly
-^^^^^^^^^^^^^
+convert_polygons
+^^^^^^^^^^^^^^^^
 
 .. argparse::
     :module: schimpy.material_poly
@@ -44,9 +44,10 @@ material_poly
 Visualizing detailed bathymetry inside SMS
 ------------------------------------------
 
-Earlier versions (before 11.2) of SMS had bugs causing incorrect georefercing of DEMs
-and very poor memory management. That is fixed but for efficiency reasons it continues to be impossible 
-to efficiently assign elevations within the software for a large mesh. We have two scripts
+Earlier versions of SMS had bugs causing incorrect georefercing of DEMs
+and very poor memory management. That is fixed but for efficiency reasons it continues to be impossible to efficiently assign elevations within the software for a large mesh. 
+There are several ways of tackling this, which are covered in the Bay-Delta SCHISM
+documentation. Here we have two scripts
 that were designed to help with this problem: `clip_dems.py` and `stacked_dem_fill.py`. 
 
 
