@@ -8,22 +8,23 @@ Installation
 Stable release
 --------------
 
-We recommend conda for installing schimpy. The simplest way to install 
-schimpy is to run this command in your terminal:
+We recommend conda for installing schimpy. There is a general description of conda on our 
+`python configuration <https://cadwrdeltamodeling.github.io/html/python.html#python-configuration-and-usage>`_ page.
 
+The most functional way to install schimpy is to use our complete environment for schism, schism_env.yml in the parent directory of 
+`BayDeltaSCHISM <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM>`_
+
+In principle, you can do a one-off install of the just the schimpy library from the command line by running this command in your conda-enabled terminal:
 .. code-block:: console
 
     $ conda install -c cadwr-dms schimpy
 
-For greater flexibility and a set of tools that are commonly used with SCHISM, however, 
-you may want to install a more complete schism environment using the 
-schism_environment.yml file that is in the parent directory of 
-`BayDeltaSCHISM <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM>`_
+
 
 From sources
 ------------
 
-The sources for schimpy can be downloaded from the `Github repo <https://github.com/CADWRDeltaModeling/schimpy>`_.
+The source for schimpy can be downloaded from the `Github repo <https://github.com/CADWRDeltaModeling/schimpy>`_.
 
 You can either clone the public repository:
 
@@ -31,7 +32,7 @@ You can either clone the public repository:
 
     $ git clone https://github.com/CADWRDeltaModeling/schimpy
 
-Or download the `tarball`_:
+Or, more rarely, download the `tarball`_:
 
 .. code-block:: console
 
@@ -49,3 +50,5 @@ Once you have a copy of the source, you can install it with:
 
 .. _Github repo: https://github.com/CADWRDeltaModeling/schimpy
 .. _tarball: https://github.com/CADWRDeltaModeling/schimpy/tarball/master
+
+This is sometimes called a developer install, since you can edit while your work and contribute your work backto a repository. As an aside, you can do it the conda way to get the prerequisites and follow up later with a developer install.
