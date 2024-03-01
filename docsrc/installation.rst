@@ -15,6 +15,7 @@ The most functional way to install schimpy is to use our complete environment fo
 `BayDeltaSCHISM <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM>`_
 
 In principle, you can do a one-off install of the just the schimpy library from the command line by running this command in your conda-enabled terminal:
+
 .. code-block:: console
 
     $ conda install -c cadwr-dms schimpy
