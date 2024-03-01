@@ -18,7 +18,7 @@ import textwrap
 RED = (228/256., 26/256., 28/256.)
 BLUE = (55/256., 126/256., 184/256.)
 
-plt.style.use(['seaborn-paper','seaborn-colorblind'])
+plt.style.use(['seaborn-v0_8-paper','seaborn-v0_8-colorblind'])
 
 def process_stations(station_file):
     sd=pd.read_csv(station_file,names=["id","x","y","dist_km","elev_navd","name","depth_mllw"],header=0,dtype={"id":pd.StringDtype()})
