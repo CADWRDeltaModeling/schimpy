@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Utilities for Working with SMS &mdash; schimpy 0+untagged.1.g29487f2 documentation</title>
+  <title>Utilities for Working with SMS &mdash; schimpy 1.8.0+37.g4bc6631.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=2ed1af86"></script>
+        <script src="_static/documentation_options.js?v=a650a3b5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -55,16 +55,30 @@
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Working with SMS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#converting-an-sms-mesh-2dm-file-to-gr3">Converting an SMS mesh (2dm) file to gr3</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#convert-mesh">convert_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-mesh">convert_mesh</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#getting-sms-polygons-for-preprocessor">Getting SMS Polygons for Preprocessor</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#convert-polygons">convert_polygons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-polygons">convert_polygons</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-detailed-bathymetry-inside-sms">Visualizing detailed bathymetry inside SMS</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#clip-dems">clip_dems</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clip-dems">clip_dems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -110,6 +124,25 @@ able to distrubute a sufficient open source mesh generator.</p>
 <section id="convert-mesh">
 <h3>convert_mesh<a class="headerlink" href="#convert-mesh" title="Link to this heading"></a></h3>
 <p>schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files</p>
+<p><p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">crs</span> <span class="n">CRS</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="named-arguments">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>--input</kbd></dt>
+<dd><p>Input mesh file</p>
+</dd>
+<dt><kbd>--output</kbd></dt>
+<dd><p>Output mesh file</p>
+</dd>
+<dt><kbd>--crs</kbd></dt>
+<dd><p>crs string for the projection</p>
+</dd>
+</dl>
+</section>
 </section>
 </section>
 <section id="getting-sms-polygons-for-preprocessor">
@@ -121,6 +154,22 @@ resulting shapefile to the preprocessor yaml format. At the time of writing we d
 not have a tutorial example of this process.</p>
 <section id="convert-polygons">
 <h3>convert_polygons<a class="headerlink" href="#convert-polygons" title="Link to this heading"></a></h3>
+<p><p>Convert polygon information from one file format to another</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_polygons</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span>
+</pre></div>
+</div>
+<section id="named-arguments">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>--input</kbd></dt>
+<dd><p>input file</p>
+</dd>
+<dt><kbd>--output</kbd></dt>
+<dd><p>output file</p>
+</dd>
+</dl>
+</section>
 </section>
 </section>
 <section id="visualizing-detailed-bathymetry-inside-sms">
@@ -132,6 +181,50 @@ documentation. Here we have two scripts
 that were designed to help with this problem: <cite>clip_dems.py</cite> and <cite>stacked_dem_fill.py</cite>.</p>
 <section id="clip-dems">
 <h3>clip_dems<a class="headerlink" href="#clip-dems" title="Link to this heading"></a></h3>
+<p><p>Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">clip_dems</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">coords</span> <span class="n">ul_x</span> <span class="n">ul_y</span> <span class="n">lr_x</span> <span class="n">lr_y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">image</span> <span class="n">INFILE</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">prefix</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outformat</span> <span class="n">OUTFORMAT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">hshift</span><span class="p">]</span>
+                 <span class="n">demlist</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h4>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>demlist</kbd></dt>
+<dd><p>file containing prioritized (high to low) list of dems.</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>--coords</kbd></dt>
+<dd><p>bounding coordinates to which DEMs will be clipped (upper left, lower right)</p>
+<p>Default: (None, None, None, None)</p>
+</dd>
+<dt><kbd>--image</kbd></dt>
+<dd><p>image or DEM used to infer bounding coordinates for clipping. Use jpeg for the image. This argument is mutually exclusive with –coords. If a sample is provided its upper left and lower right corner will be used.</p>
+</dd>
+<dt><kbd>--prefix</kbd></dt>
+<dd><p>prefix used for output file names</p>
+<p>Default: “clipped”</p>
+</dd>
+<dt><kbd>--outformat</kbd></dt>
+<dd><p>output format, default is AAIGrid (ArcInfo ascii.</p>
+<p>Default: “AAIGrid”</p>
+</dd>
+<dt><kbd>--verbose</kbd></dt>
+<dd><p>more verbose output.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--hshift</kbd></dt>
+<dd><p>(deprecated) shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS &lt; 11.1</p>
+<p>Default: False</p>
+</dd>
+</dl>
+</section>
 <p>The script clip_dems.py is used to create mini-DEMs on the fly that are small
 enough to be brought into the SMS environment as rasters without slowing it down too much.
 The same The <a class="reference internal" href="preprocessing.html#dem-list-file"><span class="std std-ref">DEM List File</span></a> is used here as elsewhere in the pre-processor.</p>
@@ -146,6 +239,35 @@ elevations that are locally most important.</p>
 <section id="stacked-dem-fill">
 <h3>stacked_dem_fill<a class="headerlink" href="#stacked-dem-fill" title="Link to this heading"></a></h3>
 <p>The script stacked_dem_fill.py is the one we use to populate a mesh with elevations.</p>
+<p><p>Fill node elevations in a .2dm SMS mesh or gr3 file using a prioritized list of DEMs.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">stacked_dem_fill</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">elev2depth</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">fill</span> <span class="n">FILL</span><span class="p">]</span> <span class="n">filename</span> <span class="n">demfile</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h4>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>filename</kbd></dt>
+<dd><p>name of 2dm or gr3 file</p>
+</dd>
+<dt><kbd>demfile</kbd></dt>
+<dd><p>file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
+<dl class="option-list">
+<dt><kbd>--elev2depth</kbd></dt>
+<dd><p>Convert elevation to depth by flipping sign. This is typical when using gr3 format, less so with 2dm.</p>
+<p>Default: False</p>
+</dd>
+<dt><kbd>--fill</kbd></dt>
+<dd><p>Fill value for areas not covered by supplied rasters.</p>
+<p>Default: 2.0</p>
+</dd>
+</dl>
+</section>
 </section>
 </section>
 </section>
