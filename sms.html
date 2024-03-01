@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Utilities for Working with SMS &mdash; schimpy 0+untagged.1.gf8b6f9d documentation</title>
+  <title>Utilities for Working with SMS &mdash; schimpy 0+untagged.1.ge67e91a documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=666975d4"></script>
+        <script src="_static/documentation_options.js?v=bf8c9f09"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -59,11 +59,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#getting-sms-polygons-for-preprocessor">Getting SMS Polygons for Preprocessor</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#convert-polygons">convert_polygons</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-polygons">convert_polygons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-detailed-bathymetry-inside-sms">Visualizing detailed bathymetry inside SMS</a><ul>
@@ -125,42 +121,6 @@ resulting shapefile to the preprocessor yaml format. At the time of writing we d
 not have a tutorial example of this process.</p>
 <section id="convert-polygons">
 <h3>convert_polygons<a class="headerlink" href="#convert-polygons" title="Link to this heading"></a></h3>
-<p><p>Convert shapefile from SMS into polygon format for preprocessor</p>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">material_poly</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">keyfile</span> <span class="n">KEYFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">out</span> <span class="n">OUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">type</span> <span class="n">TYPE</span><span class="p">]</span>
-                     <span class="p">[</span><span class="o">--</span><span class="n">default</span> <span class="n">DEFAULT</span><span class="p">]</span>
-                     <span class="n">shapefile</span> <span class="n">dset</span>
-</pre></div>
-</div>
-<section id="positional-arguments">
-<h4>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h4>
-<dl class="option-list">
-<dt><kbd>shapefile</kbd></dt>
-<dd><p>name of shapefile</p>
-</dd>
-<dt><kbd>dset</kbd></dt>
-<dd><p>name of dataset inside shapefile</p>
-</dd>
-</dl>
-</section>
-<section id="named-arguments">
-<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
-<dl class="option-list">
-<dt><kbd>--keyfile</kbd></dt>
-<dd><p>file mapping material property names to numerical values (space separated).</p>
-</dd>
-<dt><kbd>--out</kbd></dt>
-<dd><p>Output polygon file.</p>
-</dd>
-<dt><kbd>--type</kbd></dt>
-<dd><p>Polygon attribute type (min/max)</p>
-<p>Default: “min”</p>
-</dd>
-<dt><kbd>--default</kbd></dt>
-<dd><p>Global default in polygon specs</p>
-</dd>
-</dl>
-</section>
 </section>
 </section>
 <section id="visualizing-detailed-bathymetry-inside-sms">

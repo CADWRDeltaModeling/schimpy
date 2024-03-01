@@ -35,9 +35,9 @@ convert_polygons
 ^^^^^^^^^^^^^^^^
 
 .. argparse::
-    :module: schimpy.material_poly
+    :module: schimpy.convert_polygons
     :func: create_arg_parser
-    :prog: material_poly
+    :prog: convert_polygons
 
 
 
