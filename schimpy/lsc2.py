@@ -506,8 +506,6 @@ def gen_sigma(nlayer, minlayer, maxlayer, eta, h, mesh, meshfun, nsmoothlay=0):
         hsmooth = eta - zsmooth
         pseudo_bed_depth = hsmooth[:,0]
 
-
-
         # todo from here down is experimental. The next couple lines setup computation of # levels revised
         # after that, nlevel was replaced by nlevel2.
         dztarget = np.zeros_like(nlayer, dtype="d")
@@ -520,8 +518,6 @@ def gen_sigma(nlayer, minlayer, maxlayer, eta, h, mesh, meshfun, nsmoothlay=0):
         # the code later recognizes the minimum of 1 enforced above and below is artificial the globalmaxlayer stuff prevents
         # going past bound ... something that came up in a small test problem
         nlayer2 = np.maximum(1,np.minimum(nlayer2, globalmaxlayer-nsmoothlay))
-        print("yo")
-        print(nlayer2)
          
         # this is a flag needed used later to signal to indicate not enough layers to absorb nsmoothlay into the total
         # this is the last opportunity to calculate it based on the original number of layers
