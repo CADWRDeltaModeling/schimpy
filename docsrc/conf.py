@@ -22,7 +22,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 import schimpy
-
+tls_verify = False
 # using mock to avoid nodepy documentation which is hard to import
 #import mock
 #MOCK_MODULES = ['nodepy']
@@ -64,9 +64,9 @@ numpydoc_class_members_toctree = False
 templates_path = ['_templates']
 
 # mappings for intersphinx extension
-intersphinx_mapping = {'pandas': ('http://pandas.pydata.org/pandas-docs/stable',None),
- 'python': ('http://docs.python.org/', None),
- 'xarray' : ('http://xarray.pydata.org/en/stable',None)
+intersphinx_mapping = {'pandas': ('https://pandas.pydata.org/pandas-docs/stable',None),
+ 'python': ('https://docs.python.org/3', None),
+ 'xarray' : ('https://docs.xarray.dev/en/stable',None)
  }
 
 # The suffix(es) of source filenames.
