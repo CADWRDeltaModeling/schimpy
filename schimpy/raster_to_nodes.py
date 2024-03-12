@@ -22,22 +22,21 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                     mask_value=None,
                     fill_value=None,
                     band=1):
-    """ Calculate the means of raster values of the element balls.
+    """ Applies raster values to mesh by calculating means over surrounding elementss.
 
-        When an element is completely outside of the raster data, zero will be
-        assigned for the it.
-        When an element is partly covered by the raster data, an masked average
+        When an element contains no raster data, zero will be
+        assigned. When an element is partly covered by the raster data, an masked average
         is calculated.
 
-        If the bins are provided, the raster data will be binned or mapped to
-        the mapped_values first and processed. The left end of the bins is
-        included but the right end is not for binning.
-        The length of the mapped values should be larger by one than
-        that of the bins. The binning uses numpy.digitize to classification.
+        If the bins are provided, the raster data will be binned and bins mapped to
+        the mapped_values before the averaging begins. The binning uses numpy.digitize to classification,
+        and in particular the i'th mapped value is used between the values of bins (i-1) and (i).
+        There are some extra padding values provided as shown in the example
 
-        If the mask_value is given, the raster data with the given mask value
-        will be swapped with the fill_value before binning the data. This
-        masking will work only when the bins are provided.
+        If the mask_value is given, raster data with the given mask value
+        will be replaced with the fill_value before binning the data. This
+        masking will only be used when bins are provided and pertains to 
+        special cases involving vegetation data.
 
         Parameters
         ----------
@@ -55,7 +54,8 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
             Array of bins. It has to be 1-dimensional and monotonic
         
         mapped_values: array-like, optional
-           The values of the classes. It should be bigger by one than the bins.
+           The values of the classes. It should be bigger by one than the bins. The i'th
+           value will be applied between the `(i-1)` and `i` value of bins.
         
         band: int, optional
             The band index to use from the raster data.
@@ -98,7 +98,7 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                 "The mapped values need")
         if len(mapped_values) != len(bins) + 1:
             raise ValueError(
-                "The number of mapped_values should be smaller by one than the number of the bins.")
+                "The number of mapped_values should be bigger by one than the number of bin values.")
 
         # Read the raster data
         raster = gdal.Open(path_raster)
