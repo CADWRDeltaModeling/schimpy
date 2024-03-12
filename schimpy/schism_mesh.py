@@ -204,7 +204,8 @@ class SchismMesh(TriQuadMesh):
                         not_assigned.remove(edge_i)
                         return edge[1]
                     except Exception as exc:
-                        print("Attempted to remove edge {} based on node {} which is not in not_assigned list".format(edge_i,node_i))
+                        print("Attempted to remove edge {} based on node {} ({:.1f}, {:.1f}) which is not in not_assigned list"
+                            .format(edge_i,node_i,self._nodes[node_i][0],self._nodes[node_i][1]))
                         raise
             else:
                 if not edge[2] == EdgeType.INTERNAL and edge[1] == node_i:
