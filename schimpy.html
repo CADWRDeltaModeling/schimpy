@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.8.1+1.g9e9b515.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.8.1+2.g9b22e0d.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=a58902a6"></script>
+        <script src="_static/documentation_options.js?v=750c1dac"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -5827,19 +5827,18 @@ means.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.raster_to_nodes.raster_to_nodes">
 <span class="sig-prename descclassname"><span class="pre">schimpy.raster_to_nodes.</span></span><span class="sig-name descname"><span class="pre">raster_to_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_sel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_raster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.raster_to_nodes.raster_to_nodes" title="Link to this definition"></a></dt>
-<dd><p>Calculate the means of raster values of the element balls.</p>
-<p>When an element is completely outside of the raster data, zero will be
-assigned for the it.
-When an element is partly covered by the raster data, an masked average
+<dd><p>Applies raster values to mesh by calculating means over surrounding elementss.</p>
+<p>When an element contains no raster data, zero will be
+assigned. When an element is partly covered by the raster data, an masked average
 is calculated.</p>
-<p>If the bins are provided, the raster data will be binned or mapped to
-the mapped_values first and processed. The left end of the bins is
-included but the right end is not for binning.
-The length of the mapped values should be larger by one than
-that of the bins. The binning uses numpy.digitize to classification.</p>
-<p>If the mask_value is given, the raster data with the given mask value
-will be swapped with the fill_value before binning the data. This
-masking will work only when the bins are provided.</p>
+<p>If the bins are provided, the raster data will be binned and bins mapped to
+the mapped_values before the averaging begins. The binning uses numpy.digitize to classification,
+and in particular the i’th mapped value is used between the values of bins (i-1) and (i).
+There are some extra padding values provided as shown in the example</p>
+<p>If the mask_value is given, raster data with the given mask value
+will be replaced with the fill_value before binning the data. This
+masking will only be used when bins are provided and pertains to 
+special cases involving vegetation data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -5851,7 +5850,8 @@ masking will work only when the bins are provided.</p>
 </dd>
 <dt><strong>bins: array-like, optional</strong></dt><dd><p>Array of bins. It has to be 1-dimensional and monotonic</p>
 </dd>
-<dt><strong>mapped_values: array-like, optional</strong></dt><dd><p>The values of the classes. It should be bigger by one than the bins.</p>
+<dt><strong>mapped_values: array-like, optional</strong></dt><dd><p>The values of the classes. It should be bigger by one than the bins. The i’th
+value will be applied between the <cite>(i-1)</cite> and <cite>i</cite> value of bins.</p>
 </dd>
 <dt><strong>band: int, optional</strong></dt><dd><p>The band index to use from the raster data.
 The default value is 1.</p>
