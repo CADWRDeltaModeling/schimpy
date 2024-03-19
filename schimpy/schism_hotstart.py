@@ -763,8 +763,7 @@ class VariableField(object):
         else:
             polaris_cast = polaris_data[polaris_data.datetime == cast_date][[
                 'Station Number', variable, 'Depth']]
-            polaris_cast['Station'] = polaris_cast['Station Number'].astype(
-                int)
+            polaris_cast['Station'] = polaris_cast['Station Number'].astype(float)
         # setting 'Station' as the index below does not remove depth in the column
         polaris_cast.set_index('Station', inplace=True)
         if variable.lower() in polaris_cast.columns.str.lower():
@@ -778,7 +777,7 @@ class VariableField(object):
                              (variable, data_fn))
 
         # find the corresponding station locations
-        stations = pd.read_csv(station_fn, sep=",", header=0)[
+        stations = pd.read_csv(station_fn, sep=",", header=0,dtype={"Station":float} )[
             ['Station', 'y', 'x']]
         stations.set_index('Station', inplace=True)
         polaris_cast = polaris_cast.join(stations, on='Station', how='left')
