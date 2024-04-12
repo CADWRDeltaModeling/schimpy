@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.8.1+4.gcdfc076.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.8.1+5.gc73af5a.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=3caaf77b"></script>
+        <script src="_static/documentation_options.js?v=23960ad4"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -463,6 +463,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.schism_source">schimpy.schism_source module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_source.SchismSource"><code class="docutils literal notranslate"><span class="pre">SchismSource</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_source.SchismSourceIO"><code class="docutils literal notranslate"><span class="pre">SchismSourceIO</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_source.read_sources"><code class="docutils literal notranslate"><span class="pre">read_sources()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.schism_sources_sinks">schimpy.schism_sources_sinks module</a><ul>
@@ -5199,18 +5200,6 @@ If None, frequency will be set using default (or 1 Hour) and station output disa
 <dt class="sig sig-object py" id="schimpy.params.Params">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.params.</span></span><span class="sig-name descname"><span class="pre">Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.params.Params" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>core</strong></dt><dd><p>Alias for field number 0</p>
-</dd>
-<dt><strong>opt</strong></dt><dd><p>Alias for field number 1</p>
-</dd>
-<dt><strong>schout</strong></dt><dd><p>Alias for field number 2</p>
-</dd>
-</dl>
-</dd>
-</dl>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -8160,6 +8149,11 @@ fname = output file name</p>
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.schism_source.read_sources">
+<span class="sig-prename descclassname"><span class="pre">schimpy.schism_source.</span></span><span class="sig-name descname"><span class="pre">read_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_source.read_sources" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="module-schimpy.schism_sources_sinks">
