@@ -7,6 +7,64 @@
 SOURCE = 0
 SINK = 1
 
+def _read_line_and_split(f, lc, expected_count = 0):
+    """
+       returns: (tokens, lc), tokens are parsed items and lc is
+       the line counter after reading a line.
+    """
+    splits = f.readline().split()
+    comment = False
+    tokens = []
+    note = ""
+    for item in splits:
+        if comment:
+            note += " " + item
+        else:
+            if item[0] == '!':
+                comment = True
+            else:
+                tokens.append(item)
+            
+    lc += 1
+    if expected_count > 0 and len(tokens) < expected_count:
+        print("Line #: {}".format(lc))
+        raise Exception(f"Line is corrupted. Expected {expected_count} sources and got {len(tokens)}")
+    return tokens, lc, note
+
+
+def read_sources(fname):
+    f = open(fname, 'r')
+    linecount = 0
+    (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
+    n_sources = int(tokens[0])
+    sources = list()
+    for i in range(n_sources):
+        (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
+        source = SchismSource()
+        source.type = SOURCE
+        source.element_id = int(tokens[0]) - 1
+        source.note=note
+        sources.append(source)
+
+    f.readline()                    # Blank line
+    (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
+    n_sinks = int(tokens[0])
+    sinks = list()
+    print(n_sinks)
+
+    for i in range(n_sinks):
+        (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
+    
+        source = SchismSource()
+        source.type = SINK
+        source.element_id = int(tokens[0]) - 1
+        source.note = note
+        sinks.append(source)
+        
+    f.close()
+    return sources,sinks
+
+
 class SchismSource(object):
     """ A class to hold structure information
     """  
@@ -58,26 +116,27 @@ class SchismSourceIO(object):
     def read(self, fname):
         f = open(fname, 'r')
         linecount = 0
-        (tokens, linecount, note) = self._read_line_and_split(f, linecount, 1)
+        (tokens, linecount, note) =_read_line_and_split(f, linecount, 1)
         n_sources = int(tokens[0])
         for i in range(n_sources):
-            (tokens, linecount, note) = self._read_line_and_split(f, linecount, 1)
+            (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
             source = SchismSource()
             source.type = SOURCE
             source.element_id = int(tokens[0]) - 1
             self._input.sources.append(source)
 
-        (tokens, linecount, note) = self._read_line_and_split(f, linecount, 1)
+        (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
         n_sinks = int(tokens[0])
         f.readline()                    # Blank line
         for i in range(n_sinks):
-            (tokens, linecount, note) = self._read_line_and_split(f, linecount, 1)
+            (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
             source = SchismSource()
             source.type = SINK
             source.element_id = int(tokens[0]) - 1
             self._input.sources.append(source)
             
         f.close()
+        return self._input.sources
 
     def write(self, fname = 'source_sink.in'):
         f = open(fname, 'w')
@@ -98,26 +157,4 @@ class SchismSourceIO(object):
         f.flush()
         f.close()
 
-    def _read_line_and_split(self, f, lc, expected_count = 0):
-        """
-           returns: (tokens, lc), tokens are parsed items and lc is
-           the line counter after reading a line.
-        """
-        splits = f.readline().split()
-        comment = False
-        tokens = []
-        note = ""
-        for item in splits:
-            if comment:
-                note += " " + item
-            else:
-                if item[0] is '!':
-                    comment = True
-                else:
-                    tokens.append(item)
-                
-        lc += 1
-        if expected_count > 0 and len(tokens) < expected_count:
-            print("Line #: {}".format(lc))
-            raise Exception("Line is corrupted.")
-        return tokens, lc, note
+
