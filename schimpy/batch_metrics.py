@@ -597,7 +597,26 @@ class BatchMetrics(object):
             else:
                 style_palette=seaborn_style_cycler
                 self.logger.info("No style palette is given, default used.")
-                 
+
+            # write out ts_obs and tss_sim to csv
+            if "write_csv" in params.keys():
+                if params["write_csv"]:
+                    prefname = f'{station_id}_{subloc}_{variable}'
+                    ts_obs.to_csv(os.path.join(dest_dir, f'{prefname}_obs.csv'))
+                    for i,tsx in enumerate(tss_sim):
+                        tsx.to_csv(os.path.join(dest_dir, f'{prefname}_sim_{i}.csv'))
+                    # write window_inst, window_avg, labels, title, style_palette to yaml file
+                    yfile = f'{prefname}_plot.yaml'
+                    title_first_line = figtitle.split('\n')[0] # can't seem to handle multiple lines in yaml even with block output
+                    with open(yfile,'w') as fout:
+                        fout.write(f'station_id: {station_id}\n')
+                        fout.write(f'subloc: {subloc}\n')
+                        fout.write(f'variable: {variable}\n')
+                        fout.write(f'window_inst: ({start_inst}, {end_inst})\n')
+                        fout.write(f'window_avg: ({start_avg}, {end_avg})\n')
+                        fout.write(f'labels: {labels_to_plot}\n')
+                        fout.write(f'title: {title_first_line}\n')
+                        fout.write(f'style_palette: {style_palette}\n')
             if plot_format == 'simple':
                 fig = plot_comparison(ts_obs, tss_sim,
                                       window_inst=(start_inst, end_inst),
