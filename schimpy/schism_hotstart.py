@@ -72,6 +72,7 @@ class hotstart(object):
         self.nc_dataset = None
         self.modules = modules
         self.crs = crs
+        self.output_fn = None
 
     def read_yaml(self):
         """
@@ -82,12 +83,14 @@ class hotstart(object):
         hotstart_info = info['hotstart']
         self.info = hotstart_info
         self.date = hotstart_info['date']
+        self.run_start = hotstart_info['run_start']
+        self.time_step = hotstart_info['time_step']
         self.hgrid_fn = hotstart_info['hgrid_input_file']
         self.vgrid_fn = hotstart_info['vgrid_input_file']
         variables = list(hotstart_info.keys())
         # remove these items from the list.
         rfl = ['hgrid_input_file', 'vgrid_input_file', 'date', 'vgrid_version',
-               'crs', 'param_nml', 'modules', 'output_fn']
+               'crs', 'param_nml', 'modules', 'output_fn','run_start','time_step']
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
         # 5.8 and below is the old version
@@ -100,7 +103,7 @@ class hotstart(object):
 
         if self.modules is None:
             if 'modules' not in hotstart_info.keys():
-                modules = 'HYDRO'  # hydro is the minimum required module
+                modules = ['HYDRO']  # hydro is the minimum required module
             else:
                 modules = hotstart_info['modules']
             if 'HYDRO' in modules:
@@ -177,7 +180,7 @@ class hotstart(object):
                 indices, dist = compare_mesh(hotstart_mesh, self.mesh)
                 self.hotstart_ini['hotstart_nc_indices'] = indices
                 self.hotstart_ini['hotstart_nc_dist'] = dist
-
+                
             var = self.generate_3D_field(v)
             if self.nc_dataset is None:
                 if 'tke' in self.info.keys():
@@ -246,14 +249,25 @@ class hotstart(object):
             idry_e = np.zeros(self.mesh.n_elems()).astype(int)
             idry = np.zeros(self.mesh.n_nodes()).astype(int)
             idry_s = np.zeros(self.mesh.n_edges()).astype(int)
-
-            ds = xr.Dataset({'time': ('one', [0.0]),
-                             'iths': ('one', [0]),
-                             'ifile': ('one', [1]),
-                             'idry_e': ('elem', idry_e),
-                             'idry_s': ('side', idry_s),
-                             'idry': ('node', idry),
-                             'nsteps_from_cold': ('one', [0])})
+            if self.run_start == "default":
+                self.run_start=self.date
+            run_start = pd.to_datetime(self.run_start)
+            run_start_str = run_start.strftime("%Y-%m-%dT%H:%M")
+            restart_time = pd.to_datetime(self.date)
+            restart_sec = (restart_time - run_start).total_seconds()
+            restart_timestr = restart_time.strftime("%Y%m%d")
+            dt = self.time_step
+            nsteps = int(restart_sec/dt)
+            outfile = f"hotstart.{restart_timestr}.{nsteps}.nc"
+            self.output_fn = outfile
+            ds = xr.Dataset({'time': ('one', [restart_sec]),
+                              'iths': ('one', [nsteps]),
+                              'ifile': ('one', [1]),
+                              'idry_e': ('elem', idry_e),
+                              'idry_s': ('side', idry_s),
+                              'idry': ('node', idry),
+                              'nsteps_from_cold': ('one', [nsteps])})
+            ds.attrs['time_origin_of_simulation'] = run_start_str
             # apply default setting for  q2, xl, dfv,dfh,dfq1,dfq2,
             # SED3D_dp, SED3D_rough, SED3D_bed, SED3D_bedfrac
             if default_turbulence:
@@ -763,7 +777,8 @@ class VariableField(object):
         else:
             polaris_cast = polaris_data[polaris_data.datetime == cast_date][[
                 'Station Number', variable, 'Depth']]
-            polaris_cast['Station'] = polaris_cast['Station Number'].astype(float)
+            polaris_cast['Station'] = polaris_cast['Station Number'].astype(
+                int)
         # setting 'Station' as the index below does not remove depth in the column
         polaris_cast.set_index('Station', inplace=True)
         if variable.lower() in polaris_cast.columns.str.lower():
@@ -777,7 +792,7 @@ class VariableField(object):
                              (variable, data_fn))
 
         # find the corresponding station locations
-        stations = pd.read_csv(station_fn, sep=",", header=0,dtype={"Station":float} )[
+        stations = pd.read_csv(station_fn, sep=",", header=0)[
             ['Station', 'y', 'x']]
         stations.set_index('Station', inplace=True)
         polaris_cast = polaris_cast.join(stations, on='Station', how='left')
@@ -882,7 +897,7 @@ class VariableField(object):
                     'SED3D_bed': 'SED3D_bed',
                     'SED3D_bedfrac': 'SED3D_bedfrac'}
         if (var not in yaml_var) and (var in self.tr_mname):
-            yamel_var[var] = 'tr_nd'
+            yaml_var[var] = 'tr_nd'
         if var in self.tr_mname:
             self.tr_index = np.where(np.array(self.tr_mname) == var)[0][0]
 
@@ -1320,8 +1335,8 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
         hgrid_nc['SCHISM_hgrid_%s_y' % c] = gy
 
     # add time dimension to all variable elements
-    time = [dt.datetime.strptime(init_date, "%Y-%m-%d")]
-
+    time = [np.datetime64(init_date)]
+   
     # if 'time' variable already in hnc, drop it.
     if 'time' in list(hnc.variables):
         hnc = hnc.drop('time')
@@ -1365,7 +1380,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
         ds_v.attrs['data_vertical_center'] = "half"
         ds_v.attrs['i23d'] = 6  # 3d half level on element
         ds_v.attrs['ivs'] = hgrid_nc.zcor.ivs
-        hnc = xr.merge([hnc, ds_v])
+        hnc = xr.merge([hnc, ds_v.astype(float)])
     hnc = hnc.drop(['tr_el', 'tracer_list', 'tr_nd', 'tr_nd0'])
 
     hvar_t = list(hnc.variables)  # entire list
@@ -1569,16 +1584,15 @@ def main():
     # User inputs override the yaml file inputs.
     parser = create_arg_parser()
     args = parser.parse_args()
-
-    h = hotstart(args.yaml_fn, module=args.modules, crs=args.crs,
-                 output_fn=args.output_fn)
+    h = hotstart(args.yaml_fn, modules=args.modules, crs=args.crs)
+    h.create_hotstart()
     if args.output_fn is not None:
         output_fn = args.output_fn
     else:
         output_fn = h.output_fn
-    h.create_hotstart()
     hnc = h.nc_dataset
     hnc.to_netcdf(output_fn)
+    print(f"output to {output_fn} ")
 
 
 if __name__ == "__main__":
