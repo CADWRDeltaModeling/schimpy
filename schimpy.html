@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.8.1+7.g6faccb1.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.8.1+8.g1aced6b.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=bbe96ecb"></script>
+        <script src="_static/documentation_options.js?v=2af0e293"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -565,6 +565,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.subset_schism_output">schimpy.subset_schism_output module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_partition"><code class="docutils literal notranslate"><span class="pre">create_partition()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.partition_schout"><code class="docutils literal notranslate"><span class="pre">partition_schout()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.partition_sribeio"><code class="docutils literal notranslate"><span class="pre">partition_sribeio()</span></code></a></li>
@@ -9215,6 +9216,13 @@ or ‘all’ to include them all</p>
 <p>Created on Wed Oct 27 11:41:00 2021</p>
 <p>&#64;author: babban</p>
 <dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.create_arg_parser" title="Link to this definition"></a></dt>
+<dd><p>Create an argument parser
+return: argparse.ArgumentParser</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.subset_schism_output.create_partition">
 <span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">create_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_exact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.create_partition" title="Link to this definition"></a></dt>
 <dd><p>Takes a mesh and list of polygons and partitions according to where the centroids (mesh.centroids in schimpy) fall. 
@@ -9259,7 +9267,7 @@ files corresponding to each partition.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.subset_schism_output.subset_schism_scribeIO_output">
-<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">subset_schism_scribeIO_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.subset_schism_scribeIO_output" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">subset_schism_scribeIO_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_shp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.subset_schism_scribeIO_output" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
