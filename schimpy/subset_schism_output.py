@@ -15,7 +15,8 @@ import os
 import re
 import shutil
 from dms_datastore.logging_config import logger
-import pdb
+import argparse
+
 
 def records(file):
     # generator
@@ -553,15 +554,41 @@ def subset_schism_output():
 #------------------------------------------------------------------------------------------------------------
 # subset_schism_output for sribeio format
 #------------------------------------------------------------------------------------------------------------
-def subset_schism_scribeIO_output():
+def subset_schism_scribeIO_output(partition_shp):
 
-    partition_shp = 'cut.shp'
     partition_sribeio(partition_shp)
 
 # subset_schism_output()
 
+
+def create_arg_parser():
+    """ Create an argument parser
+        return: argparse.ArgumentParser
+    """
+
+    # Read in the input file
+    parser = argparse.ArgumentParser(
+        description="""
+        
+        Extract SCHISM output variables contained in predefined polygons
+        and save to a subset folder under current folder
+        
+        Usage:
+        download_hrrr 01/01/2023  g:\temp 15  37.36  39.0 -123.023 -121.16
+                     """)
+    parser.add_argument('--subset_polygon', default=None, required=True,
+                        help='a shape file defines polygons where outputs\
+                        are desired')
+
+
+    return parser
+
 if __name__ == "__main__":
-    subset_schism_scribeIO_output()
+    
+    parser = create_arg_parser()
+    args = parser.parse_args()
+    partition_shp = args.subset_polygon
+    subset_schism_scribeIO_output(partition_shp)
 # ------------------------------------------------------------------------------------------------------------
 # create_partition
 # ------------------------------------------------------------------------------------------------------------
