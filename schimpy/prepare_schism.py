@@ -114,18 +114,18 @@ def create_hgrid(s, inputs, logger):
         
 
         # Write hgrid.gr3
-        output_dir = inputs['output_dir']
+        output_dir = inputs['prepro_output_dir']
         option_name = 'gr3_outputfile'
         if option_name in section:
             logger.info("Writing hgrid file...")
-            hgrid_out_fpath = ensure_outdir(inputs['output_dir'],section[option_name])
+            hgrid_out_fpath = ensure_outdir(inputs['prepro_output_dir'],section[option_name])
             s.write_hgrid(hgrid_out_fpath,boundary=True)
 
         # Write hgrid.ll
         option_name = 'll_outputfile'
         if option_name in section:
             logger.info("Creating hgrid.ll file...")
-            hgrid_ll_fpath = ensure_outdir(inputs['output_dir'],section[option_name])
+            hgrid_ll_fpath = ensure_outdir(inputs['prepro_output_dir'],section[option_name])
             s.write_hgrid_ll(hgrid_ll_fpath,boundary=True)
 
 
@@ -136,7 +136,7 @@ def create_vgrid(s,inputs,logger):
     section_name = 'vgrid'
     section = inputs.get(section_name)
     if section is not None:
-        output_dir = inputs['output_dir']
+        output_dir = inputs['prepro_output_dir']
         if 'hgrid' in section:
             hgrid = section['hgrid']
         else: 
@@ -148,7 +148,7 @@ def create_vgrid(s,inputs,logger):
                 logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
                 hgrid  = msection['mesh_inputfile']
         vgrid_out = section['vgrid_out']
-        section['vgrid_out'] = ensure_outdir(inputs['output_dir'],vgrid_out)
+        section['vgrid_out'] = ensure_outdir(inputs['prepro_output_dir'],vgrid_out)
         vgrid_gen(hgrid,**section)
 
 def create_source_sink(s, inputs, logger):
@@ -170,7 +170,7 @@ def create_source_sink(s, inputs, logger):
     fname = dict_ss.get('outputfile')
     
     if fname is not None:
-        output_dir = inputs['output_dir']
+        output_dir = inputs['prepro_output_dir']
         fname = ensure_outdir(output_dir,fname)
         logger.info("Creating %s..." % fname)
         s.create_source_sink_in(sources_sinks, fname)
@@ -184,7 +184,7 @@ def create_gr3_with_polygons(s, inputs, logger):
         return
     logger.info("Processing gr3 outputs...")
     expected_items = ('polygons', 'default','smooth')
-    output_dir = inputs['output_dir']
+    output_dir = inputs['prepro_output_dir']
     for fname, item in dict_gr3.items():
         check_and_suggest(item, expected_items)
         polygons = item.get('polygons', [])
@@ -196,7 +196,7 @@ def create_gr3_with_polygons(s, inputs, logger):
         if fname is None:
             logger.warning("No filename is given in one of the gr3 specs")
             continue
-        fname = ensure_outdir(inputs['output_dir'],fname)
+        fname = ensure_outdir(inputs['prepro_output_dir'],fname)
         polygons = item.get('polygons', [])
         default = item.get('default')
         logger.info("Creating %s..." % fname)
@@ -212,7 +212,7 @@ def create_prop_with_polygons(s, inputs, logger):
         return
     logger.info("Processing prop outputs...")
     expected_items = ('default', 'polygons')
-    output_dir = inputs['output_dir']
+    output_dir = inputs['prepro_output_dir']
     for fname, item in dict_prop.items():
         check_and_suggest(item, expected_items)
         polygons = item.get('polygons', [])
@@ -224,7 +224,7 @@ def create_prop_with_polygons(s, inputs, logger):
         if fname is None:
             logger.warning("No filename is given in one of prop")
             continue
-        fname = ensure_outdir(inputs['output_dir'],fname)
+        fname = ensure_outdir(inputs['prepro_output_dir'],fname)
         polygons = item.get('polygons', [])
         default = item.get('default')
         logger.info("Creating %s..." % fname)
@@ -239,7 +239,7 @@ def create_structures(s, inputs, logger):
         return
     logger.info("Processing structures...")
     expected_items = ('nudging', 'structures', 'outputfile')
-    output_dir = inputs['output_dir']
+    output_dir = inputs['prepro_output_dir']
     check_and_suggest(dict_struct, expected_items)
     structures = dict_struct.get('structures')
     if structures is None:
@@ -263,7 +263,7 @@ def create_structures(s, inputs, logger):
             check_and_suggest(conf, configuration_items)
     s.create_structures(structures, nudging)
     fname = dict_struct.get('outputfile')
-    fname = ensure_outdir(inputs['output_dir'],fname)
+    fname = ensure_outdir(inputs['prepro_output_dir'],fname)
     if fname is not None:
         fname = os.path.expanduser(fname)
         logger.info("Creating %s..." % fname)
@@ -278,7 +278,7 @@ def create_fluxflag(s, inputs, logger):
         return
     logger.info("Processing fluxflag outputs...")
     expected_items = ('linestrings', 'outputfile')
-    output_dir = inputs['output_dir']
+    output_dir = inputs['prepro_output_dir']
     check_and_suggest(dict_flow, expected_items)
     flowlines = dict_flow.get('linestrings')
     if flowlines is None:
@@ -287,7 +287,7 @@ def create_fluxflag(s, inputs, logger):
     if fname is None:
         logger.info("outputfile not given for flow_outputs. Using fluxflag.prop")
         fname = 'fluxflag.prop'
-    fname = ensure_outdir(inputs['output_dir'],fname)
+    fname = ensure_outdir(inputs['prepro_output_dir'],fname)
     logger.info("Creating %s..." % fname)
     s.create_flux_regions(flowlines, fname)
     with open(fname, 'a') as f:
@@ -319,7 +319,7 @@ def update_temporal_inputs(s, inputs):
     """ Create temporal inputs. Under development
     """
     # create in interpolated tide file
-    output_dir = inputs['output_dir']
+    output_dir = inputs['prepro_output_dir']
     sf_tide_out_fpath = os.path.join(output_dir, sf_tide_out_fname)
     s.interpolate_tide(time_start, time_end, dt,
                        sf_tide_in_fpath, sf_tide_out_fpath)
@@ -375,14 +375,14 @@ def main():
 
 def process_output_dir(inputs):
     """Identify or create dir for results and diagnostics and returns the name"""
-    if "output_dir" in inputs:
-        outdir = inputs["output_dir"]
+    if "prepro_output_dir" in inputs:
+        outdir = inputs["prepro_output_dir"]
         force = True
     else: 
         warnings.warn( "No output_dir specification. This will not be allowed in the future. \n" +
             "Using '.' but specification of a separate directory recommended.",FutureWarning)
         outdir = '.'
-        inputs['output_dir']=outdir
+        inputs['prepro_output_dir']=outdir
     if os.path.exists(outdir):
         created=False
     else:
@@ -409,7 +409,7 @@ def prepare_schism(args, use_logging=True):
     in_fname = args.main_inputfile
 
 
-    keys_top_level = ["output_dir","mesh", "gr3","vgrid",
+    keys_top_level = ["prepro_output_dir","mesh", "gr3","vgrid",
                       "prop", "hydraulics",
                       "sources_sinks", "flow_outputs","copy_resources"] \
         + schism_yaml.include_keywords
@@ -422,7 +422,7 @@ def prepare_schism(args, use_logging=True):
     out_fname = os.path.splitext(in_fname)[0] \
         + '_echo' + os.path.splitext(in_fname)[1]
 
-    out_fname = os.path.join(inputs['output_dir'],out_fname)
+    out_fname = os.path.join(inputs['prepro_output_dir'],out_fname)
     with open(out_fname, 'w') as f:
         f.write(schism_yaml.safe_dump(inputs))
 
