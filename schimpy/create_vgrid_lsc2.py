@@ -117,7 +117,11 @@ def vgrid_gen(hgrid,vgrid_out,vgrid_version, eta,
     dummyout = meshfun.depth(dummyk,dummydepth,0.)
 
     print("Reading the mesh " )
-    mesh = read_mesh(hgrid)
+    if hasattr(hgrid,"n_nodes"):
+        mesh = hgrid
+        hgrid = "hgrid.gr3"
+    else:
+        mesh = read_mesh(hgrid)
     h0 = mesh.nodes[:, 2]
 
     places_on = np.array([[626573.490000,4260349.590000],[626635.000000,4260391.7]],dtype='d')
