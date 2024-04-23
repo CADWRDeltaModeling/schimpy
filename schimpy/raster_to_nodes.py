@@ -83,10 +83,8 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                   #...
 
         The values `mesh` and `node_sel`  mean the SCHISM mesh and the selected node indices
-        by a polygon. The exaple bins (or classifies) the raster values from 0.0001 to 0.3
-        to 0. and so forth. The outside of the bins are binned to -999.
-        Also raster points with the value of -10. will be switched to 0.2 first
-        before binning, so they will be mapped to 40.
+        by a polygon. The example bins (or classifies) the raster values from 0.0001 to 0.3
+        and assigns the value 0., then assigns 40. for values between 0.3 and 0.6 and so forth.
 
         
 
