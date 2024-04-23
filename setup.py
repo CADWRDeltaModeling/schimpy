@@ -78,6 +78,7 @@ setup(
             "create_hotstart=schimpy.schism_hotstart:main",
             "create_nudging=schimpy.nudging:main",
             "interpolate_structure=schimpy.interpolate_structure:main",
+            "merge_th=schimpy.merge_th:main",
         ],
     },
     install_requires=requirements,
