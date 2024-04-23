@@ -140,13 +140,15 @@ def create_vgrid(s,inputs,logger):
         if 'hgrid' in section:
             hgrid = section['hgrid']
         else: 
-            msection = inputs.get('mesh')    
-            if 'gr3_outputfile' in msection:
-                logger.info('Using gr3_outputfile from mesh section for generating vgrid')
-                hgrid = msection['gr3_outputfile']
-            elif 'mesh_inputfile' in msection:
-                logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
-                hgrid  = msection['mesh_inputfile']
+            hgrid = s.mesh
+            # 
+            #msection = inputs.get('mesh')    
+            #if 'gr3_outputfile' in msection:
+            #    logger.info('Using gr3_outputfile from mesh section for generating vgrid')
+            #    hgrid = msection['gr3_outputfile']
+            #elif 'mesh_inputfile' in msection:
+            #    logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
+            #    hgrid  = msection['mesh_inputfile']
         vgrid_out = section['vgrid_out']
         section['vgrid_out'] = ensure_outdir(inputs['prepro_output_dir'],vgrid_out)
         vgrid_gen(hgrid,**section)
@@ -380,7 +382,7 @@ def process_output_dir(inputs):
         force = True
     else: 
         warnings.warn( "No output_dir specification. This will not be allowed in the future. \n" +
-            "Using '.' but specification of a separate directory recommended.",FutureWarning)
+            "Using '.' but specification of a separate directory recommended. ",FutureWarning)
         outdir = '.'
         inputs['prepro_output_dir']=outdir
     if os.path.exists(outdir):
@@ -408,8 +410,7 @@ def prepare_schism(args, use_logging=True):
     logger.info("Start pre-processing SCHISM inputs...")
     in_fname = args.main_inputfile
 
-
-    keys_top_level = ["prepro_output_dir","mesh", "gr3","vgrid",
+    keys_top_level = ["config","env","prepro_output_dir","mesh", "gr3","vgrid",
                       "prop", "hydraulics",
                       "sources_sinks", "flow_outputs","copy_resources"] \
         + schism_yaml.include_keywords
