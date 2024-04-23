@@ -353,16 +353,16 @@ def add_regression_line(axes, d1, d2):
 
 
     x = np.array([d1.min(), d1.max()])
-    y = result[1] * x + result[0]
+    y = result.iloc[1] * x + result.iloc[0]
     #bc1 = brewer_colors[1]
     bc1="k"
     l, = axes.plot(x, y, color=bc1)
     # Text info
-    if result[1] >= 0.:
-        eqn = "Y={:.3f}*X+{:.3f}".format(result[1], result[0])
+    if result.iloc[1] >= 0.:
+        eqn = "Y={:.3f}*X+{:.3f}".format(result.iloc[1], result.iloc[0])
     # Calculate the linear regression
     else:
-        eqn = "Y={:.3f}*X-{:.3f}".format(result[1], -result[0])
+        eqn = "Y={:.3f}*X-{:.3f}".format(result.iloc[1], -result.iloc[0])
     axes.legend([l,], [eqn,], loc='upper left', prop={'size': 10})
 
 
