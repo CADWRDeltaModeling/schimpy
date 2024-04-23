@@ -212,8 +212,8 @@ class SchismSetup(object):
         
         inSpatialRef = 'epsg:' + str(input_epsg)
         outSpatialRef = 'epsg:' + str(output_epsg)
-        proj_in = pyproj.Proj(init=inSpatialRef)
-        proj_out = pyproj.Proj(init=outSpatialRef)
+        proj_in = pyproj.Proj(inSpatialRef)
+        proj_out = pyproj.Proj(outSpatialRef)
         try:
             # More performant for pyproj > 2.1.0
             project = pyproj.Transformer.from_proj(proj_in, proj_out).transform
