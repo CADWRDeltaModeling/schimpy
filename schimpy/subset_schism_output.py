@@ -16,7 +16,7 @@ import re
 import shutil
 from dms_datastore.logging_config import logger
 import argparse
-
+import netCDF4
 
 def records(file):
     # generator
@@ -270,12 +270,13 @@ def partition_schout(in_Schout_Files,
         del data
         
         
-def partition_sribeio(partition_shp,
+def partition_scribeio(partition_shp,
                      variables=["out2d","zCoordinates","salinity",
                                 "horizontalVelX","horizontalVelY"]):
     """ 
         Partitions scribio format output files  into a set of smaller 
         files corresponding to each partition. 
+        
     """
 
     # ***********************************************************************
@@ -316,8 +317,8 @@ def partition_sribeio(partition_shp,
         raise NotImplementedError(
             "The line above this error will cause an error")
     # 1c. get point list (x and y) values
-    x_coord = data_2d['SCHISM_hgrid_node_x']
-    y_coord = data_2d['SCHISM_hgrid_node_y']
+    x_coord = data_2d['SCHISM_hgrid_face_x']
+    y_coord = data_2d['SCHISM_hgrid_face_y']
     hgrid_f = data_2d['nSCHISM_hgrid_face']
     n_hgrid = len(hgrid_f)
 
@@ -335,27 +336,19 @@ def partition_sribeio(partition_shp,
     
     print('Determining faces and nodes in ROI...')
     for ii in range(n_hgrid):
-        facenodes = hgrid_f_nodes[ii]
-        all_nodes_in_region=[True]*nMax_f_nodes
+        point = Point(x_coord[ii], y_coord[ii])
+        for mp in regions:
+            if point.within(shape(mp['geometry'])):
+                facesinROI.append(hgrid_f.item(ii))
+    nFacesROI = len(facesinROI)            
+    print('Determining nodes in ROI...')
+    for ii in range(nFacesROI):
+        facenodes = hgrid_f_nodes[facesinROI[ii]]
         for jj in nMax_f_nodes:
-            not_in_any_region=True
             if (not (isnan(facenodes[jj]))):
-                node_id = int(facenodes[jj]-1)
-                point = Point(x_coord[node_id], y_coord[node_id])
-                #nodesinROI.append(int(facenodes[jj]))
-                for mp in regions:
-                    if point.within(shape(mp['geometry'])):
-                        not_in_any_region=False
-                        break
-                        
-            all_nodes_in_region[jj]=not(not_in_any_region)
-        if np.all(all_nodes_in_region):
-            facesinROI.append(hgrid_f.item(ii))
-            for jj in nMax_f_nodes:
-                if (not (isnan(facenodes[jj]))):
-                    ## here nodes starts from 1, later will be adjusted from 0 line 354
-                    nodesinROI.append(int(facenodes[jj]))
-    nFacesROI = len(facesinROI)
+                nodesinROI.append(int(facenodes[jj]))
+
+    
     nodesinROI = list(set(nodesinROI))
     nodesinROI.sort()
     nNodesROI = len(nodesinROI)
@@ -478,13 +471,13 @@ def partition_sribeio(partition_shp,
             node_sigma = np.loadtxt(vgrid_file, skiprows=3)
             node_bottom = np.loadtxt(vgrid_file, skiprows=2, max_rows=1)
             subset_sigma = node_sigma[:, nodesinROI]
-            subset_bottom = node_bottom[:, nodesinROI]
+            subset_bottom = node_bottom[nodesinROI]
             num_level = subset_sigma.shape[0]
-            with open(subset_vgrid_file, 'r') as subset_vgrid:
+            with open(subset_vgrid_file, 'w') as subset_vgrid:
                 subset_vgrid.write("1\n")
                 subset_vgrid.write(f"{num_level}\n")
-                np.savetxt(subset_bottom, "a")
-                np.savetxt(subset_sigma, "a")
+                np.savetxt(subset_vgrid,subset_bottom.reshape(1,-1).astype(int),fmt='%i')
+                np.savetxt(subset_vgrid,subset_sigma)
             
             
     all_files = next(os.walk(cur_path), (None, None, []))[2]   
@@ -533,6 +526,16 @@ def partition_sribeio(partition_shp,
             data_subset.to_netcdf(filepath)
             # data.close()
             del data
+            ## xarray would load unused dims, use netCDF4 to load from
+            ## original dataset and write to subset
+            if var_name == "out2d":
+                data = netCDF4.Dataset(ff, "r")
+                data_subset = netCDF4.Dataset(filepath, "r+")
+                num_level = data.dimensions["nSCHISM_vgrid_layers"].size
+                data_subset.createDimension("nSCHISM_vgrid_layers", num_level)
+                data_subset.close()
+                data.close()
+
 
 #------------------------------------------------------------------------------------------------------------
 # subset_schism_output for schout format
@@ -556,7 +559,7 @@ def subset_schism_output():
 #------------------------------------------------------------------------------------------------------------
 def subset_schism_scribeIO_output(partition_shp):
 
-    partition_sribeio(partition_shp)
+    partition_scribeio(partition_shp)
 
 # subset_schism_output()
 
@@ -610,5 +613,7 @@ def create_partition(mesh, polygons, enforce_exact=False):
 # write_global_local_maps
 # ------------------------------------------------------------------------------------------------------------
 def write_global_local_maps(dest, global_local, local_global):
+    
+    
     """writes maps out in the schism + visit format. Note that the global owner 
     of a shared node is the lowest rank that contains it."""
