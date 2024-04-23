@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.8.1+9.gff75116.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.8.1+16.g95ec856.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=3d5e2d99"></script>
+        <script src="_static/documentation_options.js?v=a452a0a1"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -311,6 +311,15 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.material_poly.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.material_poly.create_poly"><code class="docutils literal notranslate"><span class="pre">create_poly()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.material_poly.read_keyfile"><code class="docutils literal notranslate"><span class="pre">read_keyfile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.merge_th">schimpy.merge_th module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.merge_th"><code class="docutils literal notranslate"><span class="pre">merge_th()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.read_locations_from_input"><code class="docutils literal notranslate"><span class="pre">read_locations_from_input()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.read_th_spec"><code class="docutils literal notranslate"><span class="pre">read_th_spec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.metricsplot">schimpy.metricsplot module</a><ul>
@@ -3396,6 +3405,39 @@ as a standard S grid theta although it will be varied according to depth</p>
 </dd></dl>
 
 </section>
+<section id="module-schimpy.merge_th">
+<span id="schimpy-merge-th-module"></span><h2>schimpy.merge_th module<a class="headerlink" href="#module-schimpy.merge_th" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.merge_th.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.merge_th.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.merge_th.create_arg_parser" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.merge_th.main">
+<span class="sig-prename descclassname"><span class="pre">schimpy.merge_th.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.merge_th.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.merge_th.merge_th">
+<span class="sig-prename descclassname"><span class="pre">schimpy.merge_th.</span></span><span class="sig-name descname"><span class="pre">merge_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">th_spec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.merge_th.merge_th" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.merge_th.read_locations_from_input">
+<span class="sig-prename descclassname"><span class="pre">schimpy.merge_th.</span></span><span class="sig-name descname"><span class="pre">read_locations_from_input</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.merge_th.read_locations_from_input" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.merge_th.read_th_spec">
+<span class="sig-prename descclassname"><span class="pre">schimpy.merge_th.</span></span><span class="sig-name descname"><span class="pre">read_th_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.merge_th.read_th_spec" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.merge_th.write_th">
+<span class="sig-prename descclassname"><span class="pre">schimpy.merge_th.</span></span><span class="sig-name descname"><span class="pre">write_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.merge_th.write_th" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-schimpy.metricsplot">
 <span id="schimpy-metricsplot-module"></span><h2>schimpy.metricsplot module<a class="headerlink" href="#module-schimpy.metricsplot" title="Link to this heading"></a></h2>
 <p>Metrics plot</p>
@@ -5871,10 +5913,8 @@ The default value is 1.</p>
 </pre></div>
 </div>
 <p>The values <cite>mesh</cite> and <cite>node_sel</cite>  mean the SCHISM mesh and the selected node indices
-by a polygon. The exaple bins (or classifies) the raster values from 0.0001 to 0.3
-to 0. and so forth. The outside of the bins are binned to -999.
-Also raster points with the value of -10. will be switched to 0.2 first
-before binning, so they will be mapped to 40.</p>
+by a polygon. The example bins (or classifies) the raster values from 0.0001 to 0.3
+and assigns the value 0., then assigns 40. for values between 0.3 and 0.6 and so forth.</p>
 </dd></dl>
 
 </section>

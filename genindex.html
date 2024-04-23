@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; schimpy 1.8.1+9.gff75116.dirty documentation</title>
+  <title>Index &mdash; schimpy 1.8.1+16.g95ec856.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=3d5e2d99"></script>
+        <script src="_static/documentation_options.js?v=a452a0a1"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -356,10 +356,10 @@
 </li>
       <li><a href="schimpy.html#schimpy.param.Params.copy">copy() (schimpy.param.Params method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.params.Core">Core (class in schimpy.params)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="schimpy.html#schimpy.params.Params.core">core (schimpy.params.Params attribute)</a>
 </li>
       <li><a href="schimpy.html#schimpy.params.Opt.coricoef">coricoef (schimpy.params.Opt attribute)</a>
@@ -408,6 +408,8 @@
         <li><a href="schimpy.html#schimpy.interpolate_structure.create_arg_parser">(in module schimpy.interpolate_structure)</a>
 </li>
         <li><a href="schimpy.html#schimpy.material_poly.create_arg_parser">(in module schimpy.material_poly)</a>
+</li>
+        <li><a href="schimpy.html#schimpy.merge_th.create_arg_parser">(in module schimpy.merge_th)</a>
 </li>
         <li><a href="schimpy.html#schimpy.model_time.create_arg_parser">(in module schimpy.model_time)</a>
 </li>
@@ -1273,6 +1275,8 @@
 </li>
         <li><a href="schimpy.html#schimpy.interpolate_structure.main">(in module schimpy.interpolate_structure)</a>
 </li>
+        <li><a href="schimpy.html#schimpy.merge_th.main">(in module schimpy.merge_th)</a>
+</li>
         <li><a href="schimpy.html#schimpy.model_time.main">(in module schimpy.model_time)</a>
 </li>
         <li><a href="schimpy.html#schimpy.nudging.main">(in module schimpy.nudging)</a>
@@ -1317,6 +1321,8 @@
       <li><a href="schimpy.html#schimpy.cencoos_download.merc_to_latlon">merc_to_latlon() (in module schimpy.cencoos_download)</a>
 </li>
       <li><a href="schimpy.html#schimpy.station.merge_station_subloc">merge_station_subloc() (in module schimpy.station)</a>
+</li>
+      <li><a href="schimpy.html#schimpy.merge_th.merge_th">merge_th() (in module schimpy.merge_th)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_mesh.SchismMesh.merged_mesh">merged_mesh() (schimpy.schism_mesh.SchismMesh method)</a>
 </li>
@@ -1419,6 +1425,8 @@
         <li><a href="schimpy.html#module-schimpy.lsc2">schimpy.lsc2</a>
 </li>
         <li><a href="schimpy.html#module-schimpy.material_poly">schimpy.material_poly</a>
+</li>
+        <li><a href="schimpy.html#module-schimpy.merge_th">schimpy.merge_th</a>
 </li>
         <li><a href="schimpy.html#module-schimpy.metricsplot">schimpy.metricsplot</a>
 </li>
@@ -1833,6 +1841,8 @@
 </li>
       <li><a href="schimpy.html#schimpy.schism_linestring.read_linestrings">read_linestrings() (in module schimpy.schism_linestring)</a>
 </li>
+      <li><a href="schimpy.html#schimpy.merge_th.read_locations_from_input">read_locations_from_input() (in module schimpy.merge_th)</a>
+</li>
       <li><a href="schimpy.html#schimpy.schism_mesh.read_mesh">read_mesh() (in module schimpy.schism_mesh)</a>
 </li>
       <li><a href="schimpy.html#schimpy.station.read_obs_links">read_obs_links() (in module schimpy.station)</a>
@@ -1864,6 +1874,8 @@
       <li><a href="schimpy.html#schimpy.station.read_station_out">read_station_out() (in module schimpy.station)</a>
 </li>
       <li><a href="schimpy.html#schimpy.station.read_station_subloc">read_station_subloc() (in module schimpy.station)</a>
+</li>
+      <li><a href="schimpy.html#schimpy.merge_th.read_th_spec">read_th_spec() (in module schimpy.merge_th)</a>
 </li>
       <li><a href="schimpy.html#schimpy.schism_vertical_mesh.read_vmesh">read_vmesh() (in module schimpy.schism_vertical_mesh)</a>
 </li>
@@ -2175,6 +2187,13 @@
 </li>
       </ul></li>
       <li>
+    schimpy.merge_th
+
+      <ul>
+        <li><a href="schimpy.html#module-schimpy.merge_th">module</a>
+</li>
+      </ul></li>
+      <li>
     schimpy.metricsplot
 
       <ul>
@@ -2335,6 +2354,8 @@
         <li><a href="schimpy.html#module-schimpy.schism_yaml">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     schimpy.separate_species
 
@@ -2342,8 +2363,6 @@
         <li><a href="schimpy.html#module-schimpy.separate_species">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     schimpy.simulation_timing
 
@@ -2893,8 +2912,12 @@
       </ul></li>
       <li><a href="schimpy.html#schimpy.schism_setup.SchismSetup.write_structures">write_structures() (schimpy.schism_setup.SchismSetup method)</a>
 </li>
-      <li><a href="schimpy.html#schimpy.separate_species.write_th">write_th() (in module schimpy.separate_species)</a>
+      <li><a href="schimpy.html#schimpy.merge_th.write_th">write_th() (in module schimpy.merge_th)</a>
+
+      <ul>
+        <li><a href="schimpy.html#schimpy.separate_species.write_th">(in module schimpy.separate_species)</a>
 </li>
+      </ul></li>
       <li><a href="schimpy.html#schimpy.nudging.write_to_log">write_to_log() (in module schimpy.nudging)</a>
 </li>
       <li><a href="schimpy.html#schimpy.write_ts.write_ts">write_ts() (in module schimpy.write_ts)</a>

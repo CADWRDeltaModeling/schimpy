@@ -260,6 +260,14 @@ schimpy.material\_poly module
    :undoc-members:
    :show-inheritance:
 
+schimpy.merge\_th module
+------------------------
+
+.. automodule:: schimpy.merge_th
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.metricsplot module
 --------------------------
 
