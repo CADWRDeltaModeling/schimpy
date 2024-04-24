@@ -28,19 +28,6 @@ dwr_accessiable1_style_cycler=(cycler(linestyle=['-','--'])*cycler(color=["#3232
 seaborn_style_cycler=(cycler(linestyle=['-'])
                      *cycler(color=["#0F0F0F"] + mpl.style.library['seaborn-v0_8-colorblind']["axes.prop_cycle"].by_key()["color"])
                      *cycler(linewidth=[1.5]))
-line_thickness = 1.
-
-# Metrics format dictionary
-metrics_dpi = 300
-metrics_fig_size = (12,  7.5)  # Metrics figure size in inches
-metrics_plot_kwargs = {'linewidth': 1}
-
-metrics_plot_format = {
-    'dpi': metrics_dpi,
-    'fig_size': metrics_fig_size,
-    'color': brewer_colors,
-    'metrics_plot_kwargs': metrics_plot_kwargs}
-
 
 ##############################################################################
 # Global settings
