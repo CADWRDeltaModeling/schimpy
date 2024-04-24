@@ -23,6 +23,8 @@ from schimpy.metricsplot import plot_metrics, plot_comparison, get_common_window
     safe_window, check_if_all_tss_are_bad, fill_gaps
 from dms_datastore.read_ts import *
 
+from schimpy.plot_default_formats import dwr_accessiable1_style_cycler
+from cycler import cycler
 
 matplotlib.use('Agg')  # To prevent an unwanted failure on Linux
 __all__ = ['generate_metricsplots', ]
@@ -387,7 +389,6 @@ class BatchMetrics(object):
                 params['max_gap_to_fill'])
         else:
             max_gap_to_fill = hours(1)
-        
         # Prepare readers of simulation outputs
         sim_outputs = self.read_simulation_outputs(variable,
                                                    outputs_dir,
@@ -552,9 +553,48 @@ class BatchMetrics(object):
                     labels_to_plot[0] += " - {:g}".format(-adj_obs)
 
             if ("palette" in params.keys()):
-                style_palette=params["palette"]
+                if params['palette'] == 'dwr_accessible1':
+                    style_palette=dwr_accessiable1_style_cycler
+
+                elif params['palette'] == 'custom':
+                    if ('custom_palette' in params.keys()):
+                        if 'linecolor' in params['custom_palette']:
+                            linecolor = params['custom_palette']['linecolor']
+                            if len(linecolor) < len(labels):
+                                raise ValueError("Specify correct number of linecolors!")
+                            linecolor = linecolor[:len(labels)]
+                        else:
+                            linecolor = dwr_accessiable1_style_cycler.by_key()['color'][:len(labels)]
+                            print("'linecolor' not specified in 'custom_palette'. Default used")
+
+                        if 'linestyle' in params['custom_palette']:
+                            linestyle = params['custom_palette']['linestyle']
+                            if len(linestyle) < len(labels):
+                                raise ValueError("Specify correct number of linestyles!")
+                            linestyle = linestyle[:len(labels)]
+                        else:
+                            linestyle = ["-" for i in range(len(labels))]
+                            print("'linestyle' not specified in 'custom_palette'. Default used")
+
+                        if 'linewidth' in params['custom_palette']:
+                            linewidth = params['custom_palette']['linewidth']
+                            if len(linewidth) < len(labels):
+                                raise ValueError("Specify correct number of linewidths!")
+                            linewidth = linewidth[:len(labels)]
+                        else:
+                            linewidth = dwr_accessiable1_style_cycler.by_key()['linewidth'][:len(labels)]
+                            print("'linewidth' not specified in 'custom_palette'. Default used")
+
+                        style_palette = cycler(color=linecolor, linestyle=linestyle, linewidth=linewidth)
+
+                    else:
+                        raise ValueError("Specify custom_palette attributes!")
+
+                else:
+                    raise ValueError("palette missing!")
+
             else:
-                style_palette="dwr_accessible1"
+                style_palette=dwr_accessiable1_style_cycler
                 self.logger.info("No style palette is given, default used.")
                  
             if plot_format == 'simple':

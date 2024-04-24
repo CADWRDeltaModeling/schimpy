@@ -18,4 +18,20 @@ labels: # Three labels for field data and two runs
 # selected_stations: CCS
 # excluded_stations: CLC
 # plot_format: simple
-palette: dwr_accessible1
+palette: custom
+custom_palette:
+    linestyle:
+        - "-"
+        - "--"
+        - "-."
+
+    linecolor:
+        - "k"
+        - "c"
+        - "b"
+        - "r"
+        - "m"
+    linewidth:
+        - 1
+        - 2.5
+        - 1.5

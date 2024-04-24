@@ -21,9 +21,8 @@ font = { # 'family': '',
         'size': 12,}
 brewer_colors = [palettable.colorbrewer.qualitative.Dark2_5.mpl_colors[i]
                  for i in [1, 0, 2, 3, 4]]
-dwr_accessiable1_style_cycler=(cycler(linestyle=['-','--'])*cycler(color=["#323232","#D55E00","#0173B2"]))
-
-palette_cycler={"dwr_accessible1":dwr_accessiable1_style_cycler}
+dwr_accessiable1_style_cycler=(cycler(linestyle=['-','--'])*cycler(color=["#323232","#D55E00","#0173B2"])
+                               *cycler(linewidth=[1.5]))
 
 line_thickness = 1.
 
@@ -68,10 +67,10 @@ def get_color_cycle():
     """
     return brewer_colors
 
-def set_line_cycle(line_palette_id):
+def set_line_cycle(line_palette_id=dwr_accessiable1_style_cycler):
     """Set linetype cycle of solid line style types with 3 color dwr acceissble color    
     """
-    mpl.rcParams['axes.prop_cycle'] =palette_cycler[line_palette_id]
+    mpl.rcParams['axes.prop_cycle'] = line_palette_id
 
 
 ##############################################################################

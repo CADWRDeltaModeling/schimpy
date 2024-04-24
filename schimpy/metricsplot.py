@@ -519,7 +519,7 @@ def check_if_all_tss_are_bad(tss):
     return all([bad(ts) for ts in tss])
 
 
-def plot_metrics(obs,tssim, style_palette="dwr_accessible1",**kwargs):
+def plot_metrics(obs,tssim, style_palette,**kwargs):
     """
     Create a metrics plot
 
@@ -540,7 +540,7 @@ def plot_metrics(obs,tssim, style_palette="dwr_accessible1",**kwargs):
     return fig,metrics
 
 
-def plot_comparison(*args, style_palette="dwr_accessible1", **kwargs):
+def plot_comparison(*args, style_palette, **kwargs):
     """
     Create a simple comparison plot without metrics calculation
 
