@@ -274,9 +274,20 @@ def partition_scribeio(partition_shp,
                      variables=["out2d","zCoordinates","salinity",
                                 "horizontalVelX","horizontalVelY"]):
     """ 
-        Partitions scribio format output files  into a set of smaller 
-        files corresponding to each partition. 
+        Partitioning scribio format output files  into a set of smaller 
+        files corresponding to each partitions. This function will loop
+        all the schism scribeIO output files that contains varaibles defined
+        by the input variables, and result subset outputs will be saved
+        to a subset subdirectory.
         
+        Parameters
+        ----------
+        partition_shp : arcgis shape file
+        shape files contains polygons where subset of output desried
+
+        variables : list of str
+        Output variables to be subsetted
+
     """
 
     # ***********************************************************************
