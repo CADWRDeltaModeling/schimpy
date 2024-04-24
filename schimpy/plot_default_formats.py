@@ -24,6 +24,10 @@ brewer_colors = [palettable.colorbrewer.qualitative.Dark2_5.mpl_colors[i]
 dwr_accessiable1_style_cycler=(cycler(linestyle=['-','--'])*cycler(color=["#323232","#D55E00","#0173B2"])
                                *cycler(linewidth=[1.5]))
 
+# Use seaborn-v0_8-colorblind, but insert off-black as the first color.
+seaborn_style_cycler=(cycler(linestyle=['-'])
+                     *cycler(color=["#0F0F0F"] + mpl.style.library['seaborn-v0_8-colorblind']["axes.prop_cycle"].by_key()["color"])
+                     *cycler(linewidth=[1.5]))
 line_thickness = 1.
 
 # Metrics format dictionary
