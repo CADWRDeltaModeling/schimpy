@@ -411,7 +411,7 @@ class BatchMetrics(object):
                 "Start processing station:: {}".format(station_id))
             if not station_id.lower() in db_stations.index:
                 self.logger.warning(
-                    "Station id {} not found in station listings".format(station_id))
+                    "Station id {} not found in station listings ({})".format(station_id, params['stations_csv']))
                 continue
 
             if 'alias' in db_stations.columns:
