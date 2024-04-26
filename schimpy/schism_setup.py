@@ -197,7 +197,7 @@ class SchismSetup(object):
         """
         schism_mesh.write_mesh(self._input.mesh, fname, attr, boundary)
 
-    def write_hgrid_ll(self, fname, boundary, input_epsg=26910, output_epsg=4269):
+    def write_hgrid_ll(self, fname, boundary, input_crs="EPSG:26910", output_crs="EPSG:4269"):
         """ Write a hgrid.ll, lat-long mesh file, of the current mesh.
 
             Parameters
@@ -210,17 +210,9 @@ class SchismSetup(object):
                 output EPSG. default value is 4269, NAD83
         """
         
-        inSpatialRef = 'epsg:' + str(input_epsg)
-        outSpatialRef = 'epsg:' + str(output_epsg)
-        proj_in = pyproj.Proj(inSpatialRef)
-        proj_out = pyproj.Proj(outSpatialRef)
-        try:
-            # More performant for pyproj > 2.1.0
-            project = pyproj.Transformer.from_proj(proj_in, proj_out).transform
-        except:
-            # In case that isn't available in earlier versions
-            # but orders of magnitude slow for pyproj 2.1.0
-            project = partial(pyproj.transform, proj_in, proj_out)
+        # pyproj > 2
+        project = pyproj.Transformer.from_crs(input_crs, output_crs, always_xy=True).transform
+
 
         #new_mesh = SchismMesh()
         new_mesh = copy.copy(self.mesh)
