@@ -68,6 +68,7 @@ setup(
             "convert_linestrings=schimpy.convert_linestrings:main",
             "combine_consume=schimpy.combine_consume:main",
             "prepare_schism=schimpy.prepare_schism:main",
+            "hotstart_inventory=schimpy.hotstart_inventory:main",
             "create_vgrid_lsc2=schimpy.create_vgrid_lsc2:main",
             "schism_hotstart=schimpy.schism_hotstart:main",
             "split_quad=schimpy.split_quad:main",
