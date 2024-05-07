@@ -409,15 +409,6 @@ class BatchMetrics(object):
 
             self.logger.info(
                 "Start processing station:: {}".format(station_id))
-            if not station_id.lower() in db_stations.index:
-                self.logger.warning(
-                    "Station id {} not found in station listings ({})".format(station_id, params['stations_csv']))
-                continue
-
-            if 'alias' in db_stations.columns:
-                alias = db_stations.loc[station_id, 'alias']
-            else:
-                alias = station_id.upper()
 
             if selected_stations is not None:
                 if station_id not in selected_stations:
@@ -432,6 +423,17 @@ class BatchMetrics(object):
                                      station_id)
                     continue
 
+            print(f"\nProcessing: {station_id}")
+
+            if not station_id.lower() in db_stations.index:
+                self.logger.warning(
+                    "Station id {} not found in station listings ({})".format(station_id, params['stations_csv']))
+                continue
+
+            if 'alias' in db_stations.columns:
+                alias = db_stations.loc[station_id, 'alias']
+            else:
+                alias = station_id.upper()
             if variable == 'flow':
                 vert_pos = 'default'
             else:
@@ -445,7 +447,7 @@ class BatchMetrics(object):
                                           db_stations, db_obs)
 
             if ts_obs is None or ts_obs.isnull().all():
-                self.logger.warning(f"No observation data: {station_id}, {subloc}, {variable}.")
+                self.logger.warning(f"No observation data: {station_id}, {subloc}, {variable} ({params['obs_links_csv']}).")
                 if plot_all is False:
                     self.logger.warning("Skipping this station")
                     continue
