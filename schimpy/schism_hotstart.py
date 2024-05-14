@@ -42,7 +42,7 @@ from scipy import interpolate
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import os
-
+import datetime
 
 from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader, \
     compare_mesh
@@ -1336,7 +1336,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
         hgrid_nc['SCHISM_hgrid_%s_y' % c] = gy
 
     # add time dimension to all variable elements
-    time = [np.datetime64(init_date)]
+    time = [datetime.datetime.strptime(init_date, "%Y-%m-%d")]
    
     # if 'time' variable already in hnc, drop it.
     if 'time' in list(hnc.variables):
