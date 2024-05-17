@@ -59,7 +59,7 @@ def partition_schout(in_Schout_Files,
         for mp in mpoly:
             regions.append(mp)
     except BaseException as err:
-        print(f"Error reading partition shape file {err=}, {type(err)=}")
+        print(f"Error reading partition shape file {err}, {type(err)}")
 
     # 1b. load 1st netcdf file
     try:
@@ -67,7 +67,7 @@ def partition_schout(in_Schout_Files,
         with xr.open_dataset(filename) as ds:
             data = ds.load()
     except BaseException as err:
-        print(f"Error reading schout file list {err=}, {type(err)=}")
+        print(f"Error reading schout file list {err}, {type(err)}")
         data = None
         raise NotImplementedError(
             "The line above this error will cause an error")
@@ -272,7 +272,8 @@ def partition_schout(in_Schout_Files,
         
 def partition_scribeio(partition_shp,
                      variables=["out2d","zCoordinates","salinity",
-                                "horizontalVelX","horizontalVelY"]):
+                                "horizontalVelX","horizontalVelY",
+                                "verticalVelocity"]):
     """ 
         Partitioning scribio format output files  into a set of smaller 
         files corresponding to each partitions. This function will loop
@@ -301,7 +302,7 @@ def partition_scribeio(partition_shp,
         for mp in mpoly:
             regions.append(mp)
     except BaseException as err:
-        print(f"Error reading partition shape file {err=}, {type(err)=}")
+        print(f"Error reading partition shape file {err}, {type(err)}")
     cur_path = os.getcwd()
     out2d_file = None
     out2d_re = re.compile("out2d_[0-9]*.nc")
@@ -323,7 +324,7 @@ def partition_scribeio(partition_shp,
         with xr.open_dataset(out2d_file) as ds:
             data_2d = ds.load()
     except BaseException as err:
-        print(f"Error reading out2d file list {err=}, {type(err)=}")
+        print(f"Error reading out2d file list {err}, {type(err)}")
         data_2d = None
         raise NotImplementedError(
             "The line above this error will cause an error")
@@ -481,14 +482,22 @@ def partition_scribeio(partition_shp,
         if ivcor== 1:
             node_sigma = np.loadtxt(vgrid_file, skiprows=3)
             node_bottom = np.loadtxt(vgrid_file, skiprows=2, max_rows=1)
-            subset_sigma = node_sigma[:, nodesinROI]
+            subset_sigma = node_sigma[:, node_np]
             subset_bottom = node_bottom[nodesinROI]
             num_level = subset_sigma.shape[0]
             with open(subset_vgrid_file, 'w') as subset_vgrid:
                 subset_vgrid.write("1\n")
                 subset_vgrid.write(f"{num_level}\n")
                 np.savetxt(subset_vgrid,subset_bottom.reshape(1,-1).astype(int),fmt='%i')
-                np.savetxt(subset_vgrid,subset_sigma)
+                #np.savetxt(subset_vgrid,subset_sigma)
+                for level in range(num_level):
+                    subset_vgrid.write(str(level+1))
+                    s0= ' '
+                    for sigma in subset_sigma[level,:]:
+                        s0=s0+str(sigma)+" "
+                
+                    subset_vgrid.write(s0)
+                    subset_vgrid.write(" \n")
             
             
     all_files = next(os.walk(cur_path), (None, None, []))[2]   
@@ -588,7 +597,7 @@ def create_arg_parser():
         and save to a subset folder under current folder
         
         Usage:
-        download_hrrr 01/01/2023  g:\temp 15  37.36  39.0 -123.023 -121.16
+        subset_schism_output --subset_polygon cut.shp
                      """)
     parser.add_argument('--subset_polygon', default=None, required=True,
                         help='a shape file defines polygons where outputs\
