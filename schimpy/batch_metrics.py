@@ -23,7 +23,8 @@ from schimpy.metricsplot import plot_metrics, plot_comparison, get_common_window
     safe_window, check_if_all_tss_are_bad, fill_gaps
 from dms_datastore.read_ts import *
 
-from schimpy.plot_default_formats import dwr_accessiable1_style_cycler,seaborn_style_cycler
+from schimpy.plot_default_formats import dwr_accessiable1_style_cycler,default_style_cycler,\
+                                        default_linestyle, default_linewidth
 from cycler import cycler
 
 matplotlib.use('Agg')  # To prevent an unwanted failure on Linux
@@ -556,36 +557,48 @@ class BatchMetrics(object):
 
             if ("palette" in params.keys()):
                 if params['palette'] == 'default':
-                    style_palette=seaborn_style_cycler
+                    style_palette=default_style_cycler
                 elif params['palette'] == 'dwr_accessible1':
                     style_palette=dwr_accessiable1_style_cycler
+                elif params['palette'] in plt.style.available:
+                    style_palette=(cycler(linestyle=[default_linestyle])
+                                  *cycler(color=["#0F0F0F"] + matplotlib.style.library[params['palette']]["axes.prop_cycle"].by_key()["color"])
+                                  *cycler(linewidth=[default_linewidth]))
                 elif params['palette'] == 'custom':
                     if ('custom_palette' in params.keys()):
                         if 'linecolor' in params['custom_palette']:
                             linecolor = params['custom_palette']['linecolor']
-                            if len(linecolor) < len(labels):
+                            if linecolor == 'default':
+                                linecolor = default_style_cycler.by_key()['color'][:len(labels)]
+                            elif linecolor in plt.style.available:
+                                linecolor = ["#0F0F0F"] + matplotlib.style.library[linecolor]["axes.prop_cycle"].by_key()["color"][:len(labels)]
+                            elif len(linecolor) < len(labels):
                                 raise ValueError("Specify correct number of linecolors!")
                             linecolor = linecolor[:len(labels)]
                         else:
-                            linecolor = seaborn_style_cycler.by_key()['color'][:len(labels)]
+                            linecolor = default_style_cycler.by_key()['color'][:len(labels)]
                             print("'linecolor' not specified in 'custom_palette'. Default used")
 
                         if 'linestyle' in params['custom_palette']:
                             linestyle = params['custom_palette']['linestyle']
-                            if len(linestyle) < len(labels):
+                            if linestyle == 'default':
+                                linestyle = [default_linestyle for i in range(len(labels))]
+                            elif len(linestyle) < len(labels):
                                 raise ValueError("Specify correct number of linestyles!")
                             linestyle = linestyle[:len(labels)]
                         else:
-                            linestyle = ["-" for i in range(len(labels))]
+                            linestyle = [default_linestyle for i in range(len(labels))]
                             print("'linestyle' not specified in 'custom_palette'. Default used")
 
                         if 'linewidth' in params['custom_palette']:
                             linewidth = params['custom_palette']['linewidth']
-                            if len(linewidth) < len(labels):
+                            if linewidth == 'default':
+                                linewidth = default_style_cycler.by_key()['linewidth'][:len(labels)]
+                            elif len(linewidth) < len(labels):
                                 raise ValueError("Specify correct number of linewidths!")
                             linewidth = linewidth[:len(labels)]
                         else:
-                            linewidth = seaborn_style_cycler.by_key()['linewidth'][:len(labels)]
+                            linewidth = default_style_cycler.by_key()['linewidth'][:len(labels)]
                             print("'linewidth' not specified in 'custom_palette'. Default used")
 
                         style_palette = cycler(color=linecolor, linestyle=linestyle, linewidth=linewidth)
@@ -595,9 +608,8 @@ class BatchMetrics(object):
 
                 else:
                     raise ValueError("palette missing!")
-
             else:
-                style_palette=seaborn_style_cycler
+                style_palette=default_style_cycler
                 self.logger.info("No style palette is given, default used.")
 
             # write out ts_obs and tss_sim to csv
