@@ -19,15 +19,19 @@ __all__ = ['set_color_cycle_dark2', 'set_dual_axes', 'set_dual_axes_elev', 'set_
 font = { # 'family': '',
          # 'weight': 'regular',
         'size': 12,}
+
+default_linewidth = 1.5
+default_linestyle = '-'
+
 brewer_colors = [palettable.colorbrewer.qualitative.Dark2_5.mpl_colors[i]
                  for i in [1, 0, 2, 3, 4]]
 dwr_accessiable1_style_cycler=(cycler(linestyle=['-','--'])*cycler(color=["#323232","#D55E00","#0173B2"])
-                               *cycler(linewidth=[1.5]))
+                               *cycler(linewidth=[default_linewidth]))
 
-# Use seaborn-v0_8-colorblind, but insert off-black as the first color.
-seaborn_style_cycler=(cycler(linestyle=['-'])
+# Use seaborn-v0_8-colorblind as default, but insert off-black as the first color.
+default_style_cycler=(cycler(linestyle=[default_linestyle])
                      *cycler(color=["#0F0F0F"] + mpl.style.library['seaborn-v0_8-colorblind']["axes.prop_cycle"].by_key()["color"])
-                     *cycler(linewidth=[1.5]))
+                     *cycler(linewidth=[default_linewidth]))
 
 ##############################################################################
 # Global settings
@@ -58,7 +62,7 @@ def get_color_cycle():
     """
     return brewer_colors
 
-def set_line_cycle(line_palette_id=dwr_accessiable1_style_cycler):
+def set_line_cycle(line_palette_id=default_style_cycler):
     """Set linetype cycle of solid line style types with 3 color dwr acceissble color    
     """
     mpl.rcParams['axes.prop_cycle'] = line_palette_id
