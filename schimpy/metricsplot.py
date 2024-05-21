@@ -158,7 +158,8 @@ def plot_metrics_to_figure(fig, tss,
                            max_shift=hours(4),
                            period=minutes(int(12.24 * 60)),
                            label_loc=1,
-                           legend_size=12):
+                           legend_size=12,
+                           metrics_in_figure=True):
     """ Plot a metrics plot
 
         Returns
@@ -192,7 +193,8 @@ def plot_metrics_to_figure(fig, tss,
         plot_scatter(ax_scatter, tss_scatter)
 
     str_metrics = gen_metrics_string(metrics, labels[1:], unit)
-    write_metrics_string(axes['inst'], str_metrics)
+    if metrics_in_figure == True:
+        write_metrics_string(axes['inst'], str_metrics)
     return fig, metrics
 
 

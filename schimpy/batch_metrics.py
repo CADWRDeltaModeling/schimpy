@@ -631,6 +631,13 @@ class BatchMetrics(object):
                         fout.write(f'labels: {labels_to_plot}\n')
                         fout.write(f'title: {title_first_line}\n')
                         fout.write(f'style_palette: {style_palette}\n')
+
+            # write metrics in the figure
+            if "metrics_in_figure" in params.keys():
+                metrics_in_figure = params["metrics_in_figure"]
+            else:
+                metrics_in_figure = True
+
             if plot_format == 'simple':
                 fig = plot_comparison(ts_obs, tss_sim,
                                       window_inst=(start_inst, end_inst),
@@ -644,7 +651,8 @@ class BatchMetrics(object):
                                    window_avg=(start_avg, end_avg),
                                    labels=labels_to_plot,
                                    title=title,
-                                   style_palette=style_palette)
+                                   style_palette=style_palette,
+                                   metrics_in_figure=metrics_in_figure)
                 if(metrics[0]):
                     metric_out.write(station_id+' '+subloc+', %s, %s, %s, %s,%s, %s\n'%(metrics[0]["rmse"],metrics[0]["lag"],metrics[0]["bias"],metrics[0]["nse"],metrics[0]["willmott_skill"],metrics[0]["corr"]))
             fname_output = self.set_fname_out(alias,
