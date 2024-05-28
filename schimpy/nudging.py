@@ -899,7 +899,7 @@ class Nudging(object):
                     raise NotImplementedError
             else:  # single site
                 imap_v = np.where(weights_v > 0)[0]
-                values_v = np.broadcast_to(vdata.values,
+                values_v = np.broadcast_to(vdata.iloc[:,0].values,
                                            (len(imap_v),
                                             len(vdata))).T
 
