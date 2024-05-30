@@ -522,25 +522,26 @@ class SchismSetup(object):
             if name is None:
                 name = linestring.get('Name')
             npoint = len(line)
-            attribute = linestring.get("attribute")
+            attribute = str(linestring.get("attribute"))
             optype = linestring.get("type")
-            if attribute == 'local_min':
-                op = np.min
-            elif attribute == 'local_max':
-                op = np.max
-            elif attribute == 'local_mean':
-                op = np.mean
-            elif attribute == 'local_median':
-                op = np.median
+            if "local" in attribute:
+                optype = attribute
+                if attribute == 'local_min':
+                    op = np.min
+                elif attribute == 'local_max':
+                    op = np.max
+                elif attribute == 'local_mean':
+                    op = np.mean
+                elif attribute == 'local_median':
+                    op = np.median
+                else:
+                    raise ValueError(f"Attribute {attribute} is not known. Local operators like local_min cannot be part of a formula")
             else:
-                try:
-                    opval=float(attribute)
-                    op = lambda x: opval
-                    if optype is not None:
+                expr = attribute
+                if optype in ["min","max"]:
                         raise ValueError("Using type=min/max for linestring depth enforcement is be deprecated. Write the logic you'd like in the attribute field.")
-                except:
-                    ValueError("Linestring attribute was not a known value (e.g. local_min, local_med) or a float")
-                     
+                optype = "eval"
+              
             
             for ip in range(npoint-1):   # loop through segments on linestring
                 line_segment = np.array(line[ip:ip+2],dtype='d').flatten()
@@ -564,17 +565,29 @@ class SchismSetup(object):
                         else: 
                             node_local_nds[inode]=set(elnodes)
 
-
+                newglobals = {}
+                for item in newglobals:
+                    print(newglobals[item])
                 for inode in node_local_nds:
+                    # inode is the node being calculated
                     support_nodes = list(node_local_nds[inode])
-                    orig = mesh.nodes[support_nodes,2]
-                    # TODO: implement deprecation warning, eventually delete the following if/elseif
-                    if optype == "min":
-                        valreplace=max(opval, mesh.nodes[inode,2])
-                    elif optype == "max":
-                        valreplace=min(opval, mesh.nodes[inode,2])
+                    
+                    if (optype.startswith("local")):
+                        orig = mesh.nodes[support_nodes,2]
+                        # TODO: implement deprecation warning, eventually delete the following if/elseif
+                        if optype == "min":
+                            valreplace=max(opval, mesh.nodes[inode,2])
+                        elif optype == "max":
+                            valreplace=min(opval, mesh.nodes[inode,2])
+                        elif optype.startswith("local"):
+                            valreplace=op(orig)
+                        else: 
+                            raise ValueError(f"Op type unknown: {optype}")
                     else:
-                        valreplace=op(orig)
+                        newglobals["z"] = mesh.nodes[inode,2]
+                        newglobals["y"] = mesh.nodes[inode,1] 
+                        newglobals["x"] = mesh.nodes[inode,0]                         
+                        valreplace = eval(expr,newglobals)                       
                     attr[inode]=valreplace
         return attr
 
