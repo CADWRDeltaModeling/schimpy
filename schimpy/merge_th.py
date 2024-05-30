@@ -23,9 +23,9 @@ def read_locations_from_input(fname,role):
     with open(fname,'r') as stream:
         loc_yaml = syml.load(stream)
         if role == "source_flux" or role == "source_tracer":
-            section = loc_yaml["sources"]
+            section = loc_yaml["sources_sinks"]["sources"]
         elif role == "sink_flux":
-            section = loc_yaml["sinks"]
+            section = loc_yaml["sources_sinks"]["sinks"]
         return [item[0] for item in section.items()]
         # Assume sourc
 
@@ -40,7 +40,28 @@ def write_th(df,fname,elapsed,ref_time=None):
     else:
         df.to_csv(fname,sep=",",float_format="%.2f",date_format="%Y-%m-%dT%H:%M")
 
-
+def read_data(fname,variable):
+    print(f"reading file: {fname}")
+    if fname.endswith(".th"):
+        sep = "\s+"
+        comment = "#"
+    else:
+        sep = ","
+        comment = "#"
+    
+    if variable is None:
+        dfnew = pd.read_csv(fname,header=[0],sep=sep,index_col=0,parse_dates=[0],dtype=float,comment=comment)
+        return dfnew
+        
+    if variable.startswith("multi"):
+        # Read directly as a multi index, appropriate for files with multiple variables
+        dfnew = pd.read_csv(fname,header=[0,1],sep=sep,index_col=0,parse_dates=[0],dtype=float,comment="#")
+    else:
+        dfnew = pd.read_csv(fname,header=[0],sep=sep,index_col=0,parse_dates=[0],dtype=float)
+        # Adds a level called variable to columns and sets it to current variable,
+        # Resulting in a multiindex
+        dfnew = pd.concat([dfnew],names=["variable"],keys=[variable],axis=1)         
+    return dfnew
 
 
 def merge_th(th_spec):
@@ -61,7 +82,8 @@ def merge_th(th_spec):
         role = th_config["role"]
         dated_output = th_config["dated_output"] if "dated_output" in th_config else False
         sign = role_to_sign[role]
-        locs = read_locations_from_input("source_sink.yaml",role)
+        locfile = th_config["locs"]
+        locs = read_locations_from_input(locfile,role)
         dfs = []
         for item in th_config["data"]:
             try: 
@@ -69,22 +91,9 @@ def merge_th(th_spec):
                 
             except:
                 fname,variable = item,None
-
-            if variable is None:
-                dfnew = pd.read_csv(fname,header=[0],sep=",",index_col=0,parse_dates=[0],dtype=float)
-                dfs.append(dfnew)                                   
-            else:    
-                if variable.startswith("multi"):
- 
-                    # Read directly as a multi index, appropriate for files with multiple variables
-                    dfnew = pd.read_csv(fname,header=[0,1],sep=",",index_col=0,parse_dates=[0],dtype=float)
-                else:
-                    dfnew = pd.read_csv(fname,header=[0],sep=",",index_col=0,parse_dates=[0],dtype=float)
-                    # Adds a level called variable to columns and sets it to current variable,
-                    # Resulting in a multiindex
-                    dfnew = pd.concat([dfnew],names=["variable"],keys=[variable],axis=1) 
-                dfs.append(dfnew)
-
+            
+            dfnew = read_data(fname,variable)
+            dfs.append(dfnew)
 
         if "tracer" in role:     
             variables = th_config["variables"] # establishes order and labels
