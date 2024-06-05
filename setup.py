@@ -66,6 +66,7 @@ setup(
             "convert_mesh=schimpy.convert_mesh:main",
             "convert_polygons=schimpy.convert_polygons:main",
             "convert_linestrings=schimpy.convert_linestrings:main",
+            "convert_points=schimpy.convert_points:main",
             "combine_consume=schimpy.combine_consume:main",
             "prepare_schism=schimpy.prepare_schism:main",
             "hotstart_inventory=schimpy.hotstart_inventory:main",

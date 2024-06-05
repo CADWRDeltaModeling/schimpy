@@ -394,6 +394,29 @@ def csv2yaml(source_csv,source_yaml):
     dict_file = {'sources':dict_file}
     with open(source_yaml, 'w') as file:
         documents = yaml.dump(dict_file, file)
+
+def yaml2df(source_yaml):
+    """ Converting source yaml file to pandas dataframe
+
+    Parameters
+    ----------
+    source_yaml :YAML FILENAME
+
+    Returns
+    -------
+    pandas dataframe
+
+    """
+    with open(source_yaml, 'r') as file:
+        source_sink = yaml.safe_load(file)
+    sites = source_sink.keys()
+    sites = list(sites)
+    a = [source_sink[k] for k in sites]
+    a = np.array(a)
+    x = a[:,0]
+    y = a[:,1]
+    return pd.DataFrame({'sites': sites,'x':x,'y':y})
+
 if __name__ == "__main__":
     yaml_fn1 = 'source_sink.yaml'
     yaml_fn2 = 'potw_sources.yaml'
