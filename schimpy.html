@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.9.0+15.g4441f94.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.10.0+1.g002cba6.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=50bdccbc"></script>
+        <script src="_static/documentation_options.js?v=5238e0df"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -148,6 +148,14 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_mesh.convert_mesh"><code class="docutils literal notranslate"><span class="pre">convert_mesh()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_mesh.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_mesh.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.convert_points">schimpy.convert_points module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_points.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_points.df_to_shp"><code class="docutils literal notranslate"><span class="pre">df_to_shp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_points.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_points.read_points"><code class="docutils literal notranslate"><span class="pre">read_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_points.write_points"><code class="docutils literal notranslate"><span class="pre">write_points()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.convert_polygons">schimpy.convert_polygons module</a><ul>
@@ -490,6 +498,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_sources_sinks.write_source_sink_in"><code class="docutils literal notranslate"><span class="pre">write_source_sink_in()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_sources_sinks.write_source_sink_yaml"><code class="docutils literal notranslate"><span class="pre">write_source_sink_yaml()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_sources_sinks.yaml2csv"><code class="docutils literal notranslate"><span class="pre">yaml2csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_sources_sinks.yaml2df"><code class="docutils literal notranslate"><span class="pre">yaml2df()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.schism_structure">schimpy.schism_structure module</a><ul>
@@ -1013,6 +1022,37 @@ to Shapefile and vice versa</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.convert_mesh.main">
 <span class="sig-prename descclassname"><span class="pre">schimpy.convert_mesh.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_mesh.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-schimpy.convert_points">
+<span id="schimpy-convert-points-module"></span><h2>schimpy.convert_points module<a class="headerlink" href="#module-schimpy.convert_points" title="Link to this heading"></a></h2>
+<p>Command line tool to convert SCHISM points (source and sink) in YAML to Shapefile</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.convert_points.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_points.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_points.create_arg_parser" title="Link to this definition"></a></dt>
+<dd><p>Create an argument parser</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.convert_points.df_to_shp">
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_points.</span></span><span class="sig-name descname"><span class="pre">df_to_shp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_points.df_to_shp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.convert_points.main">
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_points.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_points.main" title="Link to this definition"></a></dt>
+<dd><p>A main function to convert polygon files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.convert_points.read_points">
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_points.</span></span><span class="sig-name descname"><span class="pre">read_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_points.read_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.convert_points.write_points">
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_points.</span></span><span class="sig-name descname"><span class="pre">write_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_points.write_points" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -8434,6 +8474,24 @@ create_source_sink_in function in schimpy preprocessor</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>None.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.schism_sources_sinks.yaml2df">
+<span class="sig-prename descclassname"><span class="pre">schimpy.schism_sources_sinks.</span></span><span class="sig-name descname"><span class="pre">yaml2df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_yaml</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_sources_sinks.yaml2df" title="Link to this definition"></a></dt>
+<dd><p>Converting source yaml file to pandas dataframe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>source_yaml :YAML FILENAME</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>pandas dataframe</dt><dd></dd>
 </dl>
 </dd>
 </dl>

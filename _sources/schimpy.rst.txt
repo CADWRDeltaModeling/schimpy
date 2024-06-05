@@ -100,6 +100,14 @@ schimpy.convert\_mesh module
    :undoc-members:
    :show-inheritance:
 
+schimpy.convert\_points module
+------------------------------
+
+.. automodule:: schimpy.convert_points
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.convert\_polygons module
 --------------------------------
 
