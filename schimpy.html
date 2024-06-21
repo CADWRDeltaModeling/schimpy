@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.10.0+1.g002cba6.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.10.0+2.gfab5823.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5238e0df"></script>
+        <script src="_static/documentation_options.js?v=14e23790"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -70,10 +70,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.base_io.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.batch_metrics">schimpy.batch_metrics module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.batch_metrics.generate_metricsplots"><code class="docutils literal notranslate"><span class="pre">generate_metricsplots()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#schimpy-batch-metrics-module">schimpy.batch_metrics module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.bctide">schimpy.bctide module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.bctide.load_boundary"><code class="docutils literal notranslate"><span class="pre">load_boundary()</span></code></a></li>
 </ul>
@@ -561,28 +558,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.test_main"><code class="docutils literal notranslate"><span class="pre">test_main()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.station">schimpy.station module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.convert_db_station_in"><code class="docutils literal notranslate"><span class="pre">convert_db_station_in()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.example"><code class="docutils literal notranslate"><span class="pre">example()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.flux_stations_from_yaml"><code class="docutils literal notranslate"><span class="pre">flux_stations_from_yaml()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.merge_station_subloc"><code class="docutils literal notranslate"><span class="pre">merge_station_subloc()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_flux_out"><code class="docutils literal notranslate"><span class="pre">read_flux_out()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_obs_links"><code class="docutils literal notranslate"><span class="pre">read_obs_links()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_staout"><code class="docutils literal notranslate"><span class="pre">read_staout()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_dbase"><code class="docutils literal notranslate"><span class="pre">read_station_dbase()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_in"><code class="docutils literal notranslate"><span class="pre">read_station_in()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_out"><code class="docutils literal notranslate"><span class="pre">read_station_out()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_subloc"><code class="docutils literal notranslate"><span class="pre">read_station_subloc()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.staout_name"><code class="docutils literal notranslate"><span class="pre">staout_name()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.station_names_from_file"><code class="docutils literal notranslate"><span class="pre">station_names_from_file()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.station_subset"><code class="docutils literal notranslate"><span class="pre">station_subset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.station_subset_multidir"><code class="docutils literal notranslate"><span class="pre">station_subset_multidir()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.u"><code class="docutils literal notranslate"><span class="pre">u()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.write_station_in"><code class="docutils literal notranslate"><span class="pre">write_station_in()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#schimpy-station-module">schimpy.station module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.subset_schism_output">schimpy.subset_schism_output module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_partition"><code class="docutils literal notranslate"><span class="pre">create_partition()</span></code></a></li>
@@ -694,14 +670,8 @@
 </dd></dl>
 
 </section>
-<section id="module-schimpy.batch_metrics">
-<span id="schimpy-batch-metrics-module"></span><h2>schimpy.batch_metrics module<a class="headerlink" href="#module-schimpy.batch_metrics" title="Link to this heading"></a></h2>
-<p>Create metrics plots in batch mode</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.batch_metrics.generate_metricsplots">
-<span class="sig-prename descclassname"><span class="pre">schimpy.batch_metrics.</span></span><span class="sig-name descname"><span class="pre">generate_metricsplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_inputfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.batch_metrics.generate_metricsplots" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="schimpy-batch-metrics-module">
+<h2>schimpy.batch_metrics module<a class="headerlink" href="#schimpy-batch-metrics-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-schimpy.bctide">
 <span id="schimpy-bctide-module"></span><h2>schimpy.bctide module<a class="headerlink" href="#module-schimpy.bctide" title="Link to this heading"></a></h2>
@@ -8982,338 +8952,8 @@ If require_all = True na_fill must be None</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-schimpy.station">
-<span id="schimpy-station-module"></span><h2>schimpy.station module<a class="headerlink" href="#module-schimpy.station" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.convert_db_station_in">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">convert_db_station_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'station.in'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sublocdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.convert_db_station_in" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.create_arg_parser">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.create_arg_parser" title="Link to this definition"></a></dt>
-<dd><p>Create an argument parser</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.example">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.example" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.flux_stations_from_yaml">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">flux_stations_from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.flux_stations_from_yaml" title="Link to this definition"></a></dt>
-<dd><p>Retrieve station id of fluxlines from yaml file or content</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.main" title="Link to this definition"></a></dt>
-<dd><p>A main function to convert polygon files</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.merge_station_subloc">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">merge_station_subloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_dbase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_subloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.merge_station_subloc" title="Link to this definition"></a></dt>
-<dd><p>Merge BayDeltaSCHISM station database with subloc file, producing the union of all stations and sublocs including a default entry for stations with no subloc entry</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>station_dbase</strong><span class="classifier">DataFrame</span></dt><dd><p>This should be the input that has only the station id as an index and includes other metadata like x,y,</p>
-</dd>
-<dt><strong>station_subloc</strong><span class="classifier">DataFrame</span></dt><dd><p>This should have (id,subloc) as an index</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that links the information.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.read_flux_out">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_flux_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reftime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_flux_out" title="Link to this definition"></a></dt>
-<dd><p>Read fluxes from a SCHISM flux.out file</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fpath</strong><span class="classifier">str</span></dt><dd></dd>
-<dt><strong>Path to the file</strong></dt><dd></dd>
-<dt><strong>names</strong><span class="classifier">str</span></dt><dd></dd>
-<dt><strong>name of file that contains  names of  flux areas, typically something like flow_xsects.yaml</strong></dt><dd></dd>
-<dt><strong>reftime</strong><span class="classifier">str</span></dt><dd></dd>
-<dt><strong>start of simulation, against which relative times will be calculated</strong></dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.read_obs_links">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_obs_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_obs_links" title="Link to this definition"></a></dt>
-<dd><p>Read an obs_links csv file which has comma as delimiter and (id,subloc,variable) as index</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.read_staout">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_staout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reftime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret_station_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elim_default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_staout" title="Link to this definition"></a></dt>
-<dd><p>Read a SCHISM staout_* file into a pandas DataFrame</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input staout file or a variable name in [“elev”, “air pressure”, “wind_x”, “wind_y”,  “temp”, “salt”, “u”, “v”, “w”] whose
-1-index will be mapped to a name like staout_1 for elev</p>
-</dd>
-<dt><strong>station_infile</strong><span class="classifier">str or DataFrame</span></dt><dd><p>Path to station.in file or DataFrame from read_station_in</p>
-</dd>
-<dt><strong>reftime</strong><span class="classifier">Timestampe</span></dt><dd><p>Start of simulation, time basis for staout file elapse time</p>
-</dd>
-<dt><strong>ret_station_in</strong><span class="classifier">bool</span></dt><dd><p>Return station_in DataFrame for use, which may speed reading of a second file</p>
-</dd>
-<dt><strong>multi</strong><span class="classifier">bool</span></dt><dd><p>Should the returned data have a multi index for the column with location and sublocation. If False the two are collapsed</p>
-</dd>
-<dt><strong>elim_default</strong><span class="classifier">bool</span></dt><dd><p>If the MultiIndex is collapsed, stations with subloc “default” will be collapsed. Eg. (“CLC”,”default”) becomes “CLC_default”</p>
-</dd>
-<dt><strong>time_unit</strong><span class="classifier">string</span></dt><dd><p>Convertible to pandas frequency string, this is the timestamp of the file.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and columns representing the staout data (collapsed as described above</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">staout1</span><span class="p">,</span><span class="n">station_in</span> <span class="o">=</span> <span class="n">read_staout</span><span class="p">(</span><span class="s2">&quot;staout_1&quot;</span><span class="p">,</span><span class="s2">&quot;station.in&quot;</span><span class="p">,</span><span class="n">reftime</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
-<span class="go">                             ret_station_in = True,multi=False,elim_default=True)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">staout6</span> <span class="o">=</span> <span class="n">read_staout</span><span class="p">(</span><span class="s2">&quot;staout_6&quot;</span><span class="p">,</span><span class="n">station_in</span><span class="p">,</span><span class="n">reftime</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span><span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">elim_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.read_station_dbase">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_dbase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_dbase" title="Link to this definition"></a></dt>
-<dd><p>Read a BayDeltaSCHISM station data base csv  file into a pandas DataFrame</p>
-<blockquote>
-<div><p>The BayDelta SCHISM format is open, but expects these columns:
-index x y z ! id subloc “Name”</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input dbase style file</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and columns x,y,z,name</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.read_station_in">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_in" title="Link to this definition"></a></dt>
-<dd><p>Read a SCHISM station.in file into a pandas DataFrame</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This only reads the tabular part, and assumes the BayDelta SCHISM format with columns:
-index x y z ! id subloc “Name”</p>
-<p>Note that there is no header and the delimiter is a space. Also note that the text beginning with !
-is extra BayDeltaSCHISM extra metadata, not required for vanilla SCHISM</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input station.in style file</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and columns x,y,z,name</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.read_station_out">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationinfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_out" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.read_station_subloc">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_subloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_subloc" title="Link to this definition"></a></dt>
-<dd><p>Read a BayDeltaSCHISM station_sublocs.csv  file into a pandas DataFrame</p>
-<blockquote>
-<div><p>The BayDelta SCHISM format has a header and uses “,” as the delimiter and has these columns:
-id,subloc,z</p>
-<p>The id is the station id, which is the key that joins this file to the station database. ‘subloc’ is a label that describes
-the sublocation or subloc and z is the actual elevation of the instrument</p>
-<p>Example might be:
-id,subloc,z
-12345,upper,-0.5</p>
-<p>Other columns are allowed, but this will commonly merged with the station database file so we avoid column names like ‘name’ that might collide</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input station.in style file</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and data column z</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.staout_name">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">staout_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.staout_name" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.station_names_from_file">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">station_names_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.station_names_from_file" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.station_subset">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">station_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isflux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'infer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">miss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raise'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.station_subset" title="Link to this definition"></a></dt>
-<dd><p>Extract a subset of stations from an staout file or flux.out file</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>fpath</strong><span class="classifier">str</span></dt><dd><p>Path to the output file to be read</p>
-</dd>
-<dt><strong>run_start</strong><span class="classifier">pd.Timestamp</span></dt><dd><p>Start time (reference time) for the simulation elapsed time</p>
-</dd>
-<dt><strong>locs</strong><span class="classifier">pd.DataFrame or str</span></dt><dd><blockquote>
-<div><p>A DataFrame with rows specifying the data to subset or a string that is the path to such a file.
-There are a few options. Minimally this file should have either one column called “station_id” or
-one called “id” and another called “subloc”. If you use station_id, it should be an
-underscore-connected combination of id and subloc which should be unique, and this will be the treatment of the output.
-of the station. If you use “subloc” you can use “default” leave the subloc column blank. You can also use another optional
-column called “alias” and this will become the label used.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>extract_freq<span class="classifier">str or pd.tseries.TimeOffset</span></dt><dd><p>Frequency to extract … this allows some economies if you want, say, 15min data. Use pandas freq string such as ‘15T’ for 15min</p>
-</dd>
-<dt>convert: str or function</dt><dd><p>A small number of conversions are supported (“ft”, “ec” for uS/cm, “cfs” for flow)</p>
-</dd>
-<dt>stationfile<span class="classifier">str</span></dt><dd><p>Name of station file such as station.in. In the case of flow this will be a yaml file or fluxflag.prop file produced by our preprocessing system.
-If you leave this None, ‘station.in’ in the same directory as the output file will be assumed for staout files. For flow, a string must be supplied
-but will be tested first in the directory of execution and then side-by-side in that order.</p>
-</dd>
-<dt>isflux<span class="classifier">‘infer’ | True | False</span></dt><dd><p>Is the request for flux.out?</p>
-</dd>
-<dt>miss<span class="classifier">‘raise’ | ‘drop’ | ‘nan’</span></dt><dd><p>What to do when a requested station_id does not exist. The default, raise, helps station lists from growing faulty. ‘drop’ will ignore the column and ‘nan’
-will return nans for the column.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that returns the converted and subsetted data. Column names will be the ids unless ‘alias’ is provided in locs, in which case those names will be
-swapped in.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.station_subset_multidir">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">station_subset_multidir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dirs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">staoutfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isflux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'infer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">miss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raise'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.station_subset_multidir" title="Link to this definition"></a></dt>
-<dd><p>Extract a subset of stations from an staout file or flux.out file across a list of directories</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>dirs</strong><span class="classifier">list(str)</span></dt><dd><p>List of directories. The output dataframe will have a column multindex (dir,station_id) where dir is the directory of the output.</p>
-</dd>
-<dt><strong>fpath</strong><span class="classifier">str</span></dt><dd><p>Path to the output file to be read</p>
-</dd>
-<dt><strong>run_start</strong><span class="classifier">pd.Timestamp</span></dt><dd><p>Start time (reference time) for the simulation elapsed time</p>
-</dd>
-<dt><strong>locs</strong><span class="classifier">pd.DataFrame or str</span></dt><dd><blockquote>
-<div><p>A DataFrame with rows specifying the data to subset or a string that is the path to such a file.
-There are a few options for staout station files. Minimally this file should have either one column called “station_id” or
-one called “id” and another called “subloc”. If you use station_id, it should be an
-underscore-connected combination of id and subloc and this will be the index treatment of the output.
-Flux files only have the station_id option. If you use “subloc” you can use “default” leave the subloc column blank.
-You can also include another optional column called “alias” and this will become the label used.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>extract_freq<span class="classifier">str or pd.tseries.TimeOffset</span></dt><dd><p>Frequency to extract … this allows some economies if you want, say, 15min data. Use pandas freq string such as ‘15T’ for 15min</p>
-</dd>
-<dt>convert: str or function</dt><dd><p>A small number of conversions are supported (“ft”, “ec” for uS/cm, “cfs” for flow)</p>
-</dd>
-<dt>stationfile<span class="classifier">str</span></dt><dd><p>Name or list of station file such as station.in. You can provide a list of the same length as dirs or a single value which will be assumed
-to be appropriate for all the directories. In the case of station.in, you can use None and ‘station.in’ in each directory
-will be assumed for staout files. For flow, a string (yaml file) must be supplied but will be tested first in the directory of
-execution and then side-by-side in that order.</p>
-</dd>
-<dt>isflux<span class="classifier">‘infer’ | True | False</span></dt><dd><p>Is the request for flux.out?</p>
-</dd>
-<dt>miss<span class="classifier">‘raise’ | ‘drop’ | ‘nan’</span></dt><dd><p>What to do when a requested station_id does not exist. The default, raise, helps station lists from growing faulty. ‘drop’ will ignore the column and ‘nan’
-will return nans for the column.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that returns the converted and subsetted data. Column names will be the ids unless ‘alias’ is provided in locs, in which case those names will be
-swapped in.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.u">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.u" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.station.write_station_in">
-<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">write_station_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.write_station_in" title="Link to this definition"></a></dt>
-<dd><p>Write a SCHISM station.in file given a pandas DataFrame of metadata</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to output station.in file</p>
-</dd>
-<dt><strong>station_in</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
-</dd>
-<dt><strong>request</strong><span class="classifier">‘all’ or list(str)</span></dt><dd><p>List of variables to put in output request from the choices ‘elev’, ‘air pressure’, ‘wind_x’, ‘wind_y’, ‘temp’, ‘salt’, ‘u’, ‘v’, ‘w’
-or ‘all’ to include them all</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="schimpy-station-module">
+<h2>schimpy.station module<a class="headerlink" href="#schimpy-station-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-schimpy.subset_schism_output">
 <span id="schimpy-subset-schism-output-module"></span><h2>schimpy.subset_schism_output module<a class="headerlink" href="#module-schimpy.subset_schism_output" title="Link to this heading"></a></h2>
