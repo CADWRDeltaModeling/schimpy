@@ -4,6 +4,14 @@ schimpy package
 Submodules
 ----------
 
+schimpy.archive\_ts module
+--------------------------
+
+.. automodule:: schimpy.archive_ts
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.base\_io module
 -----------------------
 

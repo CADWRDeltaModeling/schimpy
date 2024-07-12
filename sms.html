@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Utilities for Working with SMS &mdash; schimpy 1.10.0+2.gfab5823.dirty documentation</title>
+  <title>Utilities for Working with SMS &mdash; schimpy 1.10.0+3.g3d5bf2a.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=14e23790"></script>
+        <script src="_static/documentation_options.js?v=cbc070b2"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -55,10 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Working with SMS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#converting-an-sms-mesh-2dm-file-to-gr3">Converting an SMS mesh (2dm) file to gr3</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#convert-mesh">convert_mesh</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-mesh">convert_mesh</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#getting-sms-polygons-for-preprocessor">Getting SMS Polygons for Preprocessor</a><ul>
@@ -124,25 +121,6 @@ able to distrubute a sufficient open source mesh generator.</p>
 <section id="convert-mesh">
 <h3>convert_mesh<a class="headerlink" href="#convert-mesh" title="Link to this heading"></a></h3>
 <p>schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files</p>
-<p><p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">crs</span> <span class="n">CRS</span><span class="p">]</span>
-</pre></div>
-</div>
-<section id="named-arguments">
-<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
-<dl class="option-list">
-<dt><kbd>--input</kbd></dt>
-<dd><p>Input mesh file</p>
-</dd>
-<dt><kbd>--output</kbd></dt>
-<dd><p>Output mesh file</p>
-</dd>
-<dt><kbd>--crs</kbd></dt>
-<dd><p>crs string for the projection</p>
-</dd>
-</dl>
-</section>
 </section>
 </section>
 <section id="getting-sms-polygons-for-preprocessor">

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assigning Bathymetry &mdash; schimpy 1.10.0+2.gfab5823.dirty documentation</title>
+  <title>Assigning Bathymetry &mdash; schimpy 1.10.0+3.g3d5bf2a.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=14e23790"></script>
+        <script src="_static/documentation_options.js?v=cbc070b2"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -56,7 +56,6 @@
 <li class="toctree-l1"><a class="reference internal" href="sms.html">Working with SMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_time.html">Model time</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Populating Elevation/Depth Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#assigning-depths-from-prioritized-dems">Assigning depths from prioritized DEMs</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
@@ -75,11 +74,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#optimizing-depths-for-volume">Optimizing depths for volume</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#optimizing-depths-for-volume">Optimizing depths for volume</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="hotstart.html">Creating hotstart</a></li>
@@ -113,25 +108,6 @@
   <section id="assigning-bathymetry">
 <h1>Assigning Bathymetry<a class="headerlink" href="#assigning-bathymetry" title="Link to this heading"></a></h1>
 <p>Converting a 2dm file to gr3 or between gr3 or 2dm and shapefile</p>
-<p><p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">convert_mesh</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">output</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">crs</span> <span class="n">CRS</span><span class="p">]</span>
-</pre></div>
-</div>
-<section id="named-arguments">
-<h2>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h2>
-<dl class="option-list">
-<dt><kbd>--input</kbd></dt>
-<dd><p>Input mesh file</p>
-</dd>
-<dt><kbd>--output</kbd></dt>
-<dd><p>Output mesh file</p>
-</dd>
-<dt><kbd>--crs</kbd></dt>
-<dd><p>crs string for the projection</p>
-</dd>
-</dl>
-</section>
 <section id="assigning-depths-from-prioritized-dems">
 <h2>Assigning depths from prioritized DEMs<a class="headerlink" href="#assigning-depths-from-prioritized-dems" title="Link to this heading"></a></h2>
 <p>These tools are used by the preprocessor but also work with functions that can
@@ -300,38 +276,6 @@ we compare the volumetric quantities that come from SCHISM shape functions
 (which are much like a TIN) to a higher order quadrature using the DEM
 with bilinear interpolation. The quadrature is more accurate, and also
 incorporates more sample points.</p>
-<p><p>Perform grid optimization with a *.2dm SMS mesh or gr3 file. An optimized gr3 file with extension _opt.gr3 will be created if only one set of optimization parameter specified.</p>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">grid_opt</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">optfile</span> <span class="n">OPTFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">solver</span> <span class="n">SOLVER</span><span class="p">]</span>
-                <span class="n">filename</span> <span class="n">demfile</span> <span class="n">optparm</span>
-</pre></div>
-</div>
-<section id="positional-arguments">
-<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
-<dl class="option-list">
-<dt><kbd>filename</kbd></dt>
-<dd><p>name of 2dm or gr3 file</p>
-</dd>
-<dt><kbd>demfile</kbd></dt>
-<dd><p>file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs</p>
-</dd>
-<dt><kbd>optparm</kbd></dt>
-<dd><p>file containing optimization parameters: damp, damp_shoreline, face_coeff, volume_coeff</p>
-</dd>
-</dl>
-</section>
-<section id="named-arguments">
-<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
-<dl class="option-list">
-<dt><kbd>--optfile</kbd></dt>
-<dd><p>name for the gr3 file for the optimized results</p>
-</dd>
-<dt><kbd>--solver</kbd></dt>
-<dd><p>solver used for optimization, either L-BFGS-B (default) or lsqr</p>
-<p>Default: “L-BFGS-B”</p>
-</dd>
-</dl>
-</section>
 </section>
 </section>
 
