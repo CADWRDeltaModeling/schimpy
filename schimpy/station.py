@@ -77,6 +77,7 @@ def read_staout(fname,station_infile,reftime,ret_station_in = False,multi=False,
         station_in = station_infile
 
     station_index = station_in.index.copy()
+
     if station_index.duplicated().any():
         print(station_index[station_index.duplicated()])
         raise ValueError("Duplicate id/subloc pair in station.in file {}".format(station_infile))
