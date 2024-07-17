@@ -12,7 +12,7 @@ Goals:
 
 """
 from schimpy.station import *
-#from schimpy.paam import *
+from schimpy.param import *
 import pandas as pd
 import os
 import yaml
@@ -28,14 +28,28 @@ def create_arg_parser():
 
     # Read in the input file
     parser = argparse.ArgumentParser(
-        description="""
-                     Archive time series from one simulation in a large with many alternatives 
-                     and store in a common location with better names and formats.
-                     
-                     Usage:
-                           archive_ts --rundir mycase --ardir ../arnchive --label mycase --scenario_data={exp:1000,sjr:1400}"
-                           
-                     """)
+        description=
+        """
+            Archive time series from one simulation in a large with many alternatives 
+            and store in a common location with better names and formats.
+        """,
+        epilog= 
+        """        
+        Usage:\n                           
+            
+            $ archive_ts --ardir archive_ts --rundir mss_base --label base 
+              --scenario_data '{year: 2001, sjr: 1400, exports: 1500}' 
+              --extracted '{flux.out: flux}' --stationfile fluxflag.prop --run_start 2021-01-01
+
+            $ archive_ts --ardir archive_ts --rundir mss_base --label base 
+              --scenario_data '{year: 2001, sjr: 1400, exports:1500}' \n
+
+            $ archive_ts --ardir archive_ts --rundir mss_base --label base 
+              --scenario_data '{year: 2001, sjr: 1400, 
+              exports: 1500}' --stationfile outputs/south_delta.bp 
+              --extracted  '{fracsjr_*.out: fracsjr, fracdelta_*.out: fracdelta}' 
+              --time_sharded
+         """,formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--rundir', default=None,
                         help='location of the run launch dir where param.nml resides.')
     parser.add_argument('--ardir', default=None,
@@ -44,19 +58,23 @@ def create_arg_parser():
                         help='scenario label for output. Final name inarchive will be variable_label.csv')
     parser.add_argument('--scenario_data', default={},type=yaml.safe_load, help='dictionary of data that identifies scenario, which will be added as a column to the output. This is very helpful for stitching. ')
     
-    parser.add_argument('--stationfile',default='station.in',type=yaml.safe_load,help='name of annotated station.in or build pointfile')
+    parser.add_argument('--stationfile',default='station.in',type=yaml.safe_load,help='name of annotated station.in, build pointfile or fluxflag.prop/flow_xsects.yaml')
                             
-    parser.add_argument('--extracted',default={"staout_1": "elev", "staout_5": "temp", "staout_6": "salt"},type=yaml.safe_load,
+    parser.add_argument('--extracted',default=None,type=yaml.safe_load,
                         help='dictionary of extracted data in rundir/outputs in the form of "file_name: variable_name". '
-                             'You can only one archive atation.in plus flux.out OR the files associated with a single build point on one invocation.'
-                             'On the command line note that this is quoted and requires a space after the colons')
+                             'You can only one atation.in OR flux.out OR the files associated with a single build point per invocation.'
+                             'On the command line note that this is quoted and requires a space after the colons'
+                             'Example: "{staout_1: elev, staout_5: temp, staout_6: salt}"')
     
-    parser.add_argument('--run_start',default=None,type=str,
-                        help='start date of run. If omitted, will be parsed from param.nml')
+    parser.add_argument('--run_start',default=None,type=pd.to_datetime,
+                        help='start date of run. ')
+
+    parser.add_argument('--time_sharded',action='store_true',
+                        help='if true, assume the extracted file is sharded in time. ')
                         
     return parser
 
-def archive_time_series(rundir, ardir,scenario_label=None,scenario_data={},staouts={},stationfile='station.in'):
+def archive_time_series(rundir, ardir,runstart,scenario_label=None,scenario_data={},staouts={},stationfile='station.in',time_sharded=False):
     """ Archive time series from rundir/outputs to ardir
     
     rundir/param.nml must point to a file with the correct run start
@@ -67,15 +85,16 @@ def archive_time_series(rundir, ardir,scenario_label=None,scenario_data={},staou
     if scenario_label is None: 
         raise ValueError("Scenario label must be provided")
 
-    runstart = pd.Timestamp(2021,1,1)
     
-    do_flux = (stationfile == 'station.in')
+    do_flux = "flow" in stationfile or "flux" in stationfile 
     if do_flux:
-        archive_flux(rundir,ardir,scenario_label,scenario_data,runstart)    
-    archive_staout(rundir,ardir,scenario_label,scenario_data,runstart)
-    statouts={"fort.18": "sjrfrac"}
-    staouts={"sjrfrac.dat": "sjrfrac"}
-    #archive_staout(rundir,ardir,scenario_label,scenario_data,runstart,staouts,stationfile="outputs/south_delta.bp",time_unit='d')    
+        archive_flux(rundir,ardir,scenario_label,stationfile,scenario_data,runstart=runstart)
+    else:
+        #archive_staout(rundir,ardir,scenario_label,scenario_data,runstart)
+        #statouts={"fort.18": "sjrfrac"}
+        #staouts={"sjrfrac.dat": "sjrfrac"}
+        tunit = 'd' if 'bp' in stationfile else 's'
+        archive_staout(rundir,ardir,scenario_label,scenario_data,staouts,stationfile,time_unit=tunit,runstart=runstart,time_sharded=time_sharded)    
 
 def shard_number(x):
     a0 = os.path.splitext(x)[0]
@@ -95,14 +114,22 @@ def get_ordered_files(loc,pat,time_sharded):
         all_files.sort(key=shard_number)
     return all_files
 
-def archive_staout(rundir,ardir,scenario_label,scenario_data,runstart,
+def infer_runstart(rundir):
+    """ Infer runstart based on param.nml in directory rundir """
+    paramfile = os.path.join(rundir,"param.nml")
+    p = read_params(paramfile)
+    return p.get_run_start()
+
+def archive_staout(rundir,ardir,scenario_label,scenario_data,
                   staouts=None,stationfile="station.in",float_format="%.3f",
-                  time_unit='s',multi=False,elim_default=True,do_flux=False,time_sharded=False): 
+                  time_unit='s',multi=False,elim_default=True,do_flux=False,time_sharded=False,runstart=None):
+    if runstart is None:
+        runstart = infer_runstart(rundir)
     if staouts is None: 
         staouts = {"staout_1": "elev","staout_5": "temp","staout_6":"salt"}
         if time_sharded: raise ValueError("Time sharding unexected for staout_* files")
     for s in staouts:
-        print(f"Processing {s} in directory {rundir}")
+        print(f"Processing {s} in run directory {rundir} time_sharded={time_sharded}")
         loc = os.path.join(rundir,"outputs")
         ofiles = get_ordered_files(loc,s,time_sharded)
         dfs = [] # For concatenation in time in case there are more than one
@@ -110,8 +137,8 @@ def archive_staout(rundir,ardir,scenario_label,scenario_data,runstart,
         if len(ofiles) == 0: 
             print(f"No files found for pattern {s}")
             continue
-        for fpath in ofiles:       
-            df = read_staout(fpath,os.path.join(rundir,stationfile),reftime=runstart,time_unit=time_unit,multi=multi,elim_default=elim_default)
+        for fpath in ofiles:
+            df = read_staout(fpath,station_infile=os.path.join(rundir,stationfile),reftime=runstart,time_unit=time_unit,multi=multi,elim_default=elim_default)
             #df.pivot()
             for item in scenario_data:
                 df[item] = scenario_data[item]
@@ -122,13 +149,15 @@ def archive_staout(rundir,ardir,scenario_label,scenario_data,runstart,
         dfout = pd.concat(dfs,axis=0)
         scenario_fname = f"{varlabel}_{scenario_label}.csv"
         outfpath = os.path.join(ardir,scenario_fname)
-        dfout.to_csv(outfpath,sep=",",date_format="%Y-%m-%dT%H:%M",float_format=float_format)
+        dfout.to_csv(outfpath,sep=",",date_format="%Y-%m-%dT%H:%M:%S",float_format=float_format)
 
-def archive_flux(rundir,ardir,scenario_label,scenario_data,runstart): 
+def archive_flux(rundir,ardir,scenario_label,stationfile,scenario_data,runstart): 
     print(f"Processing flux.out in directory {rundir}")
+    if runstart is None:
+        runstart = infer_runstart(rundir)
     fpath = os.path.join(rundir,"outputs","flux.out")
-    df = read_flux_out(os.path.join(rundir,"outputs","flux.out"),names=os.path.join(rundir,"fluxflag.prop"),reftime=runstart)
-    #df.pivot()
+    df = read_flux_out(os.path.join(rundir,"outputs","flux.out"),names=os.path.join(rundir,stationfile),reftime=runstart)
+    print(df.head())
     df.index.name="datetime"
     for item in scenario_data:
         df[item] = scenario_data[item]
@@ -136,7 +165,7 @@ def archive_flux(rundir,ardir,scenario_label,scenario_data,runstart):
     varlabel = "flow"
     scenario_fname = f"{varlabel}_{scenario_label}.csv"
     outfpath = os.path.join(ardir,scenario_fname)
-    df.to_csv(outfpath,sep=",",date_format="%Y-%m-%dT%H%M")        
+    df.to_csv(outfpath,sep=",",date_format="%Y-%m-%dT%H:%M:%S")        
 
 
 def process_extracted_scalar(rundir,ardir,extract_data_file, variable, model_start, station_file, output_file):
@@ -191,13 +220,19 @@ def main():
     rundir = args.rundir
     ardir = args.ardir
     label = args.label
+    stationfile = args.stationfile
     scenario_data = args.scenario_data
     scenario_data=args.scenario_data
     staouts = args.extracted
+    time_sharded = args.time_sharded
+    print("time_sharded", time_sharded)
+    runstart = args.run_start
+    
     for key,val in scenario_data.items():
         if val is None: 
             raise ValueError("Value in scenario_data is None. On the command line this may be an omitted space after colon")
     if not staouts:
+        print("None")
         staouts = {"staout_1": "elev", "staout_5": "temp", "staout_6":"salt"}
     for key,val in staouts.items():
         if val is None: 
@@ -207,10 +242,11 @@ def main():
     archive_time_series(rundir, 
                         ardir,
                         scenario_label=label,
-                        scenario_data={},
-                        staouts={},
-                        stationfile='station.in'
-                         )
+                        scenario_data=scenario_data,
+                        staouts=staouts,
+                        stationfile=stationfile,
+                        time_sharded=time_sharded,
+                        runstart=runstart)
     
     print(rundir)
     print(ardir)

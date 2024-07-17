@@ -81,6 +81,7 @@ setup(
             "create_nudging=schimpy.nudging:main",
             "interpolate_structure=schimpy.interpolate_structure:main",
             "merge_th=schimpy.merge_th:main",
+            "archive_ts=schimpy.archive_ts:main",
         ],
     },
     install_requires=requirements,
