@@ -143,7 +143,7 @@ def archive_staout(rundir,ardir,scenario_label,scenario_data,
             for item in scenario_data:
                 df[item] = scenario_data[item]
             df["variable"] = varlabel
-            df["rundir"] = rundir
+            df["rundir"] = os.path.abspath(rundir).split("/")[-1]
             df.index.name="datetime"
             dfs.append(df)
                
@@ -163,7 +163,7 @@ def archive_flux(rundir,ardir,scenario_label,stationfile,scenario_data,runstart)
     for item in scenario_data:
         df[item] = scenario_data[item]
     
-    df["rundir"] = rundir
+    df["rundir"] = os.path.abspath(rundir).split("/")[-1]
     varlabel = "flow"
     scenario_fname = f"{varlabel}_{scenario_label}.csv"
     outfpath = os.path.join(ardir,scenario_fname)
