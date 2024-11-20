@@ -227,7 +227,7 @@ class BatchMetrics(object):
                         else:
                             raise Exception(
                             "Multiple column series received. Need to implement selector")
-                    ts_obs = ts_obs.squeeze()
+                    ts_obs = ts_obs[window[0]:window[1]].squeeze()
                 except ValueError as e:
                     raise
                     self.logger.warning(
