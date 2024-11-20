@@ -1,25 +1,23 @@
-<!-- Empty override file take the place of env/lib/python3.8/site-packages/sphinx_rtd_theme/breadcrumbs.html, which generates the top nav breadcrumbs. --><!DOCTYPE html>
+<!-- Empty override file take the place of env/lib/python3.8/site-packages/sphinx_rtd_theme/breadcrumbs.html, which generates the top nav breadcrumbs. -->
+
+<!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.10.0+6.gac1cf26.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.10.0+7.g5563aaf.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=6575b43e"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=4a512823"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -64,12 +62,28 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">schimpy package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-archive-ts-module">schimpy.archive_ts module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.archive_ts">schimpy.archive_ts module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.archive_flux"><code class="docutils literal notranslate"><span class="pre">archive_flux()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.archive_staout"><code class="docutils literal notranslate"><span class="pre">archive_staout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.archive_time_series"><code class="docutils literal notranslate"><span class="pre">archive_time_series()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.ex"><code class="docutils literal notranslate"><span class="pre">ex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.get_ordered_files"><code class="docutils literal notranslate"><span class="pre">get_ordered_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.infer_runstart"><code class="docutils literal notranslate"><span class="pre">infer_runstart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.main_hardwire"><code class="docutils literal notranslate"><span class="pre">main_hardwire()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.process_extracted_scalar"><code class="docutils literal notranslate"><span class="pre">process_extracted_scalar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.archive_ts.shard_number"><code class="docutils literal notranslate"><span class="pre">shard_number()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.base_io">schimpy.base_io module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.base_io.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-batch-metrics-module">schimpy.batch_metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.batch_metrics">schimpy.batch_metrics module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.batch_metrics.generate_metricsplots"><code class="docutils literal notranslate"><span class="pre">generate_metricsplots()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#schimpy-bctide-module">schimpy.bctide module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.bound_linear">schimpy.bound_linear module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.bound_linear.bound_linear"><code class="docutils literal notranslate"><span class="pre">bound_linear()</span></code></a></li>
@@ -338,10 +352,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.profile_plot.vertical_fill"><code class="docutils literal notranslate"><span class="pre">vertical_fill()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.raster_to_nodes">schimpy.raster_to_nodes module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.raster_to_nodes.raster_to_nodes"><code class="docutils literal notranslate"><span class="pre">raster_to_nodes()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#schimpy-raster-to-nodes-module">schimpy.raster_to_nodes module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.read_output_xyt">schimpy.read_output_xyt module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.read_output_xyt.read_depth_avg_from_output7b_xyt"><code class="docutils literal notranslate"><span class="pre">read_depth_avg_from_output7b_xyt()</span></code></a></li>
 </ul>
@@ -434,7 +445,33 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.test_main"><code class="docutils literal notranslate"><span class="pre">test_main()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-station-module">schimpy.station module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.station">schimpy.station module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.convert_db_station_in"><code class="docutils literal notranslate"><span class="pre">convert_db_station_in()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.convert_stations"><code class="docutils literal notranslate"><span class="pre">convert_stations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.example"><code class="docutils literal notranslate"><span class="pre">example()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.flux_stations_from_yaml"><code class="docutils literal notranslate"><span class="pre">flux_stations_from_yaml()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.merge_station_subloc"><code class="docutils literal notranslate"><span class="pre">merge_station_subloc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_flux_out"><code class="docutils literal notranslate"><span class="pre">read_flux_out()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_obs_links"><code class="docutils literal notranslate"><span class="pre">read_obs_links()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_pointstrings"><code class="docutils literal notranslate"><span class="pre">read_pointstrings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_staout"><code class="docutils literal notranslate"><span class="pre">read_staout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_dbase"><code class="docutils literal notranslate"><span class="pre">read_station_dbase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_in"><code class="docutils literal notranslate"><span class="pre">read_station_in()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_out"><code class="docutils literal notranslate"><span class="pre">read_station_out()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_shp"><code class="docutils literal notranslate"><span class="pre">read_station_shp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.read_station_subloc"><code class="docutils literal notranslate"><span class="pre">read_station_subloc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.staout_name"><code class="docutils literal notranslate"><span class="pre">staout_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.station_names_from_file"><code class="docutils literal notranslate"><span class="pre">station_names_from_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.station_subset"><code class="docutils literal notranslate"><span class="pre">station_subset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.station_subset_multidir"><code class="docutils literal notranslate"><span class="pre">station_subset_multidir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.u"><code class="docutils literal notranslate"><span class="pre">u()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.write_pointstrings"><code class="docutils literal notranslate"><span class="pre">write_pointstrings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.write_station_in"><code class="docutils literal notranslate"><span class="pre">write_station_in()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.station.write_station_shp"><code class="docutils literal notranslate"><span class="pre">write_station_shp()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.subset_schism_output">schimpy.subset_schism_output module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_partition"><code class="docutils literal notranslate"><span class="pre">create_partition()</span></code></a></li>
@@ -509,8 +546,75 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="schimpy-archive-ts-module">
-<h2>schimpy.archive_ts module<a class="headerlink" href="#schimpy-archive-ts-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.archive_ts">
+<span id="schimpy-archive-ts-module"></span><h2>schimpy.archive_ts module<a class="headerlink" href="#module-schimpy.archive_ts" title="Link to this heading"></a></h2>
+<p>Archive SCHISM time series outputs from station, flux and extracted output from a “study”.</p>
+<p>Goals:
+1. Allow outputs from multiple scenarios to be collected in one directory by adding labels to the name.
+2. Translate from fortranesque format to csv with # comments and datetime indexes.
+3. Assure that the datetimes are not affected by floating point precision of the time columns
+4. Add scenario info as data so that origins can be identified and data can be concatenated.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.archive_flux">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">archive_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rundir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ardir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runstart</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.archive_flux" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.archive_staout">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">archive_staout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rundir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ardir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">staouts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'station.in'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">float_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%.3f'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elim_default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_sharded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.archive_staout" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.archive_time_series">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">archive_time_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rundir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ardir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runstart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">staouts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'station.in'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_sharded</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.archive_time_series" title="Link to this definition"></a></dt>
+<dd><p>Archive time series from rundir/outputs to ardir</p>
+<p>rundir/param.nml must point to a file with the correct run start</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.create_arg_parser" title="Link to this definition"></a></dt>
+<dd><p>Create an argument parser
+return: argparse.ArgumentParser</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.ex">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">ex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.ex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.get_ordered_files">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">get_ordered_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_sharded</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.get_ordered_files" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.infer_runstart">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">infer_runstart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rundir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.infer_runstart" title="Link to this definition"></a></dt>
+<dd><p>Infer runstart based on param.nml in directory rundir</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.main">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.main_hardwire">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">main_hardwire</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.main_hardwire" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.process_extracted_scalar">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">process_extracted_scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rundir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ardir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_data_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.process_extracted_scalar" title="Link to this definition"></a></dt>
+<dd><p>Process  extracted data into a time series</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.archive_ts.shard_number">
+<span class="sig-prename descclassname"><span class="pre">schimpy.archive_ts.</span></span><span class="sig-name descname"><span class="pre">shard_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.archive_ts.shard_number" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-schimpy.base_io">
 <span id="schimpy-base-io-module"></span><h2>schimpy.base_io module<a class="headerlink" href="#module-schimpy.base_io" title="Link to this heading"></a></h2>
@@ -519,7 +623,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.base_io.BaseIO">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.base_io.</span></span><span class="sig-name descname"><span class="pre">BaseIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.base_io.BaseIO" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Common IO routines to handle text inputs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
@@ -536,8 +640,14 @@
 </dd></dl>
 
 </section>
-<section id="schimpy-batch-metrics-module">
-<h2>schimpy.batch_metrics module<a class="headerlink" href="#schimpy-batch-metrics-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.batch_metrics">
+<span id="schimpy-batch-metrics-module"></span><h2>schimpy.batch_metrics module<a class="headerlink" href="#module-schimpy.batch_metrics" title="Link to this heading"></a></h2>
+<p>Create metrics plots in batch mode</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.batch_metrics.generate_metricsplots">
+<span class="sig-prename descclassname"><span class="pre">schimpy.batch_metrics.</span></span><span class="sig-name descname"><span class="pre">generate_metricsplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_inputfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.batch_metrics.generate_metricsplots" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="schimpy-bctide-module">
 <h2>schimpy.bctide module<a class="headerlink" href="#schimpy-bctide-module" title="Link to this heading"></a></h2>
@@ -725,7 +835,7 @@ Not so sure about memory. We’ve not tested a big problem yet on a big DEM on 6
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.contour_smooth.RasterWrapper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.contour_smooth.</span></span><span class="sig-name descname"><span class="pre">RasterWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.contour_smooth.RasterWrapper" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
 <tbody>
@@ -946,7 +1056,7 @@ return: argparse.ArgumentParser</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.gaussian_quadrature.GaussianQuadrature">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.gaussian_quadrature.</span></span><span class="sig-name descname"><span class="pre">GaussianQuadrature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gaussian_quadrature.GaussianQuadrature" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Abstract base class of GaussianQuadrature</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
@@ -1797,8 +1907,8 @@ it is in the outputs dir, it will be an inventory of existing hotstarts.</p>
 <p>adapted from pyschism, original work of Linlin Cui.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.hrr3.AWSGrib2Inventory">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.hrr3.</span></span><span class="sig-name descname"><span class="pre">AWSGrib2Inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.12)"><span class="pre">datetime</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pscr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'conus'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hrr3.AWSGrib2Inventory" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.hrr3.</span></span><span class="sig-name descname"><span class="pre">AWSGrib2Inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><span class="pre">datetime</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pscr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'conus'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hrr3.AWSGrib2Inventory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -1822,7 +1932,7 @@ it is in the outputs dir, it will be an inventory of existing hotstarts.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="schimpy.hrr3.AWSGrib2Inventory.output_interval">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_interval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.12)"><span class="pre">timedelta</span></a></em><a class="headerlink" href="#schimpy.hrr3.AWSGrib2Inventory.output_interval" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_interval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><span class="pre">timedelta</span></a></em><a class="headerlink" href="#schimpy.hrr3.AWSGrib2Inventory.output_interval" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -1840,7 +1950,7 @@ it is in the outputs dir, it will be an inventory of existing hotstarts.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.hrr3.HRRR">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.hrr3.</span></span><span class="sig-name descname"><span class="pre">HRRR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rnday</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pscr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hrr3.HRRR" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
 <tbody>
@@ -1881,12 +1991,8 @@ it is in the outputs dir, it will be an inventory of existing hotstarts.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.interp_2d.Invdisttree">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.interp_2d.</span></span><span class="sig-name descname"><span class="pre">Invdisttree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nnear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">leafsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.interp_2d.Invdisttree" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Inverse-distance-weighted interpolation using KDTree</p>
-<p class="rubric">Examples</p>
-<p>tree = interp_2d.Invdisttree(obs_xy) # initialize KDTree with observational points
-tree.weights(node_xy)  # calculate weights for each node. 
-values_v = tree.interp(obs.temperature.values)   # perform spatial interpolation with the calculated weights from the previous step</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -1898,6 +2004,10 @@ values_v = tree.interp(obs.temperature.values)   # perform spatial interpolation
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<p>tree = interp_2d.Invdisttree(obs_xy) # initialize KDTree with observational points
+tree.weights(node_xy)  # calculate weights for each node. 
+values_v = tree.interp(obs.temperature.values)   # perform spatial interpolation with the calculated weights from the previous step</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.interp_2d.Invdisttree.interp">
 <span class="sig-name descname"><span class="pre">interp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninterp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.interp_2d.Invdisttree.interp" title="Link to this definition"></a></dt>
@@ -2054,7 +2164,7 @@ given as arrays) or globally (if provided as scalars).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.lsc2.BilinearMeshDensity">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.lsc2.</span></span><span class="sig-name descname"><span class="pre">BilinearMeshDensity</span></span><a class="headerlink" href="#schimpy.lsc2.BilinearMeshDensity" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
 <tbody>
@@ -2081,7 +2191,7 @@ given as arrays) or globally (if provided as scalars).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.lsc2.CubicLSC2MeshFunction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.lsc2.</span></span><span class="sig-name descname"><span class="pre">CubicLSC2MeshFunction</span></span><a class="headerlink" href="#schimpy.lsc2.CubicLSC2MeshFunction" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
 <tbody>
@@ -2397,14 +2507,14 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.nml.Namelist">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.nml.</span></span><span class="sig-name descname"><span class="pre">Namelist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nml.Namelist" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The Namelist class simply creates an attribute for each key-value pair in the dictionary.</p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.nml.TopLevelNamelist">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.nml.</span></span><span class="sig-name descname"><span class="pre">TopLevelNamelist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nml.TopLevelNamelist" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>TopLevelNamelist is a class for the top-level elements of the dictionary, and Namelist is a class for all other nested elements. 
 The TopLevelNamelist class creates attributes for each key-value pair in the dictionary and, if the value is itself a dictionary, creates a new Namelist object with the nested dictionary.</p>
 </dd></dl>
@@ -2453,7 +2563,7 @@ If there’s an inline comment starting with !, it will be stored as inline_comm
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.param.Params">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.param.</span></span><span class="sig-name descname"><span class="pre">Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.param.Params" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -3896,7 +4006,7 @@ If None, frequency will be set using default (or 1 Hour) and station output disa
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.params.Params">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.params.</span></span><span class="sig-name descname"><span class="pre">Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schout</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.params.Params" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -4411,7 +4521,7 @@ It converts SI units to non-SI one.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.priority_queue.priorityDictionary">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.priority_queue.</span></span><span class="sig-name descname"><span class="pre">priorityDictionary</span></span><a class="headerlink" href="#schimpy.priority_queue.priorityDictionary" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -4499,70 +4609,8 @@ max_depth is the maximum depth, data assumed to be</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-schimpy.raster_to_nodes">
-<span id="schimpy-raster-to-nodes-module"></span><h2>schimpy.raster_to_nodes module<a class="headerlink" href="#module-schimpy.raster_to_nodes" title="Link to this heading"></a></h2>
-<p>Functions to process raster data for schimpy pre-processing.</p>
-<p>This add rasterstats, boto3 dependency to calculate raster stastistics such as
-means.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.raster_to_nodes.raster_to_nodes">
-<span class="sig-prename descclassname"><span class="pre">schimpy.raster_to_nodes.</span></span><span class="sig-name descname"><span class="pre">raster_to_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_sel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_raster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.raster_to_nodes.raster_to_nodes" title="Link to this definition"></a></dt>
-<dd><p>Applies raster values to mesh by calculating means over surrounding elementss.</p>
-<p>When an element contains no raster data, zero will be
-assigned. When an element is partly covered by the raster data, an masked average
-is calculated.</p>
-<p>If the bins are provided, the raster data will be binned and bins mapped to
-the mapped_values before the averaging begins. The binning uses numpy.digitize to classification,
-and in particular the i’th mapped value is used between the values of bins (i-1) and (i).
-There are some extra padding values provided as shown in the example</p>
-<p>If the mask_value is given, raster data with the given mask value
-will be replaced with the fill_value before binning the data. This
-masking will only be used when bins are provided and pertains to 
-special cases involving vegetation data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>mesh: schimpy.SchismMesh</strong></dt><dd><p>The base mesh to work on</p>
-</dd>
-<dt><strong>nodes_sel: array-like</strong></dt><dd><p>The array or list of the nodes to process</p>
-</dd>
-<dt><strong>path_raster: string-like</strong></dt><dd><p>File fath to the raster data</p>
-</dd>
-<dt><strong>bins: array-like, optional</strong></dt><dd><p>Array of bins. It has to be 1-dimensional and monotonic</p>
-</dd>
-<dt><strong>mapped_values: array-like, optional</strong></dt><dd><p>The values of the classes. It should be bigger by one than the bins. The i’th
-value will be applied between the <cite>(i-1)</cite> and <cite>i</cite> value of bins.</p>
-</dd>
-<dt><strong>band: int, optional</strong></dt><dd><p>The band index to use from the raster data.
-The default value is 1.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>numpy.array</dt><dd><p>means of raster values of the element balls around the nodes</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>An example of this function in the pre-processor yaml is below:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">gr3</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">sav_N.gr3</span><span class="p">:</span>
-<span class="w">   </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.</span>
-<span class="w">   </span><span class="nt">polygons</span><span class="p">:</span>
-<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">attribute</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raster_to_nodes.raster_to_nodes(mesh, nodes_sel, &#39;NDVI.tif&#39;, bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)</span>
-<span class="w">       </span><span class="nt">imports</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">schimpy.raster_to_nodes</span>
-<span class="w">       </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">none</span>
-<span class="w">       </span><span class="nt">vertices</span><span class="p">:</span>
-<span class="w">       </span><span class="c1">#...</span>
-</pre></div>
-</div>
-<p>The values <cite>mesh</cite> and <cite>node_sel</cite>  mean the SCHISM mesh and the selected node indices
-by a polygon. The example bins (or classifies) the raster values from 0.0001 to 0.3
-and assigns the value 0., then assigns 40. for values between 0.3 and 0.6 and so forth.</p>
-</dd></dl>
-
+<section id="schimpy-raster-to-nodes-module">
+<h2>schimpy.raster_to_nodes module<a class="headerlink" href="#schimpy-raster-to-nodes-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-schimpy.read_output_xyt">
 <span id="schimpy-read-output-xyt-module"></span><h2>schimpy.read_output_xyt module<a class="headerlink" href="#module-schimpy.read_output_xyt" title="Link to this heading"></a></h2>
@@ -4791,7 +4839,7 @@ is for stations.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_linestring.LineStringIo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_linestring.</span></span><span class="sig-name descname"><span class="pre">LineStringIo</span></span><a class="headerlink" href="#schimpy.schism_linestring.LineStringIo" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
 <tbody>
@@ -4818,7 +4866,7 @@ is for stations.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_linestring.LineStringIoFactory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_linestring.</span></span><span class="sig-name descname"><span class="pre">LineStringIoFactory</span></span><a class="headerlink" href="#schimpy.schism_linestring.LineStringIoFactory" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
 <tbody>
@@ -5263,7 +5311,7 @@ This class has extra information</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_polygon.SchismPolygonIo">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_polygon.</span></span><span class="sig-name descname"><span class="pre">SchismPolygonIo</span></span><a class="headerlink" href="#schimpy.schism_polygon.SchismPolygonIo" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>SchismPolygon I/O abstract class</p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
@@ -5283,7 +5331,7 @@ This class has extra information</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_polygon.SchismPolygonIoFactory">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_polygon.</span></span><span class="sig-name descname"><span class="pre">SchismPolygonIoFactory</span></span><a class="headerlink" href="#schimpy.schism_polygon.SchismPolygonIoFactory" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A factory class for SchismPolygonIo</p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
@@ -5467,7 +5515,7 @@ data columns such as name, type, and attribute.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_source.SchismSource">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_source.</span></span><span class="sig-name descname"><span class="pre">SchismSource</span></span><a class="headerlink" href="#schimpy.schism_source.SchismSource" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A class to hold structure information</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
@@ -5504,7 +5552,7 @@ data columns such as name, type, and attribute.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_source.SchismSourceIO">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_source.</span></span><span class="sig-name descname"><span class="pre">SchismSourceIO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_source.SchismSourceIO" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A class to manage source/sink I/O</p>
 <p class="rubric">Methods</p>
 <table class="docutils align-default">
@@ -5543,7 +5591,7 @@ data columns such as name, type, and attribute.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_structure.SchismStructure">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_structure.</span></span><span class="sig-name descname"><span class="pre">SchismStructure</span></span><a class="headerlink" href="#schimpy.schism_structure.SchismStructure" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A class to hold structure information</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes<span class="colon">:</span></dt>
@@ -5675,7 +5723,7 @@ It stores document in an ordered dict and supports variable substitution.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_yaml.ArgumentParserYaml">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_yaml.</span></span><span class="sig-name descname"><span class="pre">ArgumentParserYaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prog=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usage=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epilog=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parents=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formatter_class=&lt;class</span> <span class="pre">'argparse.HelpFormatter'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_chars='-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fromfile_prefix_chars=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argument_default=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflict_handler='error'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_help=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_yaml.ArgumentParserYaml" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentParser</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentParser</span></code></a></p>
 <p>Extended parser to handle YAML file as file input for ArgumentParser.
 If a file input given with ‘fromfile_prefix_chars’ has a YAML extension,
 ‘.yaml’, it will be handled as optional pairs for ArgumentParser.
@@ -5757,7 +5805,7 @@ $script.py –input1 1 –input2 2 3</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_yaml.YamlAction">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_yaml.</span></span><span class="sig-name descname"><span class="pre">YamlAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option_strings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_yaml.YamlAction" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Action" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Action</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Action" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Action</span></code></a></p>
 <p>Custom action to parse YAML files for argparse.
 This action reads in simple pairs of data from a YAML file, and
 feeds them to the parser. A YAML file must be a list of pairs
@@ -5871,7 +5919,7 @@ Some material borrowed &#64;author: snegusse</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.sms2gr3.Boundary">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.sms2gr3.</span></span><span class="sig-name descname"><span class="pre">Boundary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">btype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodestring</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.sms2gr3.Boundary" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 </dd></dl>
 
 <dl class="py function">
@@ -5982,8 +6030,412 @@ If require_all = True na_fill must be None</p>
 <dd></dd></dl>
 
 </section>
-<section id="schimpy-station-module">
-<h2>schimpy.station module<a class="headerlink" href="#schimpy-station-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.station">
+<span id="schimpy-station-module"></span><h2>schimpy.station module<a class="headerlink" href="#module-schimpy.station" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.convert_db_station_in">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">convert_db_station_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'station.in'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sublocdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.convert_db_station_in" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.convert_stations">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">convert_stations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_sta_var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.convert_stations" title="Link to this definition"></a></dt>
+<dd><p>Read a station shapefile/.in file and write to a .in/shapefile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>input</strong><span class="classifier">fname</span></dt><dd><p>Path to input station.in style file or station.shp style file with station id, x, y, z, name and subloc fields</p>
+</dd>
+<dt><strong>output</strong><span class="classifier">fname</span></dt><dd><p>Path to input station.in style file or station.shp style file with station id, x, y, z, name and subloc fields</p>
+</dd>
+<dt><strong>write_sta_var</strong><span class="classifier">‘all’ or list(str)</span></dt><dd><p>List of variables to put in output request from the choices ‘elev’, ‘air pressure’, ‘wind_x’, ‘wind_y’, ‘temp’, ‘salt’, ‘u’, ‘v’, ‘w’
+or ‘all’ to include them all</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and columns x,y,z,name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.create_arg_parser" title="Link to this definition"></a></dt>
+<dd><p>Create an argument parser</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.example">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">example</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.example" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.flux_stations_from_yaml">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">flux_stations_from_yaml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.flux_stations_from_yaml" title="Link to this definition"></a></dt>
+<dd><p>Retrieve station id of fluxlines from yaml file or content</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.main">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.main" title="Link to this definition"></a></dt>
+<dd><p>A main function to convert polygon files</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.merge_station_subloc">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">merge_station_subloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_dbase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_subloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.merge_station_subloc" title="Link to this definition"></a></dt>
+<dd><p>Merge BayDeltaSCHISM station database with subloc file, producing the union of all stations and sublocs including a default entry for stations with no subloc entry</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>station_dbase</strong><span class="classifier">DataFrame</span></dt><dd><p>This should be the input that has only the station id as an index and includes other metadata like x,y,</p>
+</dd>
+<dt><strong>station_subloc</strong><span class="classifier">DataFrame</span></dt><dd><p>This should have (id,subloc) as an index</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that links the information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_flux_out">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_flux_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reftime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_flux_out" title="Link to this definition"></a></dt>
+<dd><p>Read fluxes from a SCHISM flux.out file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>Path to the file</strong></dt><dd></dd>
+<dt><strong>names</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>name of file that contains  names of  flux areas, typically something like flow_xsects.yaml</strong></dt><dd></dd>
+<dt><strong>reftime</strong><span class="classifier">str</span></dt><dd></dd>
+<dt><strong>start of simulation, against which relative times will be calculated</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_obs_links">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_obs_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_obs_links" title="Link to this definition"></a></dt>
+<dd><p>Read an obs_links csv file which has comma as delimiter and (id,subloc,variable) as index</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_pointstrings">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_pointstrings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_pointstrings" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_staout">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_staout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reftime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ret_station_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elim_default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_staout" title="Link to this definition"></a></dt>
+<dd><p>Read a SCHISM staout_* file into a pandas DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input staout file or a variable name in [“elev”, “air pressure”, “wind_x”, “wind_y”,  “temp”, “salt”, “u”, “v”, “w”] whose
+1-index will be mapped to a name like staout_1 for elev</p>
+</dd>
+<dt><strong>station_infile</strong><span class="classifier">str or DataFrame</span></dt><dd><p>Path to station.in file or DataFrame from read_station_in</p>
+</dd>
+<dt><strong>reftime</strong><span class="classifier">Timestampe</span></dt><dd><p>Start of simulation, time basis for staout file elapse time</p>
+</dd>
+<dt><strong>ret_station_in</strong><span class="classifier">bool</span></dt><dd><p>Return station_in DataFrame for use, which may speed reading of a second file</p>
+</dd>
+<dt><strong>multi</strong><span class="classifier">bool</span></dt><dd><p>Should the returned data have a multi index for the column with location and sublocation. If False the two are collapsed</p>
+</dd>
+<dt><strong>elim_default</strong><span class="classifier">bool</span></dt><dd><p>If the MultiIndex is collapsed, stations with subloc “default” will be collapsed. Eg. (“CLC”,”default”) becomes “CLC_default”</p>
+</dd>
+<dt><strong>time_unit</strong><span class="classifier">string</span></dt><dd><p>Convertible to pandas frequency string, this is the timestamp of the file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and columns representing the staout data (collapsed as described above</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">staout1</span><span class="p">,</span><span class="n">station_in</span> <span class="o">=</span> <span class="n">read_staout</span><span class="p">(</span><span class="s2">&quot;staout_1&quot;</span><span class="p">,</span><span class="s2">&quot;station.in&quot;</span><span class="p">,</span><span class="n">reftime</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span>
+<span class="go">                             ret_station_in = True,multi=False,elim_default=True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">staout6</span> <span class="o">=</span> <span class="n">read_staout</span><span class="p">(</span><span class="s2">&quot;staout_6&quot;</span><span class="p">,</span><span class="n">station_in</span><span class="p">,</span><span class="n">reftime</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="mi">2009</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span><span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">elim_default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_station_dbase">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_dbase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_dbase" title="Link to this definition"></a></dt>
+<dd><p>Read a BayDeltaSCHISM station data base csv  file into a pandas DataFrame</p>
+<blockquote>
+<div><p>The BayDelta SCHISM format is open, but expects these columns:
+index x y z ! id subloc “Name”</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input dbase style file</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and columns x,y,z,name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_station_in">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_in" title="Link to this definition"></a></dt>
+<dd><p>Read a SCHISM station.in file into a pandas DataFrame</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This only reads the tabular part, and assumes the BayDelta SCHISM format with columns:
+index x y z ! id subloc “Name”</p>
+<p>Note that there is no header and the delimiter is a space. Also note that the text beginning with !
+is extra BayDeltaSCHISM extra metadata, not required for vanilla SCHISM</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input station.in style file</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and columns x,y,z,name</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_station_out">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationinfo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_out" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_station_shp">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_shp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_xy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_shp" title="Link to this definition"></a></dt>
+<dd><p>Read a shapefile and convert into a pandas DataFrame
+Parameters</p>
+<blockquote>
+<div><dl class="simple">
+<dt>fpath<span class="classifier">fname</span></dt><dd><p>Path to input point shapefile - has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
+</dd>
+<dt>pop_xy<span class="classifier">bool</span></dt><dd><p>Repopulate the x &amp; y fields with point coordinates?</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.read_station_subloc">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_subloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_subloc" title="Link to this definition"></a></dt>
+<dd><p>Read a BayDeltaSCHISM station_sublocs.csv  file into a pandas DataFrame</p>
+<blockquote>
+<div><p>The BayDelta SCHISM format has a header and uses “,” as the delimiter and has these columns:
+id,subloc,z</p>
+<p>The id is the station id, which is the key that joins this file to the station database. ‘subloc’ is a label that describes
+the sublocation or subloc and z is the actual elevation of the instrument</p>
+<p>Example might be:
+id,subloc,z
+12345,upper,-0.5</p>
+<p>Other columns are allowed, but this will commonly merged with the station database file so we avoid column names like ‘name’ that might collide</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input station.in style file</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame with hierarchical index (id,subloc) and data column z</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.staout_name">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">staout_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.staout_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.station_names_from_file">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">station_names_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.station_names_from_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.station_subset">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">station_subset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isflux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'infer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">miss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raise'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.station_subset" title="Link to this definition"></a></dt>
+<dd><p>Extract a subset of stations from an staout file or flux.out file</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>fpath</strong><span class="classifier">str</span></dt><dd><p>Path to the output file to be read</p>
+</dd>
+<dt><strong>run_start</strong><span class="classifier">pd.Timestamp</span></dt><dd><p>Start time (reference time) for the simulation elapsed time</p>
+</dd>
+<dt><strong>locs</strong><span class="classifier">pd.DataFrame or str</span></dt><dd><blockquote>
+<div><p>A DataFrame with rows specifying the data to subset or a string that is the path to such a file.
+There are a few options. Minimally this file should have either one column called “station_id” or
+one called “id” and another called “subloc”. If you use station_id, it should be an
+underscore-connected combination of id and subloc which should be unique, and this will be the treatment of the output.
+of the station. If you use “subloc” you can use “default” leave the subloc column blank. You can also use another optional
+column called “alias” and this will become the label used.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>extract_freq<span class="classifier">str or pd.tseries.TimeOffset</span></dt><dd><p>Frequency to extract … this allows some economies if you want, say, 15min data. Use pandas freq string such as ‘15T’ for 15min</p>
+</dd>
+<dt>convert: str or function</dt><dd><p>A small number of conversions are supported (“ft”, “ec” for uS/cm, “cfs” for flow)</p>
+</dd>
+<dt>stationfile<span class="classifier">str</span></dt><dd><p>Name of station file such as station.in. In the case of flow this will be a yaml file or fluxflag.prop file produced by our preprocessing system.
+If you leave this None, ‘station.in’ in the same directory as the output file will be assumed for staout files. For flow, a string must be supplied
+but will be tested first in the directory of execution and then side-by-side in that order.</p>
+</dd>
+<dt>isflux<span class="classifier">‘infer’ | True | False</span></dt><dd><p>Is the request for flux.out?</p>
+</dd>
+<dt>miss<span class="classifier">‘raise’ | ‘drop’ | ‘nan’</span></dt><dd><p>What to do when a requested station_id does not exist. The default, raise, helps station lists from growing faulty. ‘drop’ will ignore the column and ‘nan’
+will return nans for the column.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that returns the converted and subsetted data. Column names will be the ids unless ‘alias’ is provided in locs, in which case those names will be
+swapped in.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.station_subset_multidir">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">station_subset_multidir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dirs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">staoutfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extract_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stationfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isflux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'infer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">miss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'raise'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.station_subset_multidir" title="Link to this definition"></a></dt>
+<dd><p>Extract a subset of stations from an staout file or flux.out file across a list of directories</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>dirs</strong><span class="classifier">list(str)</span></dt><dd><p>List of directories. The output dataframe will have a column multindex (dir,station_id) where dir is the directory of the output.</p>
+</dd>
+<dt><strong>fpath</strong><span class="classifier">str</span></dt><dd><p>Path to the output file to be read</p>
+</dd>
+<dt><strong>run_start</strong><span class="classifier">pd.Timestamp</span></dt><dd><p>Start time (reference time) for the simulation elapsed time</p>
+</dd>
+<dt><strong>locs</strong><span class="classifier">pd.DataFrame or str</span></dt><dd><blockquote>
+<div><p>A DataFrame with rows specifying the data to subset or a string that is the path to such a file.
+There are a few options for staout station files. Minimally this file should have either one column called “station_id” or
+one called “id” and another called “subloc”. If you use station_id, it should be an
+underscore-connected combination of id and subloc and this will be the index treatment of the output.
+Flux files only have the station_id option. If you use “subloc” you can use “default” leave the subloc column blank.
+You can also include another optional column called “alias” and this will become the label used.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>extract_freq<span class="classifier">str or pd.tseries.TimeOffset</span></dt><dd><p>Frequency to extract … this allows some economies if you want, say, 15min data. Use pandas freq string such as ‘15T’ for 15min</p>
+</dd>
+<dt>convert: str or function</dt><dd><p>A small number of conversions are supported (“ft”, “ec” for uS/cm, “cfs” for flow)</p>
+</dd>
+<dt>stationfile<span class="classifier">str</span></dt><dd><p>Name or list of station file such as station.in. You can provide a list of the same length as dirs or a single value which will be assumed
+to be appropriate for all the directories. In the case of station.in, you can use None and ‘station.in’ in each directory
+will be assumed for staout files. For flow, a string (yaml file) must be supplied but will be tested first in the directory of
+execution and then side-by-side in that order.</p>
+</dd>
+<dt>isflux<span class="classifier">‘infer’ | True | False</span></dt><dd><p>Is the request for flux.out?</p>
+</dd>
+<dt>miss<span class="classifier">‘raise’ | ‘drop’ | ‘nan’</span></dt><dd><p>What to do when a requested station_id does not exist. The default, raise, helps station lists from growing faulty. ‘drop’ will ignore the column and ‘nan’
+will return nans for the column.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that returns the converted and subsetted data. Column names will be the ids unless ‘alias’ is provided in locs, in which case those names will be
+swapped in.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.u">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">u</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.u" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.write_pointstrings">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">write_pointstrings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.write_pointstrings" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.write_station_in">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">write_station_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.write_station_in" title="Link to this definition"></a></dt>
+<dd><p>Write a SCHISM station.in file given a pandas DataFrame of metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to output station.in file</p>
+</dd>
+<dt><strong>station_in</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
+</dd>
+<dt><strong>request</strong><span class="classifier">‘all’ or list(str)</span></dt><dd><p>List of variables to put in output request from the choices ‘elev’, ‘air pressure’, ‘wind_x’, ‘wind_y’, ‘temp’, ‘salt’, ‘u’, ‘v’, ‘w’
+or ‘all’ to include them all</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.station.write_station_shp">
+<span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">write_station_shp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.write_station_shp" title="Link to this definition"></a></dt>
+<dd><p>Write a point Shapefile file given a pandas DataFrame of metadata</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to output station.in file</p>
+</dd>
+<dt><strong>station_in</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-schimpy.subset_schism_output">
 <span id="schimpy-subset-schism-output-module"></span><h2>schimpy.subset_schism_output module<a class="headerlink" href="#module-schimpy.subset_schism_output" title="Link to this heading"></a></h2>
