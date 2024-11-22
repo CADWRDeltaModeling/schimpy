@@ -57,7 +57,7 @@ class BatchMetrics(object):
     VAR_2D = ('elev', )
     VAR_3D = ('salt', 'temp', 'ssc')
     MAP_VAR_FOR_STATIONDB = {'flow': 'flow', 'elev': 'stage', 'salt': 'wq',
-                             'temp': 'wq', 'ssc': 'wq'}
+                             'temp': 'wq', 'ssc': 'wq', 'turbidity': 'wq'}
     variable_units = {'flow': 'cms', 'elev': 'm', 'salt': 'PSU',
                       'temp': 'deg C', 'ssc': 'mg/L'}
 
