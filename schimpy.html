@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.10.0+9.ge1f30c8.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.10.0+10.g391227e.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=7424d65f"></script>
+      <script src="_static/documentation_options.js?v=fd4bec94"></script>
       <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -352,7 +352,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.profile_plot.vertical_fill"><code class="docutils literal notranslate"><span class="pre">vertical_fill()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-raster-to-nodes-module">schimpy.raster_to_nodes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.raster_to_nodes">schimpy.raster_to_nodes module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.raster_to_nodes.raster_to_nodes"><code class="docutils literal notranslate"><span class="pre">raster_to_nodes()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.read_output_xyt">schimpy.read_output_xyt module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.read_output_xyt.read_depth_avg_from_output7b_xyt"><code class="docutils literal notranslate"><span class="pre">read_depth_avg_from_output7b_xyt()</span></code></a></li>
 </ul>
@@ -4609,8 +4612,70 @@ max_depth is the maximum depth, data assumed to be</p>
 <dd></dd></dl>
 
 </section>
-<section id="schimpy-raster-to-nodes-module">
-<h2>schimpy.raster_to_nodes module<a class="headerlink" href="#schimpy-raster-to-nodes-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.raster_to_nodes">
+<span id="schimpy-raster-to-nodes-module"></span><h2>schimpy.raster_to_nodes module<a class="headerlink" href="#module-schimpy.raster_to_nodes" title="Link to this heading"></a></h2>
+<p>Functions to process raster data for schimpy pre-processing.</p>
+<p>This add rasterstats, boto3 dependency to calculate raster stastistics such as
+means.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.raster_to_nodes.raster_to_nodes">
+<span class="sig-prename descclassname"><span class="pre">schimpy.raster_to_nodes.</span></span><span class="sig-name descname"><span class="pre">raster_to_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_sel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_raster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.raster_to_nodes.raster_to_nodes" title="Link to this definition"></a></dt>
+<dd><p>Applies raster values to mesh by calculating means over surrounding elementss.</p>
+<p>When an element contains no raster data, zero will be
+assigned. When an element is partly covered by the raster data, an masked average
+is calculated.</p>
+<p>If the bins are provided, the raster data will be binned and bins mapped to
+the mapped_values before the averaging begins. The binning uses numpy.digitize to classification,
+and in particular the i’th mapped value is used between the values of bins (i-1) and (i).
+There are some extra padding values provided as shown in the example</p>
+<p>If the mask_value is given, raster data with the given mask value
+will be replaced with the fill_value before binning the data. This
+masking will only be used when bins are provided and pertains to 
+special cases involving vegetation data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh: schimpy.SchismMesh</strong></dt><dd><p>The base mesh to work on</p>
+</dd>
+<dt><strong>nodes_sel: array-like</strong></dt><dd><p>The array or list of the nodes to process</p>
+</dd>
+<dt><strong>path_raster: string-like</strong></dt><dd><p>File fath to the raster data</p>
+</dd>
+<dt><strong>bins: array-like, optional</strong></dt><dd><p>Array of bins. It has to be 1-dimensional and monotonic</p>
+</dd>
+<dt><strong>mapped_values: array-like, optional</strong></dt><dd><p>The values of the classes. It should be bigger by one than the bins. The i’th
+value will be applied between the <cite>(i-1)</cite> and <cite>i</cite> value of bins.</p>
+</dd>
+<dt><strong>band: int, optional</strong></dt><dd><p>The band index to use from the raster data.
+The default value is 1.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>numpy.array</dt><dd><p>means of raster values of the element balls around the nodes</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>An example of this function in the pre-processor yaml is below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">gr3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">sav_N.gr3</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.</span>
+<span class="w">   </span><span class="nt">polygons</span><span class="p">:</span>
+<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">attribute</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raster_to_nodes.raster_to_nodes(mesh, nodes_sel, &#39;NDVI.tif&#39;, bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)</span>
+<span class="w">       </span><span class="nt">imports</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">schimpy.raster_to_nodes</span>
+<span class="w">       </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">none</span>
+<span class="w">       </span><span class="nt">vertices</span><span class="p">:</span>
+<span class="w">       </span><span class="c1">#...</span>
+</pre></div>
+</div>
+<p>The values <cite>mesh</cite> and <cite>node_sel</cite>  mean the SCHISM mesh and the selected node indices
+by a polygon. The example bins (or classifies) the raster values from 0.0001 to 0.3
+and assigns the value 0., then assigns 40. for values between 0.3 and 0.6 and so forth.</p>
+</dd></dl>
+
 </section>
 <section id="module-schimpy.read_output_xyt">
 <span id="schimpy-read-output-xyt-module"></span><h2>schimpy.read_output_xyt module<a class="headerlink" href="#module-schimpy.read_output_xyt" title="Link to this heading"></a></h2>
