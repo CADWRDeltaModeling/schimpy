@@ -409,13 +409,26 @@ def yaml2df(source_yaml):
     """
     with open(source_yaml, 'r') as file:
         source_sink = yaml.safe_load(file)
-    sites = source_sink.keys()
-    sites = list(sites)
-    a = [source_sink[k] for k in sites]
-    a = np.array(a)
-    x = a[:,0]
-    y = a[:,1]
-    return pd.DataFrame({'sites': sites,'x':x,'y':y})
+    if {"sources", "sinks"} & source_sink.keys():
+        sites, x, y, stype = [], [], [], []
+        for v in ["sources","sinks"]:
+            skeys = source_sink[v].keys()
+            skeys = list(skeys)
+            sites.extend(skeys)
+            a = [source_sink[v][k] for k in skeys]
+            a = np.array(a)
+            stype.extend([v[:-1]] * len(skeys))
+            x.extend(a[:,0])
+            y.extend(a[:,1])
+    else:
+        sites = source_sink.keys()
+        sites = list(sites)
+        a = [source_sink[k] for k in sites]
+        a = np.array(a)
+        x = a[:,0]
+        y = a[:,1]
+        stype = None
+    return pd.DataFrame({'sites': sites,'x':x,'y':y,'stype':stype})
 
 if __name__ == "__main__":
     yaml_fn1 = 'source_sink.yaml'

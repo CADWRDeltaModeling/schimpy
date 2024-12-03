@@ -15,14 +15,14 @@ def df_to_shp(fpath, df):
         fpath,
         mode="w",
         driver="ESRI Shapefile",
-        schema={"geometry": "Point", "properties": [("site", "str")]},
+        schema={"geometry": "Point", "properties": [("site", "str"),("stype", "str")]},
         crs="EPSG:26910",
     )
 
     for index, row in df.iterrows():
         rowDict = {
             "geometry": {"type": "Point", "coordinates": (row.x, row.y)},
-            "properties": {"site": row.sites},
+            "properties": {"site": row.sites, "stype": row.stype},
         }
         pointShp.write(rowDict)
 
