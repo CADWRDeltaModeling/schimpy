@@ -228,6 +228,14 @@ schimpy.hotstart\_inventory module
    :undoc-members:
    :show-inheritance:
 
+schimpy.hotstart\_nudging\_data module
+--------------------------------------
+
+.. automodule:: schimpy.hotstart_nudging_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.hrr3 module
 -------------------
 
