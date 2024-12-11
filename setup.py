@@ -70,6 +70,7 @@ setup(
             "combine_consume=schimpy.combine_consume:main",
             "prepare_schism=schimpy.prepare_schism:main",
             "hotstart_inventory=schimpy.hotstart_inventory:main",
+            "hotstart_nudging_data=schimpy.hotstart_nudging_data:main",
             "create_vgrid_lsc2=schimpy.create_vgrid_lsc2:main",
             "schism_hotstart=schimpy.schism_hotstart:main",
             "split_quad=schimpy.split_quad:main",
