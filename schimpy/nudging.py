@@ -21,6 +21,7 @@ from shapely.geometry import Polygon
 from schimpy import interp_2d
 import time as timer
 from vtools.data.vtime import hours, days
+import argparse
 
 log_file = "log_nudging.out"
 
@@ -61,6 +62,7 @@ class Nudging(object):
         self.vgrid_fn = nudging_info['vgrid_input_file']
         self.default_value = nudging_info['default']
         self.vgrid_version = nudging_info['vgrid_version']
+        self.crs = nudging_info['crs']
         self.mesh = read_mesh(self.hgrid_fn, self.vgrid_fn, self.vgrid_version)
         self.node_x = self.mesh.nodes[:, 0]
         self.node_y = self.mesh.nodes[:, 1]
@@ -70,12 +72,9 @@ class Nudging(object):
         self._mesh_gpd = None
         self._z = None
         if self.crs is None:
-            if 'crs' in nudging_info.keys():
-                self.crs = nudging_info['crs']
-            else:
-                # this is required because 3dfield from roms or hycom only provides lat, lon.
-                self.crs = 'EPSG:26910'
-                print("crs not specified, and assigned to the default crs for UTM10N")
+            # this is required because 3dfield from roms or hycom only provides lat, lon.
+            self.crs = 'EPSG:26910'
+            print("crs not specified, and assigned to the default crs for UTM10N")
 
         if self.output_suffix is None:
             if 'output_suffix' in nudging_info:
@@ -1033,15 +1032,12 @@ class Nudging(object):
 
 
 def create_arg_parser():
-    import argparse
     parser = argparse.ArgumentParser(
-        description="Create hotstart for a schism run")
+        description="Create nudging for a schism run")
     parser.add_argument('--yaml_fn', type=str,
                         help='yaml file for nudging', required=True)
     parser.add_argument('--suffix', type=str,
                         help='suffix for generated nudging files', default=None)
-    parser.add_argument(
-        '--crs', type=str, help='The projection system for the mesh', default=None)
     return parser
 
 
@@ -1060,12 +1056,12 @@ def main():
     # User inputs override the yaml file inputs.
     parser = create_arg_parser()
     args = parser.parse_args()
-
-    nudge = Nudging(args.yaml_fn, crs=args.crs,
-                      suffix=suffix)
-    nudge.read_yaml()
-    nudge.create_nudging()
-
+    if args.yaml_fn.endswith(".yaml"):
+        nudge = Nudging(args.yaml_fn, suffix=args.suffix)
+        nudge.read_yaml()
+        nudge.create_nudging()
+    else:
+        raise ValueError("Not supported input file type")
 
 if __name__ == "__main__":
     main()
