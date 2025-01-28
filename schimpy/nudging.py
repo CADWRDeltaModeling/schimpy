@@ -31,12 +31,10 @@ class Nudging(object):
     A class to create schism nudging
     """
 
-    def __init__(self, input, crs=None, suffix=None, **kwargs):
+    def __init__(self, input, **kwargs):
         self.input = input
         self._interpolant = ['nearest', 'inverse distance']
         self._kernel = ['gaussian']
-        self.crs = crs
-        self.output_suffix = suffix
 
     def read_yaml(self):
         """
@@ -45,7 +43,7 @@ class Nudging(object):
 
         write_to_log("---read_yaml---\n")
 
-        with open(self.yaml_fn) as file:
+        with open(self.input) as file:
             info = yaml.load(file, Loader=yaml.FullLoader)
         nudging_info = info['nudging']
         self.info = nudging_info
@@ -63,6 +61,7 @@ class Nudging(object):
         self.default_value = nudging_info['default']
         self.vgrid_version = nudging_info['vgrid_version']
         self.crs = nudging_info['crs']
+        self.output_suffix = nudging_info['output_suffix']
         self.mesh = read_mesh(self.hgrid_fn, self.vgrid_fn, self.vgrid_version)
         self.node_x = self.mesh.nodes[:, 0]
         self.node_y = self.mesh.nodes[:, 1]
@@ -77,10 +76,7 @@ class Nudging(object):
             print("crs not specified, and assigned to the default crs for UTM10N")
 
         if self.output_suffix is None:
-            if 'output_suffix' in nudging_info:
-                self.output_suffix = nudging_info['output_suffix']
-            else:
-                self.output_suffix = None
+            self.output_suffix = ""
 
     @property
     def mesh_gpd(self):
@@ -98,9 +94,6 @@ class Nudging(object):
         """
         Parameters
         ----------
-        suffix : TYPE, optional
-            Options to give a suffix to the output nuding files. 
-            The default is 'nu.nc'
         create_file : TYPE, optional
             Options to create nudging files. The default is True.
         Returns
@@ -262,10 +255,7 @@ class Nudging(object):
             # for the last time, make sure that all nan values are set to -9999.0
             values_merged[np.isnan(values_merged)] = -9999.0
 
-            if self.output_suffix is None:
-                suffix = ''
-            else:
-                suffix = self.output_suffix
+            suffix = self.output_suffix
 
             if v == 'temperature':
                 nudging_fn = "TEM_nu_%s.nc" % suffix
@@ -1034,8 +1024,6 @@ def create_arg_parser():
         description="Create nudging for a schism run")
     parser.add_argument('--input', type=str,
                         help='input yaml file for nudging', required=True)
-    parser.add_argument('--suffix', type=str,
-                        help='suffix for generated nudging files', default=None)
     return parser
 
 
@@ -1055,7 +1043,7 @@ def main():
     parser = create_arg_parser()
     args = parser.parse_args()
     if args.input.endswith(".yaml"):
-        nudge = Nudging(args.input, suffix=args.suffix)
+        nudge = Nudging(args.input)
         nudge.read_yaml()
         nudge.create_nudging()
     else:
