@@ -48,12 +48,13 @@ def create_arg_parser():
     parser.add_argument('--sdate', default=None, required=True,
                         help='starting date of SCHISM model, must be \
                         format like 2018-02-19')
-    parser.add_argument('--dest_dir', default=None, required=True,
-                        help='folder to store downloaded obs nudging data')
     parser.add_argument('--ndays', default=None, required=True,type=int,
                         help="number of days to be downloaded \
                             from starting date")
 
+    parser.add_argument('--dest_dir', default=".", required=False,
+                        help='folder to store downloaded obs nudging data. \
+                            Default is current folder')
     return parser
 
 
