@@ -42,13 +42,13 @@ def create_arg_parser():
         Download station data from repo and save in cvs format for hotstart 
         nudging.
         Usage:
-        hotstart_nudging_data --sdate 2018-02-19  --ndays 300
+        hotstart_nudging_data --start_date 2018-02-19  --nudge_len 300
                     --dest_dir .
                      """)
-    parser.add_argument('--sdate', default=None, required=True,
+    parser.add_argument('--start_date', default=None, required=True,
                         help='starting date of SCHISM model, must be \
                         format like 2018-02-19')
-    parser.add_argument('--ndays', default=None, required=True,type=int,
+    parser.add_argument('--nudge_len', default=None, required=True,type=int,
                         help="number of days to be downloaded \
                             from starting date")
 
@@ -183,9 +183,9 @@ def main():
     parser = create_arg_parser()
     args = parser.parse_args()
     dest = args.dest_dir
-    ndays = args.ndays
+    ndays = args.nudge_len
     
-    start_date = pd.to_datetime(args.sdate, format='%Y-%m-%d')
+    start_date = pd.to_datetime(args.start_date, format='%Y-%m-%d')
     hotstart_nudge_data(start_date,ndays,dest)
     
 
