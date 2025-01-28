@@ -31,8 +31,8 @@ class Nudging(object):
     A class to create schism nudging
     """
 
-    def __init__(self, yaml_fn, crs=None, suffix=None, **kwargs):
-        self.yaml_fn = yaml_fn
+    def __init__(self, input, crs=None, suffix=None, **kwargs):
+        self.input = input
         self._interpolant = ['nearest', 'inverse distance']
         self._kernel = ['gaussian']
         self.crs = crs
@@ -1032,8 +1032,8 @@ class Nudging(object):
 def create_arg_parser():
     parser = argparse.ArgumentParser(
         description="Create nudging for a schism run")
-    parser.add_argument('--yaml_fn', type=str,
-                        help='yaml file for nudging', required=True)
+    parser.add_argument('--input', type=str,
+                        help='input yaml file for nudging', required=True)
     parser.add_argument('--suffix', type=str,
                         help='suffix for generated nudging files', default=None)
     return parser
@@ -1054,8 +1054,8 @@ def main():
     # User inputs override the yaml file inputs.
     parser = create_arg_parser()
     args = parser.parse_args()
-    if args.yaml_fn.endswith(".yaml"):
-        nudge = Nudging(args.yaml_fn, suffix=args.suffix)
+    if args.input.endswith(".yaml"):
+        nudge = Nudging(args.input, suffix=args.suffix)
         nudge.read_yaml()
         nudge.create_nudging()
     else:
