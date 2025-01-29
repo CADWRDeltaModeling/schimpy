@@ -287,10 +287,17 @@ class Nudging(object):
             rootgrp_T.close()
             print("%s file created" % nudging_fn)
 
-            nudge_gr3_fn = "%s_nudge_%s.gr3" % (v, suffix)
+            if v == 'temperature':
+                nudge_gr3_fn = "TEM_nudge_%s.gr3" % suffix
+            elif v == 'salinity':
+                nudge_gr3_fn = "SAL_nudge_%s.gr3" % suffix
+            else:
+                raise NotImplementedError(
+                    "write %s as nuding gr3 not implemented" % v)
             write_mesh(self.mesh,
                        fpath_mesh=nudge_gr3_fn,
                        node_attr=weights_merged)
+            print("%s file created" % nudge_gr3_fn)
         # return values_merged, weights_merged, imap_merged
 
     def create_region_nudging(self, region_info):
