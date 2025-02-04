@@ -31,7 +31,7 @@ Required data files:
     * hgrid.gr3
     * vgrid.in
     * hotstart.yaml and input files defined in the yaml file.
-    
+
 """
 
 import yaml
@@ -181,7 +181,7 @@ class hotstart(object):
                 indices, dist = compare_mesh(hotstart_mesh, self.mesh)
                 self.hotstart_ini['hotstart_nc_indices'] = indices
                 self.hotstart_ini['hotstart_nc_dist'] = dist
-                
+
             var = self.generate_3D_field(v)
             if self.nc_dataset is None:
                 if 'tke' in self.info.keys():
@@ -300,7 +300,7 @@ class hotstart(object):
             idry_e[idry_e != 0] = 1
             self.nc_dataset['idry_s'] = xr.DataArray(idry_s, dims=['side'])
             self.nc_dataset['idry'] = xr.DataArray(idry, dims=['node'])
-            self.nc_dataset['idry_e'] = xr.DataArray(idry_e, dims=['elem']) 
+            self.nc_dataset['idry_e'] = xr.DataArray(idry_e, dims=['elem'])
 
     def map_to_schism(self):
         """
@@ -723,7 +723,7 @@ class VariableField(object):
             # perform contiguity check and return a mapping array if successful.
             mapping = geo_tools.partition_check(self.mesh, poly_fn,
                                                self.ini_meta['regions'],
-                                                self.centering,                                                
+                                                self.centering,
                                                 self.crs,
                                                 allow_overlap,
                                                 allow_incomplete)
@@ -1160,9 +1160,9 @@ def describe_tracers(param_nml, modules=['HYDRO']):
     """ return the number of tracers, the sequence of the tracers and a list
     of tracer names based on the input list of modules and corresponding
     input files.
-    
+
     Availabel modules are:
-    
+
       #. T (default)
       #. S (default)
       #. GEN
@@ -1174,7 +1174,7 @@ def describe_tracers(param_nml, modules=['HYDRO']):
       #. Feco: FIB
       #. TIMOR
       #. FABM
-    
+
     The script is mainly translated from schism_ini.F90
     """
     ntrs = []  # number of tracers for each module
@@ -1337,7 +1337,7 @@ def hotstart_to_outputnc(hotstart_fn, init_date, hgrid_fn='hgrid.gr3',
 
     # add time dimension to all variable elements
     time = [datetime.datetime.strptime(init_date, "%Y-%m-%d")]
-   
+
     # if 'time' variable already in hnc, drop it.
     if 'time' in list(hnc.variables):
         hnc = hnc.drop('time')
