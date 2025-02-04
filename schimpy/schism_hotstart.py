@@ -938,6 +938,7 @@ class VariableField(object):
                                           ini_meta['source_vgrid'],
                                           ini_meta['source_vgrid_version'],
                                           inpoly)
+        hotstart_data.close()
         return v
 
     def interp_from_mesh(self, hgrid_fn, vin, vgrid_fn=None, vgrid_version=5.8,
