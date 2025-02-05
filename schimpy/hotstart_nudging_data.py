@@ -43,7 +43,7 @@ def create_arg_parser():
         nudging.
         Usage:
         hotstart_nudging_data --start_date 2018-02-19  --nudge_len 300
-                    --dest_dir .
+                    --dest_dir . --repo_dir $repo_path
                      """)
     parser.add_argument('--start_date', default=None, required=True,
                         help='starting date of SCHISM model, must be \
@@ -55,16 +55,20 @@ def create_arg_parser():
     parser.add_argument('--dest_dir', default=".", required=False,
                         help='folder to store downloaded obs nudging data. \
                             Default is current folder')
+    parser.add_argument('--repo_dir', default=repo, required=False,
+                        help=f'path to the repo of observed time series. \
+                            Default is {repo}')
     return parser
 
 
 ## Items you may want to change
 
-def hotstart_nudge_data(sdate,ndays,dest):
+def hotstart_nudge_data(sdate,ndays,dest,repo_dir):
 
     t0 = sdate
     nudgelen = pd.Timedelta(days=ndays)
 
+    repo = repo_dir
     ##  
     station_df=station_dbase()
     
@@ -184,9 +188,10 @@ def main():
     args = parser.parse_args()
     dest = args.dest_dir
     ndays = args.nudge_len
+    repo_dir = args.repo_dir
     
     start_date = pd.to_datetime(args.start_date, format='%Y-%m-%d')
-    hotstart_nudge_data(start_date,ndays,dest)
+    hotstart_nudge_data(start_date,ndays,dest,repo_dir)
     
 
 if __name__ == '__main__':
