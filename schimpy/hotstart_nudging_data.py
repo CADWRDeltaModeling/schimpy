@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from dms_datastore.read_ts import *
 from dms_datastore.dstore_config import *
 from dms_datastore.read_multi import *
-from schimpy.unit_conversions import *
+from vtools.functions.unit_conversions import *
 from vtools.data.vtime import days
 import glob
 import pandas as pd
@@ -80,7 +80,7 @@ def hotstart_nudge_data(sdate,ndays,dest,repo_dir):
     
 
     no_such_file = []
-    tndx = pd.date_range(t0,t0+nudgelen,freq='H')
+    tndx = pd.date_range(t0,t0+nudgelen,freq='h')
     all_vars = ["temperature","salinity"]
     used_stations = set()
     nudging_dfs = {}
