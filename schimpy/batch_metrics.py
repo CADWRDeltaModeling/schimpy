@@ -409,7 +409,7 @@ class BatchMetrics(object):
                 "==================================================")
 
             self.logger.info(
-                "Start processing station:: {}".format(station_id))
+                "Start processing station: {}".format(station_id))
 
             if selected_stations is not None:
                 if station_id not in selected_stations:
@@ -424,7 +424,6 @@ class BatchMetrics(object):
                                      station_id)
                     continue
 
-            print(f"\nProcessing: {station_id}")
 
             if not station_id.lower() in db_stations.index:
                 self.logger.warning(
