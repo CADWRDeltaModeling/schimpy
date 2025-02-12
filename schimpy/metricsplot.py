@@ -204,7 +204,7 @@ def plot_inst_and_avg(axes, tss, window_inst, window_avg, labels, label_loc, leg
     if window_inst is None:
         window_inst = get_union_window(tss)
 
-    lines = plot_tss(axes['inst'], tss, window_inst,cell_method='inst')
+    lines = plot_tss(axes['inst'], tss, labels, window_inst,cell_method='inst')
     if labels is not None:
         axes['inst'].legend(lines, labels, prop={'size': legend_size}, loc=label_loc,bbox_to_anchor=(1.1, 1.3),frameon=False)
 
@@ -214,7 +214,7 @@ def plot_inst_and_avg(axes, tss, window_inst, window_avg, labels, label_loc, leg
     window_to_filter = (window_avg[0] - pad, window_avg[1] + pad)
     tss_clipped = [safe_window(ts, window_to_filter) for ts in tss]
     tss_filtered = filter_timeseries(tss_clipped)
-    plot_tss(axes['avg'], tss_filtered, window_avg,cell_method='ave')
+    plot_tss(axes['avg'], tss_filtered, labels, window_avg,cell_method='ave')
 
 
 def plot_comparison_to_figure(fig, tss, title=None,
@@ -261,7 +261,7 @@ def gen_metrics_grid():
     return grids
 
 
-def plot_tss(ax, tss, window=None,cell_method='inst'):
+def plot_tss(ax, tss, labels, window=None,cell_method='inst'):
     """ Simply plot lines from a list of time series
     """
     print(f"Checking time window validity for {cell_method} plot")
@@ -270,10 +270,7 @@ def plot_tss(ax, tss, window=None,cell_method='inst'):
         if len(tss) > 0:
             for it in range(len(tss)):
                 ts = tss[it]
-                if it == 0:
-                    print("   ts_obs...")
-                else:
-                    print(f"   {ts.name}...")
+                print(f"   {labels[it]}...")
                 tss_plot.append(safe_window(ts, window))
     else:
         tss_plot = tss
