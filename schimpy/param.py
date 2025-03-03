@@ -31,7 +31,42 @@ class Params(object):
         """Adjust dt without perturbing variables that depend on it"""
         raise NotImplementedError("Adjusting dt safely not implemented")
 
+    # Get Properties --------------------------------------------------------------
+    # All functions which retrieve properties from param.nml here:
+    # -----------------------------------------------------------------------------
 
+    def get_run_start(self):
+        """Get start time as datetime"""
+        syear= self['start_year']
+        smonth= self['start_month']
+        sday = self['start_day']
+        shour= self['start_hour']
+        return pd.Timestamp(year=syear,month=smonth,day=sday,hour=shour)
+    
+    def get_interval(self,name):
+        dt = self['dt']
+        sec=self[name]*dt
+        freq = pd.Timedelta(sec,unit='S')
+
+        return pd.tseries.frequencies.to_offset(freq)
+
+    def get_hotstart_freq(self):
+        return self.get_interval('nhot_write')
+
+
+    def get_nc_out_freq(self):
+        return self.get_interval("ihfskip")
+    
+    def get_nc_stack(self):
+        return self.get_interval('ihfskip')
+    
+    def get_station_out_freq(self):
+        return self.get_interval('nspool_sta')
+        
+    # Set Properties --------------------------------------------------------------
+    # All functions which set properties to param.nml here:
+    # -----------------------------------------------------------------------------
+    
     def set_run_start(self,run_start):
         """ Set start time
         
@@ -53,16 +88,7 @@ class Params(object):
         self['start_day']  = sday
         self['start_hour'] = shour
 
-    def get_run_start(self):
-        """Get start time as datetime"""
-        syear= self['start_year']
-        smonth= self['start_month']
-        sday = self['start_day']
-        shour= self['start_hour']
-        return pd.Timestamp(year=syear,month=smonth,day=sday,hour=shour)
-
     run_start = property(get_run_start,set_run_start)
-
 
     def set_interval(self,name,freq):
         """Set binary output frequency using Pandas offset or string that evaluates as offset"""
@@ -83,13 +109,6 @@ class Params(object):
             raise ValueError("Entry must be string or offset or something that is convertible to offset")
         self[name] = int(nspool)
 
-    def get_interval(self,name):
-        dt = self['dt']
-        sec=self[name]*dt
-        freq = pd.Timedelta(sec,unit='S')
-
-        return pd.tseries.frequencies.to_offset(freq)
-
 
     def set_hotstart_freq(self,freq):
         """Set hotstart frequency using Pandas offset or string that evaluates as offset
@@ -107,32 +126,19 @@ class Params(object):
             self['nhot'] = 1
             self.set_interval('nhot_write',freq)
 
-    def get_hotstart_freq(self):
-        return self.get_interval('nhot_write')
-
     hotstart_freq = property(get_hotstart_freq, set_hotstart_freq)
-
 
     def set_nc_out_freq(self,freq):
         """Set binary output frequency using Pandas offset or string that evaluates as offset"""
         self.set_interval('ihfskip',freq)
 
-
-    def get_nc_out_freq(self):
-        return self.get_interval("ihfskip")
-
     nc_out_freq = property(get_nc_out_freq, set_nc_out_freq)
-
 
     def set_nc_stack(self,freq):
         """Set binary output frequency using Pandas offset or string that evaluates as offset"""
         self.set_interval('ihfskip',freq)
 
-    def get_nc_stack(self):
-        return self.get_interval('ihfskip')
-
     nc_stack = property(get_nc_stack, set_nc_stack)
-
 
     def set_station_out_freq(self,freq):
         """Set station output frequency 
@@ -151,8 +157,6 @@ class Params(object):
             self.set_interval('nspool_sta',freq)
             self['iout_sta'] = 1 
 
-    def get_station_out_freq(self):
-        return self.get_interval('nspool_sta')
 
     station_out_freq = property(get_station_out_freq, set_station_out_freq)
     
