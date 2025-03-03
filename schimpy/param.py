@@ -62,6 +62,11 @@ class Params(object):
     
     def get_station_out_freq(self):
         return self.get_interval('nspool_sta')
+    
+    def get_baro(self):
+        ibc = self._namelist['CORE']['ibc']['value']
+        
+        return 'clinic' if ibc==0 else 'tropic'
         
     # Set Properties --------------------------------------------------------------
     # All functions which set properties to param.nml here:
