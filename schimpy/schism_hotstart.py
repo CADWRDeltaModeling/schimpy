@@ -47,6 +47,7 @@ import datetime
 from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader, \
     compare_mesh
 from schimpy import geo_tools
+from schimpy import schism_yaml
 
 
 class SCHISMHotstart(object):
@@ -79,8 +80,8 @@ class hotstart(object):
         """
         read yaml and load mesh grid
         """
-        with open(self.yaml_fn) as file:
-            info = yaml.load(file, Loader=yaml.FullLoader)
+        with open(self.yaml_fn) as f:
+            info = schism_yaml.load(f)
         hotstart_info = info['hotstart']
         self.info = hotstart_info
         self.date = hotstart_info['date']
