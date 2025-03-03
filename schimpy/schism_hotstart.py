@@ -1112,9 +1112,9 @@ class VariableField(object):
         elif self.variable_name == 'tke':
             var_name = ['q2', 'xl', 'dfv', 'dfh', 'dfq1', 'dfq2']
             ds = xr.Dataset()
-            for name in var_name:
+            for v_ind, name in enumerate(var_name):
                 ds_ar = xr.Dataset({name: (['node', 'nVert'],
-                                           var[name])})
+                                           var[v_ind])})
                 ds = ds.merge(ds_ar)
         else:
             ds_var = xr.DataArray(var,  # coords=[range(self.n_hgrid),range(self.n_vgrid)],
