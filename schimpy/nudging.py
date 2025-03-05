@@ -48,13 +48,13 @@ class Nudging(object):
         nudging_info = info['nudging']
         self.info = nudging_info
         self.nudge_step = nudging_info['step_nu_tr']
-        self.start_date = nudging_info['start_date']
+        self.start_date = pd.to_datetime(nudging_info['start_date'])
         self.rnday = nudging_info['rnday']
-        self.end_date = self.start_date + datetime.timedelta(self.rnday)
+        self.end_date = self.start_date + datetime.timedelta(days=self.rnday)
         self.datetime = pd.date_range(self.start_date, self.end_date,
                                       freq=self.nudge_step)[:-1]  # minus 1 step_nu_tr to keep the end_date within the last day.
         self.time = pd.to_datetime(self.datetime.values) - \
-            pd.to_datetime(self.start_date)
+            self.start_date
         self.time_seconds = self.time.total_seconds().astype(int)
         self.hgrid_fn = nudging_info['hgrid_input_file']
         self.vgrid_fn = nudging_info['vgrid_input_file']
@@ -330,7 +330,7 @@ class Nudging(object):
         small1 = 1.e-2
         weights, obs_df = self.gen_region_weight(region_info['attribute'],
                                                  region_info['vertices'])
-        istart = pd.to_datetime(self.start_date)
+        istart = self.start_date
         istart_year = istart.year
         istart_mon = istart.month
         istart_day = istart.day
@@ -385,7 +385,7 @@ class Nudging(object):
             date = datetime.date(istart_year, istart_mon, istart_day) + \
                 datetime.timedelta(d)
             day = (datetime.date(istart_year, istart_mon, istart_day) -
-                   self.start_date).days + d
+                   self.start_date.date()).days + d
             write_to_log('Time out (days)=%d\n' % day)
 
             ncfile = f'{ncfile1}{date.strftime("%Y%m%d")}.nc'
@@ -433,7 +433,7 @@ class Nudging(object):
 
             for t in time:
                 ctime = pd.to_datetime(t)
-                dt = ctime-pd.to_datetime(self.start_date)
+                dt = ctime-self.start_date
                 dt_in_days = dt.total_seconds()/86400.
                 print(
                     f"Time out at hr stage (days)={ctime}, dt ={dt_in_days} ")
@@ -908,7 +908,7 @@ class Nudging(object):
                               parse_dates=['datetime'])
             obs.index.name = 'time'
             obs = obs[(obs.index >=
-                       pd.to_datetime(self.start_date)) &
+                       self.start_date) &
                       (obs.index <
                        pd.to_datetime(self.end_date))]
             # time interpolation
