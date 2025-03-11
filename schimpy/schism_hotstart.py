@@ -128,8 +128,8 @@ class hotstart(object):
         if 'output_fn' in hotstart_info.keys():
             self.output_fn = hotstart_info['output_fn']
         else:
-            print("No output file name specified. 'hotstart.nc' will be used as default.")
-            self.output_fn = 'hotstart.nc'
+            print("No output file name specified. hotstart.restart_timestr.nsteps.nc will be used.")
+            self.output_fn = None
 
         if 'param_nml' in hotstart_info.keys():
             self.param_nml = hotstart_info['param_nml']
@@ -263,8 +263,9 @@ class hotstart(object):
             restart_timestr = restart_time.strftime("%Y%m%d")
             dt = self.time_step
             nsteps = int(restart_sec/dt)
-            outfile = f"hotstart.{restart_timestr}.{nsteps}.nc"
-            self.output_fn = outfile
+            if self.output_fn is None:
+                outfile = f"hotstart.{restart_timestr}.{nsteps}.nc"
+                self.output_fn = outfile
             ds = xr.Dataset({'time': ('one', [restart_sec]),
                               'iths': ('one', [nsteps]),
                               'ifile': ('one', [1]),
