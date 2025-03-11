@@ -66,17 +66,17 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, yaml_fn=None):
+    def __init__(self, input=None):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
-        self.yaml_fn = yaml_fn
+        self.input = input
         self.nc_dataset = None
 
     def read_yaml(self):
         """
         read yaml and load mesh grid
         """
-        with open(self.yaml_fn) as f:
+        with open(self.input) as f:
             info = schism_yaml.load(f)
         hotstart_info = info['hotstart']
         self.info = hotstart_info
@@ -138,7 +138,7 @@ class hotstart(object):
                 # these modules require param.nml
                 if any([m in ['SED', 'AGE', 'GEN', 'ECO'] for m in self.modules]):
                     raise ValueError(
-                        'param_nml needs to be defined in %s' % self.yaml_fn)
+                        'param_nml needs to be defined in %s' % self.input)
             # for all other modules, param.nml will not be used.
             self.param_nml = "param.nml"
 
@@ -1576,8 +1576,8 @@ def create_arg_parser():
     import argparse
     parser = argparse.ArgumentParser(
         description="Create hotstart for a schism run")
-    parser.add_argument('--yaml_fn', type=str,
-                        help='yaml file for hotstart', required=True)
+    parser.add_argument('--input', type=str,
+                        help='input yaml file for hotstart', required=True)
     return parser
 
 
@@ -1585,7 +1585,7 @@ def main():
     # User inputs override the yaml file inputs.
     parser = create_arg_parser()
     args = parser.parse_args()
-    h = hotstart(args.yaml_fn)
+    h = hotstart(args.input)
     h.create_hotstart()
     output_fn = h.output_fn
     hnc = h.nc_dataset
