@@ -66,13 +66,11 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, yaml_fn=None, modules=None):
+    def __init__(self, yaml_fn=None):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
-        # the modules to turn on.
         self.yaml_fn = yaml_fn
         self.nc_dataset = None
-        self.modules = modules
         self.output_fn = None
 
     def read_yaml(self):
@@ -101,6 +99,18 @@ class hotstart(object):
             self.crs = 'EPSG:26910'
             print("crs not specified, and assigned to the default crs of EPSG:26910")
 
+        if 'modules' in hotstart_info.keys():
+            modules = hotstart_info['modules']
+        else:
+            print("No module specified. Baroclinic run assumed. 'TEM', and 'SAL' turned on as default")
+            modules = ['TEM', 'SAL']
+        if modules is None:
+            print("No module specified. Barotropic run assumed.")
+        else:
+            for m in modules:
+                print("%s module is turned on" % m)
+        self.modules = modules  # modules can be none for barotropic runs.
+
         # remove these items from the list.
         rfl = ['hgrid_input_file', 'vgrid_input_file', 'date', 'vgrid_version',
                'crs', 'param_nml', 'modules', 'output_fn','run_start','time_step']
@@ -113,16 +123,6 @@ class hotstart(object):
             self.output_fn = hotstart_info['output_fn']
         else:
             self.output_fn = 'hotstart.nc'
-
-        if self.modules is None:
-            if 'modules' not in hotstart_info.keys():
-                modules = ['HYDRO']  # hydro is the minimum required module
-            else:
-                modules = hotstart_info['modules']
-            if 'HYDRO' in modules:
-                modules.remove('HYDRO')
-                modules += ['TEM', 'SAL']
-            self.modules = modules  # modules can be none for barotropic runs.
 
         if 'param_nml' in hotstart_info.keys():
             self.param_nml = hotstart_info['param_nml']
@@ -1575,8 +1575,6 @@ def create_arg_parser():
         description="Create hotstart for a schism run")
     parser.add_argument('--yaml_fn', type=str,
                         help='yaml file for hotstart', required=True)
-    parser.add_argument('--modules', '--list', nargs='+',
-                        help='modules activated in schism', default=None)
     parser.add_argument('--output_fn', type=str,
                         help='Output hotstart filename.nc', default=None)
     return parser
@@ -1586,7 +1584,7 @@ def main():
     # User inputs override the yaml file inputs.
     parser = create_arg_parser()
     args = parser.parse_args()
-    h = hotstart(args.yaml_fn, modules=args.modules)
+    h = hotstart(args.yaml_fn)
     h.create_hotstart()
     if args.output_fn is not None:
         output_fn = args.output_fn
