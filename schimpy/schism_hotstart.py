@@ -66,14 +66,13 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, yaml_fn=None, modules=None, crs=None):
+    def __init__(self, yaml_fn=None, modules=None):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
         # the modules to turn on.
         self.yaml_fn = yaml_fn
         self.nc_dataset = None
         self.modules = modules
-        self.crs = crs
         self.output_fn = None
 
     def read_yaml(self):
@@ -90,6 +89,18 @@ class hotstart(object):
         self.hgrid_fn = hotstart_info['hgrid_input_file']
         self.vgrid_fn = hotstart_info['vgrid_input_file']
         variables = list(hotstart_info.keys())
+
+        if 'crs' in hotstart_info.keys():
+            self.crs = hotstart_info['crs']
+
+            if self.crs is None:
+                self.crs = 'EPSG:26910'
+                print("crs not specified, and assigned to the default crs of EPSG:26910")
+
+        else:
+            self.crs = 'EPSG:26910'
+            print("crs not specified, and assigned to the default crs of EPSG:26910")
+
         # remove these items from the list.
         rfl = ['hgrid_input_file', 'vgrid_input_file', 'date', 'vgrid_version',
                'crs', 'param_nml', 'modules', 'output_fn','run_start','time_step']
@@ -123,16 +134,6 @@ class hotstart(object):
                         'param_nml needs to be defined in %s' % self.yaml_fn)
             # for all other modules, param.nml will not be used.
             self.param_nml = "param.nml"
-
-        if self.crs is None:
-            if 'crs' not in hotstart_info.keys():
-                # when crs is not specified, use default UTM10N projection. The projection is not important if all inputs are in the same coordinate system.
-                self.crs = 'EPSG:26910'
-            #    raise ValueError("crs must be specified")
-            else:
-                crs = hotstart_info['crs']
-                print("crs is {}".format(crs))
-                self.crs = crs
 
         if self.modules:  # if modules is None for barotropic run, this step is not required.
             self.ntracers, self.ntrs, self.irange_tr, self.tr_mname = \
@@ -1576,8 +1577,6 @@ def create_arg_parser():
                         help='yaml file for hotstart', required=True)
     parser.add_argument('--modules', '--list', nargs='+',
                         help='modules activated in schism', default=None)
-    parser.add_argument(
-        '--crs', type=str, help='The projection system for the mesh', default=None)
     parser.add_argument('--output_fn', type=str,
                         help='Output hotstart filename.nc', default=None)
     return parser
@@ -1587,7 +1586,7 @@ def main():
     # User inputs override the yaml file inputs.
     parser = create_arg_parser()
     args = parser.parse_args()
-    h = hotstart(args.yaml_fn, modules=args.modules, crs=args.crs)
+    h = hotstart(args.yaml_fn, modules=args.modules)
     h.create_hotstart()
     if args.output_fn is not None:
         output_fn = args.output_fn
