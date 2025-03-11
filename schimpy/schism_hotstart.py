@@ -110,9 +110,16 @@ class hotstart(object):
                 print("%s module is turned on" % m)
         self.modules = modules  # modules can be none for barotropic runs.
 
+        if self.modules is not None:
+            if "SED" in self.modules:
+                if 'sediment_input_file' not in hotstart_info.keys() or not os.path.isfile(hotstart_info['sediment_input_file']):
+                    raise FileNotFoundError(
+                        "Valid path to sediment.nml is required if SED module is turned on.")
+                self.sediment_fn = hotstart_info['sediment_input_file']
+
         # remove these items from the list.
         rfl = ['hgrid_input_file', 'vgrid_input_file', 'date', 'vgrid_version',
-               'crs', 'param_nml', 'modules', 'output_fn','run_start','time_step']
+               'crs', 'param_nml', 'modules', 'output_fn','run_start','time_step','sediment_input_file']
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
         # 5.8 and below is the old version
@@ -228,13 +235,8 @@ class hotstart(object):
         kwargs_options = {}
         if 'SED' in variable:
             if 'Nbed' not in self.__dict__.keys():
-                if os.path.isfile("sediment.nml"):
-                    self.sediment_fn = "sediment.nml"
-                    params = read_param_nml(self.sediment_fn)
-                    self.Nbed = params['Nbed']
-                else:
-                    raise FileNotFoundError(
-                        "sediment.nml is required if SED module is turned on")
+                params = read_param_nml(self.sediment_fn)
+                self.Nbed = params['Nbed']
             kwargs_options.update({'Nbed': self.Nbed})
         if kwargs_options:
             var = VariableField(v_meta, variable, self.mesh,
