@@ -71,7 +71,6 @@ class hotstart(object):
         # create elev.ic if it does not exist or not used as an input
         self.yaml_fn = yaml_fn
         self.nc_dataset = None
-        self.output_fn = None
 
     def read_yaml(self):
         """
@@ -122,6 +121,7 @@ class hotstart(object):
         if 'output_fn' in hotstart_info.keys():
             self.output_fn = hotstart_info['output_fn']
         else:
+            print("No output file name specified. 'hotstart.nc' will be used as default.")
             self.output_fn = 'hotstart.nc'
 
         if 'param_nml' in hotstart_info.keys():
@@ -1575,8 +1575,6 @@ def create_arg_parser():
         description="Create hotstart for a schism run")
     parser.add_argument('--yaml_fn', type=str,
                         help='yaml file for hotstart', required=True)
-    parser.add_argument('--output_fn', type=str,
-                        help='Output hotstart filename.nc', default=None)
     return parser
 
 
@@ -1586,10 +1584,7 @@ def main():
     args = parser.parse_args()
     h = hotstart(args.yaml_fn)
     h.create_hotstart()
-    if args.output_fn is not None:
-        output_fn = args.output_fn
-    else:
-        output_fn = h.output_fn
+    output_fn = h.output_fn
     hnc = h.nc_dataset
     hnc.to_netcdf(output_fn)
     print(f"output to {output_fn} ")
