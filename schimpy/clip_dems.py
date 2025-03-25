@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import math
+import click
 
 try:
     from osgeo import gdal
@@ -153,73 +154,67 @@ def clip_dem(
             print("Output file: %s" % outname)
 
 
-def create_arg_parser():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS"
-    )
-    parser.add_argument(
-        "--coords",
-        type=float,
-        nargs=4,
-        metavar=("ul_x", "ul_y", "lr_x", "lr_y"),
-        default=(None, None, None, None),
-        help="bounding coordinates to which DEMs will be clipped (upper left, lower right)",
-    )
-    parser.add_argument(
-        "--image",
-        dest="infile",
-        default=None,
-        help="image or DEM used to infer bounding coordinates for clipping. Use jpeg for the image. This argument is mutually exclusive with --coords. If a sample is provided its upper left and lower right corner will be used.",
-    )
-    parser.add_argument(
-        "--prefix",
-        dest="prefix",
-        default="clipped",
-        help="prefix used for output file names",
-    )
-    parser.add_argument(
-        "--outformat",
-        default="AAIGrid",
-        help="output format, default is AAIGrid (ArcInfo ascii.",
-    )
-    parser.add_argument(
-        "--verbose", action="store_true", default=False, help="more verbose output."
-    )
-    parser.add_argument(
-        "--hshift",
-        action="store_true",
-        default=False,
-        help="(deprecated) shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS < 11.1",
-    )
-    parser.add_argument(
-        "demlist", help="file containing prioritized (high to low) list of dems."
-    )
-    return parser
-
-
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    if not (args.coords[0] or args.infile):
-        raise ValueError(
-            "Either --coords or --sample argument required. See --help for usage."
+@click.command()
+@click.option(
+    "--coords",
+    type=(float, float, float, float),
+    default=None,
+    help="Bounding coordinates to which DEMs will be clipped (upper left x, y, lower right x, y).",
+)
+@click.option(
+    "--image",
+    "infile",
+    type=click.Path(exists=True),
+    default=None,
+    help="Image or DEM used to infer bounding coordinates for clipping. Use jpeg for the image. This argument is mutually exclusive with --coords. If a sample is provided its upper left and lower right corner will be used.",
+)
+@click.option(
+    "--prefix",
+    default="clipped",
+    help="Prefix used for output file names.",
+)
+@click.option(
+    "--outformat",
+    default="AAIGrid",
+    help="Output format, default is AAIGrid (ArcInfo ASCII).",
+)
+@click.option(
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="Enable verbose output.",
+)
+@click.option(
+    "--hshift",
+    is_flag=True,
+    default=False,
+    help="(Deprecated) Shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS < 11.1",
+)
+@click.argument(
+    "demlist",
+    type=click.Path(exists=True),
+    help="file containing prioritized (high to low) list of dems.",
+)
+def main(coords, infile, prefix, outformat, verbose, hshift, demlist):
+    """
+    Trim each DEM on a prioritized list. The coordinates used for clipping are supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice, this script is usually used with images saved from SMS.
+    """
+    if not (coords or infile):
+        raise click.UsageError(
+            "Either --coords or --image argument is required. See --help for usage."
         )
-    if args.coords[0] and args.infile:
-        raise ValueError(
-            "Arguments --coords and --sample cannot both be supplied. See --help for usage."
+    if coords[0] and infile:
+        raise click.UsageError(
+            "Arguments --coords and --image cannot both be supplied. See --help for usage."
         )
 
-    if args.coords[0]:
-        x0 = (args.coords[0], args.coords[1])
-        x1 = (args.coords[2], args.coords[3])
+    if coords[0]:
+        x0 = (coords[0], coords[1])
+        x1 = (coords[2], coords[3])
     else:
-        x0, x1 = bounding_coords(args.infile)
+        x0, x1 = bounding_coords(infile)
 
-    clip_dem(
-        x0, x1, args.demlist, args.outformat, args.hshift, args.prefix, args.verbose
-    )
+    clip_dem(x0, x1, demlist, outformat, hshift, prefix, verbose)
 
 
 if __name__ == "__main__":
