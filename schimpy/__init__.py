@@ -3,6 +3,6 @@
 __author__ = """Eli Ateljevich, Kijin Nam"""
 __email__ = "Eli.Ateljevich@water.ca.gov; Kijin.Nam@water.ca.gov"
 
-from .. import _version
+from schimpy._version import get_versions
 
-__version__ = _version.get_versions()["version"]
+__version__ = get_versions()["version"]
