@@ -91,7 +91,8 @@ class BatchMetrics(object):
                     station_in = stations_input[i]
                 datafname = os.path.join(working_dir, "flux.out")
                 sim_out = station.read_flux_out(
-                    datafname, station_in, reftime=time_basis)
+                    datafname, station_in, reftime=time_basis[i]
+                )
                 sim_outputs.append(sim_out)
         else:
             for i, working_dir in enumerate(outputs_dir):
@@ -99,11 +100,14 @@ class BatchMetrics(object):
                     station_infile = os.path.join(working_dir, "station.in")
                 else:
                     station_infile = stations_input[i]
-                datafname = os.path.join(
-                    working_dir, station.staout_name(variable))
-                sim_out = station.read_staout(datafname, station_infile,
-                                              reftime=time_basis, ret_station_in=False,
-                                              multi=True)
+                datafname = os.path.join(working_dir, station.staout_name(variable))
+                sim_out = station.read_staout(
+                    datafname,
+                    station_infile,
+                    reftime=time_basis[i],
+                    ret_station_in=False,
+                    multi=True,
+                )
 
                 # todo: case
                 sim_out.columns = sim_out.columns.set_levels(
@@ -348,8 +352,10 @@ class BatchMetrics(object):
         outputs_dir = params['outputs_dir']
         if isinstance(outputs_dir, str):
             outputs_dir = outputs_dir.split()
-        time_basis = process_time_str(params['time_basis'])
-        stations_input = params.get('stations_input')
+        time_basis = [
+            process_time_str(date_str) for date_str in params["time_basis"].split()
+        ]
+        stations_input = params.get("stations_input")
         if stations_input is None:
             stations_input = params.get(
                 'flow_station_input') if variable == "flow" else params.get('station_input')
