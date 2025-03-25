@@ -154,7 +154,15 @@ def clip_dem(
             print("Output file: %s" % outname)
 
 
-@click.command()
+@click.command(
+    help="Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS.\n\n"
+    "Arguments:\n"
+    " DEMLIST file containing prioritized (high to low) list of dems."
+)
+@click.argument(
+    "demlist",
+    type=click.Path(exists=True),
+)
 @click.option(
     "--coords",
     type=(float, float, float, float),
@@ -189,11 +197,6 @@ def clip_dem(
     is_flag=True,
     default=False,
     help="(Deprecated) Shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS < 11.1",
-)
-@click.argument(
-    "demlist",
-    type=click.Path(exists=True),
-    help="file containing prioritized (high to low) list of dems.",
 )
 def main(coords, infile, prefix, outformat, verbose, hshift, demlist):
     """
