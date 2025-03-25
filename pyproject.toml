@@ -74,6 +74,7 @@ exclude = ["docs"]
 collect_ignore = ["setup.py"]
 
 [project.scripts]
+sch = "schimpy.__main__.cli"
 batch_metrics = "schimpy.batch_metrics:main"
 clip_dems = "schimpy.clip_dems:main"
 contour_smooth = "schimpy.contour_smooth:main"
