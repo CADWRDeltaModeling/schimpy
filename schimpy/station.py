@@ -361,7 +361,7 @@ def read_obs_links(fpath):
     """Read an obs_links csv file which has comma as delimiter and (id,subloc,variable) as index """
     df = pd.read_csv(fpath,sep=",",
                      header=0,
-                     index_col=["id", "subloc", "variable"],
+                     index_col=["station_id", "subloc", "variable"],
                      comment="#")
     df.index = df.index.set_levels(df.index.levels[0].astype(str).str.lower(),
                         level=0)
