@@ -18,7 +18,7 @@ import glob
 from datetime import datetime
 import numpy as np
 import schimpy.station as station
-import argparse
+import click
 from vtools.functions.error_detect import med_outliers
 from vtools.data.vtime import days, hours
 import schimpy.schism_yaml as schism_yaml
@@ -781,19 +781,6 @@ class BatchMetrics(object):
         metric_out.close()
 
 
-def create_arg_parser():
-    """Create an argument parser
-    return: argparse.ArgumentParser
-    """
-    parser = argparse.ArgumentParser()
-    # Read in the input file
-    parser = argparse.ArgumentParser(description="Create metrics plots in a batch mode")
-    parser.add_argument(
-        dest="main_inputfile", default=None, help="main input file name"
-    )
-    return parser
-
-
 def init_logger():
     """Initialize a logger for this routine"""
     logging.basicConfig(level=logging.INFO, filename="metrics.log", filemode="w")
@@ -822,25 +809,19 @@ def get_params(fname):
     return params
 
 
-def generate_metricsplots(path_inputfile):
-    params = get_params(path_inputfile)
+@click.command()
+@click.argument("main_inputfile", type=click.Path(exists=True))
+def generate_metricsplots(main_inputfile):
+    """
+    Create metrics plots in batch mode.
+
+    MAIN_INPUTFILE: Path to the main input YAML file.
+    """
+    params = get_params(main_inputfile)
     init_logger()
     BatchMetrics(params).plot()
     shutdown_logger()
 
 
-def main():
-    """Main function"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    generate_metricsplots(args.main_inputfile)
-
-
 if __name__ == "__main__":
-    # main()
-    import os
-
-    os.chdir("/scratch/tomkovic/schism_repos")
-    generate_metricsplots(
-        "/scratch/tomkovic/schism_repos/batch_metrics_delta_dash.yaml"
-    )
+    generate_metricsplots()
