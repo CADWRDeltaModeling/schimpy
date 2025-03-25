@@ -1,3 +1,102 @@
 [build-system]
-requires = ["setuptools", "versioneer[toml]"] #, "tomli; python_version < '3.11'"]
+requires = ["setuptools", "wheel", "versioneer[toml]"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "schimpy"
+dynamic = ["version"] # Placeholder; versioneer will manage this
+description = "Python package for SCHISM"
+readme = "README.rst"
+license = "MIT"
+authors = [
+    {name = "California Department of Water Resources", email = "Eli.Ateljevich@water.ca.gov"},
+    {name = "California Department of Water Resources", email = "Kijin.Nam@water.ca.gov"}
+]
+requires-python = ">=3.9"
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9"
+]
+
+keywords = ["schimpy", "SCHISM", "hydrodynamics", "mesh", "geometry", "GIS", "geospatial", "data processing"]
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "_version.py"
+parentdir_prefix = ""
+
+dependencies = [
+    "geopandas",
+    "vtools3>=3.8",
+    "gdal",
+    "xarray",
+    "netcdf4",
+    "scipy",
+    "matplotlib",
+    "statsmodels",
+    "palettable",
+    "pyyaml",
+    "boto3",
+    "beautifulsoup4",
+    "pyproj",
+    "nodepy",
+    "sympy",
+    "shapely>=2.0",
+    "rasterstats",
+    "param",
+    "click"
+]
+
+[project.optional-dependencies]
+doc = [
+    "sphinx",
+    "sphinx-rtd-theme",
+    "myst-parser",
+    "numpydoc"
+]
+test = [
+    "pytest>=3",
+    "pytest-cov",
+    "tox"
+]
+[project.urls]
+Homepage = "https://cadwrdeltamodeling.github.io/schimpy/"
+
+[tool.flake8]
+exclude = ["docs"]
+
+[tool.pytest.ini_options]
+collect_ignore = ["setup.py"]
+
+[project.scripts]
+batch_metrics = "schimpy.batch_metrics:main"
+clip_dems = "schimpy.clip_dems:main"
+contour_smooth = "schimpy.contour_smooth:main"
+convert_mesh = "schimpy.convert_mesh:main"
+convert_polygons = "schimpy.convert_polygons:main"
+convert_linestrings = "schimpy.convert_linestrings:main"
+convert_points = "schimpy.convert_points:main"
+combine_consume = "schimpy.combine_consume:main"
+prepare_schism = "schimpy.prepare_schism:main"
+hotstart_inventory = "schimpy.hotstart_inventory:main"
+create_vgrid_lsc2 = "schimpy.create_vgrid_lsc2:main"
+schism_hotstart = "schimpy.schism_hotstart:main"
+split_quad = "schimpy.split_quad:main"
+model_time = "schimpy.model_time:main"
+gen_elev2d = "schimpy.gen_elev2d:main"
+small_areas = "schimpy.small_areas:main"
+station = "schimpy.station:main"
+create_hotstart = "schimpy.schism_hotstart:main"
+create_nudging = "schimpy.nudging:main"
+interpolate_structure = "schimpy.interpolate_structure:main"
+merge_th = "schimpy.merge_th:main"
+archive_ts = "schimpy.archive_ts:main"
+
+[tool.setuptools.packages.find]
+include = ["schimpy"]
+exclude = ["docsrc"]
