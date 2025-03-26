@@ -3,8 +3,8 @@ from schimpy.batch_metrics import batch_metrics_cli
 from schimpy.clip_dems import clip_dems_cli
 from schimpy.contour_smooth import contour_smooth_cli
 from schimpy.convert_mesh import convert_mesh_cli
+from schimpy.convert_polygons import convert_polygons_cli
 
-# from schimpy.convert_polygons import convert_polygons
 # from schimpy.convert_linestrings import convert_linestrings
 # from schimpy.convert_points import convert_points
 # from schimpy.combine_consume import combine_consume
@@ -37,7 +37,7 @@ cli.add_command(batch_metrics_cli, "batch_metrics")
 cli.add_command(clip_dems_cli, "clip_dems")
 cli.add_command(contour_smooth_cli, "contour_smooth")
 cli.add_command(convert_mesh_cli, "convert_mesh")
-# cli.add_command(convert_polygons, "convert_polygons")
+cli.add_command(convert_polygons_cli, "convert_polygons")
 # cli.add_command(convert_linestrings, "convert_linestrings")
 # cli.add_command(convert_points, "convert_points")
 # cli.add_command(combine_consume, "combine_consume")
