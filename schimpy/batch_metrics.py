@@ -811,6 +811,16 @@ def get_params(fname):
 
 @click.command()
 @click.argument("main_inputfile", type=click.Path(exists=True))
+@click.help_option("-h", "--help")
+def batch_metrics_cli(main_inputfile):
+    """
+    Command line interface for generating metrics plots.
+
+    MAIN_INPUTFILE: Path to the main input YAML file.
+    """
+    generate_metricsplots(main_inputfile)
+
+
 def generate_metricsplots(main_inputfile):
     """
     Create metrics plots in batch mode.
@@ -824,4 +834,4 @@ def generate_metricsplots(main_inputfile):
 
 
 if __name__ == "__main__":
-    generate_metricsplots()
+    batch_metrics_cli()
