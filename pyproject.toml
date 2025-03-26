@@ -102,3 +102,6 @@ archive_ts = "schimpy.archive_ts:main"
 [tool.setuptools.packages.find]
 include = ["schimpy"]
 exclude = ["docsrc"]
+
+[tool.poetry.dependencies]
+rtree = "*"
