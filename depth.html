@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assigning Bathymetry &mdash; schimpy 1.10.0+41.gbd3938f.dirty documentation</title>
+  <title>Assigning Bathymetry &mdash; schimpy 1.10.0+54.gb3f1099.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=c96138f8"></script>
+      <script src="_static/documentation_options.js?v=658a96d6"></script>
       <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -62,16 +62,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#smoother-for-complex-topography">Smoother for complex topography</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#subcommands">subcommands</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#Sub-commands">Sub-commands</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#smooth">smooth</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#view">view</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#save">save</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#smoother-for-complex-topography">Smoother for complex topography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#optimizing-depths-for-volume">Optimizing depths for volume</a></li>
 </ul>
 </li>
@@ -149,121 +140,6 @@ be used generically and consistently with SCHISM.</p>
 are poorly sampled and contours are tortuous. The script contour_smooth.py
 uses minmax curvature flow (Malladi and Sethian) to impose a minimum length scale
 of change for contours, essentially unraveling the features that are most contorted.</p>
-<p><p>Uses the min-max curvature flow algorithm of Malladi and Sethian to simplify DEM topograph
-The script requires a subcommand like: $ contour_smooth.py smooth
-The most basic subcommand is <cite>smooth</cite>. 
-Given limited efficiency at the moment, the script is generally run on a small area 
-and dumps intermediate points in the processing as numpy arrays so you can 
-view the differences using the contour_smooth.py view subcommand.
-You can  get subject-specific help on a subcommand by typing
-$ model_time.py subcommand –help</p>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">contour_smooth</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="n">smooth</span><span class="p">,</span><span class="n">view</span><span class="p">,</span><span class="n">save</span><span class="p">}</span> <span class="o">...</span>
-</pre></div>
-</div>
-<section id="subcommands">
-<h3>subcommands<a class="headerlink" href="#subcommands" title="Link to this heading"></a></h3>
-<dl class="option-list">
-<dt><kbd>subcommand</kbd></dt>
-<dd><p>Possible choices: smooth, view, save</p>
-<p>sub-commands indicating the particular action required.</p>
-</dd>
-</dl>
-</section>
-<section id="Sub-commands">
-<h3>Sub-commands<a class="headerlink" href="#Sub-commands" title="Link to this heading"></a></h3>
-<section id="smooth">
-<h4>smooth<a class="headerlink" href="#smooth" title="Link to this heading"></a></h4>
-<p>Smooth the input DEM.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">smooth</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="nb">input</span> <span class="n">INPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scales</span> <span class="p">[</span><span class="n">SCALES</span> <span class="o">...</span><span class="p">]]</span>
-                      <span class="p">[</span><span class="o">--</span><span class="n">nstep</span> <span class="n">NSTEP</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">max_time</span> <span class="n">MAX_TIME</span><span class="p">]</span>
-                      <span class="p">[</span><span class="o">--</span><span class="n">report_interval</span> <span class="n">REPORT_INTERVAL</span><span class="p">]</span>
-</pre></div>
-</div>
-<section id="named-arguments">
-<h5>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h5>
-<dl class="option-list">
-<dt><kbd>--input</kbd></dt>
-<dd><p>Input file name, file in tiff format.</p>
-</dd>
-<dt><kbd>--scales</kbd></dt>
-<dd><p>Scales (in multiples of DEM side length) over which to smooth. The sequence [1,2,3,4] is an example, where the smoothing is gradually introduced at 10m, 20m, 30m and 40m for a 10m DEM.</p>
-<p>Default: [1, 2]</p>
-</dd>
-<dt><kbd>--nstep</kbd></dt>
-<dd><p>number of pseudo time steps to resolve integration. Default of 160 is recommended.</p>
-<p>Default: 40</p>
-</dd>
-<dt><kbd>--max_time</kbd></dt>
-<dd><p>Pseudo time representing final time step. 2.0 is the default.</p>
-<p>Default: 4.0</p>
-</dd>
-<dt><kbd>--report_interval</kbd></dt>
-<dd><p>Intermediate interval at which integration will be segmented and smoothed DEMs will be dumped. So if –max_time is 2.0 and –report_interval is 0.1 you will get 20 intermediate reports.</p>
-<p>Default: 1.0</p>
-</dd>
-</dl>
-</section>
-</section>
-<section id="view">
-<h4>view<a class="headerlink" href="#view" title="Link to this heading"></a></h4>
-<p>View two versions of the smoothed DEM based on their .npy dump.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">view</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">levels</span> <span class="p">[</span><span class="n">LEVELS</span> <span class="o">...</span><span class="p">]]</span> <span class="p">[</span><span class="o">--</span><span class="n">vmin</span> <span class="n">VMIN</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">vmax</span> <span class="n">VMAX</span><span class="p">]</span>
-                    <span class="n">file0</span> <span class="n">file1</span>
-</pre></div>
-</div>
-<section id="positional-arguments">
-<h5>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h5>
-<dl class="option-list">
-<dt><kbd>file0</kbd></dt>
-<dd><p>First file in .npy format.</p>
-</dd>
-<dt><kbd>file1</kbd></dt>
-<dd><p>Second file in .npy format.</p>
-</dd>
-</dl>
-</section>
-<section id="named-arguments_repeat1">
-<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat1" title="Link to this heading"></a></h5>
-<dl class="option-list">
-<dt><kbd>--levels</kbd></dt>
-<dd><p>Contour levels</p>
-<p>Default: [-4, -3, -2, -1, 0, 1]</p>
-</dd>
-<dt><kbd>--vmin</kbd></dt>
-<dd><p>Minimum elevation in color bar</p>
-<p>Default: -6.0</p>
-</dd>
-<dt><kbd>--vmax</kbd></dt>
-<dd><p>Maximum elevation in color bar</p>
-<p>Default: 4.0</p>
-</dd>
-</dl>
-</section>
-</section>
-<section id="save">
-<h4>save<a class="headerlink" href="#save" title="Link to this heading"></a></h4>
-<p>save dumped DEM based on .npy dump and the original DEM it came from.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">contour_smooth</span> <span class="n">save</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">dumpfile</span> <span class="n">DUMPFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">original</span> <span class="n">ORIGINAL</span><span class="p">]</span>
-                    <span class="p">[</span><span class="o">--</span><span class="n">outfile</span> <span class="n">OUTFILE</span><span class="p">]</span>
-</pre></div>
-</div>
-<section id="named-arguments_repeat2">
-<h5>Named Arguments<a class="headerlink" href="#named-arguments_repeat2" title="Link to this heading"></a></h5>
-<dl class="option-list">
-<dt><kbd>--dumpfile</kbd></dt>
-<dd><p>Dump file from smoothing (npy format)</p>
-</dd>
-<dt><kbd>--original</kbd></dt>
-<dd><p>Original DEM (GeoTiff).</p>
-</dd>
-<dt><kbd>--outfile</kbd></dt>
-<dd><p>Output file that will be saved (GeoTiff format).</p>
-</dd>
-</dl>
-</section>
-</section>
-</section>
 </section>
 <section id="optimizing-depths-for-volume">
 <h2>Optimizing depths for volume<a class="headerlink" href="#optimizing-depths-for-volume" title="Link to this heading"></a></h2>

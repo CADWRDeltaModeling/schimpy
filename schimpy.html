@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.10.0+41.gbd3938f.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.10.0+54.gb3f1099.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=c96138f8"></script>
+      <script src="_static/documentation_options.js?v=658a96d6"></script>
       <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -99,8 +99,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.clip_dems">schimpy.clip_dems module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.clip_dems.bounding_coords"><code class="docutils literal notranslate"><span class="pre">bounding_coords()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.clip_dems.clip_dem"><code class="docutils literal notranslate"><span class="pre">clip_dem()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.clip_dems.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.clip_dems.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.combine_consume">schimpy.combine_consume module</a><ul>
@@ -134,8 +132,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.contour_smooth.calc_f"><code class="docutils literal notranslate"><span class="pre">calc_f()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.contour_smooth.contour_smooth"><code class="docutils literal notranslate"><span class="pre">contour_smooth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.contour_smooth.contour_smooth2d"><code class="docutils literal notranslate"><span class="pre">contour_smooth2d()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.contour_smooth.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.contour_smooth.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.contour_smooth.save_smooth"><code class="docutils literal notranslate"><span class="pre">save_smooth()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.contour_smooth.view_smooth"><code class="docutils literal notranslate"><span class="pre">view_smooth()</span></code></a></li>
 </ul>
@@ -648,8 +644,10 @@ return: argparse.ArgumentParser</p>
 <p>Create metrics plots in batch mode</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.batch_metrics.generate_metricsplots">
-<span class="sig-prename descclassname"><span class="pre">schimpy.batch_metrics.</span></span><span class="sig-name descname"><span class="pre">generate_metricsplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_inputfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.batch_metrics.generate_metricsplots" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">schimpy.batch_metrics.</span></span><span class="sig-name descname"><span class="pre">generate_metricsplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_inputfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.batch_metrics.generate_metricsplots" title="Link to this definition"></a></dt>
+<dd><p>Create metrics plots in batch mode.</p>
+<p>MAIN_INPUTFILE: Path to the main input YAML file.</p>
+</dd></dl>
 
 </section>
 <section id="schimpy-bctide-module">
@@ -701,16 +699,6 @@ written, blocking the query in time was very inefficient</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.clip_dems.clip_dem">
 <span class="sig-prename descclassname"><span class="pre">schimpy.clip_dems.</span></span><span class="sig-name descname"><span class="pre">clip_dem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xhi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demlist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dem.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outformat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'AAIGrid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'clipped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.clip_dems.clip_dem" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.clip_dems.create_arg_parser">
-<span class="sig-prename descclassname"><span class="pre">schimpy.clip_dems.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.clip_dems.create_arg_parser" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.clip_dems.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.clip_dems.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.clip_dems.main" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -830,9 +818,9 @@ written, blocking the query in time was very inefficient</p>
 <p>This module contains tools for a smoother for DEMs (currently tiff format) based on curvature flow
 The algorithm is based on one by Malladi and Sethian, and results in a simplification of contours while allowing
 sharp gradients as long as they are persistent. So it is not a cure for pressure gradient errors a la Hannah.
-The script shows some artefacts of a time when it wasn’t particularly stable and could run out of memory. 
-In particular, the algorithm dumps out intermediate arrays as it goes along and 
-these have to be visualized or saved using the appropriate subcommands or functions. 
+The script shows some artefacts of a time when it wasn’t particularly stable and could run out of memory.
+In particular, the algorithm dumps out intermediate arrays as it goes along and
+these have to be visualized or saved using the appropriate subcommands or functions.
 Stability is no longer an issue. it has been good for quite a while.
 Not so sure about memory. We’ve not tested a big problem yet on a big DEM on 64bit python.</p>
 <dl class="py class">
@@ -869,16 +857,6 @@ Not so sure about memory. We’ve not tested a big problem yet on a big DEM on 6
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.contour_smooth.contour_smooth2d">
 <span class="sig-prename descclassname"><span class="pre">schimpy.contour_smooth.</span></span><span class="sig-name descname"><span class="pre">contour_smooth2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nstep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_interval</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.contour_smooth.contour_smooth2d" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.contour_smooth.create_arg_parser">
-<span class="sig-prename descclassname"><span class="pre">schimpy.contour_smooth.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.contour_smooth.create_arg_parser" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.contour_smooth.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.contour_smooth.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.contour_smooth.main" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

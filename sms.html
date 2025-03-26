@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Utilities for Working with SMS &mdash; schimpy 1.10.0+41.gbd3938f.dirty documentation</title>
+  <title>Utilities for Working with SMS &mdash; schimpy 1.10.0+54.gb3f1099.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=c96138f8"></script>
+      <script src="_static/documentation_options.js?v=658a96d6"></script>
       <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -64,11 +64,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-detailed-bathymetry-inside-sms">Visualizing detailed bathymetry inside SMS</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#clip-dems">clip_dems</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#clip-dems">clip_dems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
@@ -157,50 +153,6 @@ documentation. Here we have two scripts
 that were designed to help with this problem: <cite>clip_dems.py</cite> and <cite>stacked_dem_fill.py</cite>.</p>
 <section id="clip-dems">
 <h3>clip_dems<a class="headerlink" href="#clip-dems" title="Link to this heading"></a></h3>
-<p><p>Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS</p>
-</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">clip_dems</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">coords</span> <span class="n">ul_x</span> <span class="n">ul_y</span> <span class="n">lr_x</span> <span class="n">lr_y</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">image</span> <span class="n">INFILE</span><span class="p">]</span>
-                 <span class="p">[</span><span class="o">--</span><span class="n">prefix</span> <span class="n">PREFIX</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">outformat</span> <span class="n">OUTFORMAT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">verbose</span><span class="p">]</span>
-                 <span class="p">[</span><span class="o">--</span><span class="n">hshift</span><span class="p">]</span>
-                 <span class="n">demlist</span>
-</pre></div>
-</div>
-<section id="positional-arguments">
-<h4>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h4>
-<dl class="option-list">
-<dt><kbd>demlist</kbd></dt>
-<dd><p>file containing prioritized (high to low) list of dems.</p>
-</dd>
-</dl>
-</section>
-<section id="named-arguments">
-<h4>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h4>
-<dl class="option-list">
-<dt><kbd>--coords</kbd></dt>
-<dd><p>bounding coordinates to which DEMs will be clipped (upper left, lower right)</p>
-<p>Default: (None, None, None, None)</p>
-</dd>
-<dt><kbd>--image</kbd></dt>
-<dd><p>image or DEM used to infer bounding coordinates for clipping. Use jpeg for the image. This argument is mutually exclusive with –coords. If a sample is provided its upper left and lower right corner will be used.</p>
-</dd>
-<dt><kbd>--prefix</kbd></dt>
-<dd><p>prefix used for output file names</p>
-<p>Default: “clipped”</p>
-</dd>
-<dt><kbd>--outformat</kbd></dt>
-<dd><p>output format, default is AAIGrid (ArcInfo ascii.</p>
-<p>Default: “AAIGrid”</p>
-</dd>
-<dt><kbd>--verbose</kbd></dt>
-<dd><p>more verbose output.</p>
-<p>Default: False</p>
-</dd>
-<dt><kbd>--hshift</kbd></dt>
-<dd><p>(deprecated) shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS &lt; 11.1</p>
-<p>Default: False</p>
-</dd>
-</dl>
-</section>
 <p>The script clip_dems.py is used to create mini-DEMs on the fly that are small
 enough to be brought into the SMS environment as rasters without slowing it down too much.
 The same The <a class="reference internal" href="preprocessing.html#dem-list-file"><span class="std std-ref">DEM List File</span></a> is used here as elsewhere in the pre-processor.</p>
