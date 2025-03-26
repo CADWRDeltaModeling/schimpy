@@ -1,7 +1,7 @@
 import click
 from schimpy.batch_metrics import batch_metrics_cli
 from schimpy.clip_dems import clip_dems_cli
-from schimpy.contour_smooth import contour_smooth
+from schimpy.contour_smooth import contour_smooth_cli
 
 # from schimpy.convert_mesh import convert_mesh
 # from schimpy.convert_polygons import convert_polygons
@@ -35,7 +35,7 @@ def cli():
 # Register the commands
 cli.add_command(batch_metrics_cli, "batch_metrics")
 cli.add_command(clip_dems_cli, "clip_dems")
-cli.add_command(contour_smooth, "contour_smooth")
+cli.add_command(contour_smooth_cli, "contour_smooth")
 # cli.add_command(convert_mesh, "convert_mesh")
 # cli.add_command(convert_polygons, "convert_polygons")
 # cli.add_command(convert_linestrings, "convert_linestrings")

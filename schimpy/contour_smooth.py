@@ -296,115 +296,123 @@ def save_smooth(dumpfile, original, outfile, **kwargs):
     ds = None
 
 
-def create_arg_parser():
-    import argparse
-    import textwrap
-
-    def convert_arg_line_to_args(arg_line):
-        for arg in arg_line.split():
-            if not arg.strip():
-                continue
-            yield arg
-
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        prog="contour_smooth.py",
-        fromfile_prefix_chars="@",
-        description=textwrap.dedent(
-            """
-      Uses the min-max curvature flow algorithm of Malladi and Sethian to simplify DEM topograph
-      The script requires a subcommand like: $ contour_smooth.py smooth
-      The most basic subcommand is `smooth`. 
-      Given limited efficiency at the moment, the script is generally run on a small area 
-      and dumps intermediate points in the processing as numpy arrays so you can 
-      view the differences using the contour_smooth.py view subcommand.
-      You can  get subject-specific help on a subcommand by typing
-      $ model_time.py subcommand --help
-      """
-        ),
-    )
-    parser.convert_arg_line_to_args = convert_arg_line_to_args
-
-    subparsers = parser.add_subparsers(
-        title="subcommands",
-        help="sub-commands indicating the particular action required. ",
-        dest="subcommand",
-    )
-
-    parser_smooth = subparsers.add_parser("smooth", help="Smooth the input DEM.")
-    parser_smooth.add_argument(
-        "--input", type=str, help="Input file name, file in tiff format."
-    )
-    parser_smooth.add_argument(
-        "--scales",
-        type=int,
-        nargs="*",
-        default=[1, 2],
-        help="Scales (in multiples of DEM side length) over which to smooth. The sequence [1,2,3,4] is an example, where the smoothing is gradually introduced at 10m, 20m, 30m and 40m for a 10m DEM.",
-    )
-    parser_smooth.add_argument(
-        "--nstep",
-        type=int,
-        default=40,
-        help="number of pseudo time steps to resolve integration. Default of 160 is recommended.",
-    )
-    parser_smooth.add_argument(
-        "--max_time",
-        type=float,
-        default=4.0,
-        help="Pseudo time representing final time step. 2.0 is the default.",
-    )
-    parser_smooth.add_argument(
-        "--report_interval",
-        type=float,
-        default=1.0,
-        help="Intermediate interval at which integration will be segmented and smoothed DEMs will be dumped. So if --max_time is 2.0 and --report_interval is 0.1 you will get 20 intermediate reports.",
-    )
-    parser_smooth.set_defaults(func=contour_smooth)
-
-    parser_view = subparsers.add_parser(
-        "view", help="View two versions of the smoothed DEM based on their .npy dump."
-    )
-    parser_view.add_argument("file0", type=str, help="First file in .npy format.")
-    parser_view.add_argument("file1", type=str, help="Second file in .npy format.")
-    parser_view.add_argument(
-        "--levels",
-        type=float,
-        nargs="*",
-        default=[-4, -3, -2, -1, 0, 1],
-        help="Contour levels",
-    )
-    parser_view.add_argument(
-        "--vmin", type=float, default=-6.0, help="Minimum elevation in color bar"
-    )
-    parser_view.add_argument(
-        "--vmax", type=float, default=4.0, help="Maximum elevation in color bar"
-    )
-
-    parser_view.set_defaults(func=view_smooth)
-
-    parser_save = subparsers.add_parser(
-        "save",
-        help="save dumped DEM based on .npy dump and the original DEM it came from.",
-    )
-
-    parser_save.add_argument(
-        "--dumpfile", type=str, help="Dump file from smoothing (npy format)"
-    )
-    parser_save.add_argument("--original", type=str, help="Original DEM (GeoTiff).")
-    parser_save.add_argument(
-        "--outfile", type=str, help="Output file that will be saved (GeoTiff format)."
-    )
-    parser_save.set_defaults(func=save_smooth)
-    return parser
+import click
 
 
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    func = args.func
-    func(**vars(args))
+@click.group(
+    help=(
+        "Uses the min-max curvature flow algorithm of Malladi and Sethian to simplify DEM topography.\n\n"
+        "The script requires a subcommand like: $ contour_smooth.py smooth\n"
+        "The most basic subcommand is `smooth`. Given limited efficiency at the moment, the script is generally run "
+        "on a small area and dumps intermediate points in the processing as numpy arrays so you can view the "
+        "differences using the contour_smooth.py view subcommand.\n\n"
+        "You can get subject-specific help on a subcommand by typing:\n"
+        "$ contour_smooth.py subcommand --help"
+    )
+)
+@click.help_option("-h", "--help")
+def contour_smooth_cli():
+    """Main entry point for contour smoothing commands."""
+    pass
+
+
+@click.command(help="Smooth the input DEM.")
+@click.help_option("-h", "--help")
+@click.option(
+    "--input",
+    type=click.Path(exists=True),
+    required=True,
+    help="Input file name, file in tiff format.",
+)
+@click.option(
+    "--scales",
+    type=int,
+    multiple=True,
+    default=[1, 2],
+    help=(
+        "Scales (in multiples of DEM side length) over which to smooth. "
+        "The sequence [1,2,3,4] is an example, where the smoothing is gradually introduced "
+        "at 10m, 20m, 30m and 40m for a 10m DEM."
+    ),
+)
+@click.option(
+    "--nstep",
+    type=int,
+    default=40,
+    help="Number of pseudo time steps to resolve integration. Default is 40.",
+)
+@click.option(
+    "--max_time",
+    type=float,
+    default=4.0,
+    help="Pseudo time representing final time step. Default is 4.0.",
+)
+@click.option(
+    "--report_interval",
+    type=float,
+    default=1.0,
+    help=(
+        "Intermediate interval at which integration will be segmented and smoothed DEMs will be dumped. "
+        "For example, if --max_time is 2.0 and --report_interval is 0.1, you will get 20 intermediate reports."
+    ),
+)
+def smooth(input, scales, nstep, max_time, report_interval):
+    """Smooth the input DEM."""
+    contour_smooth(input, scales, max_time, nstep, report_interval)
+
+
+@click.command(help="View two versions of the smoothed DEM based on their .npy dump.")
+@click.help_option("-h", "--help")
+@click.argument("file0", type=click.Path(exists=True))
+@click.argument("file1", type=click.Path(exists=True))
+@click.option(
+    "--levels",
+    type=float,
+    multiple=True,
+    default=[-4, -3, -2, -1, 0, 1],
+    help="Contour levels.",
+)
+@click.option(
+    "--vmin", type=float, default=-6.0, help="Minimum elevation in color bar."
+)
+@click.option("--vmax", type=float, default=4.0, help="Maximum elevation in color bar.")
+def view(file0, file1, levels, vmin, vmax):
+    """View the dumped files to graphically explore smoothing progress."""
+    view_smooth(file0, file1, levels, vmin, vmax)
+
+
+@click.command(
+    help="Save dumped DEM based on .npy dump and the original DEM it came from."
+)
+@click.help_option("-h", "--help")
+@click.option(
+    "--dumpfile",
+    type=click.Path(exists=True),
+    required=True,
+    help="Dump file from smoothing (npy format).",
+)
+@click.option(
+    "--original",
+    type=click.Path(exists=True),
+    required=True,
+    help="Original DEM (GeoTiff).",
+)
+@click.option(
+    "--outfile",
+    type=click.Path(),
+    required=True,
+    help="Output file that will be saved (GeoTiff format).",
+)
+def save(dumpfile, original, outfile):
+    """Save the smoothed DEM."""
+    save_smooth(dumpfile, original, outfile)
+
+
+# Register subcommands
+contour_smooth_cli.add_command(smooth)
+contour_smooth_cli.add_command(view)
+contour_smooth_cli.add_command(save)
 
 
 if __name__ == "__main__":
-    main()
+    contour_smooth_cli()
