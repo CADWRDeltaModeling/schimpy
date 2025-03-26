@@ -1,39 +1,55 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" Command line tool to convert SCHISM line strings in YAML
-    to Shapefile and vice versa
+"""Command line tool to convert SCHISM line strings in YAML
+to Shapefile and vice versa
 """
 from schimpy.schism_linestring import read_linestrings, write_linestrings
-import argparse
-
-def create_arg_parser():
-    """ Create an argument parser
-    """
-    parser = argparse.ArgumentParser(description="Convert line string information from one file format to another")
-    parser.add_argument('--input',
-                        help="input file")
-    parser.add_argument('--output',
-                        help="output file")
-    return parser
+import click
 
 
-def main():
-    """ A main function to convert polygon files
-    """
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    if args.input.endswith('.yaml'):
-        linestrings = read_linestrings(args.input)
-        if args.output.endswith('.shp'):
-            write_linestrings(args.output, linestrings)
+@click.command(help="Convert SCHISM line strings between YAML and Shapefile formats.")
+@click.help_option("-h", "--help")
+@click.option(
+    "--input",
+    required=True,
+    type=click.Path(exists=True),
+    help="Input file (YAML or Shapefile).",
+)
+@click.option(
+    "--output",
+    required=True,
+    type=click.Path(),
+    help="Output file (YAML or Shapefile).",
+)
+@click.help_option("-h", "--help")
+def convert_linestrings_cli(input, output):
+    """CLI wrapper for converting line string files."""
+    main(input, output)
+
+
+def main(input, output):
+    """Function for converting line string files."""
+    if input.endswith(".yaml"):
+        linestrings = read_linestrings(input)
+        if output.endswith(".shp"):
+            write_linestrings(output, linestrings)
         else:
-            raise ValueError("Not supported output file type")
-    elif args.input.endswith('.shp'):
-        linestrings = read_linestrings(args.input)
-        write_linestrings(args.output, linestrings)
+            raise ValueError(
+                "Unsupported output file type. Only Shapefile (.shp) is supported for YAML input."
+            )
+    elif input.endswith(".shp"):
+        linestrings = read_linestrings(input)
+        if output.endswith(".yaml"):
+            write_linestrings(output, linestrings)
+        else:
+            raise ValueError(
+                "Unsupported output file type. Only YAML (.yaml) is supported for Shapefile input."
+            )
     else:
-        raise ValueError("Not supported input file type")
+        raise ValueError(
+            "Unsupported input file type. Only YAML (.yaml) or Shapefile (.shp) are supported."
+        )
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    convert_linestrings_cli()
