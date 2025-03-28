@@ -60,6 +60,14 @@ schimpy.check\_mesh\_skewness module
    :undoc-members:
    :show-inheritance:
 
+schimpy.clip\_beyond\_subdomain module
+--------------------------------------
+
+.. automodule:: schimpy.clip_beyond_subdomain
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.clip\_dems module
 -------------------------
 
