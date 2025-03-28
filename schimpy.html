@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>schimpy package &mdash; schimpy 1.10.0+55.g7912c62.dirty documentation</title>
+  <title>schimpy package &mdash; schimpy 1.10.0+60.gac31c64.dirty documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=11cc0a6f"></script>
+      <script src="_static/documentation_options.js?v=92b44f4c"></script>
       <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -138,14 +138,12 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.convert_linestrings">schimpy.convert_linestrings module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_linestrings.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_linestrings.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#schimpy-convert-mesh-module">schimpy.convert_mesh module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#schimpy-convert-points-module">schimpy.convert_points module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.convert_polygons">schimpy.convert_polygons module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_polygons.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_polygons.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
 </li>
@@ -880,15 +878,9 @@ Not so sure about memory. We’ve not tested a big problem yet on a big DEM on 6
 <p>Command line tool to convert SCHISM line strings in YAML
 to Shapefile and vice versa</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.convert_linestrings.create_arg_parser">
-<span class="sig-prename descclassname"><span class="pre">schimpy.convert_linestrings.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_linestrings.create_arg_parser" title="Link to this definition"></a></dt>
-<dd><p>Create an argument parser</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.convert_linestrings.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.convert_linestrings.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_linestrings.main" title="Link to this definition"></a></dt>
-<dd><p>A main function to convert polygon files</p>
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_linestrings.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_linestrings.main" title="Link to this definition"></a></dt>
+<dd><p>Function for converting line string files.</p>
 </dd></dl>
 
 </section>
@@ -903,16 +895,9 @@ to Shapefile and vice versa</p>
 <p>Command line tool to convert SCHISM polygons in YAML
 to Shapefile and vice versa</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.convert_polygons.create_arg_parser">
-<span class="sig-prename descclassname"><span class="pre">schimpy.convert_polygons.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_polygons.create_arg_parser" title="Link to this definition"></a></dt>
-<dd><p>Create an argument parser</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.convert_polygons.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.convert_polygons.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_polygons.main" title="Link to this definition"></a></dt>
-<dd><p>A main function to convert polygon files</p>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_polygons.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_polygons.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </section>
 <section id="schimpy-convert-sav-class-to-number-module">
