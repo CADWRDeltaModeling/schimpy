@@ -5,10 +5,11 @@ import os
 from schimpy.schism_mesh import read_mesh
 from schimpy.schism_linestring import read_linestrings, write_linestrings
 from schimpy.schism_polygon import read_polygons, write_polygons
-
+import yaml
 from shapely.geometry import Point, LineString
 from shapely.geometry.polygon import Polygon
 import geopandas as gpd
+
 # %%
 # Path to original preprocessing directory
 raw_prepro_dir = "../raw_preprocessing/"
@@ -17,9 +18,16 @@ raw_prepro_dir = "../raw_preprocessing/"
 buffer = 50
 
 # List of input files to process
-linestring_yaml = ["open_boundary.yaml", "depth_enforcement_linestrings.yaml", "depth_enforcement_ss_linestrings.yaml"]
+linestring_yaml = [
+    "open_boundary.yaml",
+    "depth_enforcement_linestrings.yaml",
+    "depth_enforcement_ss_linestrings.yaml",
+    "flow_station_xsects.yaml",
+]
 polygon_yaml = ["depth_enforcement_polygons.yaml", "depth_enforcement_ss_polygons.yaml"]
 shapefiles = ["minmaxlayer_slr_0_mod105.shp"]
+
+other_inputs = {"hydraulic_structure": "hydraulic_structures.yaml"}
 
 
 # Obtain mesh extent
@@ -105,7 +113,7 @@ for yaml_file in polygon_yaml:
 
 # %%
 
-#%%
+# %%
 # Process shape files
 
 # Load the shapefile into a GeoDataFrame
@@ -134,3 +142,42 @@ for shapefile in shapefiles:
     gdf.to_file(shapefile)
 # %%
 
+# %%
+# Process hydraulic structure
+feature_type = {"hydraulic_structure": "structures"}
+
+filtered_feature = {}
+removed_feature = {}
+
+for input in list(other_inputs.keys()):
+    yaml_file = other_inputs[input]
+    with open(os.path.join(raw_prepro_dir, yaml_file)) as f:
+        content = yaml.full_load(f)
+
+    features = content[feature_type[input]]
+
+    filtered_feature[yaml_file] = []
+    removed_feature[yaml_file] = []
+    for feature in features:
+
+        pt1 = feature["end_points"][0]
+        pt2 = feature["end_points"][1]
+
+        seg = LineString((pt1, pt2))
+        if domain_polygon.intersects(seg):
+            print(f"Kept:  {feature['name']}")
+            filtered_feature[yaml_file].append(feature)
+        else:
+            print(f"Removed: {feature['name']}")
+            removed_feature[yaml_file].append(feature)
+
+    # Writing filtered linestrings to file
+    new_yaml_content = content.copy()
+    new_yaml_content[feature_type[input]] = filtered_feature[yaml_file]
+
+    print(f"Writing filtered features to {yaml_file}...")
+    with open(yaml_file, "w") as outfile:
+        yaml.dump(new_yaml_content, outfile, default_flow_style=False)
+
+
+# %%
