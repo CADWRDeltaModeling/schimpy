@@ -67,7 +67,7 @@ for yaml_file in linestring_yaml:
         y = line.xy[1].tolist()
 
         seg = LineString(zip(x, y))
-        if domain_polygon.contains(seg):
+        if domain_polygon.intersects(seg):
             print(f"Kept:  {line.prop['name']}")
             filtered_linestrings[yaml_file].append(line)
         else:
@@ -99,7 +99,7 @@ for yaml_file in polygon_yaml:
         y = poly.boundary.xy[1].tolist()
 
         seg = LineString(zip(x, y))
-        if domain_polygon.contains(seg):
+        if domain_polygon.intersects(seg):
             print(f"Kept:  {poly.prop['name']}")
             filtered_polygons[yaml_file].append(poly)
         else:
