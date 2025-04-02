@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools", "wheel", "versioneer[toml]"]
-build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
+requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
 
 [project]
 name = "schimpy"

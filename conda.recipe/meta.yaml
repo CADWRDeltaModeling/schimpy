@@ -1,10 +1,11 @@
 {# raw is for ignoring templating with cookiecutter, leaving it for use with conda-build -#}
 {% set pyproject = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
+{% set version = VERSION %}
 {% set project = pyproject['project'] %}
 
 package:
-  name: "{{ project['name']|lower }}"
-  version: "{{ load_setup_py_data() }}"  # Dynamically retrieve version using versioneer
+  name: schimpy
+  version: {{ version }}  # Dynamically retrieve version using versioneer
 
 source:
   #git_url: https://github.com/CADWRDeltaModeling/schimpy.git
@@ -13,8 +14,19 @@ source:
 build:
   script: {{ PYTHON }} -m pip install --no-build-isolation --no-deps --ignore-installed -vv .
   noarch: python
+  number: 0
+  entry_points:
+    {% for name, reference in project['scripts'].items() %}
+    - {{ name }} = {{ reference }}
+    {% endfor %}
 
 requirements:
+  host:
+    - python {{ project['requires-python'] }}
+    - pip
+    {% for dep in pyproject['build-system']['requires'] %}
+    - {{ dep.lower() }}
+    {% endfor %}
   build:
     - python
     - pip
@@ -33,11 +45,16 @@ test:
   source_files:
     - tests
   requires:
-    - pytest
-    - pytest-cov
+    {% for dep in project['optional-dependencies']['test'] %}
+    - {{ dep.lower() }}
+    {% endfor %}
   commands:
     - (setlocal && cd tests && pytest && endlocal) # [win]
     - (cd tests; pytest) # [unix]
+    {% for name in project['scripts'] %}
+    - {{ name }}
+    {% endfor %}
+    - python -c "from schimpy_cc import __version__; assert __version__ == \"{{ version }}\""
 
 about:
   home: https://github.com/CADWRDeltaModeling/schimpy
