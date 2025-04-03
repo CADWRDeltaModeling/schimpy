@@ -24,7 +24,7 @@ jobs:
       env: 
         ANACONDA_CHANNEL_UPLOAD_TOKEN: ${{ secrets.ANACONDA_CHANNEL_UPLOAD_TOKEN }}
       run: |
-        conda create -n test_schimpy -y conda-build conda-verify numpy anaconda-client
+        conda create -n test_schimpy -y conda-build conda-verify numpy anaconda-client setuptools-scm
         source $CONDA/etc/profile.d/conda.sh
         conda activate test_schimpy
         conda config --set anaconda_upload yes
