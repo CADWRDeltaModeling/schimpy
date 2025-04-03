@@ -3,6 +3,9 @@
 __author__ = """Eli Ateljevich, Kijin Nam"""
 __email__ = "Eli.Ateljevich@water.ca.gov; Kijin.Nam@water.ca.gov"
 
-from schimpy._version import get_versions
+from importlib.metadata import version, PackageNotFoundError
 
-__version__ = get_versions()["version"]
+try:
+    __version__ = version("schimpy")
+except PackageNotFoundError:
+    __version__ = "0.0.0"  # Default version if package metadata is unavailable

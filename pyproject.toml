@@ -1,13 +1,13 @@
 [build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling", "hatch-vcs>=0.3", "setuptools-scm>=7.1"]
+requires = ["setuptools", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "schimpy"
 dynamic = ["version"] # Placeholder; versioneer will manage this
 description = "Python package for SCHISM"
 readme = "README.rst"
-license = "MIT"
+license = { file = "LICENSE" }
 authors = [
     {name = "California Department of Water Resources", email = "Eli.Ateljevich@water.ca.gov"},
     {name = "California Department of Water Resources", email = "Kijin.Nam@water.ca.gov"}
@@ -18,17 +18,10 @@ classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9"
 ]
 
 keywords = ["schimpy", "SCHISM", "hydrodynamics", "mesh", "geometry", "GIS", "geospatial", "data processing"]
-
-[tool.versioneer]
-VCS = "git"
-style = "pep440"
-versionfile_source = "_version.py"
-parentdir_prefix = ""
 
 dependencies = [
     "geopandas",
@@ -74,6 +67,14 @@ exclude = ["docs"]
 [tool.pytest.ini_options]
 collect_ignore = ["setup.py"]
 
+[tool.setuptools.packages.find]
+include = ["schimpy"]
+exclude = ["docsrc"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "dirty-tag"
+
 [project.scripts]
 sch = "schimpy.__main__:cli"
 batch_metrics = "schimpy.batch_metrics:batch_metrics_cli"
@@ -99,9 +100,3 @@ interpolate_structure = "schimpy.interpolate_structure:main"
 merge_th = "schimpy.merge_th:main"
 archive_ts = "schimpy.archive_ts:main"
 
-[tool.setuptools.packages.find]
-include = ["schimpy"]
-exclude = ["docsrc"]
-
-[tool.poetry.dependencies]
-rtree = "*"

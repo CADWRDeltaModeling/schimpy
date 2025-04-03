@@ -28,6 +28,6 @@ jobs:
         source $CONDA/etc/profile.d/conda.sh
         conda activate test_schimpy
         conda config --set anaconda_upload yes
-        conda build -c cadwr-dms -c defaults -c plotly --user cadwr-dms --token "$ANACONDA_CHANNEL_UPLOAD_TOKEN" conda.recipe
+        conda build -c cadwr-dms -c conda-forge --user cadwr-dms --token "$ANACONDA_CHANNEL_UPLOAD_TOKEN" conda.recipe
         conda activate
         conda remove -n test_schimpy --all

@@ -1,11 +1,11 @@
 {# raw is for ignoring templating with cookiecutter, leaving it for use with conda-build -#}
 {% set pyproject = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
-{% set version = VERSION %}
 {% set project = pyproject['project'] %}
+{% set version = load_setup_py_data().get('version', '0.0.0') %}
 
 package:
   name: schimpy
-  version: {{ version }}  # Dynamically retrieve version using versioneer
+  version: {{ version }}
 
 source:
   #git_url: https://github.com/CADWRDeltaModeling/schimpy.git
@@ -31,11 +31,12 @@ requirements:
     - python
     - pip
     - setuptools
+    - setuptools_scm
     - pyproj
     - pytest-runner >=5.0
   run:
     - python {{ project['requires-python'] }}
-    {% for dep in project['dependencies'] %}
+    {% for dep in project.get('dependencies', []) %}
     - {{ dep.lower() }}
     {% endfor %}
 
@@ -45,7 +46,7 @@ test:
   source_files:
     - tests
   requires:
-    {% for dep in project['optional-dependencies']['test'] %}
+    {% for dep in project.get("optional-dependencies", {}).get('test', []) %}
     - {{ dep.lower() }}
     {% endfor %}
   commands:
@@ -54,8 +55,6 @@ test:
     {% for name in project['scripts'] %}
     - {{ name }}
     {% endfor %}
-    - python -c "from schimpy_cc import __version__; assert __version__ == \"{{ version }}\""
-
 about:
   home: https://github.com/CADWRDeltaModeling/schimpy
   summary: Tools, scripts, templates and data for running SCHISM on the Bay-Delta
