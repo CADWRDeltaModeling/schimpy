@@ -96,11 +96,11 @@
              
   <section id="model-time-conversion">
 <h1>Model time conversion<a class="headerlink" href="#model-time-conversion" title="Link to this heading"></a></h1>
-<p>The SCHISM *.th file has two flavors, binary and text. Both are multicolumn formats,
+<p>The SCHISM <code class="docutils literal notranslate"><span class="pre">*.th</span></code> file has two flavors, binary and text. Both are multicolumn formats,
 with elapsed time in seconds in the left column since the start of the simulation
 and the other columns representing values.
 There is no datum within the file to link elapsed time to calendar or geophysical time,
-and it is hard to search for events, re-use the *.th file with a different
+and it is hard to search for events, re-use the <code class="docutils literal notranslate"><span class="pre">*.th</span></code> file with a different
 start date or make sense of orphaned files.</p>
 <p>The model_time script utility performs conversions between geophysical
 and elapsed times on flat files. This is a pretty easy task on simple files using

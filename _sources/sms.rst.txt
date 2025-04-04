@@ -16,9 +16,7 @@ convert_mesh
 
 schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files
 
-.. argparse::
-    :module: schimpy.convert_mesh
-    :func: create_arg_parser
+.. click:: schimpy.convert_mesh:convert_mesh_cli
     :prog: convert_mesh
 
 
@@ -34,9 +32,7 @@ not have a tutorial example of this process.
 convert_polygons
 ^^^^^^^^^^^^^^^^
 
-.. argparse::
-    :module: schimpy.convert_polygons
-    :func: create_arg_parser
+.. click:: schimpy.convert_polygons:convert_polygons_cli
     :prog: convert_polygons
 
 
@@ -54,9 +50,7 @@ that were designed to help with this problem: `clip_dems.py` and `stacked_dem_fi
 clip_dems
 ^^^^^^^^^
 
-.. argparse::
-    :module: schimpy.clip_dems
-    :func: create_arg_parser
+.. click:: schimpy.clip_dems:clip_dems_cli
     :prog: clip_dems
 
 The script clip_dems.py is used to create mini-DEMs on the fly that are small 

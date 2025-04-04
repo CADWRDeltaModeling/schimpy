@@ -53,15 +53,24 @@
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Working with SMS</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#converting-an-sms-mesh-2dm-file-to-gr3">Converting an SMS mesh (2dm) file to gr3</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#convert-mesh">convert_mesh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-mesh">convert_mesh</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#convert-mesh">convert_mesh</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#getting-sms-polygons-for-preprocessor">Getting SMS Polygons for Preprocessor</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#convert-polygons">convert_polygons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-polygons">convert_polygons</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#convert-polygons">convert_polygons</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#visualizing-detailed-bathymetry-inside-sms">Visualizing detailed bathymetry inside SMS</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#clip-dems">clip_dems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clip-dems">clip_dems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#clip-dems">clip_dems</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
@@ -112,6 +121,38 @@ able to distrubute a sufficient open source mesh generator.</p>
 <section id="convert-mesh">
 <h3>convert_mesh<a class="headerlink" href="#convert-mesh" title="Link to this heading"></a></h3>
 <p>schimpy provides a single conversion utility between sms, shapefiles and SMS 2dm files</p>
+<section id="convert-mesh">
+<h4>convert_mesh<a class="headerlink" href="#convert-mesh" title="Link to this heading"></a></h4>
+<p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>convert_mesh<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_mesh-input">
+<span class="sig-name descname"><span class="pre">--input</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;input&gt;</span></span><a class="headerlink" href="#cmdoption-convert_mesh-input" title="Link to this definition"></a></dt>
+<dd><p><strong>Required</strong> Input mesh file.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_mesh-output">
+<span class="sig-name descname"><span class="pre">--output</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output&gt;</span></span><a class="headerlink" href="#cmdoption-convert_mesh-output" title="Link to this definition"></a></dt>
+<dd><p><strong>Required</strong> Output mesh file.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_mesh-crs">
+<span class="sig-name descname"><span class="pre">--crs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;crs&gt;</span></span><a class="headerlink" href="#cmdoption-convert_mesh-crs" title="Link to this definition"></a></dt>
+<dd><p>CRS string for the projection.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_mesh-h">
+<span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-convert_mesh-h" title="Link to this definition"></a></dt>
+<dd><p>Show this message and exit.</p>
+</dd></dl>
+
+</section>
 </section>
 </section>
 <section id="getting-sms-polygons-for-preprocessor">
@@ -123,6 +164,38 @@ resulting shapefile to the preprocessor yaml format. At the time of writing we d
 not have a tutorial example of this process.</p>
 <section id="convert-polygons">
 <h3>convert_polygons<a class="headerlink" href="#convert-polygons" title="Link to this heading"></a></h3>
+<section id="convert-polygons">
+<h4>convert_polygons<a class="headerlink" href="#convert-polygons" title="Link to this heading"></a></h4>
+<p>Convert SCHISM polygons between YAML and Shapefile formats.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>convert_polygons<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_polygons-h">
+<span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-convert_polygons-h" title="Link to this definition"></a></dt>
+<dd><p>Show this message and exit.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_polygons-input">
+<span class="sig-name descname"><span class="pre">--input</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;input&gt;</span></span><a class="headerlink" href="#cmdoption-convert_polygons-input" title="Link to this definition"></a></dt>
+<dd><p><strong>Required</strong> Input file (YAML or Shapefile).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_polygons-output">
+<span class="sig-name descname"><span class="pre">--output</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output&gt;</span></span><a class="headerlink" href="#cmdoption-convert_polygons-output" title="Link to this definition"></a></dt>
+<dd><p><strong>Required</strong> Output file (YAML or Shapefile).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-convert_polygons-0">
+<span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-convert_polygons-0" title="Link to this definition"></a></dt>
+<dd><p>Show this message and exit.</p>
+</dd></dl>
+
+</section>
 </section>
 </section>
 <section id="visualizing-detailed-bathymetry-inside-sms">
@@ -134,6 +207,67 @@ documentation. Here we have two scripts
 that were designed to help with this problem: <cite>clip_dems.py</cite> and <cite>stacked_dem_fill.py</cite>.</p>
 <section id="clip-dems">
 <h3>clip_dems<a class="headerlink" href="#clip-dems" title="Link to this heading"></a></h3>
+<section id="clip-dems">
+<h4>clip_dems<a class="headerlink" href="#clip-dems" title="Link to this heading"></a></h4>
+<p>Trim each DEM on a prioritized list. The coordinates used for clipping is supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice this script is usually used with images saved from SMS.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>DEMLIST file containing prioritized (high to low) list of dems.</p>
+</dd>
+</dl>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>clip_dems<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>DEMLIST
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-coords">
+<span class="sig-name descname"><span class="pre">--coords</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;coords&gt;</span></span><a class="headerlink" href="#cmdoption-clip_dems-coords" title="Link to this definition"></a></dt>
+<dd><p>Bounding coordinates to which DEMs will be clipped (upper left x, y, lower right x, y).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-image">
+<span class="sig-name descname"><span class="pre">--image</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;infile&gt;</span></span><a class="headerlink" href="#cmdoption-clip_dems-image" title="Link to this definition"></a></dt>
+<dd><p>Image or DEM used to infer bounding coordinates for clipping. Use jpeg for the image. This argument is mutually exclusive with –coords. If a sample is provided its upper left and lower right corner will be used.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-prefix">
+<span class="sig-name descname"><span class="pre">--prefix</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;prefix&gt;</span></span><a class="headerlink" href="#cmdoption-clip_dems-prefix" title="Link to this definition"></a></dt>
+<dd><p>Prefix used for output file names.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-outformat">
+<span class="sig-name descname"><span class="pre">--outformat</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outformat&gt;</span></span><a class="headerlink" href="#cmdoption-clip_dems-outformat" title="Link to this definition"></a></dt>
+<dd><p>Output format, default is AAIGrid (ArcInfo ASCII).</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-verbose">
+<span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-clip_dems-verbose" title="Link to this definition"></a></dt>
+<dd><p>Enable verbose output.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-hshift">
+<span class="sig-name descname"><span class="pre">--hshift</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-clip_dems-hshift" title="Link to this definition"></a></dt>
+<dd><p>(Deprecated) Shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS &lt; 11.1</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-h">
+<span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-clip_dems-h" title="Link to this definition"></a></dt>
+<dd><p>Show this message and exit.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-clip_dems-arg-DEMLIST">
+<span class="sig-name descname"><span class="pre">DEMLIST</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-clip_dems-arg-DEMLIST" title="Link to this definition"></a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</section>
 <p>The script clip_dems.py is used to create mini-DEMs on the fly that are small
 enough to be brought into the SMS environment as rasters without slowing it down too much.
 The same The <a class="reference internal" href="preprocessing.html#dem-list-file"><span class="std std-ref">DEM List File</span></a> is used here as elsewhere in the pre-processor.</p>
