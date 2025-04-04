@@ -80,7 +80,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.bound_linear.bound_linear"><code class="docutils literal notranslate"><span class="pre">bound_linear()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-cencoos-download-module">schimpy.cencoos_download module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.cencoos_download">schimpy.cencoos_download module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.cencoos_download.cencoos_schism_opendap"><code class="docutils literal notranslate"><span class="pre">cencoos_schism_opendap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.cencoos_download.merc_to_latlon"><code class="docutils literal notranslate"><span class="pre">merc_to_latlon()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.cencoos_download.time_block_report"><code class="docutils literal notranslate"><span class="pre">time_block_report()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.check_mesh_skewness">schimpy.check_mesh_skewness module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.check_mesh_skewness.calculate_skewness"><code class="docutils literal notranslate"><span class="pre">calculate_skewness()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.check_mesh_skewness.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
@@ -204,7 +209,15 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.gaussian_quadrature.GaussianQuadratureTri3"><code class="docutils literal notranslate"><span class="pre">GaussianQuadratureTri3</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-gen-elev2d-module">schimpy.gen_elev2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.gen_elev2d">schimpy.gen_elev2d module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.gen_elev2d.BinaryTHWriter"><code class="docutils literal notranslate"><span class="pre">BinaryTHWriter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.gen_elev2d.NetCDFTHWriter"><code class="docutils literal notranslate"><span class="pre">NetCDFTHWriter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.gen_elev2d.THWriter"><code class="docutils literal notranslate"><span class="pre">THWriter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.gen_elev2d.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.gen_elev2d.gen_elev2D"><code class="docutils literal notranslate"><span class="pre">gen_elev2D()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.gen_elev2d.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.geo_tools">schimpy.geo_tools module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.geo_tools.FindMultiPoly"><code class="docutils literal notranslate"><span class="pre">FindMultiPoly()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.geo_tools.Polylen"><code class="docutils literal notranslate"><span class="pre">Polylen()</span></code></a></li>
@@ -335,7 +348,13 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.nml.write"><code class="docutils literal notranslate"><span class="pre">write()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-nudging-module">schimpy.nudging module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.nudging">schimpy.nudging module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.nudging.Nudging"><code class="docutils literal notranslate"><span class="pre">Nudging</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.nudging.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.nudging.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.nudging.write_to_log"><code class="docutils literal notranslate"><span class="pre">write_to_log()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.param">schimpy.param module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.param.Params"><code class="docutils literal notranslate"><span class="pre">Params</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.param.param_from_template"><code class="docutils literal notranslate"><span class="pre">param_from_template()</span></code></a></li>
@@ -382,7 +401,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.profile_plot.vertical_fill"><code class="docutils literal notranslate"><span class="pre">vertical_fill()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-raster-to-nodes-module">schimpy.raster_to_nodes module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.raster_to_nodes">schimpy.raster_to_nodes module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.raster_to_nodes.raster_to_nodes"><code class="docutils literal notranslate"><span class="pre">raster_to_nodes()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.read_output_xyt">schimpy.read_output_xyt module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.read_output_xyt.read_depth_avg_from_output7b_xyt"><code class="docutils literal notranslate"><span class="pre">read_depth_avg_from_output7b_xyt()</span></code></a></li>
 </ul>
@@ -555,7 +577,17 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.station.write_station_shp"><code class="docutils literal notranslate"><span class="pre">write_station_shp()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-subset-schism-output-module">schimpy.subset_schism_output module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.subset_schism_output">schimpy.subset_schism_output module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.create_partition"><code class="docutils literal notranslate"><span class="pre">create_partition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.partition_schout"><code class="docutils literal notranslate"><span class="pre">partition_schout()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.partition_scribeio"><code class="docutils literal notranslate"><span class="pre">partition_scribeio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.records"><code class="docutils literal notranslate"><span class="pre">records()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.subset_schism_output"><code class="docutils literal notranslate"><span class="pre">subset_schism_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.subset_schism_scribeIO_output"><code class="docutils literal notranslate"><span class="pre">subset_schism_scribeIO_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.write_global_local_maps"><code class="docutils literal notranslate"><span class="pre">write_global_local_maps()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.three_point_linear_norm">schimpy.three_point_linear_norm module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.three_point_linear_norm.ThreePointLinearNorm"><code class="docutils literal notranslate"><span class="pre">ThreePointLinearNorm</span></code></a></li>
 </ul>
@@ -686,8 +718,30 @@ At the end of this script, there is a synthetic example which demonstrates the f
 <dd></dd></dl>
 
 </section>
-<section id="schimpy-cencoos-download-module">
-<h2>schimpy.cencoos_download module<a class="headerlink" href="#schimpy-cencoos-download-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.cencoos_download">
+<span id="schimpy-cencoos-download-module"></span><h2>schimpy.cencoos_download module<a class="headerlink" href="#module-schimpy.cencoos_download" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.cencoos_download.cencoos_schism_opendap">
+<span class="sig-prename descclassname"><span class="pre">schimpy.cencoos_download.</span></span><span class="sig-name descname"><span class="pre">cencoos_schism_opendap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_lo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_lo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_hi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_hi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.cencoos_download.cencoos_schism_opendap" title="Link to this definition"></a></dt>
+<dd><p>Download cencoos opendap data for all time based on a bounding set of lat/lon 
+file_base : str prefix for files
+to_cache :  bool whether to stash data in numpy arrays to make it easier next time
+from_cache : use cache rather than download)</p>
+<p>The strategy for this download may change with time. When the script was originally
+written, blocking the query in time was very inefficient</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.cencoos_download.merc_to_latlon">
+<span class="sig-prename descclassname"><span class="pre">schimpy.cencoos_download.</span></span><span class="sig-name descname"><span class="pre">merc_to_latlon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.cencoos_download.merc_to_latlon" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.cencoos_download.time_block_report">
+<span class="sig-prename descclassname"><span class="pre">schimpy.cencoos_download.</span></span><span class="sig-name descname"><span class="pre">time_block_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">told</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.cencoos_download.time_block_report" title="Link to this definition"></a></dt>
+<dd><p>This routine is for reporting incremental timing of parts of the script</p>
+</dd></dl>
+
 </section>
 <section id="module-schimpy.check_mesh_skewness">
 <span id="schimpy-check-mesh-skewness-module"></span><h2>schimpy.check_mesh_skewness module<a class="headerlink" href="#module-schimpy.check_mesh_skewness" title="Link to this heading"></a></h2>
@@ -1931,8 +1985,107 @@ Ordering is counter-clockwise direction</p>
 </dd></dl>
 
 </section>
-<section id="schimpy-gen-elev2d-module">
-<h2>schimpy.gen_elev2d module<a class="headerlink" href="#schimpy-gen-elev2d-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.gen_elev2d">
+<span id="schimpy-gen-elev2d-module"></span><h2>schimpy.gen_elev2d module<a class="headerlink" href="#module-schimpy.gen_elev2d" title="Link to this heading"></a></h2>
+<p>Generate elev2D.th for a Bay-Delta SCHSIM model using tides at
+Point Reyes and Monterey.</p>
+<p>2015-06-16: Customized</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.BinaryTHWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.gen_elev2d.</span></span><span class="sig-name descname"><span class="pre">BinaryTHWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starttime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.BinaryTHWriter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schimpy.gen_elev2d.THWriter" title="schimpy.gen_elev2d.THWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">THWriter</span></code></a></p>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>write_all</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>write_step</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.BinaryTHWriter.write_all">
+<span class="sig-name descname"><span class="pre">write_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.BinaryTHWriter.write_all" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.BinaryTHWriter.write_step">
+<span class="sig-name descname"><span class="pre">write_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.BinaryTHWriter.write_step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.NetCDFTHWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.gen_elev2d.</span></span><span class="sig-name descname"><span class="pre">NetCDFTHWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath_out</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nloc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starttime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.NetCDFTHWriter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schimpy.gen_elev2d.THWriter" title="schimpy.gen_elev2d.THWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">THWriter</span></code></a></p>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>write_all</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>write_step</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.NetCDFTHWriter.write_all">
+<span class="sig-name descname"><span class="pre">write_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.NetCDFTHWriter.write_all" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.NetCDFTHWriter.write_step">
+<span class="sig-name descname"><span class="pre">write_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.NetCDFTHWriter.write_step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.THWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.gen_elev2d.</span></span><span class="sig-name descname"><span class="pre">THWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starttime</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.THWriter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>write_all</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>write_step</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.THWriter.write_all">
+<span class="sig-name descname"><span class="pre">write_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.THWriter.write_all" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.THWriter.write_step">
+<span class="sig-name descname"><span class="pre">write_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vals</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.THWriter.write_step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.gen_elev2d.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.create_arg_parser" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.gen_elev2D">
+<span class="sig-prename descclassname"><span class="pre">schimpy.gen_elev2d.</span></span><span class="sig-name descname"><span class="pre">gen_elev2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hgrid_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pt_reyes_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monterey_fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.gen_elev2D" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.gen_elev2d.main">
+<span class="sig-prename descclassname"><span class="pre">schimpy.gen_elev2d.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.gen_elev2d.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-schimpy.geo_tools">
 <span id="schimpy-geo-tools-module"></span><h2>schimpy.geo_tools module<a class="headerlink" href="#module-schimpy.geo_tools" title="Link to this heading"></a></h2>
@@ -3436,8 +3589,201 @@ If there’s an inline comment starting with !, it will be stored as inline_comm
 </dd></dl>
 
 </section>
-<section id="schimpy-nudging-module">
-<h2>schimpy.nudging module<a class="headerlink" href="#schimpy-nudging-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.nudging">
+<span id="schimpy-nudging-module"></span><h2>schimpy.nudging module<a class="headerlink" href="#module-schimpy.nudging" title="Link to this heading"></a></h2>
+<p>Created on Tue Jun  8 10:19:56 2021</p>
+<p>&#64;author: zzhang
+To be implemented: other weights function (length scale) from OI in additional
+to gaussian</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.nudging.</span></span><span class="sig-name descname"><span class="pre">Nudging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A class to create schism nudging</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh_gpd</strong></dt><dd></dd>
+<dt><strong>z</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.nudging.Nudging.create_nudging" title="schimpy.nudging.Nudging.create_nudging"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_nudging</span></code></a>([create_file])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#schimpy.nudging.Nudging.read_yaml" title="schimpy.nudging.Nudging.read_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_yaml</span></code></a>()</p></td>
+<td><p>read yaml and load mesh grid</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>concatenate_nudge</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>construct_weights</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>create_region_nudging</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>gaussian_weights</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>gen_nudge_3dfield</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>gen_nudge_obs</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>gen_region_weight</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_nudging_comb</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>in_vertices</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>organize_nudging</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>plot</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>read_data</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>reorder_variables</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>signa</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.concatenate_nudge">
+<span class="sig-name descname"><span class="pre">concatenate_nudge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imap_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_newlist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.concatenate_nudge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.construct_weights">
+<span class="sig-name descname"><span class="pre">construct_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.construct_weights" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.create_nudging">
+<span class="sig-name descname"><span class="pre">create_nudging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">create_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.create_nudging" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>create_file</strong><span class="classifier">TYPE, optional</span></dt><dd><p>Options to create nudging files. The default is True.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
+<dt><strong>None.</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.create_region_nudging">
+<span class="sig-name descname"><span class="pre">create_region_nudging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.create_region_nudging" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.gaussian_weights">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gaussian_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xyc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.gaussian_weights" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.gen_nudge_3dfield">
+<span class="sig-name descname"><span class="pre">gen_nudge_3dfield</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.gen_nudge_3dfield" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.gen_nudge_obs">
+<span class="sig-name descname"><span class="pre">gen_nudge_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.gen_nudge_obs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.gen_region_weight">
+<span class="sig-name descname"><span class="pre">gen_region_weight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.gen_region_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.get_nudging_comb">
+<span class="sig-name descname"><span class="pre">get_nudging_comb</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.get_nudging_comb" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.in_vertices">
+<span class="sig-name descname"><span class="pre">in_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.in_vertices" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.mesh_gpd">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mesh_gpd</span></span><a class="headerlink" href="#schimpy.nudging.Nudging.mesh_gpd" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.organize_nudging">
+<span class="sig-name descname"><span class="pre">organize_nudging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights_comb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values_comb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imap_comb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.organize_nudging" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.plot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.read_data">
+<span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.read_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.read_yaml">
+<span class="sig-name descname"><span class="pre">read_yaml</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.read_yaml" title="Link to this definition"></a></dt>
+<dd><p>read yaml and load mesh grid</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.reorder_variables">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reorder_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_ordered_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.reorder_variables" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.signa">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">signa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y3</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.Nudging.signa" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="schimpy.nudging.Nudging.z">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#schimpy.nudging.Nudging.z" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.nudging.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.nudging.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.create_arg_parser" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.nudging.main">
+<span class="sig-prename descclassname"><span class="pre">schimpy.nudging.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.nudging.write_to_log">
+<span class="sig-prename descclassname"><span class="pre">schimpy.nudging.</span></span><span class="sig-name descname"><span class="pre">write_to_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nudging.write_to_log" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-schimpy.param">
 <span id="schimpy-param-module"></span><h2>schimpy.param module<a class="headerlink" href="#module-schimpy.param" title="Link to this heading"></a></h2>
@@ -5504,8 +5850,70 @@ max_depth is the maximum depth, data assumed to be</p>
 <dd></dd></dl>
 
 </section>
-<section id="schimpy-raster-to-nodes-module">
-<h2>schimpy.raster_to_nodes module<a class="headerlink" href="#schimpy-raster-to-nodes-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.raster_to_nodes">
+<span id="schimpy-raster-to-nodes-module"></span><h2>schimpy.raster_to_nodes module<a class="headerlink" href="#module-schimpy.raster_to_nodes" title="Link to this heading"></a></h2>
+<p>Functions to process raster data for schimpy pre-processing.</p>
+<p>This add rasterstats, boto3 dependency to calculate raster stastistics such as
+means.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.raster_to_nodes.raster_to_nodes">
+<span class="sig-prename descclassname"><span class="pre">schimpy.raster_to_nodes.</span></span><span class="sig-name descname"><span class="pre">raster_to_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_sel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_raster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.raster_to_nodes.raster_to_nodes" title="Link to this definition"></a></dt>
+<dd><p>Applies raster values to mesh by calculating means over surrounding elementss.</p>
+<p>When an element contains no raster data, zero will be
+assigned. When an element is partly covered by the raster data, an masked average
+is calculated.</p>
+<p>If the bins are provided, the raster data will be binned and bins mapped to
+the mapped_values before the averaging begins. The binning uses numpy.digitize to classification,
+and in particular the i’th mapped value is used between the values of bins (i-1) and (i).
+There are some extra padding values provided as shown in the example</p>
+<p>If the mask_value is given, raster data with the given mask value
+will be replaced with the fill_value before binning the data. This
+masking will only be used when bins are provided and pertains to 
+special cases involving vegetation data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh: schimpy.SchismMesh</strong></dt><dd><p>The base mesh to work on</p>
+</dd>
+<dt><strong>nodes_sel: array-like</strong></dt><dd><p>The array or list of the nodes to process</p>
+</dd>
+<dt><strong>path_raster: string-like</strong></dt><dd><p>File fath to the raster data</p>
+</dd>
+<dt><strong>bins: array-like, optional</strong></dt><dd><p>Array of bins. It has to be 1-dimensional and monotonic</p>
+</dd>
+<dt><strong>mapped_values: array-like, optional</strong></dt><dd><p>The values of the classes. It should be bigger by one than the bins. The i’th
+value will be applied between the <cite>(i-1)</cite> and <cite>i</cite> value of bins.</p>
+</dd>
+<dt><strong>band: int, optional</strong></dt><dd><p>The band index to use from the raster data.
+The default value is 1.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>numpy.array</dt><dd><p>means of raster values of the element balls around the nodes</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>An example of this function in the pre-processor yaml is below:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">gr3</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">sav_N.gr3</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.</span>
+<span class="w">   </span><span class="nt">polygons</span><span class="p">:</span>
+<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">attribute</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raster_to_nodes.raster_to_nodes(mesh, nodes_sel, &#39;NDVI.tif&#39;, bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)</span>
+<span class="w">       </span><span class="nt">imports</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">schimpy.raster_to_nodes</span>
+<span class="w">       </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">none</span>
+<span class="w">       </span><span class="nt">vertices</span><span class="p">:</span>
+<span class="w">       </span><span class="c1">#...</span>
+</pre></div>
+</div>
+<p>The values <cite>mesh</cite> and <cite>node_sel</cite>  mean the SCHISM mesh and the selected node indices
+by a polygon. The example bins (or classifies) the raster values from 0.0001 to 0.3
+and assigns the value 0., then assigns 40. for values between 0.3 and 0.6 and so forth.</p>
+</dd></dl>
+
 </section>
 <section id="module-schimpy.read_output_xyt">
 <span id="schimpy-read-output-xyt-module"></span><h2>schimpy.read_output_xyt module<a class="headerlink" href="#module-schimpy.read_output_xyt" title="Link to this heading"></a></h2>
@@ -6701,11 +7109,13 @@ to boundaries.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>line_segment: array-like</strong></dt><dd><p>two end points of the line segment, start_x, start_y, end_x, end_y</p>
 </dd>
-<dt><strong>Returns</strong></dt><dd></dd>
-<dt><strong>——</strong></dt><dd></dd>
-<dt><strong>up_path: array of int</strong></dt><dd><p>upstream side of node paths</p>
+</dl>
 </dd>
-<dt><strong>down_path: array of int</strong></dt><dd><p>downstream side of node paths</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>up_path: array of int</dt><dd><p>upstream side of node paths</p>
+</dd>
+<dt>down_path: array of int</dt><dd><p>downstream side of node paths</p>
 </dd>
 </dl>
 </dd>
@@ -8721,20 +9131,18 @@ is extra BayDeltaSCHISM extra metadata, not required for vanilla SCHISM</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.station.read_station_shp">
 <span class="sig-prename descclassname"><span class="pre">schimpy.station.</span></span><span class="sig-name descname"><span class="pre">read_station_shp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fpath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pop_xy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.station.read_station_shp" title="Link to this definition"></a></dt>
-<dd><p>Read a shapefile and convert into a pandas DataFrame
-Parameters
-———-
-fpath : fname</p>
-<blockquote>
-<div><p>Path to input point shapefile - has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
-</div></blockquote>
-<dl class="simple">
-<dt>pop_xy<span class="classifier">bool</span></dt><dd><p>Repopulate the x &amp; y fields with point coordinates?</p>
+<dd><p>Read a shapefile and convert into a pandas DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fpath</strong><span class="classifier">fname</span></dt><dd><p>Path to input point shapefile - has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
+</dd>
+<dt><strong>pop_xy</strong><span class="classifier">bool</span></dt><dd><p>Repopulate the x &amp; y fields with point coordinates?</p>
 </dd>
 </dl>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>Result</strong><span class="classifier">DataFrame</span></dt><dd><p>DataFrame that has station id, x, y, z, name and subloc labels (id is the station id, index will be autogenerated)</p>
 </dd>
 </dl>
@@ -8925,8 +9333,85 @@ or ‘all’ to include them all</p>
 </dd></dl>
 
 </section>
-<section id="schimpy-subset-schism-output-module">
-<h2>schimpy.subset_schism_output module<a class="headerlink" href="#schimpy-subset-schism-output-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.subset_schism_output">
+<span id="schimpy-subset-schism-output-module"></span><h2>schimpy.subset_schism_output module<a class="headerlink" href="#module-schimpy.subset_schism_output" title="Link to this heading"></a></h2>
+<p>Created on Wed Oct 27 11:41:00 2021</p>
+<p>&#64;author: babban</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.create_arg_parser">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.create_arg_parser" title="Link to this definition"></a></dt>
+<dd><p>Create an argument parser
+return: argparse.ArgumentParser</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.create_partition">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">create_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_exact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.create_partition" title="Link to this definition"></a></dt>
+<dd><p>Takes a mesh and list of polygons and partitions according to where the centroids (mesh.centroids in schimpy) fall. 
+Parameters
+————
+mesh : schimpy.SchismMesh The mesh to partition</p>
+<p>polygons :  Polygons (parsed from shape file or yaml into SCHIMPY</p>
+<p>enforce_exact: bool
+Requires a unique, complete partition. Initially not implemented for True</p>
+<p>Produces meshes and dicitonary(?) maps of local_to_global and global_to_local. (tuple or class)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.partition_schout">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">partition_schout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_Schout_Files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_shp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combined</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'salt_depth_ave':</span> <span class="pre">('depth_ave',</span> <span class="pre">'salt')}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.partition_schout" title="Link to this definition"></a></dt>
+<dd><p>Partitions schout binary output files (start with combined) into a set of smaller schout files corresponding to each partition.</p>
+<p>Initially implementation will be nodal variables but ultimately native centered (edge centered velocity, prism centered tracers).</p>
+<p>Transform is an opportunity to generate new variables that are well determined with the data from one time step, 
+but not based on time-stenciled operations.</p>
+<p>Exclude would be an opportunity to prune variables not desired by dropping variables, although certain variables that are required 
+for well-formedness (zcor, wet-dry) and visualization would not be “excludable” so exclude = “all_data” could be used to exclude all 
+but the non-excludable. No output, but side effect is production of files. 
+p0000/schout_1.nc.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.partition_scribeio">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">partition_scribeio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_shp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['out2d',</span> <span class="pre">'zCoordinates',</span> <span class="pre">'salinity',</span> <span class="pre">'horizontalVelX',</span> <span class="pre">'horizontalVelY',</span> <span class="pre">'verticalVelocity']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.partition_scribeio" title="Link to this definition"></a></dt>
+<dd><p>Partitioning scribio format output files  into a set of smaller 
+files corresponding to each partitions. This function will loop
+all the schism scribeIO output files that contains varaibles defined
+by the input variables, and result subset outputs will be saved
+to a subset subdirectory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>partition_shp</strong><span class="classifier">arcgis shape file</span></dt><dd></dd>
+<dt><strong>shape files contains polygons where subset of output desried</strong></dt><dd></dd>
+<dt><strong>variables</strong><span class="classifier">list of str</span></dt><dd></dd>
+<dt><strong>Output variables to be subsetted</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.records">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.records" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.subset_schism_output">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">subset_schism_output</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.subset_schism_output" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.subset_schism_scribeIO_output">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">subset_schism_scribeIO_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_shp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.subset_schism_scribeIO_output" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.subset_schism_output.write_global_local_maps">
+<span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">write_global_local_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_global</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.write_global_local_maps" title="Link to this definition"></a></dt>
+<dd><p>writes maps out in the schism + visit format. Note that the global owner 
+of a shared node is the lowest rank that contains it.</p>
+</dd></dl>
+
 </section>
 <section id="module-schimpy.three_point_linear_norm">
 <span id="schimpy-three-point-linear-norm-module"></span><h2>schimpy.three_point_linear_norm module<a class="headerlink" href="#module-schimpy.three_point_linear_norm" title="Link to this heading"></a></h2>
