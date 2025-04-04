@@ -63,7 +63,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#smoother-for-complex-topography">Smoother for complex topography</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#optimizing-depths-for-volume">Optimizing depths for volume</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optimizing-depths-for-volume">Optimizing depths for volume</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#named-arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="hotstart.html">Creating hotstart</a></li>
@@ -150,6 +154,38 @@ we compare the volumetric quantities that come from SCHISM shape functions
 (which are much like a TIN) to a higher order quadrature using the DEM
 with bilinear interpolation. The quadrature is more accurate, and also
 incorporates more sample points.</p>
+<p><p>Perform grid optimization with a *.2dm SMS mesh or gr3 file. An optimized gr3 file with extension _opt.gr3 will be created if only one set of optimization parameter specified.</p>
+</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">grid_opt</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">optfile</span> <span class="n">OPTFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">solver</span> <span class="n">SOLVER</span><span class="p">]</span>
+                <span class="n">filename</span> <span class="n">demfile</span> <span class="n">optparm</span>
+</pre></div>
+</div>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>filename</kbd></dt>
+<dd><p>name of 2dm or gr3 file</p>
+</dd>
+<dt><kbd>demfile</kbd></dt>
+<dd><p>file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs</p>
+</dd>
+<dt><kbd>optparm</kbd></dt>
+<dd><p>file containing optimization parameters: damp, damp_shoreline, face_coeff, volume_coeff</p>
+</dd>
+</dl>
+</section>
+<section id="named-arguments">
+<h3>Named Arguments<a class="headerlink" href="#named-arguments" title="Link to this heading"></a></h3>
+<dl class="option-list">
+<dt><kbd>--optfile</kbd></dt>
+<dd><p>name for the gr3 file for the optimized results</p>
+</dd>
+<dt><kbd>--solver</kbd></dt>
+<dd><p>solver used for optimization, either L-BFGS-B (default) or lsqr</p>
+<p>Default: “L-BFGS-B”</p>
+</dd>
+</dl>
+</section>
 </section>
 </section>
 
