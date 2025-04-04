@@ -3,7 +3,6 @@ Assigning Bathymetry
 
 Converting a 2dm file to gr3 or between gr3 or 2dm and shapefile
 
-
 .. click:: schimpy.convert_mesh:convert_mesh_cli
     :prog: convert_mesh
 
@@ -30,10 +29,9 @@ are poorly sampled and contours are tortuous. The script contour_smooth.py
 uses minmax curvature flow (Malladi and Sethian) to impose a minimum length scale
 of change for contours, essentially unraveling the features that are most contorted.
 
-.. argparse::
-    :module: schimpy.contour_smooth
-    :func: create_arg_parser
+.. click:: schimpy.contour_smooth:contour_smooth_cli
     :prog: contour_smooth
+    :nested: full
 
 Optimizing depths for volume
 ----------------------------
