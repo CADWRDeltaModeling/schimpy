@@ -175,6 +175,7 @@ def write_pointstrings(fpath, station_in, request="all"):
 
 def read_station_shp(fpath, pop_xy=True):
     """Read a shapefile and convert into a pandas DataFrame
+
     Parameters
     ----------
     fpath : fname
