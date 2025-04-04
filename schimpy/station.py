@@ -440,7 +440,7 @@ def read_station_out(fpath_base, stationinfo, var=None, start=None):
             )
         fname = "{}_{:d}".format(fpath_base, fileno)
     data = pd.read_csv(
-        fpath,
+        fname,
         var,
         sep="\s+",
         index_col=0,
