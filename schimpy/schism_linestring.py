@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" Line String data based on Shapely LineStrings
-"""
+"""Line String data based on Shapely LineStrings"""
 from . import schism_yaml
 import shapely.geometry
 from shapely.wkb import loads
@@ -206,6 +205,7 @@ class LineStringIoFactory(object):
 
 
 def read_linestrings(fpath):
+    fpath = str(fpath)  # Convert PosixPath to string
     if fpath.endswith(".yaml"):
         return LineStringIoFactory().get_reader("yaml").read(fpath)
     elif fpath.endswith(".shp"):
@@ -223,6 +223,7 @@ def write_linestrings(fpath, lines):
     lines: array of schism_linestring.LineString
         list of LineStrings
     """
+    fpath = str(fpath)  # Convert PosixPath to string
     if fpath.endswith(".yaml"):
         return LineStringIoFactory().get_writer("yaml").write(fpath, lines)
     if fpath.endswith(".shp"):
