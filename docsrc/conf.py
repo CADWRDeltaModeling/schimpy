@@ -139,7 +139,6 @@ html_theme = "sphinx_rtd_theme"
 html_logo = "./_static/dwr_logo_small.png"
 html_theme_options = {
     "logo_only": True,
-    "display_version": False,
     "prev_next_buttons_location": "both",
 }
 
