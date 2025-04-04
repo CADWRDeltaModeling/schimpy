@@ -11,9 +11,9 @@ dependencies:
   - schimpy>=1.6.5         # Recommended for compatibility with current code. Please coordinate with schism_env.yml
   - vtools3
   - dms-datastore>=0.0.16
-  - pandas>=1.5            # Below here minimum versions are to reduce solve space
-  - numpy>=1.21.6,<1.24    # Pinned to avoid compatibility issues with dask
-  - xarray>=2022.11
+  - pandas>=1.3,<1.6       # Updated to ensure compatibility
+  - numpy>=1.21.6,<1.24    # Updated to avoid compatibility issues
+  - xarray>=2022.6,<2023.1 # Updated to ensure compatibility
   - netcdf4>=1.5.7
   - dask>=2022.11,<2023.5  # Pinned to ensure compatibility with numpy
   - numba>=0.56

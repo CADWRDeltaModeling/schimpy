@@ -33,6 +33,7 @@ jobs:
           conda env create -f schimpy_env.yml
           source $CONDA/etc/profile.d/conda.sh
           conda activate schimpy
+          pip install --upgrade pip
           pip install -r docsrc/requirements.txt
       - name: Build HTML
         run: |
