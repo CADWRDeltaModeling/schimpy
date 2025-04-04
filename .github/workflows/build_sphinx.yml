@@ -35,6 +35,7 @@ jobs:
           conda activate schimpy
           pip install --upgrade pip
           pip install -r docsrc/requirements.txt
+          conda install -c conda-forge gdal geopandas numpy
       - name: Build HTML
         run: |
           source $CONDA/etc/profile.d/conda.sh

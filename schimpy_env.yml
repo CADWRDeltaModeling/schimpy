@@ -11,11 +11,11 @@ dependencies:
   - schimpy>=1.6.5         # Recommended for compatibility with current code. Please coordinate with schism_env.yml
   - vtools3
   - dms-datastore>=0.0.16
-  - pandas>=1.3,<1.6       # Updated to ensure compatibility
-  - numpy>=1.21.6,<1.24    # Updated to avoid compatibility issues
-  - xarray>=2022.6,<2023.1 # Updated to ensure compatibility
+  - pandas>=1.3
+  - numpy>=1.21.6
+  - xarray>=2022.6
   - netcdf4>=1.5.7
-  - dask>=2022.11,<2023.5  # Pinned to ensure compatibility with numpy
+  - dask>=2022.11
   - numba>=0.56
   - scipy>=1.8,<1.11
   - statsmodels>=0.13.2
@@ -29,6 +29,7 @@ dependencies:
   - ipykernel
   - pyshp
   - rtree
+  - gdal>=3.10.2
   
 # Note, though these are listed below as if conda would use pip
 # we do not recommend that you uncomment and use conda to install them via pip. 

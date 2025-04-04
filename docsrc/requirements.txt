@@ -3,6 +3,7 @@ sphinx>=7.0
 sphinx-design
 sphinx-argparse  
 sphinxcontrib-bibtex
+sphinx-autodoc-typehints  # For better type hint support in Sphinx
 sphinx_rtd_theme
 sphinx-click
 ghp-import # for GitHub Pages import
@@ -12,3 +13,7 @@ docutils
 matplotlib # needed for matplotlib.sphinxext.mathmply
 ipython    # neededd for IPython.sphinxext.ipython_directive
 pip
+shapely>=2.0
+babel
+
+# pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org -r .\requirements.txt
