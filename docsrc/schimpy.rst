@@ -4,14 +4,6 @@ schimpy package
 Submodules
 ----------
 
-schimpy.adjust\_source\_sink module
------------------------------------
-
-.. automodule:: schimpy.adjust_source_sink
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 schimpy.base\_io module
 -----------------------
 
@@ -104,6 +96,14 @@ schimpy.convert\_mesh module
 ----------------------------
 
 .. automodule:: schimpy.convert_mesh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.convert\_points module
+------------------------------
+
+.. automodule:: schimpy.convert_points
    :members:
    :undoc-members:
    :show-inheritance:
@@ -268,6 +268,14 @@ schimpy.material\_poly module
    :undoc-members:
    :show-inheritance:
 
+schimpy.merge\_th module
+------------------------
+
+.. automodule:: schimpy.merge_th
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 schimpy.metricsplot module
 --------------------------
 
@@ -284,10 +292,10 @@ schimpy.model\_time module
    :undoc-members:
    :show-inheritance:
 
-schimpy.namelist module
------------------------
+schimpy.nml module
+------------------
 
-.. automodule:: schimpy.namelist
+.. automodule:: schimpy.nml
    :members:
    :undoc-members:
    :show-inheritance:
@@ -296,6 +304,22 @@ schimpy.nudging module
 ----------------------
 
 .. automodule:: schimpy.nudging
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.param module
+--------------------
+
+.. automodule:: schimpy.param
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+schimpy.params module
+---------------------
+
+.. automodule:: schimpy.params
    :members:
    :undoc-members:
    :show-inheritance:
@@ -348,14 +372,6 @@ schimpy.read\_output\_xyt module
    :undoc-members:
    :show-inheritance:
 
-schimpy.schimpy\_locale module
-------------------------------
-
-.. automodule:: schimpy.schimpy_locale
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 schimpy.schism\_hotstart module
 -------------------------------
 
@@ -384,14 +400,6 @@ schimpy.schism\_mesh module
 ---------------------------
 
 .. automodule:: schimpy.schism_mesh
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-schimpy.schism\_nudging module
-------------------------------
-
-.. automodule:: schimpy.schism_nudging
    :members:
    :undoc-members:
    :show-inheritance:
@@ -544,14 +552,6 @@ schimpy.unit\_conversions module
 --------------------------------
 
 .. automodule:: schimpy.unit_conversions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-schimpy.untitled0 module
-------------------------
-
-.. automodule:: schimpy.untitled0
    :members:
    :undoc-members:
    :show-inheritance:
