@@ -313,7 +313,7 @@ class SchismMesh(TriQuadMesh):
             two end points of the line segment, start_x, start_y, end_x, end_y
 
         Returns
-        ------
+        -------
         up_path: array of int
             upstream side of node paths
         down_path: array of int
