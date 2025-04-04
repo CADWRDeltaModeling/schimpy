@@ -54,7 +54,6 @@
 <li class="toctree-l1"><a class="reference internal" href="sms.html">Working with SMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_time.html">Model time</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Populating Elevation/Depth Data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#convert-mesh">convert_mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#assigning-depths-from-prioritized-dems">Assigning depths from prioritized DEMs</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#stacked-dem-fill">stacked_dem_fill</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
@@ -110,38 +109,6 @@
   <section id="assigning-bathymetry">
 <h1>Assigning Bathymetry<a class="headerlink" href="#assigning-bathymetry" title="Link to this heading"></a></h1>
 <p>Converting a 2dm file to gr3 or between gr3 or 2dm and shapefile</p>
-<section id="convert-mesh">
-<h2>convert_mesh<a class="headerlink" href="#convert-mesh" title="Link to this heading"></a></h2>
-<p>Convert a mesh from one format to another. The format is decided by the extensions automatically.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>convert_mesh<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</pre></div>
-</div>
-<p class="rubric">Options</p>
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-convert_mesh-input">
-<span class="sig-name descname"><span class="pre">--input</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;input&gt;</span></span><a class="headerlink" href="#cmdoption-convert_mesh-input" title="Link to this definition"></a></dt>
-<dd><p><strong>Required</strong> Input mesh file.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-convert_mesh-output">
-<span class="sig-name descname"><span class="pre">--output</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;output&gt;</span></span><a class="headerlink" href="#cmdoption-convert_mesh-output" title="Link to this definition"></a></dt>
-<dd><p><strong>Required</strong> Output mesh file.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-convert_mesh-crs">
-<span class="sig-name descname"><span class="pre">--crs</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;crs&gt;</span></span><a class="headerlink" href="#cmdoption-convert_mesh-crs" title="Link to this definition"></a></dt>
-<dd><p>CRS string for the projection.</p>
-</dd></dl>
-
-<dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-convert_mesh-h">
-<span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-convert_mesh-h" title="Link to this definition"></a></dt>
-<dd><p>Show this message and exit.</p>
-</dd></dl>
-
-</section>
 <section id="assigning-depths-from-prioritized-dems">
 <h2>Assigning depths from prioritized DEMs<a class="headerlink" href="#assigning-depths-from-prioritized-dems" title="Link to this heading"></a></h2>
 <p>These tools are used by the preprocessor but also work with functions that can

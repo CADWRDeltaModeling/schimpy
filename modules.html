@@ -93,7 +93,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="schimpy.html">schimpy package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-archive-ts-module">schimpy.archive_ts module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.base_io">schimpy.base_io module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.base_io.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.base_io.BaseIO.linecounter"><code class="docutils literal notranslate"><span class="pre">BaseIO.linecounter</span></code></a></li>
@@ -101,7 +100,10 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-batch-metrics-module">schimpy.batch_metrics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.batch_metrics">schimpy.batch_metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.batch_metrics.generate_metricsplots"><code class="docutils literal notranslate"><span class="pre">generate_metricsplots()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.bctide">schimpy.bctide module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.bctide.load_boundary"><code class="docutils literal notranslate"><span class="pre">load_boundary()</span></code></a></li>
 </ul>
@@ -110,12 +112,7 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.bound_linear.bound_linear"><code class="docutils literal notranslate"><span class="pre">bound_linear()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.cencoos_download">schimpy.cencoos_download module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.cencoos_download.cencoos_schism_opendap"><code class="docutils literal notranslate"><span class="pre">cencoos_schism_opendap()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.cencoos_download.merc_to_latlon"><code class="docutils literal notranslate"><span class="pre">merc_to_latlon()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.cencoos_download.time_block_report"><code class="docutils literal notranslate"><span class="pre">time_block_report()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-cencoos-download-module">schimpy.cencoos_download module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.check_mesh_skewness">schimpy.check_mesh_skewness module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.check_mesh_skewness.calculate_skewness"><code class="docutils literal notranslate"><span class="pre">calculate_skewness()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.check_mesh_skewness.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
@@ -123,7 +120,6 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.check_mesh_skewness.write_prop"><code class="docutils literal notranslate"><span class="pre">write_prop()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-clip-beyond-subdomain-module">schimpy.clip_beyond_subdomain module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.clip_dems">schimpy.clip_dems module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.clip_dems.bounding_coords"><code class="docutils literal notranslate"><span class="pre">bounding_coords()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.clip_dems.clip_dem"><code class="docutils literal notranslate"><span class="pre">clip_dem()</span></code></a></li>
@@ -341,7 +337,13 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.grid_opt.object_func"><code class="docutils literal notranslate"><span class="pre">object_func()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-hotstart-inventory-module">schimpy.hotstart_inventory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.hotstart_inventory">schimpy.hotstart_inventory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.hotstart_inventory"><code class="docutils literal notranslate"><span class="pre">hotstart_inventory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.hotstart_inventory2"><code class="docutils literal notranslate"><span class="pre">hotstart_inventory2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.hrr3">schimpy.hrr3 module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.hrr3.AWSGrib2Inventory"><code class="docutils literal notranslate"><span class="pre">AWSGrib2Inventory</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.hrr3.AWSGrib2Inventory.bucket"><code class="docutils literal notranslate"><span class="pre">AWSGrib2Inventory.bucket</span></code></a></li>
@@ -368,7 +370,15 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-interpolate-structure-module">schimpy.interpolate_structure module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.interpolate_structure">schimpy.interpolate_structure module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.ensure_offset"><code class="docutils literal notranslate"><span class="pre">ensure_offset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.interpolate_structure"><code class="docutils literal notranslate"><span class="pre">interpolate_structure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.test_date_label_correct"><code class="docutils literal notranslate"><span class="pre">test_date_label_correct()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.test_template_times"><code class="docutils literal notranslate"><span class="pre">test_template_times()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.laplace_smooth_data">schimpy.laplace_smooth_data module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_data"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_data2"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data2()</span></code></a></li>
@@ -423,7 +433,11 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.merge_th.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-metricsplot-module">schimpy.metricsplot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.metricsplot">schimpy.metricsplot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.metricsplot.plot_comparison"><code class="docutils literal notranslate"><span class="pre">plot_comparison()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.metricsplot.plot_metrics"><code class="docutils literal notranslate"><span class="pre">plot_metrics()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.model_time">schimpy.model_time module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.model_time.clip"><code class="docutils literal notranslate"><span class="pre">clip()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.model_time.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
@@ -447,33 +461,7 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.nml.write"><code class="docutils literal notranslate"><span class="pre">write()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.nudging">schimpy.nudging module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging"><code class="docutils literal notranslate"><span class="pre">Nudging</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.concatenate_nudge"><code class="docutils literal notranslate"><span class="pre">Nudging.concatenate_nudge()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.construct_weights"><code class="docutils literal notranslate"><span class="pre">Nudging.construct_weights()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.create_nudging"><code class="docutils literal notranslate"><span class="pre">Nudging.create_nudging()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.create_region_nudging"><code class="docutils literal notranslate"><span class="pre">Nudging.create_region_nudging()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.gaussian_weights"><code class="docutils literal notranslate"><span class="pre">Nudging.gaussian_weights()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.gen_nudge_3dfield"><code class="docutils literal notranslate"><span class="pre">Nudging.gen_nudge_3dfield()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.gen_nudge_obs"><code class="docutils literal notranslate"><span class="pre">Nudging.gen_nudge_obs()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.gen_region_weight"><code class="docutils literal notranslate"><span class="pre">Nudging.gen_region_weight()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.get_nudging_comb"><code class="docutils literal notranslate"><span class="pre">Nudging.get_nudging_comb()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.in_vertices"><code class="docutils literal notranslate"><span class="pre">Nudging.in_vertices()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.mesh_gpd"><code class="docutils literal notranslate"><span class="pre">Nudging.mesh_gpd</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.organize_nudging"><code class="docutils literal notranslate"><span class="pre">Nudging.organize_nudging()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.plot"><code class="docutils literal notranslate"><span class="pre">Nudging.plot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.read_data"><code class="docutils literal notranslate"><span class="pre">Nudging.read_data()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.read_yaml"><code class="docutils literal notranslate"><span class="pre">Nudging.read_yaml()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.reorder_variables"><code class="docutils literal notranslate"><span class="pre">Nudging.reorder_variables()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.signa"><code class="docutils literal notranslate"><span class="pre">Nudging.signa()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.nudging.Nudging.z"><code class="docutils literal notranslate"><span class="pre">Nudging.z</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.nudging.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.nudging.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.nudging.write_to_log"><code class="docutils literal notranslate"><span class="pre">write_to_log()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-nudging-module">schimpy.nudging module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.param">schimpy.param module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.param.Params"><code class="docutils literal notranslate"><span class="pre">Params</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.param.Params.adjust_dt"><code class="docutils literal notranslate"><span class="pre">Params.adjust_dt()</span></code></a></li>
@@ -824,7 +812,13 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.params.get_value_dict"><code class="docutils literal notranslate"><span class="pre">get_value_dict()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-plot-default-formats-module">schimpy.plot_default_formats module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.plot_default_formats">schimpy.plot_default_formats module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_color_cycle_dark2"><code class="docutils literal notranslate"><span class="pre">set_color_cycle_dark2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_dual_axes"><code class="docutils literal notranslate"><span class="pre">set_dual_axes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_dual_axes_elev"><code class="docutils literal notranslate"><span class="pre">set_dual_axes_elev()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_dual_axes_salt"><code class="docutils literal notranslate"><span class="pre">set_dual_axes_salt()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.prepare_schism">schimpy.prepare_schism module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.prepare_schism.prepare_schism"><code class="docutils literal notranslate"><span class="pre">prepare_schism()</span></code></a></li>
 </ul>
@@ -845,10 +839,7 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.profile_plot.vertical_fill"><code class="docutils literal notranslate"><span class="pre">vertical_fill()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.raster_to_nodes">schimpy.raster_to_nodes module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.raster_to_nodes.raster_to_nodes"><code class="docutils literal notranslate"><span class="pre">raster_to_nodes()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-raster-to-nodes-module">schimpy.raster_to_nodes module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.read_output_xyt">schimpy.read_output_xyt module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.read_output_xyt.read_depth_avg_from_output7b_xyt"><code class="docutils literal notranslate"><span class="pre">read_depth_avg_from_output7b_xyt()</span></code></a></li>
 </ul>
@@ -1127,7 +1118,15 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.schism_yaml.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-separate-species-module">schimpy.separate_species module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.separate_species">schimpy.separate_species module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.separate_species.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.separate_species.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.separate_species.plot_result"><code class="docutils literal notranslate"><span class="pre">plot_result()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.separate_species.run_example"><code class="docutils literal notranslate"><span class="pre">run_example()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.separate_species.separate_species"><code class="docutils literal notranslate"><span class="pre">separate_species()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.separate_species.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.simulation_timing">schimpy.simulation_timing module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.simulation_timing.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.simulation_timing.schism_timing"><code class="docutils literal notranslate"><span class="pre">schism_timing()</span></code></a></li>
@@ -1190,17 +1189,7 @@
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.station.write_station_shp"><code class="docutils literal notranslate"><span class="pre">write_station_shp()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.subset_schism_output">schimpy.subset_schism_output module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.create_partition"><code class="docutils literal notranslate"><span class="pre">create_partition()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.partition_schout"><code class="docutils literal notranslate"><span class="pre">partition_schout()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.partition_scribeio"><code class="docutils literal notranslate"><span class="pre">partition_scribeio()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.records"><code class="docutils literal notranslate"><span class="pre">records()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.subset_schism_output"><code class="docutils literal notranslate"><span class="pre">subset_schism_output()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.subset_schism_scribeIO_output"><code class="docutils literal notranslate"><span class="pre">subset_schism_scribeIO_output()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.subset_schism_output.write_global_local_maps"><code class="docutils literal notranslate"><span class="pre">write_global_local_maps()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html#schimpy-subset-schism-output-module">schimpy.subset_schism_output module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="schimpy.html#module-schimpy.three_point_linear_norm">schimpy.three_point_linear_norm module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy.three_point_linear_norm.ThreePointLinearNorm"><code class="docutils literal notranslate"><span class="pre">ThreePointLinearNorm</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.three_point_linear_norm.ThreePointLinearNorm.autoscale"><code class="docutils literal notranslate"><span class="pre">ThreePointLinearNorm.autoscale()</span></code></a></li>
