@@ -19,14 +19,16 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+
+sys.path.insert(0, os.path.abspath(".."))
 
 import schimpy
+
 tls_verify = False
 # using mock to avoid nodepy documentation which is hard to import
-#import mock
-#MOCK_MODULES = ['nodepy']
-#for mod_name in MOCK_MODULES:
+# import mock
+# MOCK_MODULES = ['nodepy']
+# for mod_name in MOCK_MODULES:
 #    sys.modules[mod_name] = mock.Mock()
 
 # -- General configuration ---------------------------------------------
@@ -34,20 +36,23 @@ tls_verify = False
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
- 
 
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['nbsphinx', 'sphinx.ext.mathjax',
-          'sphinx.ext.autodoc','sphinxarg.ext', #'sphinx.ext.viewcode',
-          'matplotlib.sphinxext.mathmpl',
-          'matplotlib.sphinxext.plot_directive',
-          'IPython.sphinxext.ipython_directive',
-          'IPython.sphinxext.ipython_console_highlighting',
-          'sphinx.ext.intersphinx',
-          'sphinx.ext.doctest',
-          'numpydoc']
+extensions = [
+    "nbsphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.autodoc",
+    "sphinxarg.ext",  #'sphinx.ext.viewcode',
+    "matplotlib.sphinxext.mathmpl",
+    "matplotlib.sphinxext.plot_directive",
+    "IPython.sphinxext.ipython_directive",
+    "IPython.sphinxext.ipython_console_highlighting",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.doctest",
+    "numpydoc",
+]
 
 # Figure configuration
 numfig = True
@@ -55,33 +60,33 @@ numfig_number_figures = True
 numfig_figure_caption_prefix = "Figure"
 
 autosummary_generate = False
-autodoc_member_order = 'alphabetical'
-autodoc_mock_imports = ["numpy","nodepy"]
-autosummary_mock_imports = ["numpy","nodepy"]
+autodoc_member_order = "alphabetical"
+autodoc_mock_imports = ["numpy", "nodepy"]
+autosummary_mock_imports = ["numpy", "nodepy"]
 numpydoc_class_members_toctree = False
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # mappings for intersphinx extension
-intersphinx_mapping = {'pandas': ('https://pandas.pydata.org/pandas-docs/stable',None),
- 'python': ('https://docs.python.org/3', None),
- 'xarray' : ('https://docs.xarray.dev/en/stable',None)
- }
+intersphinx_mapping = {
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "python": ("https://docs.python.org/3", None),
+    "xarray": ("https://docs.xarray.dev/en/stable", None),
+}
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The master toctree document.
-master_doc = 'index'
-
+master_doc = "index"
 
 
 # General information about the project.
-project = 'schimpy'
+project = "schimpy"
 copyright = "2020, California Department of Water Resources"
 author = "Eli Ateljevich, Kijin Nam, Nicky Sandhu"
 
@@ -99,17 +104,23 @@ release = schimpy.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'en'
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['*test*']
+exclude_patterns = ["*test*"]
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store',
-    '*test*','_build','**.ipynb_checkpoints']
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "*test*",
+    "_build",
+    "**.ipynb_checkpoints",
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
@@ -123,12 +134,12 @@ todo_include_todos = False
 
 import sphinx_rtd_theme
 
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 html_logo = "./_static/dwr_logo_small.png"
 html_theme_options = {
-    'logo_only': True,
-    'display_version': False,
-    'prev_next_buttons_location': 'both'
+    "logo_only": True,
+    "display_version": False,
+    "prev_next_buttons_location": "both",
 }
 
 # Theme options are theme-specific and customize the look and feel of a
@@ -138,13 +149,13 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'schimpydoc'
+htmlhelp_basename = "schimpydoc"
 
 
 # -- Options for LaTeX output ------------------------------------------
@@ -153,15 +164,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -171,9 +179,13 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'schimpy.tex',
-     'schimpy Documentation',
-     'Eli Ateljevich, Kijin Nam', 'manual'),
+    (
+        master_doc,
+        "schimpy.tex",
+        "schimpy Documentation",
+        "Eli Ateljevich, Kijin Nam",
+        "manual",
+    ),
 ]
 
 
@@ -181,11 +193,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'schimpy',
-     'schimpy',
-     [author], 1)
-]
+man_pages = [(master_doc, "schimpy", "schimpy", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -194,13 +202,13 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'schimpy',
-     'schimpy Documentation',
-     author,
-     'schimpy',
-     'Python scripts for SCHISM',
-     'Miscellaneous'),
+    (
+        master_doc,
+        "schimpy",
+        "schimpy Documentation",
+        author,
+        "schimpy",
+        "Python scripts for SCHISM",
+        "Miscellaneous",
+    ),
 ]
-
-
-
