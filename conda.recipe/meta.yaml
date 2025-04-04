@@ -52,9 +52,7 @@ test:
   commands:
     - (setlocal && cd tests && pytest && endlocal) # [win]
     - (cd tests; pytest) # [unix]
-    {% for name in project['scripts'] %}
-    - {{ name }}
-    {% endfor %}
+    
 about:
   home: https://github.com/CADWRDeltaModeling/schimpy
   summary: Tools, scripts, templates and data for running SCHISM on the Bay-Delta
