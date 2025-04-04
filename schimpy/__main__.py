@@ -20,7 +20,6 @@ from schimpy.convert_points import convert_points_cli
 # from schimpy.nudging import create_nudging
 # from schimpy.interpolate_structure import interpolate_structure
 # from schimpy.merge_th import merge_th
-# from schimpy.archive_ts import archive_ts
 
 
 @click.group(
@@ -53,7 +52,6 @@ cli.add_command(convert_points_cli, "convert_points")
 # cli.add_command(create_nudging, "create_nudging")
 # cli.add_command(interpolate_structure, "interpolate_structure")
 # cli.add_command(merge_th, "merge_th")
-# cli.add_command(archive_ts, "archive_ts")
 
 
 if __name__ == "__main__":
