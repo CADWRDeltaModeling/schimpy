@@ -34,9 +34,9 @@ def main(input, output):
             write_polygons(output, polygons)
         else:
             raise ValueError("Not supported output file type")
-    elif args.input.endswith(".shp"):
-        polygons = read_polygons(args.input)
-        write_polygons(args.output, polygons)
+    elif input.endswith(".shp"):
+        polygons = read_polygons(input)
+        write_polygons(output, polygons)
     else:
         raise ValueError(
             "Unsupported input file type. Only YAML (.yaml) or Shapefile (.shp) are supported."
