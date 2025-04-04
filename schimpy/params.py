@@ -497,7 +497,7 @@ class Opt(param.Parameterized):
     hw_depth = param.Number(15.0, bounds=(0, None), doc="Wave depth parameter (m)")
     hw_ratio = param.Number(1.2, bounds=(0, None), doc="Wave height/depth ratio")
     level_age = param.List(
-        class_=float,
+        item_type=float,
         default=[-999.0],
         bounds=(-999.0, None),
         doc="Minimum age of a level (days)",
