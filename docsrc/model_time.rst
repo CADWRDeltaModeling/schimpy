@@ -1,7 +1,7 @@
 Model time conversion
 =====================
 
-The SCHISM \*\.th file has two flavors, binary and text. Both are multicolumn formats,
+The SCHISM \*.th file has two flavors, binary and text. Both are multicolumn formats,
 with elapsed time in seconds in the left column since the start of the simulation
 and the other columns representing values. 
 There is no datum within the file to link elapsed time to calendar or geophysical time, 
@@ -20,4 +20,3 @@ model_time.py
     :module: schimpy.model_time
     :func: create_arg_parser
     :prog: model_time
-    
