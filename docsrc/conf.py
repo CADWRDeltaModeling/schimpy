@@ -45,6 +45,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.autodoc",
     "sphinxarg.ext",  #'sphinx.ext.viewcode',
+    "sphinx_click",
     "matplotlib.sphinxext.mathmpl",
     "matplotlib.sphinxext.plot_directive",
     "IPython.sphinxext.ipython_directive",

@@ -1,13 +1,10 @@
-
 Assigning Bathymetry
 ====================
 
 Converting a 2dm file to gr3 or between gr3 or 2dm and shapefile
 
 
-.. argparse::
-    :module: schimpy.convert_mesh
-    :func: create_arg_parser
+.. click:: schimpy.convert_mesh:convert_mesh_cli
     :prog: convert_mesh
 
 Assigning depths from prioritized DEMs
