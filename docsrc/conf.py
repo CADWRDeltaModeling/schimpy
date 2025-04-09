@@ -53,6 +53,8 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.doctest",
     "numpydoc",
+    "sphinx.ext.napoleon",
+    "sphinx_click",
 ]
 
 # Figure configuration
