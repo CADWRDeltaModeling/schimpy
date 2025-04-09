@@ -19,7 +19,6 @@ build:
     {% for name, reference in project['scripts'].items() %}
     - {{ name }} = {{ reference }}
     {% endfor %}
-  skip: true  # [not win]
 
 requirements:
   host:
