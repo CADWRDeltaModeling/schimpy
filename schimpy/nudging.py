@@ -1151,6 +1151,7 @@ def main():
     parser = create_arg_parser()
     args = parser.parse_args()
     if args.input.endswith(".yaml"):
+        os.chdir(os.path.abspath(os.path.dirname(args.input)))
         nudge = Nudging(args.input)
         nudge.read_yaml()
         nudge.create_nudging()
