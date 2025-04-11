@@ -1,7 +1,14 @@
-schimpy
-=======
+Module Documentation
+=====================
 
-.. toctree::
-   :maxdepth: 4
+Command Line Tools
+-------------------
 
-   schimpy
+.. click:: schimpy.__main__:cli
+    :prog: sch
+    :show-nested:
+
+Schimpy Modules
+-----------------
+
+.. include:: schimpy.rst
