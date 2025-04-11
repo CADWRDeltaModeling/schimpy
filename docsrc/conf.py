@@ -64,8 +64,8 @@ numfig_figure_caption_prefix = "Figure"
 
 autosummary_generate = False
 autodoc_member_order = "alphabetical"
-autodoc_mock_imports = ["numpy", "nodepy"]
-autosummary_mock_imports = ["numpy", "nodepy"]
+# autodoc_mock_imports = ["numpy", "nodepy"]
+# autosummary_mock_imports = ["numpy", "nodepy"]
 numpydoc_class_members_toctree = False
 
 # Add any paths that contain templates here, relative to this directory.
