@@ -33,7 +33,7 @@ Contents
 ---------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
    
    Installation <installation>
    Spatial data in SCHISM <spatial>
