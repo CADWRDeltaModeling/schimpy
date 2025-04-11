@@ -1,11 +1,9 @@
-schimpy package
-===============
 
 Submodules
-----------
+"""""""""""
 
 schimpy.base\_io module
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.base_io
    :members:
@@ -13,7 +11,7 @@ schimpy.base\_io module
    :show-inheritance:
 
 schimpy.batch\_metrics module
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.batch_metrics
    :members:
@@ -21,7 +19,7 @@ schimpy.batch\_metrics module
    :show-inheritance:
 
 schimpy.bctide module
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.bctide
    :members:
@@ -29,7 +27,7 @@ schimpy.bctide module
    :show-inheritance:
 
 schimpy.bound\_linear module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.bound_linear
    :members:
@@ -37,7 +35,7 @@ schimpy.bound\_linear module
    :show-inheritance:
 
 schimpy.cencoos\_download module
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.cencoos_download
    :members:
@@ -45,7 +43,7 @@ schimpy.cencoos\_download module
    :show-inheritance:
 
 schimpy.check\_mesh\_skewness module
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.check_mesh_skewness
    :members:
@@ -53,7 +51,7 @@ schimpy.check\_mesh\_skewness module
    :show-inheritance:
 
 schimpy.clip\_dems module
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.clip_dems
    :members:
@@ -61,7 +59,7 @@ schimpy.clip\_dems module
    :show-inheritance:
 
 schimpy.combine\_consume module
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.combine_consume
    :members:
@@ -69,7 +67,7 @@ schimpy.combine\_consume module
    :show-inheritance:
 
 schimpy.combine\_flux module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.combine_flux
    :members:
@@ -77,7 +75,7 @@ schimpy.combine\_flux module
    :show-inheritance:
 
 schimpy.contour\_smooth module
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.contour_smooth
    :members:
@@ -85,7 +83,7 @@ schimpy.contour\_smooth module
    :show-inheritance:
 
 schimpy.convert\_linestrings module
------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.convert_linestrings
    :members:
@@ -93,7 +91,7 @@ schimpy.convert\_linestrings module
    :show-inheritance:
 
 schimpy.convert\_mesh module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.convert_mesh
    :members:
@@ -101,7 +99,7 @@ schimpy.convert\_mesh module
    :show-inheritance:
 
 schimpy.convert\_points module
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.convert_points
    :members:
@@ -109,7 +107,7 @@ schimpy.convert\_points module
    :show-inheritance:
 
 schimpy.convert\_polygons module
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.convert_polygons
    :members:
@@ -117,7 +115,7 @@ schimpy.convert\_polygons module
    :show-inheritance:
 
 schimpy.convert\_sav\_class\_to\_number module
-----------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.convert_sav_class_to_number
    :members:
@@ -125,7 +123,7 @@ schimpy.convert\_sav\_class\_to\_number module
    :show-inheritance:
 
 schimpy.create\_mesh\_n\_levels module
---------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.create_mesh_n_levels
    :members:
@@ -133,7 +131,7 @@ schimpy.create\_mesh\_n\_levels module
    :show-inheritance:
 
 schimpy.create\_vgrid\_lsc2 module
-----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.create_vgrid_lsc2
    :members:
@@ -141,7 +139,7 @@ schimpy.create\_vgrid\_lsc2 module
    :show-inheritance:
 
 schimpy.cruise module
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.cruise
    :members:
@@ -149,7 +147,7 @@ schimpy.cruise module
    :show-inheritance:
 
 schimpy.cut\_mesh module
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.cut_mesh
    :members:
@@ -157,7 +155,7 @@ schimpy.cut\_mesh module
    :show-inheritance:
 
 schimpy.download\_hrrr module
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.download_hrrr
    :members:
@@ -165,7 +163,7 @@ schimpy.download\_hrrr module
    :show-inheritance:
 
 schimpy.embed\_raster module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.embed_raster
    :members:
@@ -173,7 +171,7 @@ schimpy.embed\_raster module
    :show-inheritance:
 
 schimpy.gaussian\_quadrature module
------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.gaussian_quadrature
    :members:
@@ -181,7 +179,7 @@ schimpy.gaussian\_quadrature module
    :show-inheritance:
 
 schimpy.gen\_elev2d module
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.gen_elev2d
    :members:
@@ -189,7 +187,7 @@ schimpy.gen\_elev2d module
    :show-inheritance:
 
 schimpy.geo\_tools module
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.geo_tools
    :members:
@@ -197,7 +195,7 @@ schimpy.geo\_tools module
    :show-inheritance:
 
 schimpy.gr3 module
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.gr3
    :members:
@@ -205,7 +203,7 @@ schimpy.gr3 module
    :show-inheritance:
 
 schimpy.grid\_opt module
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.grid_opt
    :members:
@@ -213,7 +211,7 @@ schimpy.grid\_opt module
    :show-inheritance:
 
 schimpy.hotstart\_inventory module
-----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.hotstart_inventory
    :members:
@@ -221,7 +219,7 @@ schimpy.hotstart\_inventory module
    :show-inheritance:
 
 schimpy.hrr3 module
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.hrr3
    :members:
@@ -229,7 +227,7 @@ schimpy.hrr3 module
    :show-inheritance:
 
 schimpy.interp\_2d module
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.interp_2d
    :members:
@@ -237,7 +235,7 @@ schimpy.interp\_2d module
    :show-inheritance:
 
 schimpy.interpolate\_structure module
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.interpolate_structure
    :members:
@@ -245,7 +243,7 @@ schimpy.interpolate\_structure module
    :show-inheritance:
 
 schimpy.laplace\_smooth\_data module
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.laplace_smooth_data
    :members:
@@ -253,7 +251,7 @@ schimpy.laplace\_smooth\_data module
    :show-inheritance:
 
 schimpy.lsc2 module
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.lsc2
    :members:
@@ -261,7 +259,7 @@ schimpy.lsc2 module
    :show-inheritance:
 
 schimpy.material\_poly module
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.material_poly
    :members:
@@ -269,7 +267,7 @@ schimpy.material\_poly module
    :show-inheritance:
 
 schimpy.merge\_th module
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.merge_th
    :members:
@@ -277,7 +275,7 @@ schimpy.merge\_th module
    :show-inheritance:
 
 schimpy.metricsplot module
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.metricsplot
    :members:
@@ -285,7 +283,7 @@ schimpy.metricsplot module
    :show-inheritance:
 
 schimpy.model\_time module
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.model_time
    :members:
@@ -293,7 +291,7 @@ schimpy.model\_time module
    :show-inheritance:
 
 schimpy.nml module
-------------------
+~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.nml
    :members:
@@ -301,7 +299,7 @@ schimpy.nml module
    :show-inheritance:
 
 schimpy.nudging module
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.nudging
    :members:
@@ -309,7 +307,7 @@ schimpy.nudging module
    :show-inheritance:
 
 schimpy.param module
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.param
    :members:
@@ -317,7 +315,7 @@ schimpy.param module
    :show-inheritance:
 
 schimpy.params module
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.params
    :members:
@@ -325,7 +323,7 @@ schimpy.params module
    :show-inheritance:
 
 schimpy.plot\_default\_formats module
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.plot_default_formats
    :members:
@@ -333,7 +331,7 @@ schimpy.plot\_default\_formats module
    :show-inheritance:
 
 schimpy.prepare\_schism module
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.prepare_schism
    :members:
@@ -341,7 +339,7 @@ schimpy.prepare\_schism module
    :show-inheritance:
 
 schimpy.priority\_queue module
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.priority_queue
    :members:
@@ -349,7 +347,7 @@ schimpy.priority\_queue module
    :show-inheritance:
 
 schimpy.profile\_plot module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.profile_plot
    :members:
@@ -357,7 +355,7 @@ schimpy.profile\_plot module
    :show-inheritance:
 
 schimpy.raster\_to\_nodes module
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.raster_to_nodes
    :members:
@@ -365,7 +363,7 @@ schimpy.raster\_to\_nodes module
    :show-inheritance:
 
 schimpy.read\_output\_xyt module
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.read_output_xyt
    :members:
@@ -373,7 +371,7 @@ schimpy.read\_output\_xyt module
    :show-inheritance:
 
 schimpy.schism\_hotstart module
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_hotstart
    :members:
@@ -381,7 +379,7 @@ schimpy.schism\_hotstart module
    :show-inheritance:
 
 schimpy.schism\_input module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_input
    :members:
@@ -389,7 +387,7 @@ schimpy.schism\_input module
    :show-inheritance:
 
 schimpy.schism\_linestring module
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_linestring
    :members:
@@ -397,7 +395,7 @@ schimpy.schism\_linestring module
    :show-inheritance:
 
 schimpy.schism\_mesh module
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_mesh
    :members:
@@ -405,7 +403,7 @@ schimpy.schism\_mesh module
    :show-inheritance:
 
 schimpy.schism\_polygon module
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_polygon
    :members:
@@ -413,7 +411,7 @@ schimpy.schism\_polygon module
    :show-inheritance:
 
 schimpy.schism\_setup module
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_setup
    :members:
@@ -421,7 +419,7 @@ schimpy.schism\_setup module
    :show-inheritance:
 
 schimpy.schism\_source module
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_source
    :members:
@@ -429,7 +427,7 @@ schimpy.schism\_source module
    :show-inheritance:
 
 schimpy.schism\_sources\_sinks module
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_sources_sinks
    :members:
@@ -437,7 +435,7 @@ schimpy.schism\_sources\_sinks module
    :show-inheritance:
 
 schimpy.schism\_structure module
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_structure
    :members:
@@ -445,7 +443,7 @@ schimpy.schism\_structure module
    :show-inheritance:
 
 schimpy.schism\_vertical\_mesh module
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_vertical_mesh
    :members:
@@ -453,7 +451,7 @@ schimpy.schism\_vertical\_mesh module
    :show-inheritance:
 
 schimpy.schism\_yaml module
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.schism_yaml
    :members:
@@ -461,7 +459,7 @@ schimpy.schism\_yaml module
    :show-inheritance:
 
 schimpy.separate\_species module
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.separate_species
    :members:
@@ -469,7 +467,7 @@ schimpy.separate\_species module
    :show-inheritance:
 
 schimpy.simulation\_timing module
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.simulation_timing
    :members:
@@ -477,7 +475,7 @@ schimpy.simulation\_timing module
    :show-inheritance:
 
 schimpy.small\_areas module
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.small_areas
    :members:
@@ -485,7 +483,7 @@ schimpy.small\_areas module
    :show-inheritance:
 
 schimpy.sms2gr3 module
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.sms2gr3
    :members:
@@ -493,7 +491,7 @@ schimpy.sms2gr3 module
    :show-inheritance:
 
 schimpy.split\_quad module
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.split_quad
    :members:
@@ -501,7 +499,7 @@ schimpy.split\_quad module
    :show-inheritance:
 
 schimpy.stacked\_dem\_fill module
----------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.stacked_dem_fill
    :members:
@@ -509,7 +507,7 @@ schimpy.stacked\_dem\_fill module
    :show-inheritance:
 
 schimpy.station module
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.station
    :members:
@@ -517,7 +515,7 @@ schimpy.station module
    :show-inheritance:
 
 schimpy.subset\_schism\_output module
--------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.subset_schism_output
    :members:
@@ -525,7 +523,7 @@ schimpy.subset\_schism\_output module
    :show-inheritance:
 
 schimpy.three\_point\_linear\_norm module
------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.three_point_linear_norm
    :members:
@@ -533,7 +531,7 @@ schimpy.three\_point\_linear\_norm module
    :show-inheritance:
 
 schimpy.trimesh module
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.trimesh
    :members:
@@ -541,7 +539,7 @@ schimpy.trimesh module
    :show-inheritance:
 
 schimpy.triquadmesh module
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.triquadmesh
    :members:
@@ -549,7 +547,7 @@ schimpy.triquadmesh module
    :show-inheritance:
 
 schimpy.unit\_conversions module
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.unit_conversions
    :members:
@@ -557,7 +555,7 @@ schimpy.unit\_conversions module
    :show-inheritance:
 
 schimpy.vgrid\_opt2 module
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.vgrid_opt2
    :members:
@@ -565,17 +563,10 @@ schimpy.vgrid\_opt2 module
    :show-inheritance:
 
 schimpy.write\_ts module
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: schimpy.write_ts
    :members:
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: schimpy
-   :members:
-   :undoc-members:
-   :show-inheritance:

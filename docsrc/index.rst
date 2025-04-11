@@ -33,7 +33,7 @@ Contents
 ---------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
    
    Installation <installation>
    Spatial data in SCHISM <spatial>
@@ -46,7 +46,7 @@ Contents
    Post-processing <postprocessing>
    Evaluating Model Performance <performance>
    Using Python Pre-processing Script Programatically <direct_use>
-   Modules <modules>
+   Module Documentation <modules>
    History <history>
    License <license_and_disclaimer>
    Contributing <contributing>

@@ -41,7 +41,7 @@ jobs:
           source $CONDA/etc/profile.d/conda.sh
           conda activate schimpy
           cd docsrc/
-          sphinx-apidoc --force -o . ../schimpy
+          sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
           make clean
           make html
       - name: Run ghp-import
