@@ -1,5 +1,6 @@
 
-Submodules
+
+Modules
 """""""""""
 
 schimpy.base\_io module

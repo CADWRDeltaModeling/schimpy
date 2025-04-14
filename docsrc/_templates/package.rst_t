@@ -28,7 +28,7 @@ Subpackages
 {% endif %}
 
 {%- if submodules %}
-Submodules
+Modules
 """""""""""
 {% if separatemodules %}
 {{ toctree(submodules) }}
