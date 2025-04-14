@@ -53,7 +53,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.doctest",
     "numpydoc",
-    "sphinx.ext.napoleon",
     "sphinx_click",
 ]
 
@@ -142,6 +141,8 @@ html_logo = "./_static/dwr_logo_small.png"
 html_theme_options = {
     "logo_only": True,
     "prev_next_buttons_location": "both",
+    "globaltoc_collapse": True,
+    "globaltoc_maxdepth": None,
 }
 
 # Theme options are theme-specific and customize the look and feel of a
