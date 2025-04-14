@@ -42,6 +42,7 @@ jobs:
           conda activate schimpy
           cd docsrc/
           sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
+          conda list sphinx
           make clean
           make html
       - name: Run ghp-import
