@@ -75,10 +75,10 @@ class BatchMetrics(object):
     MAP_VAR_FOR_STATIONDB = {
         "flow": "flow",
         "elev": "stage",
-        "salt": "wq",
-        "temp": "wq",
-        "ssc": "wq",
-        "turbidity": "wq",
+        "salt": "quality",
+        "temp": "quality",
+        "ssc": "quality",
+        "turbidity": "quality",
     }
     variable_units = {
         "flow": "cms",
