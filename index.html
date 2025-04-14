@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SCHIMPY Toolset &mdash; schimpy 1.12.dev30+gb1b41ae documentation</title>
+  <title>SCHIMPY Toolset &mdash; schimpy 1.12.dev33+g8fef5d9 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,12 +14,10 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=ee605beb"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/documentation_options.js?v=ae02ef47"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
-      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -120,7 +118,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l1"><a class="reference internal" href="preprocessing.html">Pre-processing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="preprocessing.html#invoking-the-preprocessor">Invoking the preprocessor</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="preprocessing.html#prepare-schism">prepare_schism</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="preprocessing.html#positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preprocessing.html#schimpy.prepare_schism-create_arg_parser-positional-arguments">Positional Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -175,8 +173,8 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="sms.html#stacked-dem-fill">stacked_dem_fill</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="sms.html#positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="sms.html#named-arguments">Named Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sms.html#schimpy.stacked_dem_fill-create_arg_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sms.html#schimpy.stacked_dem_fill-create_arg_parser-named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -185,7 +183,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="model_time.html">Model time</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="model_time.html#model-time-py">model_time.py</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="model_time.html#subcommands">subcommands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="model_time.html#schimpy.model_time-create_arg_parser-subcommands">subcommands</a></li>
 <li class="toctree-l3"><a class="reference internal" href="model_time.html#Sub-commands">Sub-commands</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="model_time.html#to_elapsed">to_elapsed</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="model_time.html#positional-arguments">Positional Arguments</a></li>
@@ -212,8 +210,8 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l2"><a class="reference internal" href="depth.html#convert-mesh">convert_mesh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="depth.html#assigning-depths-from-prioritized-dems">Assigning depths from prioritized DEMs</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="depth.html#stacked-dem-fill">stacked_dem_fill</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="depth.html#positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l4"><a class="reference internal" href="depth.html#named-arguments">Named Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="depth.html#schimpy.stacked_dem_fill-create_arg_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="depth.html#schimpy.stacked_dem_fill-create_arg_parser-named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -228,8 +226,8 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="depth.html#optimizing-depths-for-volume">Optimizing depths for volume</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="depth.html#positional-arguments">Positional Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="depth.html#named-arguments">Named Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="depth.html#schimpy.grid_opt-create_arg_parser-positional-arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="depth.html#schimpy.grid_opt-create_arg_parser-named-arguments">Named Arguments</a></li>
 </ul>
 </li>
 </ul>
@@ -254,26 +252,8 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Module Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="schimpy_cli.html">Command Line Tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="schimpy_cli.html#sch">sch</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy_cli.html#sch-batch-metrics-cli">batch-metrics-cli</a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy_cli.html#sch-clip-dems-cli">clip-dems-cli</a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy_cli.html#sch-contour-smooth-cli">contour-smooth-cli</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="schimpy_cli.html#sch-contour-smooth-cli-save">save</a></li>
-<li class="toctree-l5"><a class="reference internal" href="schimpy_cli.html#sch-contour-smooth-cli-smooth">smooth</a></li>
-<li class="toctree-l5"><a class="reference internal" href="schimpy_cli.html#sch-contour-smooth-cli-view">view</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy_cli.html#sch-convert-linestrings-cli">convert-linestrings-cli</a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy_cli.html#sch-convert-mesh-cli">convert-mesh-cli</a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy_cli.html#sch-convert-points-cli">convert-points-cli</a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy_cli.html#sch-convert-polygons-cli">convert-polygons-cli</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="schimpy.html">schimpy package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy_cli.html">Command Line Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.html">Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.base_io">schimpy.base_io module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.base_io.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.base_io.BaseIO.linecounter"><code class="docutils literal notranslate"><span class="pre">BaseIO.linecounter</span></code></a></li>
@@ -281,10 +261,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.batch_metrics">schimpy.batch_metrics module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.batch_metrics.generate_metricsplots"><code class="docutils literal notranslate"><span class="pre">generate_metricsplots()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy-batch-metrics-module">schimpy.batch_metrics module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.bctide">schimpy.bctide module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.bctide.load_boundary"><code class="docutils literal notranslate"><span class="pre">load_boundary()</span></code></a></li>
 </ul>
@@ -460,27 +437,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.gen_elev2d">schimpy.gen_elev2d module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.BinaryTHWriter"><code class="docutils literal notranslate"><span class="pre">BinaryTHWriter</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.BinaryTHWriter.write_all"><code class="docutils literal notranslate"><span class="pre">BinaryTHWriter.write_all()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.BinaryTHWriter.write_step"><code class="docutils literal notranslate"><span class="pre">BinaryTHWriter.write_step()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.NetCDFTHWriter"><code class="docutils literal notranslate"><span class="pre">NetCDFTHWriter</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.NetCDFTHWriter.write_all"><code class="docutils literal notranslate"><span class="pre">NetCDFTHWriter.write_all()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.NetCDFTHWriter.write_step"><code class="docutils literal notranslate"><span class="pre">NetCDFTHWriter.write_step()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.THWriter"><code class="docutils literal notranslate"><span class="pre">THWriter</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.THWriter.write_all"><code class="docutils literal notranslate"><span class="pre">THWriter.write_all()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.THWriter.write_step"><code class="docutils literal notranslate"><span class="pre">THWriter.write_step()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.gen_elev2D"><code class="docutils literal notranslate"><span class="pre">gen_elev2D()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.gen_elev2d.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy-gen-elev2d-module">schimpy.gen_elev2d module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.geo_tools">schimpy.geo_tools module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.geo_tools.FindMultiPoly"><code class="docutils literal notranslate"><span class="pre">FindMultiPoly()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.geo_tools.Polylen"><code class="docutils literal notranslate"><span class="pre">Polylen()</span></code></a></li>
@@ -543,13 +500,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.grid_opt.object_func"><code class="docutils literal notranslate"><span class="pre">object_func()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.hotstart_inventory">schimpy.hotstart_inventory module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.hotstart_inventory"><code class="docutils literal notranslate"><span class="pre">hotstart_inventory()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.hotstart_inventory2"><code class="docutils literal notranslate"><span class="pre">hotstart_inventory2()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.hotstart_inventory.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy-hotstart-inventory-module">schimpy.hotstart_inventory module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.hrr3">schimpy.hrr3 module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.hrr3.AWSGrib2Inventory"><code class="docutils literal notranslate"><span class="pre">AWSGrib2Inventory</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.hrr3.AWSGrib2Inventory.bucket"><code class="docutils literal notranslate"><span class="pre">AWSGrib2Inventory.bucket</span></code></a></li>
@@ -576,15 +527,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.interpolate_structure">schimpy.interpolate_structure module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.ensure_offset"><code class="docutils literal notranslate"><span class="pre">ensure_offset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.interpolate_structure"><code class="docutils literal notranslate"><span class="pre">interpolate_structure()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.test_date_label_correct"><code class="docutils literal notranslate"><span class="pre">test_date_label_correct()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.interpolate_structure.test_template_times"><code class="docutils literal notranslate"><span class="pre">test_template_times()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy-interpolate-structure-module">schimpy.interpolate_structure module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.laplace_smooth_data">schimpy.laplace_smooth_data module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_data"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_data2"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data2()</span></code></a></li>
@@ -639,11 +582,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.merge_th.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.metricsplot">schimpy.metricsplot module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.metricsplot.plot_comparison"><code class="docutils literal notranslate"><span class="pre">plot_comparison()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.metricsplot.plot_metrics"><code class="docutils literal notranslate"><span class="pre">plot_metrics()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy-metricsplot-module">schimpy.metricsplot module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.model_time">schimpy.model_time module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.model_time.clip"><code class="docutils literal notranslate"><span class="pre">clip()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.model_time.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
@@ -1044,13 +983,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.params.get_value_dict"><code class="docutils literal notranslate"><span class="pre">get_value_dict()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.plot_default_formats">schimpy.plot_default_formats module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_color_cycle_dark2"><code class="docutils literal notranslate"><span class="pre">set_color_cycle_dark2()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_dual_axes"><code class="docutils literal notranslate"><span class="pre">set_dual_axes()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_dual_axes_elev"><code class="docutils literal notranslate"><span class="pre">set_dual_axes_elev()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.plot_default_formats.set_dual_axes_salt"><code class="docutils literal notranslate"><span class="pre">set_dual_axes_salt()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy-plot-default-formats-module">schimpy.plot_default_formats module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.prepare_schism">schimpy.prepare_schism module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.prepare_schism.prepare_schism"><code class="docutils literal notranslate"><span class="pre">prepare_schism()</span></code></a></li>
 </ul>
@@ -1353,15 +1286,7 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.schism_yaml.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.separate_species">schimpy.separate_species module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.separate_species.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.separate_species.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.separate_species.plot_result"><code class="docutils literal notranslate"><span class="pre">plot_result()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.separate_species.run_example"><code class="docutils literal notranslate"><span class="pre">run_example()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.separate_species.separate_species"><code class="docutils literal notranslate"><span class="pre">separate_species()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.separate_species.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#schimpy-separate-species-module">schimpy.separate_species module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.simulation_timing">schimpy.simulation_timing module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.simulation_timing.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.simulation_timing.schism_timing"><code class="docutils literal notranslate"><span class="pre">schism_timing()</span></code></a></li>
@@ -1547,7 +1472,6 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.write_ts.write_ts"><code class="docutils literal notranslate"><span class="pre">write_ts()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy">Module contents</a></li>
 </ul>
 </li>
 </ul>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Model time conversion &mdash; schimpy 1.12.dev30+gb1b41ae documentation</title>
+  <title>Model time conversion &mdash; schimpy 1.12.dev33+g8fef5d9 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,8 +14,8 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=ee605beb"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/documentation_options.js?v=ae02ef47"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -54,7 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="sms.html">Working with SMS</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Model time</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#model-time-py">model_time.py</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#subcommands">subcommands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schimpy.model_time-create_arg_parser-subcommands">subcommands</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Sub-commands">Sub-commands</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#to_elapsed">to_elapsed</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#to_date">to_date</a></li>
@@ -117,8 +117,8 @@ $ model_time.py subcommand –help</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">model_time</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span><span class="n">to_elapsed</span><span class="p">,</span><span class="n">to_date</span><span class="p">,</span><span class="n">clip</span><span class="p">}</span> <span class="o">...</span>
 </pre></div>
 </div>
-<section id="subcommands">
-<h3>subcommands<a class="headerlink" href="#subcommands" title="Link to this heading"></a></h3>
+<section id="schimpy.model_time-create_arg_parser-subcommands">
+<h3>subcommands<a class="headerlink" href="#schimpy.model_time-create_arg_parser-subcommands" title="Link to this heading"></a></h3>
 <dl class="option-list">
 <dt><kbd>subcommand</kbd></dt>
 <dd><p>Possible choices: to_elapsed, to_date, clip</p>
@@ -151,7 +151,7 @@ $ model_time.py subcommand –help</p>
 <dd><p>Starting date and time basis for output if the input is a file. Allows a larger database with readable times to be clipped</p>
 </dd>
 <dt><kbd>--annotate</kbd></dt>
-<dd><p>Default: False</p>
+<dd><p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </dd>
 <dt><kbd>--step</kbd></dt>
 <dd><p>Model time step. If given, answer will be the integer time step.</p>
@@ -161,7 +161,7 @@ $ model_time.py subcommand –help</p>
 </dd>
 <dt><kbd>--skip_nan</kbd></dt>
 <dd><p>Skip a record with nan if True</p>
-<p>Default: False</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </dd>
 </dl>
 </section>
@@ -194,14 +194,14 @@ $ model_time.py subcommand –help</p>
 </dd>
 <dt><kbd>--elapsed_unit</kbd></dt>
 <dd><p>Time unit of input file. Must be either ‘s’ for seconds or ‘d’ for days. Only used for files</p>
-<p>Default: “s”</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">'s'</span></code></p>
 </dd>
 <dt><kbd>--time_format</kbd></dt>
 <dd><p>Time format for output, e.g. the default is %Y-%m-%dT%H:%M:%S for 2009-03-14T22:40:00. Only used when converting fields.</p>
-<p>Default: “%Y-%m-%dT%H:%M”</p>
+<p>Default: <code class="docutils literal notranslate"><span class="pre">'%Y-%m-%dT%H:%M'</span></code></p>
 </dd>
 <dt><kbd>--annotate</kbd></dt>
-<dd><p>Default: False</p>
+<dd><p>Default: <code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 </dd>
 <dt><kbd>--out</kbd></dt>
 <dd><p>Name of output file. If input is a <a href="#id1"><span class="problematic" id="id2">*</span></a>.th file the file will be converted and output to this file, otherwise printed to screen</p>
