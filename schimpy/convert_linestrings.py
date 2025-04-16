@@ -6,28 +6,7 @@ to Shapefile and vice versa
 from schimpy.schism_linestring import read_linestrings, write_linestrings
 import click
 
-
-@click.command(help="Convert SCHISM line strings between YAML and Shapefile formats.")
-@click.help_option("-h", "--help")
-@click.option(
-    "--input",
-    required=True,
-    type=click.Path(exists=True),
-    help="Input file (YAML or Shapefile).",
-)
-@click.option(
-    "--output",
-    required=True,
-    type=click.Path(),
-    help="Output file (YAML or Shapefile).",
-)
-@click.help_option("-h", "--help")
-def convert_linestrings_cli(input, output):
-    """CLI wrapper for converting line string files."""
-    main(input, output)
-
-
-def main(input, output):
+def convert_linestrings_main(input, output):
     """Function for converting line string files."""
     if input.endswith(".yaml"):
         linestrings = read_linestrings(input)
@@ -50,6 +29,24 @@ def main(input, output):
             "Unsupported input file type. Only YAML (.yaml) or Shapefile (.shp) are supported."
         )
 
+@click.command(help="Convert SCHISM line strings between YAML and Shapefile formats.")
+@click.help_option("-h", "--help")
+@click.option(
+    "--input",
+    required=True,
+    type=click.Path(exists=True),
+    help="Input file (YAML or Shapefile).",
+)
+@click.option(
+    "--output",
+    required=True,
+    type=click.Path(),
+    help="Output file (YAML or Shapefile).",
+)
+
+def convert_linestrings_cli(input, output):
+    """CLI wrapper for converting line string files."""
+    convert_linestrings_main(input, output)
 
 if __name__ == "__main__":
     convert_linestrings_cli()
