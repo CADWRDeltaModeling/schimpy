@@ -683,7 +683,7 @@ class SchismMesh(TriQuadMesh):
         if create_gdf:
             return gdf
 
-    def plot_elems(self, var=None, ax=None, inpoly=None, plot_nan=False, **kwargs):
+    def plot_elems(self, var, ax=None, inpoly=None, plot_nan=False, **kwargs):
         """
         Plot variables (1D array on element) based on SCHISM mesh grid.
         if var is None,just plot the grid.
@@ -705,7 +705,7 @@ class SchismMesh(TriQuadMesh):
             else:
                 inpoly = ~np.isnan(var)
                 # xy = np.asarray(xy)[inpoly]
-                xy = [xy[i] for i in inpoly]
+                xy = [xy[i] for i in range(len(xy)) if inpoly[i]]
                 coll = PolyCollection(xy, array=var[inpoly], **kwargs)
         if not ax:
             fig, ax = plt.subplots()
@@ -750,14 +750,14 @@ class SchismMesh(TriQuadMesh):
             multi_poly = list(boundary_mesh)
         for pi in multi_poly:
             if isinstance(pi.boundary, MultiLineString):
-                boundary = list(pi.boundary)
+                boundary = list(pi.boundary.geoms)
                 for b in boundary:
                     cxy = np.asarray(b.xy).T
-                    poly = patches.Polygon(cxy, True)
+                    poly = patches.Polygon(cxy, closed=True)
                     patch.append(poly)
             else:
                 cxy = np.asarray(pi.boundary.xy).T
-                poly = patches.Polygon(cxy, True)
+                poly = patches.Polygon(cxy, closed=True)
                 patch.append(poly)
 
         p = PatchCollection(patch, facecolor="none", edgecolor=edgecolor, **kwargs)
