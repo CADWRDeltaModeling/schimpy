@@ -66,11 +66,13 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, input=None):
+    def __init__(self, input=None, modules=None, crs=None):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
         self.input = input
         self.nc_dataset = None
+        self.modules = modules
+        self.crs = crs
 
     def read_yaml(self):
         """
@@ -94,28 +96,30 @@ class hotstart(object):
                 self.crs = 'EPSG:26910'
                 print("crs not specified, and assigned to the default crs of EPSG:26910")
 
-        else:
+        elif self.crs is None:
             self.crs = 'EPSG:26910'
             print("crs not specified, and assigned to the default crs of EPSG:26910")
 
-        if 'modules' in hotstart_info.keys():
-            modules = hotstart_info['modules']
-        else:
-            print("No module specified. Baroclinic run assumed. 'TEM', and 'SAL' turned on as default")
-            modules = ['TEM', 'SAL']
-        if modules is None:
-            print("No module specified. Barotropic run assumed.")
-        else:
-            for m in modules:
-                print("%s module is turned on" % m)
-        self.modules = modules  # modules can be none for barotropic runs.
+        # If modules are passed then override yaml modules section, otherwise use yaml modules
+        if self.modules is None:
+            if 'modules' in hotstart_info.keys():
+                modules = hotstart_info['modules']
+            else:
+                print("No module specified. Baroclinic run assumed. 'TEM', and 'SAL' turned on as default")
+                modules = ['TEM', 'SAL']
+            if modules is None:
+                print("No module specified. Barotropic run assumed.")
+            else:
+                for m in modules:
+                    print("%s module is turned on" % m)
+            self.modules = modules  # modules can be none for barotropic runs.
 
-        if self.modules is not None:
-            if "SED" in self.modules:
-                if 'sediment_input_file' not in hotstart_info.keys() or not os.path.isfile(hotstart_info['sediment_input_file']):
-                    raise FileNotFoundError(
-                        "Valid path to sediment.nml is required if SED module is turned on.")
-                self.sediment_fn = hotstart_info['sediment_input_file']
+            if self.modules is not None:
+                if "SED" in self.modules:
+                    if 'sediment_input_file' not in hotstart_info.keys() or not os.path.isfile(hotstart_info['sediment_input_file']):
+                        raise FileNotFoundError(
+                            "Valid path to sediment.nml is required if SED module is turned on.")
+                    self.sediment_fn = hotstart_info['sediment_input_file']
 
         # remove these items from the list.
         rfl = ['hgrid_input_file', 'vgrid_input_file', 'date', 'vgrid_version',
