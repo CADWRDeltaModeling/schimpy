@@ -106,12 +106,13 @@ class Nudging(object):
         weights_comb, values_comb, imap_comb = self.get_nudging_comb()
 
         weights_var, values_var, imap_var, var_v = self.organize_nudging(
-            weights_comb, values_comb, imap_comb
-        )
+            weights_comb, values_comb, imap_comb)
 
-        self.concatenate_nudge(
-            weights_var, values_var, imap_var, var_v, create_file=True
-        )
+        self.concatenate_nudge(weights_var,
+                               values_var,
+                               imap_var,
+                               var_v,
+                               create_file=True)
 
     def organize_nudging(self, weights_comb, values_comb, imap_comb):
 
@@ -203,6 +204,7 @@ class Nudging(object):
 
         for i, v in enumerate(var_newlist):
             # merge all the mapping values
+            print(v)
             imap_merged = []
             for l in imap_var[i]:
                 imap_merged = np.append(imap_merged, l)
@@ -248,10 +250,10 @@ class Nudging(object):
                     )
                 else:
                     r = idx_r[0]
-                    weights_merged[imap_merged[im]] = weights_var[i][r, imap_merged[im]]
-                    values_merged[:, im, :] = values_var[i][r][
-                        :, int(idx_list[im, r]), :
-                    ]
+                    weights_merged[imap_merged[im]
+                                   ] = weights_var[i][r, imap_merged[im]]
+                    values_merged[:, im, :] = values_var[i][r][:,
+                                                               int(idx_list[im, r]), :]
 
             # for the last time, make sure that all nan values are set to -9999.0
             values_merged[np.isnan(values_merged)] = -9999.0
@@ -441,6 +443,7 @@ class Nudging(object):
                 else:
                     raise ("vcoords can either be 'Z' or 'S'. ")
                 ilen = len(zm)
+                time = ncdata['time'].values[1:]
 
             time = ncdata["time"].values
 

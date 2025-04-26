@@ -119,6 +119,7 @@ def read_staout(
         else:
             staout.columns = [f"{loc}_{subloc}" for loc, subloc in staout.columns]
     f = pd.infer_freq(staout.index)
+    f = pd.infer_freq(staout.index)
     if f is None:
         # raise ValueError("Could not determine the time frequency of staoutfile")
         f2 = pd.infer_freq(staout.iloc[0:10, 0].index)
