@@ -5999,7 +5999,7 @@ is for stations.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="schimpy.schism_hotstart.VariableField">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_hotstart.</span></span><span class="sig-name descname"><span class="pre">VariableField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tr_mname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hotstart_ini</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.VariableField" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.schism_hotstart.</span></span><span class="sig-name descname"><span class="pre">VariableField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tr_mname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hotstart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hotstart_ini</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.VariableField" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A class initializing each varaible for the hotstart file</p>
 <p class="rubric">Methods</p>
@@ -6132,7 +6132,7 @@ The input initializer overwrites self.initializer</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.schism_hotstart.VariableField.interp_from_mesh">
-<span class="sig-name descname"><span class="pre">interp_from_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inpoly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.VariableField.interp_from_mesh" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">interp_from_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'5.10'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inpoly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.VariableField.interp_from_mesh" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -6240,17 +6240,31 @@ input files.</p>
 </table>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><strong>create_hotstart</strong></p></td>
+<tr class="row-odd"><td><p><strong>close_hotstart_cache</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><strong>generate_3D_field</strong></p></td>
+<tr class="row-even"><td><p><strong>create_hotstart</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p><strong>initialize_netcdf</strong></p></td>
+<tr class="row-odd"><td><p><strong>generate_3D_field</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>get_hotstart_data</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>get_mesh</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>initialize_netcdf</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.schism_hotstart.hotstart.close_hotstart_cache">
+<span class="sig-name descname"><span class="pre">close_hotstart_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.hotstart.close_hotstart_cache" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.schism_hotstart.hotstart.create_hotstart">
 <span class="sig-name descname"><span class="pre">create_hotstart</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.hotstart.create_hotstart" title="Link to this definition"></a></dt>
@@ -6259,6 +6273,16 @@ input files.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.schism_hotstart.hotstart.generate_3D_field">
 <span class="sig-name descname"><span class="pre">generate_3D_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.hotstart.generate_3D_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.schism_hotstart.hotstart.get_hotstart_data">
+<span class="sig-name descname"><span class="pre">get_hotstart_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.hotstart.get_hotstart_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.schism_hotstart.hotstart.get_mesh">
+<span class="sig-name descname"><span class="pre">get_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'5.10'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.hotstart.get_mesh" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
