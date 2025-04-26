@@ -40,6 +40,7 @@ import xarray as xr
 import pandas as pd
 from scipy import interpolate
 from scipy.spatial import distance
+from scipy.spatial import cKDTree
 import matplotlib.pyplot as plt
 import os
 import datetime
@@ -73,6 +74,11 @@ class hotstart(object):
         self.nc_dataset = None
         self.modules = modules
         self.crs = crs
+        self._hotstart_cache = {}
+        self._mesh_cache = {}  # hgrid_fn -> mesh object
+
+
+
 
     def read_yaml(self):
         """
@@ -153,9 +159,24 @@ class hotstart(object):
             self.ntracers = 0
             self.tr_mname = []
 
+    def get_hotstart_data(self, path):
+        if path not in self._hotstart_cache:
+            self._hotstart_cache[path] = xr.open_dataset(path)
+        return self._hotstart_cache[path]
+
+    def close_hotstart_cache(self):
+        for ds in self._hotstart_cache.values():
+            ds.close()
+        self._hotstart_cache.clear()
+
+    def get_mesh(self, hgrid_fn, vgrid_fn, vgrid_version='5.10'):
+        if (hgrid_fn,vgrid_fn) not in self._mesh_cache:
+            self._mesh_cache[(hgrid_fn,vgrid_fn)] = read_mesh(hgrid_fn,vgrid_fn,vgrid_version)
+        return self._mesh_cache[(hgrid_fn,vgrid_fn)]
+
     def create_hotstart(self):
         self.read_yaml()
-        mesh = read_mesh(self.hgrid_fn, self.vgrid_fn, self.vgrid_version)
+        mesh = self.get_mesh(self.hgrid_fn, self.vgrid_fn, self.vgrid_version)
         self.mesh = mesh
         self.depths = self.mesh.build_z()  # this is required to get depths for elevation
         self.hotstart_ini = {}
@@ -188,7 +209,7 @@ class hotstart(object):
                             'source_vgrid_version']
 
             if self.hotstart_ini:
-                hotstart_mesh = read_mesh(self.hotstart_ini['hotstart_nc_hfn'],
+                hotstart_mesh = self.get_mesh(self.hotstart_ini['hotstart_nc_hfn'],
                                           self.hotstart_ini['hotstart_nc_vfn'],
                                           self.hotstart_ini['source_vgrid_version'])
                 indices, dist = compare_mesh(hotstart_mesh, self.mesh)
@@ -232,6 +253,8 @@ class hotstart(object):
             elev=self.nc_dataset['elevation'].values)
         self.wet_dry_check()
         self.map_to_schism()
+        # Close source hotstart datasets, if any
+        self.close_hotstart_cache()
         return self.nc_dataset
 
     def generate_3D_field(self, variable):
@@ -245,11 +268,11 @@ class hotstart(object):
         if kwargs_options:
             var = VariableField(v_meta, variable, self.mesh,
                                 self.depths, self.date, self.crs,
-                                self.tr_mname, **kwargs_options)
+                                self.tr_mname, self, **kwargs_options)
         else:
             var = VariableField(v_meta, variable, self.mesh,
                                 self.depths, self.date, self.crs,
-                                self.tr_mname, self.hotstart_ini)
+                                self.tr_mname, self, self.hotstart_ini)
         return var.GenerateField()
 
     def initialize_netcdf(self, default_turbulence=True):
@@ -366,13 +389,14 @@ class VariableField(object):
     A class initializing each varaible for the hotstart file
     """
 
-    def __init__(self, v_meta, vname, mesh, depths, date, crs, tr_mname,
+    def __init__(self, v_meta, vname, mesh, depths, date, crs, tr_mname, hotstart,
                  hotstart_ini=None, **kwargs):
         #self.centering = v_meta['centering']
         self.variable_name = vname
         # the centering option is dependent on the varialbe name.
         self.centering = self.var_centering()
         self.mesh = mesh
+        self.hotstart = hotstart
         self.depths = depths
         if self.centering == 'edge':
             self.edge_depths = (depths[self.mesh.edges[:, 0]] +
@@ -908,10 +932,11 @@ class VariableField(object):
                     'SED3D_bedfrac': 'SED3D_bedfrac'}
         if (var not in yaml_var) and (var in self.tr_mname):
             yaml_var[var] = 'tr_nd'
+            
         if var in self.tr_mname:
             self.tr_index = np.where(np.array(self.tr_mname) == var)[0][0]
-
-        hotstart_data = xr.open_dataset(data_source)
+        hotstart_data = self.hotstart.get_hotstart_data(data_source)
+        
 
         if 'source_hgrid' not in ini_meta.keys():  # if the grids are exactly the same
             if self.tr_index is not None:
@@ -950,10 +975,10 @@ class VariableField(object):
         hotstart_data.close()
         return v
 
-    def interp_from_mesh(self, hgrid_fn, vin, vgrid_fn=None, vgrid_version=5.8,
+    def interp_from_mesh(self, hgrid_fn, vin, vgrid_fn=None, vgrid_version='5.10',
                          inpoly=None, dist_th=None, method=None):
-        import rtree.index
-        mesh1 = read_mesh(hgrid_fn, vgrid_fn, vgrid_version)
+
+        mesh1 = self.hotstart.get_mesh(hgrid_fn, vgrid_fn, vgrid_version)
 
         grid1 = self.define_new_grid(mesh1)  # mesh to be interpolated from
         hgrid1 = list(grid1.values())[0][1]
@@ -979,22 +1004,18 @@ class VariableField(object):
                 indices = np.array(indices)[inpoly]
                 dist = np.array(dist)[inpoly]
         else:
-            mesh1_idx = rtree.index.Rtree()
-            # Horizontal: nearest neighbor method
-            for i, p in enumerate(hgrid1):
-                mesh1_idx.insert(i, np.append(p, p))
-            dist = []
-            indices = []
-            print("interpolating horizontal grid from %s" % (
-                hgrid_fn))
-            for n2 in hgrid2:
-                idx = list(mesh1_idx.nearest(tuple(n2)))[0]
-                dist2 = (n2[0]-hgrid1[idx, 0])**2 + (n2[1]-hgrid1[idx, 1])**2
-                dist.append(np.sqrt(dist2))
-                indices.append(idx)
+            from scipy.spatial import cKDTree
+
+            # Build KDTree
+            mesh1_idx = cKDTree(hgrid1)
+
+            # Bulk query
+            print("interpolating horizontal grid from %s" % (hgrid_fn))
+            dist, indices = mesh1_idx.query(hgrid2)
             print("horizontal interpolation completed!")
-        dist = np.array(dist)
-        indices = np.array(indices)
+            dist = np.asarray(dist,dtype=float)
+            indices = np.asarray(indices)
+
 
         if dist_th is not None:  # same points, apply nearest; different points, apply the method defined
             same_points = np.where(dist <= dist_th)[0]
@@ -1028,10 +1049,13 @@ class VariableField(object):
             else:
                 vout = np.zeros_like(vgrid2)
                 if method == 'nearest':
-                    try:
-                        vout[same_points] = vin[indices[same_points]]
-                    except ValueError:
-                        vout[same_points] = vin[indices[same_points]].to_dataframe()
+                    if hasattr(vin, 'values'):
+                        vsource = vin.values
+                    else:
+                        vsource = vin
+
+                    vout[same_points] = vsource[indices[same_points]]
+
                     for p in diff_points:
                         z1 = vgrid1[indices[p]]
                         z2 = vgrid2[p]
