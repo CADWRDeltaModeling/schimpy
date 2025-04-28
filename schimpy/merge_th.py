@@ -1,4 +1,3 @@
-import yaml
 import argparse
 
 import pandas as pd
@@ -23,22 +22,36 @@ def read_locations_from_input(fname,role):
     with open(fname,'r') as stream:
         loc_yaml = syml.load(stream)
         if role == "source_flux" or role == "source_tracer":
-            section = loc_yaml["sources_sinks"]["sources"]
+            if "sources_sinks" in loc_yaml:
+                section = loc_yaml["sources_sinks"]["sources"]
+            elif "sources" in loc_yaml:
+                section = loc_yaml["sources"]
+            else:
+                raise ValueError("sources section not found in file or in sources_sinks parent section")
         elif role == "sink_flux":
-            section = loc_yaml["sources_sinks"]["sinks"]
+            if "sources_sinks" in loc_yaml:
+                section = loc_yaml["sources_sinks"]["sinks"]
+            elif "sinks" in loc_yaml:            
+                section = loc_yaml["sinks"]
+            else:            
+                raise ValueError("sinks section not found in file or in sources_sinks parent section")            
+            
         return [item[0] for item in section.items()]
         # Assume sourc
 
 
 def write_th(df,fname,elapsed,ref_time=None):
+    print("writing ",fname)
+    print(f"dataframe dimensions: {df.shape}")
     if elapsed:
         dfe = datetime_elapsed(df,reftime=ref_time,dtype=float)
         dfe.index.name="time"
         with open(fname,mode="w",newline="\n") as outfile:
-            dfe.to_csv(outfile,sep=" ",float_format="%.2f",header=False)
+            dfe.to_csv(outfile,sep=" ",float_format="%.3f",header=False)
             #outfile.write("#"+str(dfe.columns.values.join(","))+"\n")
     else:
-        df.to_csv(fname,sep=",",float_format="%.2f",date_format="%Y-%m-%dT%H:%M")
+        sep = " " if fname.endswith("th") else ","
+        df.to_csv(fname,sep=sep,float_format="%.3f",date_format="%Y-%m-%dT%H:%M")
 
 def read_data(fname,variable):
     print(f"reading file: {fname}")
@@ -78,6 +91,7 @@ def merge_th(th_spec):
 
     
     for th_out in th_files:
+        print("processing: ",th_out)
         th_config = th_files[th_out]
         role = th_config["role"]
         dated_output = th_config["dated_output"] if "dated_output" in th_config else False
@@ -95,17 +109,23 @@ def merge_th(th_spec):
             dfnew = read_data(fname,variable)
             dfs.append(dfnew)
 
-        if "tracer" in role:     
+        if "tracer" in role:
+            # Create column index representing desired output
             variables = th_config["variables"] # establishes order and labels
             nvar = len(variables)
-            nloc = len(locs) #hardwire
+            nloc = len(locs) 
             varlevel = np.repeat(variables,nloc)
             srclevel = np.tile(locs,nvar)
             multicol = pd.MultiIndex.from_arrays([varlevel,srclevel], names=('variable', 'source'))
             #mdf = pd.DataFrame(index=vdf.index,data=np.nan,columns=multicol,dtype=float)
+            
+            # horizontally stack, eliminate earlier copies
             vdf = pd.concat(dfs,axis=1).loc[start_time:end_time,:]
             vdf = vdf.loc[:,~vdf.columns.duplicated(keep="last")].copy()
-            mdf = vdf.reindex(multicol,axis=1)
+            
+            mdf = vdf.reindex(multicol,axis=1)   # Choose the desired output
+            
+            # take care of anything assigned to a constant
             constantval = th_config["constant"] if "constant" in th_config else None
             if constantval is not None:
                 vars = mdf.columns.get_level_values("variable")
@@ -136,12 +156,16 @@ def merge_th(th_spec):
             if (mdf > 0).any(axis=None):
                 raise  ValueError(f"In {th_out} variable signs do not meet convention")    
         
-        colmissing = mdf.isnull().any(axis=0)
+        colmissing = mdf.isnull().sum(axis=0)
+        colmissing = colmissing[colmissing>0]
+        
         if colmissing.any():
             print("Missing data in columns:")
-            print(mdf.columns[colmissing])
+            print(colmissing)
+            print(mdf.loc[mdf.isnull().any(axis=1),:])
+            mdf.loc[mdf.isnull().any(axis=1),:].to_csv("missing.csv")
             raise ValueError("Missing data. Check for gaps or non-matching labels between locations and time series.")
-                
+             
                 
         _write_output(mdf,th_out,dated_output,start_time)
 
