@@ -211,7 +211,7 @@ def gen_elev2D(hgrid_fpath,outfile,pt_reyes_fpath,monterey_fpath,start,end,slr):
     print("Reading Monterey...")
     monterey = read_noaa(monterey_fpath, start=sdate - tbuf, end=bufend, force_regular=True)
     monterey.interpolate(limit=max_gap,inplace=True)
-    if pt_reyes.isna().any(axis=None):
+    if monterey.isna().any(axis=None):
         raise ValueError("monterey has gaps larger than fill limit")
     
     if pt_reyes.index.freq  != monterey.index.freq:
