@@ -207,12 +207,12 @@ def clip_dems_cli(coords, infile, prefix, outformat, verbose, hshift, demlist):
         raise click.UsageError(
             "Either --coords or --image argument is required. See --help for usage."
         )
-    if coords[0] and infile:
+    if coords and infile:
         raise click.UsageError(
             "Arguments --coords and --image cannot both be supplied. See --help for usage."
         )
 
-    if coords[0]:
+    if coords:
         x0 = (coords[0], coords[1])
         x1 = (coords[2], coords[3])
     else:
