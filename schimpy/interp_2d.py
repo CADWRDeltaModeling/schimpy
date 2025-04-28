@@ -99,6 +99,7 @@ class Invdisttree:
                 np.isnan(obs)) <= self.nnear, "not enough data points for nnear"
         assert len(self.x) == len(
             obs), "len(x) %d != len(z) %d" % (len(self.x), len(obs))
+        obs = obs.copy()
         obs[obs == -9999.0] = np.nan
         idm = np.argwhere(np.isnan(obs))  # check if any value is missing
         if len(idm) == 0:  # all data points are available
