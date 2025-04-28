@@ -84,7 +84,8 @@ class hotstart(object):
         """
         read yaml and load mesh grid
         """
-        with open(self.input) as f:
+        print(self.input)
+        with open(self.input, 'r') as f:
             info = schism_yaml.load(f)
         hotstart_info = info['hotstart']
         self.info = hotstart_info
@@ -169,10 +170,46 @@ class hotstart(object):
             ds.close()
         self._hotstart_cache.clear()
 
-    def get_mesh(self, hgrid_fn, vgrid_fn, vgrid_version='5.10'):
-        if (hgrid_fn,vgrid_fn) not in self._mesh_cache:
-            self._mesh_cache[(hgrid_fn,vgrid_fn)] = read_mesh(hgrid_fn,vgrid_fn,vgrid_version)
-        return self._mesh_cache[(hgrid_fn,vgrid_fn)]
+    def get_mesh(self, hgrid_fn, vgrid_fn=None, vgrid_version=None):
+        """
+        Load and cache a SCHISM mesh (hgrid+vgrid), checking consistency between horizontal and vertical grids.
+
+        Parameters
+        ----------
+        hgrid_fn : str
+            Path to the hgrid (horizontal mesh) file.
+        vgrid_fn : str or None
+            Path to the vgrid (vertical grid) file. None if not applicable.
+        vgrid_version : int or None
+            Version of vgrid format if needed.
+
+        Returns
+        -------
+        mesh : SchismMesh
+            Fully loaded and validated mesh object.
+        """
+        key = (hgrid_fn, vgrid_fn)
+        if key not in self._mesh_cache:
+            mesh = read_mesh(hgrid_fn, vgrid_fn, vgrid_version)
+
+            # SAFETY CHECK: horizontal nodes vs vertical grid
+            if mesh.vmesh is not None:
+                n_nodes = mesh.nodes.shape[0]
+                n_kbps = mesh.vmesh.kbps.shape[0]
+                if n_nodes != n_kbps:
+                    raise ValueError(
+                        f"Inconsistent mesh/vgrid:\n"
+                        f"  hgrid file: {hgrid_fn}\n"
+                        f"  vgrid file: {vgrid_fn}\n"
+                        f"  nodes in hgrid: {n_nodes}\n"
+                        f"  entries in vgrid: {n_kbps}\n"
+                        f"  (They must match exactly.)"
+                    )
+
+            self._mesh_cache[key] = mesh
+
+        return self._mesh_cache[key]
+
 
     def create_hotstart(self):
         self.read_yaml()
