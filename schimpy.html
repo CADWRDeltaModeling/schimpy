@@ -5848,41 +5848,15 @@ max_depth is the maximum depth, data assumed to be</p>
 </section>
 <section id="module-schimpy.raster_to_nodes">
 <span id="schimpy-raster-to-nodes-module"></span><h2>schimpy.raster_to_nodes module<a class="headerlink" href="#module-schimpy.raster_to_nodes" title="Link to this heading"></a></h2>
-<p>Functions to process raster data for schimpy pre-processing.</p>
-<p>This add rasterstats, boto3 dependency to calculate raster stastistics such as
-means.</p>
+<p>Optimized raster_to_nodes function without rasterstats, using rasterio directly.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.raster_to_nodes.raster_to_nodes">
 <span class="sig-prename descclassname"><span class="pre">schimpy.raster_to_nodes.</span></span><span class="sig-name descname"><span class="pre">raster_to_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_sel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_raster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mapped_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">band</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.raster_to_nodes.raster_to_nodes" title="Link to this definition"></a></dt>
-<dd><p>Applies raster values to mesh by calculating means over surrounding elementss.</p>
-<p>When an element contains no raster data, zero will be
-assigned. When an element is partly covered by the raster data, an masked average
-is calculated.</p>
-<p>If the bins are provided, the raster data will be binned and bins mapped to
-the mapped_values before the averaging begins. The binning uses numpy.digitize to classification,
-and in particular the i’th mapped value is used between the values of bins (i-1) and (i).
-There are some extra padding values provided as shown in the example</p>
-<p>If the mask_value is given, raster data with the given mask value
-will be replaced with the fill_value before binning the data. This
-masking will only be used when bins are provided and pertains to 
-special cases involving vegetation data.</p>
+<dd><p>Applies raster values to mesh by calculating means over surrounding elements.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>mesh: schimpy.SchismMesh</strong></dt><dd><p>The base mesh to work on</p>
-</dd>
-<dt><strong>nodes_sel: array-like</strong></dt><dd><p>The array or list of the nodes to process</p>
-</dd>
-<dt><strong>path_raster: string-like</strong></dt><dd><p>File fath to the raster data</p>
-</dd>
-<dt><strong>bins: array-like, optional</strong></dt><dd><p>Array of bins. It has to be 1-dimensional and monotonic</p>
-</dd>
-<dt><strong>mapped_values: array-like, optional</strong></dt><dd><p>The values of the classes. It should be bigger by one than the bins. The i’th
-value will be applied between the <cite>(i-1)</cite> and <cite>i</cite> value of bins.</p>
-</dd>
-<dt><strong>band: int, optional</strong></dt><dd><p>The band index to use from the raster data.
-The default value is 1.</p>
-</dd>
+<dt><strong>(same as original)</strong></dt><dd></dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -5892,22 +5866,6 @@ The default value is 1.</p>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>An example of this function in the pre-processor yaml is below:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">gr3</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">sav_N.gr3</span><span class="p">:</span>
-<span class="w">   </span><span class="nt">default</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.</span>
-<span class="w">   </span><span class="nt">polygons</span><span class="p">:</span>
-<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">attribute</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">raster_to_nodes.raster_to_nodes(mesh, nodes_sel, &#39;NDVI.tif&#39;, bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)</span>
-<span class="w">       </span><span class="nt">imports</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">schimpy.raster_to_nodes</span>
-<span class="w">       </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">none</span>
-<span class="w">       </span><span class="nt">vertices</span><span class="p">:</span>
-<span class="w">       </span><span class="c1">#...</span>
-</pre></div>
-</div>
-<p>The values <cite>mesh</cite> and <cite>node_sel</cite>  mean the SCHISM mesh and the selected node indices
-by a polygon. The example bins (or classifies) the raster values from 0.0001 to 0.3
-and assigns the value 0., then assigns 40. for values between 0.3 and 0.6 and so forth.</p>
 </dd></dl>
 
 </section>
@@ -6227,13 +6185,16 @@ input files.</p>
 <p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.schism_hotstart.hotstart.map_to_schism" title="schimpy.schism_hotstart.hotstart.map_to_schism"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map_to_schism</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.schism_hotstart.hotstart.get_mesh" title="schimpy.schism_hotstart.hotstart.get_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_mesh</span></code></a>(hgrid_fn[, vgrid_fn, vgrid_version])</p></td>
+<td><p>Load and cache a SCHISM mesh (hgrid+vgrid), checking consistency between horizontal and vertical grids.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#schimpy.schism_hotstart.hotstart.map_to_schism" title="schimpy.schism_hotstart.hotstart.map_to_schism"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map_to_schism</span></code></a>()</p></td>
 <td><p>map the hotstart variable to the variable names required by SCHISM hotstart file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#schimpy.schism_hotstart.hotstart.read_yaml" title="schimpy.schism_hotstart.hotstart.read_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_yaml</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.schism_hotstart.hotstart.read_yaml" title="schimpy.schism_hotstart.hotstart.read_yaml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_yaml</span></code></a>()</p></td>
 <td><p>read yaml and load mesh grid</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.schism_hotstart.hotstart.wet_dry_check" title="schimpy.schism_hotstart.hotstart.wet_dry_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wet_dry_check</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#schimpy.schism_hotstart.hotstart.wet_dry_check" title="schimpy.schism_hotstart.hotstart.wet_dry_check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wet_dry_check</span></code></a>()</p></td>
 <td><p>modify idry_e, idry, and idry_s based on eta2 and water depth.</p></td>
 </tr>
 </tbody>
@@ -6252,10 +6213,7 @@ input files.</p>
 <tr class="row-even"><td><p><strong>get_hotstart_data</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p><strong>get_mesh</strong></p></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><p><strong>initialize_netcdf</strong></p></td>
+<tr class="row-odd"><td><p><strong>initialize_netcdf</strong></p></td>
 <td></td>
 </tr>
 </tbody>
@@ -6282,8 +6240,27 @@ input files.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.schism_hotstart.hotstart.get_mesh">
-<span class="sig-name descname"><span class="pre">get_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'5.10'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.hotstart.get_mesh" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vgrid_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_hotstart.hotstart.get_mesh" title="Link to this definition"></a></dt>
+<dd><p>Load and cache a SCHISM mesh (hgrid+vgrid), checking consistency between horizontal and vertical grids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>hgrid_fn</strong><span class="classifier">str</span></dt><dd><p>Path to the hgrid (horizontal mesh) file.</p>
+</dd>
+<dt><strong>vgrid_fn</strong><span class="classifier">str or None</span></dt><dd><p>Path to the vgrid (vertical grid) file. None if not applicable.</p>
+</dd>
+<dt><strong>vgrid_version</strong><span class="classifier">int or None</span></dt><dd><p>Version of vgrid format if needed.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">SchismMesh</span></dt><dd><p>Fully loaded and validated mesh object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.schism_hotstart.hotstart.initialize_netcdf">
