@@ -1,20 +1,11 @@
 # -*- coding: utf-8 -*-
-""" Functions to process raster data for schimpy pre-processing.
+"""Optimized raster_to_nodes function without rasterstats, using rasterio directly."""
 
-    This add rasterstats, boto3 dependency to calculate raster stastistics such as
-    means.
-"""
-import os
-import tempfile
-import itertools
-from copy import deepcopy
 import numpy as np
-from osgeo import gdal
-from shapely.geometry import Polygon
-import rasterstats
-
-__all__ = ['raster_to_nodes', ]
-
+import rasterio
+from rasterio.mask import mask
+from shapely.geometry import Polygon, mapping
+import itertools
 
 def raster_to_nodes(mesh, nodes_sel, path_raster,
                     bins=None,
@@ -22,130 +13,103 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                     mask_value=None,
                     fill_value=None,
                     band=1):
-    """ Applies raster values to mesh by calculating means over surrounding elementss.
-
-        When an element contains no raster data, zero will be
-        assigned. When an element is partly covered by the raster data, an masked average
-        is calculated.
-
-        If the bins are provided, the raster data will be binned and bins mapped to
-        the mapped_values before the averaging begins. The binning uses numpy.digitize to classification,
-        and in particular the i'th mapped value is used between the values of bins (i-1) and (i).
-        There are some extra padding values provided as shown in the example
-
-        If the mask_value is given, raster data with the given mask value
-        will be replaced with the fill_value before binning the data. This
-        masking will only be used when bins are provided and pertains to 
-        special cases involving vegetation data.
-
-        Parameters
-        ----------
-        
-        mesh: schimpy.SchismMesh
-            The base mesh to work on
-        
-        nodes_sel: array-like
-            The array or list of the nodes to process
-        
-        path_raster: string-like
-            File fath to the raster data
-        
-        bins: array-like, optional
-            Array of bins. It has to be 1-dimensional and monotonic
-        
-        mapped_values: array-like, optional
-           The values of the classes. It should be bigger by one than the bins. The i'th
-           value will be applied between the `(i-1)` and `i` value of bins.
-        
-        band: int, optional
-            The band index to use from the raster data.
-            The default value is 1.
-
-        Returns
-        -------
-        numpy.array
-            means of raster values of the element balls around the nodes
-
-        Notes
-        -----
-        An example of this function in the pre-processor yaml is below:
-        
-        .. code-block:: yaml
-           
-           gr3:
-             sav_N.gr3:
-              default: 0.
-              polygons:
-                - attribute: raster_to_nodes.raster_to_nodes(mesh, nodes_sel, 'NDVI.tif', bins=[-998., 0.0001, 0.3, 0.6, 1.0], mapped_values=[-999., 0., 40., 70., 100., -999.], maske_value=-10., fill_value=0.1)
-                  imports: schimpy.raster_to_nodes
-                  type: none
-                  vertices:
-                  #...
-
-        The values `mesh` and `node_sel`  mean the SCHISM mesh and the selected node indices
-        by a polygon. The example bins (or classifies) the raster values from 0.0001 to 0.3
-        and assigns the value 0., then assigns 40. for values between 0.3 and 0.6 and so forth.
-
-        
-
     """
-    
+    Applies raster values to mesh by calculating means over surrounding elements.
+
+    Parameters
+    ----------
+    (same as original)
+
+    Returns
+    -------
+    numpy.array
+        means of raster values of the element balls around the nodes
+    """
+
+    # Step 1: Prepare binning if needed
+    classify_raster = False
     if bins is not None:
         if mapped_values is None:
-            raise ValueError(
-                "The mapped values need")
+            raise ValueError("mapped_values must be provided if bins are used.")
         if len(mapped_values) != len(bins) + 1:
-            raise ValueError(
-                "The number of mapped_values should be bigger by one than the number of bin values.")
+            raise ValueError("mapped_values must be one longer than bins.")
+        classify_raster = True
 
-        # Read the raster data
-        raster = gdal.Open(path_raster)
-        band = raster.GetRasterBand(band)
-        raster_array = band.ReadAsArray()
+    # Step 2: Precompute node balls (cache)
+    elements_in_balls = {node_i: list(mesh.get_elems_i_from_node(node_i)) for node_i in nodes_sel}
+    elements_in_polygon = sorted(set(itertools.chain.from_iterable(elements_in_balls.values())))
 
-        # TODO:This converts the whole raster and not very efficient.
-        if mask_value is not None:
-            if fill_value is None:
-                raise ValueError(
-                    "The arugment fill_value must be given when mask_value is set.")
-            raster_array_masked = deepcopy(raster_array)
-            raster_array_masked[raster_array == mask_value] = fill_value
+    # Step 3: Build element polygons
+    element_polygons = {}
+    for elem_i in elements_in_polygon:
+        nodes_idx = mesh.elem(elem_i)
+        coords = mesh.nodes[nodes_idx, :2]  # x,y only
+        element_polygons[elem_i] = Polygon(coords)
+
+    # Step 4: Open raster
+    with rasterio.open(path_raster) as src:
+        nodata = src.nodatavals[band-1] if src.nodatavals else None
+        
+        # Read full raster band if binning is needed
+        if classify_raster:
+            raster_array = src.read(band)
+            if mask_value is not None:
+                raster_array = np.where(raster_array == mask_value, fill_value, raster_array)
+            digitized = np.digitize(raster_array, bins, right=False)
+            classified_array = np.array(mapped_values)[digitized]
         else:
-            raster_array_masked = raster_array
-        digitized = np.digitize(raster_array_masked,
-                                bins, right=False).reshape((-1,))
-        classified_array = np.array(mapped_values)[
-            digitized].reshape(raster_array.shape)
+            classified_array = None  # Will read on demand
 
-        # Save the classifed array
-        driver = gdal.GetDriverByName("GTiff")
-        path_temp = os.path.join(tempfile.mkdtemp(), 'temp.tif')
-        outdata = driver.CreateCopy(path_temp, raster)
-        outdata.GetRasterBand(1).WriteArray(classified_array)
-        outdata.GetRasterBand(1).SetNoDataValue(-999)
-        outdata.FlushCache()  # saves to disk!
+        # Step 5: Calculate mean per element
+        sav_in_elements = {}
+        for elem_i, polygon in element_polygons.items():
+            geom = [mapping(polygon)]
+            if classify_raster is False:
+                out_image, out_transform = mask(src, geom, crop=True, indexes=band, nodata=nodata)
+                data = out_image[0]
+            else:
+                # Clip manually from classified_array
+                bounds = polygon.bounds  # (minx, miny, maxx, maxy)
+                row_min, col_min = src.index(bounds[0], bounds[3])  # (xmin, ymax)
+                row_max, col_max = src.index(bounds[2], bounds[1])  # (xmax, ymin)
+                rows = slice(min(row_min, row_max), max(row_min, row_max)+1)
+                cols = slice(min(col_min, col_max), max(col_min, col_max)+1)
+                if rows.start == rows.stop or cols.start == cols.stop:
+                    sav_in_elements[elem_i] = 0.0
+                    continue
+                window = classified_array[rows, cols]
+                # Verify that window has nonzero size
+                if window.shape[0] == 0 or window.shape[1] == 0:
+                    sav_in_elements[elem_i] = 0.0
+                    continue
+                # Build temporary profile
+                transform = src.window_transform(((rows.start, rows.stop), (cols.start, cols.stop)))
+                with rasterio.io.MemoryFile() as memfile:
+                    with memfile.open(
+                        driver='GTiff',
+                        height=window.shape[0],
+                        width=window.shape[1],
+                        count=1,
+                        dtype=window.dtype,
+                        transform=transform,
+                        crs=src.crs,
+                        nodata=-999
+                    ) as dataset:
+                        dataset.write(window, 1)
+                        out_image, out_transform = mask(dataset, geom, crop=True, indexes=1, nodata=-999)
+                        data = out_image[0]
 
-    # Get the zonal data
-    elements_in_balls = [list(mesh.get_elems_i_from_node(node_i))
-                         for node_i in nodes_sel]
-    elements_in_polygon = list(
-        set(list(itertools.chain.from_iterable(elements_in_balls))))
-    element_polygons = [Polygon(mesh.nodes[mesh.elem(elem_i), :2])
-                        for elem_i in elements_in_polygon]
-    path_data = path_raster if bins is None else path_temp
-    zs = rasterstats.zonal_stats(element_polygons, path_data, stats='mean')
-    sav_in_elements = dict(zip(elements_in_polygon, [s['mean']
-                                                     if s['mean'] is not None else 0.
-                                                     for s in zs]))
+            masked = np.ma.masked_array(data, mask=(data == nodata))
+            mean_val = masked.mean() if masked.count() > 0 else 0.0
+            sav_in_elements[elem_i] = mean_val
+
+    # Step 6: Assemble node values
     elem_areas = mesh.areas()
     sav_at_nodes = np.empty((len(nodes_sel),), dtype=float)
     for i, node_i in enumerate(nodes_sel):
-        ball = list(mesh.get_elems_i_from_node(node_i))
-        sav_at_nodes[i] = np.average(
-            [sav_in_elements[e_i] for e_i in ball], weights=elem_areas[ball])
+        ball = elements_in_balls[node_i]
+        values = [sav_in_elements[e] for e in ball]
+        weights = elem_areas[ball]
+        sav_at_nodes[i] = np.average(values, weights=weights)
 
-    # Remove the temporary file if exists
-    if bins is not None:
-        del outdata
-        os.remove(path_temp)
     return sav_at_nodes
