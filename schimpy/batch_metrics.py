@@ -114,7 +114,7 @@ class BatchMetrics(object):
         if variable == "flow":
             for i, working_dir in enumerate(outputs_dir):
                 if stations_input is None:
-                    station_in = os.path.join(working_dir, "flowlines.yaml")
+                    station_in = os.path.join(working_dir, "fluxflag.prop")
                 else:
                     station_in = stations_input[i]
                 datafname = os.path.join(working_dir, "flux.out")
