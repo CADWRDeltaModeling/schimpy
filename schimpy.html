@@ -6964,25 +6964,28 @@ and sources/sinks.
 <tr class="row-even"><td><p><a class="reference internal" href="#schimpy.schism_mesh.SchismMesh.plot_mesh_boundary" title="schimpy.schism_mesh.SchismMesh.plot_mesh_boundary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_mesh_boundary</span></code></a>([ax, edgecolor])</p></td>
 <td><p>Plot the edge of the computational grid.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">renumber</span></code>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.schism_mesh.SchismMesh.plot_open_boundaries" title="schimpy.schism_mesh.SchismMesh.plot_open_boundaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_open_boundaries</span></code></a>([ax, edgecolor])</p></td>
+<td><p>Plot the open boundaries of the computational grid.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">renumber</span></code>()</p></td>
 <td><p>removes duplicate elems and nodes that are not referenced by any element, as well as elems that have been deleted (==-1) This function is lifted and modified slightly from Rusty's code.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_elem</span></code>(index, connectivity)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_elem</span></code>(index, connectivity)</p></td>
 <td><p>Set element connectivity information.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_node</span></code>(index, coords)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_node</span></code>(index, coords)</p></td>
 <td><p>Set one node information.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortest_path</span></code>(n1, n2[, boundary_only])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortest_path</span></code>(n1, n2[, boundary_only])</p></td>
 <td><p>Dijkstra on the edge graph from node n1 to n2.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.schism_mesh.SchismMesh.to_geopandas" title="schimpy.schism_mesh.SchismMesh.to_geopandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_geopandas</span></code></a>([feature_type, crs, shp_fn, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#schimpy.schism_mesh.SchismMesh.to_geopandas" title="schimpy.schism_mesh.SchismMesh.to_geopandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_geopandas</span></code></a>([feature_type, crs, shp_fn, ...])</p></td>
 <td><p>Create mesh polygon and points as geopandas dataframe and shapefiles if Shap_fn file name is supplied.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trim_elems</span></code>(paths[, left])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">trim_elems</span></code>(paths[, left])</p></td>
 <td><p>Given a path, trim all elems to the left of it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#schimpy.schism_mesh.SchismMesh.trim_to_left_of_mesh" title="schimpy.schism_mesh.SchismMesh.trim_to_left_of_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trim_to_left_of_mesh</span></code></a>(line_segments)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#schimpy.schism_mesh.SchismMesh.trim_to_left_of_mesh" title="schimpy.schism_mesh.SchismMesh.trim_to_left_of_mesh"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trim_to_left_of_mesh</span></code></a>(line_segments)</p></td>
 <td><p>Trim mesh using line_segments.</p></td>
 </tr>
 </tbody>
@@ -7226,6 +7229,12 @@ if var is None,just plot the grid.</p>
 <dt class="sig sig-object py" id="schimpy.schism_mesh.SchismMesh.plot_nodes">
 <span class="sig-name descname"><span class="pre">plot_nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inpoly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_mesh.SchismMesh.plot_nodes" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.schism_mesh.SchismMesh.plot_open_boundaries">
+<span class="sig-name descname"><span class="pre">plot_open_boundaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blue'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_mesh.SchismMesh.plot_open_boundaries" title="Link to this definition"></a></dt>
+<dd><p>Plot the open boundaries of the computational grid.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.schism_mesh.SchismMesh.to_geopandas">
