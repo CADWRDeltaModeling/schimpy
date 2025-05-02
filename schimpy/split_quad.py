@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" PoC of quad splitting
-"""
+"""PoC of quad splitting"""
 
 
 from . import schism_mesh
@@ -11,29 +10,32 @@ import argparse
 import os
 
 import sys
+
 if sys.version_info[0] < 3:
     import sets
 
 
-__all__ = ['split_all_quads', ]
+__all__ = [
+    "split_all_quads",
+]
 
-angle_e = np.array((np.pi / 3., np.pi * 2. / 3.))
+angle_e = np.array((np.pi / 3.0, np.pi * 2.0 / 3.0))
 
 
 def calculate_angle(a, b, ccw=True):
-    """ Calculate an interior angle with two vectors
+    """Calculate an interior angle with two vectors
 
-        Parameters
-        ----------
-        a, b: numpy.ndarry
-            two vectors to calculate angle.
-        ccw: bool, optional
-            If true, it is assumed that a and b are created from nodes in the
-            CCW ordering. Otherwise, CW.
-        Returns
-        -------
-        float
-            radian between 0 to 2 pi
+    Parameters
+    ----------
+    a, b: numpy.ndarry
+        two vectors to calculate angle.
+    ccw: bool, optional
+        If true, it is assumed that a and b are created from nodes in the
+        CCW ordering. Otherwise, CW.
+    Returns
+    -------
+    float
+        radian between 0 to 2 pi
     """
     numer = np.cross(a, b)
     denom = np.dot(a, b)
@@ -41,23 +43,23 @@ def calculate_angle(a, b, ccw=True):
         theta = np.pi * 0.5
     else:
         theta = np.arctan2(np.abs(numer), denom)
-    if (ccw and numer > 0.) or (not ccw and numer < 0.):
-        theta = 2. * np.pi - theta
+    if (ccw and numer > 0.0) or (not ccw and numer < 0.0):
+        theta = 2.0 * np.pi - theta
     return theta
 
 
 def calculate_internal_angles(nodes):
-    """ Calculate internal angles of a polygon
+    """Calculate internal angles of a polygon
 
-        Parameters
-        ----------
-        nodes: array
-            a list or array of node coordinates
+    Parameters
+    ----------
+    nodes: array
+        a list or array of node coordinates
 
-        Returns
-        -------
-        Numpy array
-            a list of internal angles in radian
+    Returns
+    -------
+    Numpy array
+        a list of internal angles in radian
     """
     angles = []
     for i in range(len(nodes)):
@@ -72,40 +74,39 @@ def calculate_internal_angles(nodes):
 
 
 def calculate_skewness(nodes):
-    """ Calculate a skewness of an element with a list of nodes
-        Skewness is defined by the ratio of the max interior angle divided
-        by the min one.
+    """Calculate a skewness of an element with a list of nodes
+    Skewness is defined by the ratio of the max interior angle divided
+    by the min one.
 
-        Parameters
-        ----------
-        nodes: array
-            a list or array of node coordinates
+    Parameters
+    ----------
+    nodes: array
+        a list or array of node coordinates
 
-        Returns
-        -------
-        float
-            skewness of the given element
+    Returns
+    -------
+    float
+        skewness of the given element
     """
     angles = calculate_internal_angles(nodes)
-    if np.sum(angles) > (len(nodes) - 2) * np.pi + 1.e-5:
+    if np.sum(angles) > (len(nodes) - 2) * np.pi + 1.0e-5:
         return np.inf
     angle_min = np.min(angles)
     angle_max = np.max(angles)
-    if angle_min == 0.:
-        raise ValueError(
-            'Minimum angle of a polygon is zero. Degenerate element.')
+    if angle_min == 0.0:
+        raise ValueError("Minimum angle of a polygon is zero. Degenerate element.")
     return angle_max / angle_min
 
 
 def split_quads(mesh, elems_to_split):
-    """ Split given quad elements into two tri ones
+    """Split given quad elements into two tri ones
 
-        Parameters
-        ----------
-        mesh: SchismMesh
-            a mesh with elements to split
-        elems_to_split: sets
-            a list of quadrilateral element indexes to split
+    Parameters
+    ----------
+    mesh: SchismMesh
+        a mesh with elements to split
+    elems_to_split: sets
+        a list of quadrilateral element indexes to split
     """
     split_index = [[[0, 1, 2], [0, 2, 3]], [[0, 1, 3], [1, 2, 3]]]  # CCW
     shape_ori = mesh._elems.shape
@@ -113,15 +114,20 @@ def split_quads(mesh, elems_to_split):
     for i, elem_i in enumerate(elems_to_split):
         elem = np.array(mesh.elem(elem_i), dtype=int)
         if len(elem) != 4:
-            raise ValueError('split_quads requires quad elements')
+            raise ValueError("split_quads requires quad elements")
         skew = []
         for index1, index2 in split_index:
-            re = np.max((calculate_skewness(mesh.nodes[elem[index1]]),
-                         calculate_skewness(mesh.nodes[elem[index2]])))
+            re = np.max(
+                (
+                    calculate_skewness(mesh.nodes[elem[index1]]),
+                    calculate_skewness(mesh.nodes[elem[index2]]),
+                )
+            )
             skew.append(re)
         for j, index in enumerate(split_index[np.argmin(np.array(skew))]):
-            mesh._elems[shape_ori[0] + i * 2 +
-                        j] = np.append(elem[index], np.iinfo(np.int32).min)
+            mesh._elems[shape_ori[0] + i * 2 + j] = np.append(
+                elem[index], np.iinfo(np.int32).min
+            )
     for elem_i in elems_to_split:
         mesh.mark_elem_deleted(elem_i)
     mesh.renumber()
@@ -146,7 +152,7 @@ def split_all_quads(mesh):
     """
     tri = schism_mesh.SchismMesh()
     n_nodes = mesh.n_nodes()
-    mask_elem_i_quad = (mesh._elems[:, 3] >= 0)
+    mask_elem_i_quad = mesh._elems[:, 3] >= 0
     tri.allocate(mesh.n_elems() + np.sum(mask_elem_i_quad), n_nodes)
     tri._nodes[:] = mesh._nodes
     split_index = [[[0, 1, 2], [0, 2, 3]], [[0, 1, 3], [1, 2, 3]]]  # CCW
@@ -158,8 +164,12 @@ def split_all_quads(mesh):
             skew = []
             elem = mesh._elems[i]
             for index1, index2 in split_index:
-                re = np.max((calculate_skewness(mesh.nodes[elem[index1]]),
-                             calculate_skewness(mesh.nodes[elem[index2]])))
+                re = np.max(
+                    (
+                        calculate_skewness(mesh.nodes[elem[index1]]),
+                        calculate_skewness(mesh.nodes[elem[index2]]),
+                    )
+                )
                 skew.append(re)
             index = split_index[np.argmin(np.array(skew))]
             tri._elems[i][:3] = elem[index[0]]
@@ -171,63 +181,98 @@ def split_all_quads(mesh):
 
 
 def write_prop(elems_to_split, n_elems, fpath):
-    """ Write a prop file with flags that show which elements are split
-        in the input mesh
+    """Write a prop file with flags that show which elements are split
+    in the input mesh
     """
     prop = np.zeros(n_elems)
     prop[list(elems_to_split)] = 1
-    np.savetxt(fpath, np.hstack(((np.arange(n_elems) + 1).reshape(-1, 1),
-                                 prop.reshape(-1, 1))),
-               fmt='%d %d')
+    np.savetxt(
+        fpath,
+        np.hstack(((np.arange(n_elems) + 1).reshape(-1, 1), prop.reshape(-1, 1))),
+        fmt="%d %d",
+    )
 
 
 def create_arg_parser():
-    """ Create an argument parser
+    """Create an argument parser
 
-        Returns
-        -------
-        argparse.ArgumentParser
+    Returns
+    -------
+    argparse.ArgumentParser
     """
-    description = "Split quadrilateral elements that have higher skewness " \
+    description = (
+        "Split quadrilateral elements that have higher skewness "
         "value than the given skewness into triangular elements."
+    )
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('meshinput', type=str,
-                        help="Mesh input file to process in gr3 or SMS 2dm format.")
-    parser.add_argument('meshoutput', type=str,
-                        help="Output mesh file name in gr3 format.")
-    parser.add_argument('--skewness', dest='skewness', type=float, default=None,
-                        help="Maximum skewness (not normalized.) to split. "
-                        "If the skewness of an element is bigger than this, "
-                        "the element will be split.")
-    parser.add_argument('--minangle', dest='minangle', type=float, default=None,
-                        help="Minimum angle (degrees) to keep in quads. If any of "
-                        "internal angles of a quad is smaller than mingangle, "
-                        "the quad will be split.")
-    parser.add_argument('--maxangle', dest='maxangle', type=float, default=None,
-                        help="Minimum angle (degrees) to keep in quads. If any of "
-                        "internal angles of a quad is larger than maxgangle, "
-                        "the quad will be split.")
-    parser.add_argument('--propfile', dest='propfile', type=str,default=None,
-                        help="Write a prop file that shows elements that are split")
+    parser.add_argument(
+        "meshinput",
+        type=str,
+        help="Mesh input file to process in gr3 or SMS 2dm format.",
+    )
+    parser.add_argument(
+        "meshoutput", type=str, help="Output mesh file name in gr3 format."
+    )
+    parser.add_argument(
+        "--skewness",
+        dest="skewness",
+        type=float,
+        default=None,
+        help="Maximum skewness (not normalized.) to split. "
+        "If the skewness of an element is bigger than this, "
+        "the element will be split.",
+    )
+    parser.add_argument(
+        "--minangle",
+        dest="minangle",
+        type=float,
+        default=None,
+        help="Minimum angle (degrees) to keep in quads. If any of "
+        "internal angles of a quad is smaller than mingangle, "
+        "the quad will be split.",
+    )
+    parser.add_argument(
+        "--maxangle",
+        dest="maxangle",
+        type=float,
+        default=None,
+        help="Minimum angle (degrees) to keep in quads. If any of "
+        "internal angles of a quad is larger than maxgangle, "
+        "the quad will be split.",
+    )
+    parser.add_argument(
+        "--propfile",
+        dest="propfile",
+        type=str,
+        default=None,
+        help="Write a prop file that shows elements that are split",
+    )
     return parser
 
 
-def split_quad(mesh,skewness=None,minangle=None,maxangle=None,meshout=None,propfile=None,logger=None):
-    """ main function for CLI
-    """
+def split_quad(
+    mesh,
+    skewness=None,
+    minangle=None,
+    maxangle=None,
+    meshout=None,
+    propfile=None,
+    logger=None,
+):
+    """main function for CLI"""
     if logger is not None:
         logger.info("Splitting quads")
     if skewness is not None:
-        if skewness < 0.:
-            raise ValueError('Skewness must be bigger than zero')
+        if skewness < 0.0:
+            raise ValueError("Skewness must be bigger than zero")
     if minangle is not None:
-        minangle = np.pi * minangle / 180.
+        minangle = np.pi * minangle / 180.0
     if maxangle is not None:
-        maxangle = np.pi * maxangle / 180.
+        maxangle = np.pi * maxangle / 180.0
     if skewness is None and minangle is None and maxangle is None:
-        raise ValueError('No splitting criteria were given')
+        raise ValueError("No splitting criteria were given")
 
-    if isinstance(mesh,str): 
+    if isinstance(mesh, str):
         mesh = schism_mesh.read_mesh(mesh)
     if sys.version_info[0] < 3:
         elems_to_split = sets.Set()
@@ -255,7 +300,7 @@ def split_quad(mesh,skewness=None,minangle=None,maxangle=None,meshout=None,propf
                     if angle_max > maxangle:
                         elems_to_split.add(elem_i)
 
-    print("Found {} quad element(s) to spilt.".format( len(elems_to_split)))
+    print("Found {} quad element(s) to spilt.".format(len(elems_to_split)))
 
     if len(elems_to_split) < 1:
         print("No element to split.")
@@ -273,25 +318,20 @@ def split_quad(mesh,skewness=None,minangle=None,maxangle=None,meshout=None,propf
 
 
 def main():
-    """ main function for CLI
-    """
+    """main function for CLI"""
     parser = create_arg_parser()
     args = parser.parse_args()
     meshin = args.meshinput
     if not os.path.exists(meshin):
-        raise ValueError('The given input file not found')
+        raise ValueError("The given input file not found")
     meshout = args.meshoutput
     fpath_prop = args.propfile
     skewness = args.skewness
     minangle = args.minangle
     maxangle = args.maxangle
-    newmesh=split_quad(meshin,skewness,minangle,maxangle,\
-                       meshout,fpath_prop)
-    return 
-                       
+    newmesh = split_quad(meshin, skewness, minangle, maxangle, meshout, fpath_prop)
+    return
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

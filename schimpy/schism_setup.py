@@ -34,8 +34,7 @@ class SchismSetup(object):
     """
 
     def __init__(self, logger=None):
-        """ Constructor
-        """
+        """Constructor"""
         self._logger = logger
         self._input = SchismInput(logger)
 
@@ -45,25 +44,24 @@ class SchismSetup(object):
 
     @property
     def mesh(self):
-        """ Mesh
+        """Mesh
 
-            :getter: Return the mesh.
+        :getter: Return the mesh.
         """
         return self._input.mesh
 
     @mesh.setter
     def mesh(self, value):
-        """ Mesh setter
-        """
+        """Mesh setter"""
         self._input.mesh = value
 
     def load(self, dir):
-        """ Read SCHISM input
+        """Read SCHISM input
 
-            Parameters
-            ----------
-            dir: String
-                An directory where the SCHISM inputs reside
+        Parameters
+        ----------
+        dir: String
+            An directory where the SCHISM inputs reside
         """
         # Assuming we are dealing SCHISM format
         # Read the grid
@@ -85,12 +83,12 @@ class SchismSetup(object):
             source_reader.read(fname)
 
     def get_closest_node_i_from_new_mesh(self, mesh, node_i):
-        old_node = self._input.mesh.nodes[node_i, ]
+        old_node = self._input.mesh.nodes[node_i,]
         return mesh.find_closest_nodes(old_node[:2], count=1, boundary=1)
 
     def adopt_new_mesh(self, fname):
-        """ Adopt a new grid.
-                fname = the file name of a new hgrid file
+        """Adopt a new grid.
+        fname = the file name of a new hgrid file
         """
         gr3_reader = Gr3IO()
         if not os.path.exists(fname):
@@ -106,11 +104,9 @@ class SchismSetup(object):
         # Open boundary
         for b in mesh.boundaries:
             # First Node
-            node_1 = self.get_closest_node_i_from_new_mesh(
-                new_mesh, b.nodes[0])
+            node_1 = self.get_closest_node_i_from_new_mesh(new_mesh, b.nodes[0])
             # End Node
-            node_2 = self.get_closest_node_i_from_new_mesh(
-                new_mesh, b.nodes[-1])
+            node_2 = self.get_closest_node_i_from_new_mesh(new_mesh, b.nodes[-1])
             # Get a path between the two
             new_nodes = new_mesh.shortest_path(node_1, node_2, boundary_only=1)
             new_mesh.add_boundary(new_nodes, b.btype)
@@ -119,8 +115,10 @@ class SchismSetup(object):
         new_structures = []
         for struct in self._input.structures:
             # Ref node
-            new_ref_pair = tuple(self.get_closest_node_i_from_new_mesh(
-                new_mesh, node_i) for node_i in struct.reference_pair)
+            new_ref_pair = tuple(
+                self.get_closest_node_i_from_new_mesh(new_mesh, node_i)
+                for node_i in struct.reference_pair
+            )
 
             # Node pairs.  This one is slightly trickier
             original_up = [node_i[0] for node_i in struct.node_pairs]
@@ -139,13 +137,12 @@ class SchismSetup(object):
                         if new_up[-1] == path[0]:
                             new_up.extend(path[1:])
                         else:
-                            raise Exception('Path segment does not match.')
+                            raise Exception("Path segment does not match.")
                     node_prev = node
             # Step 2: Create a new downstream node pair
             new_down_inter = []
             for i in range(len(original_up)):
-                path = list(new_mesh.shortest_path(original_up[i],
-                                                   original_down[i]))
+                path = list(new_mesh.shortest_path(original_up[i], original_down[i]))
                 new_down_inter.append(path[1])
             # Step 3: Build middle nodes of the downstream side
             node_prev = None
@@ -161,16 +158,16 @@ class SchismSetup(object):
                         if new_down[-1] == path[0]:
                             new_down.extend(path[1:])
                         else:
-                            raise Exception('Path segment does not match.')
+                            raise Exception("Path segment does not match.")
                     node_prev = node
             # Step 4: Check the pairs
             new_pairs = []
             if not len(new_up) == len(new_down):
-                raise Exception('Number of pairs does not match')
+                raise Exception("Number of pairs does not match")
             for i in range(len(new_up)):
                 path = list(new_mesh.shortest_path(new_up[i], new_down[i]))
                 if not len(path) == 2:
-                    raise Exception('Having trouble with ')
+                    raise Exception("Having trouble with ")
                 new_pairs.append((new_up[i], new_down[i]))
 
             # Create a new structure
@@ -188,118 +185,125 @@ class SchismSetup(object):
         self._structures = new_structures
 
     def write_hgrid(self, fname, attr=None, boundary=True):
-        """ Write a hgrid file only.
-            fname = the output file name
-            attr = attribute array in numpy format. If None, original data
-            will be kept.
-            boundary = If True, boundary info will be appended at the end of
-            the file. Otherwise, not appended.
+        """Write a hgrid file only.
+        fname = the output file name
+        attr = attribute array in numpy format. If None, original data
+        will be kept.
+        boundary = If True, boundary info will be appended at the end of
+        the file. Otherwise, not appended.
         """
         schism_mesh.write_mesh(self._input.mesh, fname, attr, boundary)
 
-    def write_hgrid_ll(self, fname, boundary, input_crs="EPSG:26910", output_crs="EPSG:4269"):
-        """ Write a hgrid.ll, lat-long mesh file, of the current mesh.
+    def write_hgrid_ll(
+        self, fname, boundary, input_crs="EPSG:26910", output_crs="EPSG:4269"
+    ):
+        """Write a hgrid.ll, lat-long mesh file, of the current mesh.
 
-            Parameters
-            ----------
-            fname: str
-                the output file name
-            input_epsg: int, optional
-                input EPSG. default value is 26910, NAD83/UTM10N.
-            output_epsg: int, optional
-                output EPSG. default value is 4269, NAD83
+        Parameters
+        ----------
+        fname: str
+            the output file name
+        input_epsg: int, optional
+            input EPSG. default value is 26910, NAD83/UTM10N.
+        output_epsg: int, optional
+            output EPSG. default value is 4269, NAD83
         """
-        
+
         # pyproj > 2
-        project = pyproj.Transformer.from_crs(input_crs, output_crs, always_xy=True).transform
+        project = pyproj.Transformer.from_crs(
+            input_crs, output_crs, always_xy=True
+        ).transform
 
-
-        #new_mesh = SchismMesh()
+        # new_mesh = SchismMesh()
         new_mesh = copy.copy(self.mesh)
         new_mesh._nodes = np.copy(new_mesh._nodes)
-        #new_mesh._elems = np.copy(self.mesh._elems)
+        # new_mesh._elems = np.copy(self.mesh._elems)
 
-        #new_mesh = SchismMesh()
-        #new_mesh._nodes = np.copy(self.mesh.nodes)
-        #new_mesh._elems = np.copy(self.mesh._elems)
-        #new_mesh._nodes = transform(project,self.mesh.nodes[:,0],self.mesh.nodes[:,1])
-        
+        # new_mesh = SchismMesh()
+        # new_mesh._nodes = np.copy(self.mesh.nodes)
+        # new_mesh._elems = np.copy(self.mesh._elems)
+        # new_mesh._nodes = transform(project,self.mesh.nodes[:,0],self.mesh.nodes[:,1])
+
         for i, node in enumerate(self.mesh.nodes):
             point = Point(node[0], node[1])
             point = transform(project, point)
             new_mesh.nodes[i, 0] = point.xy[0][0]
             new_mesh.nodes[i, 1] = point.xy[1][0]
-        write_mesh(new_mesh, fname,write_boundary=boundary)
-
+        write_mesh(new_mesh, fname, write_boundary=boundary)
 
     def elements_on_linestring(self, coords):
         """List elements along linestring"""
         mesh = self._input.mesh
-        line_segment = np.array(coords,dtype="d").flatten()
+        line_segment = np.array(coords, dtype="d").flatten()
         print(line_segment)
         return mesh.find_intersecting_elems_with_line(line_segment)
 
-    def create_flux_regions(self, linestrings, out_fname='fluxflag.prop'):
-        """ Create and write flux_regions.gr3 with the given lines
+    def create_flux_regions(self, linestrings, out_fname="fluxflag.prop"):
+        """Create and write flux_regions.gr3 with the given lines
 
-            Parameters
-            ----------
-            linestrings: list
-                A list containing information for flux regions.
-                It must contains 'linestrings.'
-            out_fname: str, optional
-                Output file name
+        Parameters
+        ----------
+        linestrings: list
+            A list containing information for flux regions.
+            It must contains 'linestrings.'
+        out_fname: str, optional
+            Output file name
         """
         mesh = self._input.mesh
         assigned = set()
         flagval = 0
-        flags = np.full((mesh.n_elems(), 1), -1, dtype='int')        
-        for flagval,linestring in enumerate(linestrings):
-            line = linestring.get('coordinates')
-            name = linestring.get('name')
+        flags = np.full((mesh.n_elems(), 1), -1, dtype="int")
+        for flagval, linestring in enumerate(linestrings):
+            line = linestring.get("coordinates")
+            name = linestring.get("name")
             if name is None:
-                name = linestring.get('Name')
+                name = linestring.get("Name")
             npoint = len(line)
-            for ip in range(npoint-1):
-                line_segment = np.array(line[ip:ip+2],dtype='d').flatten()
-                try: 
-                    on_line,neighbors = mesh.find_neighbors_on_segment(line_segment)
+            for ip in range(npoint - 1):
+                line_segment = np.array(line[ip : ip + 2], dtype="d").flatten()
+                try:
+                    on_line, neighbors = mesh.find_neighbors_on_segment(line_segment)
                 except:
-                    raise ValueError("Neighbor set not found for linestring {}".format(name))               
-                flags[np.array(on_line,dtype='i')] = flagval + 1
-                flags[np.array(neighbors,dtype='i')] = flagval 
+                    raise ValueError(
+                        "Neighbor set not found for linestring {}".format(name)
+                    )
+                flags[np.array(on_line, dtype="i")] = flagval + 1
+                flags[np.array(neighbors, dtype="i")] = flagval
                 assigned.update(on_line + neighbors)
 
         index = np.arange(flags.shape[0]).reshape((-1, 1))
         index += 1
         elementflags = np.concatenate((index, flags), axis=1)
-        np.savetxt(out_fname, elementflags, fmt='%d')
+        np.savetxt(out_fname, elementflags, fmt="%d")
 
     def _area_of_poligon(x):
-        """ Calculate area of a polygon based on shoelace formula
+        """Calculate area of a polygon based on shoelace formula
 
-            Parameters
-            ----------
-            x: numpy.array
-                array of coordinates for the polygon
+        Parameters
+        ----------
+        x: numpy.array
+            array of coordinates for the polygon
 
-            Returns
-            -------
-            float
-                area of the polygon
+        Returns
+        -------
+        float
+            area of the polygon
         """
-        area = 0.
+        area = 0.0
         for i in range(len(x)):
             area += x[i][0] * x[i + 1][1] - x[i + 1][0] * x[i][1]
 
-        return fabs(area) * .5
+        return fabs(area) * 0.5
 
     def _clip(subjectPolygon, clipPolygon):
-        """  Sutherland-Hodgman polygon clipping algorithm
-             from Rosetta code
+        """Sutherland-Hodgman polygon clipping algorithm
+        from Rosetta code
         """
+
         def inside(p):
-            return(cp2[0] - cp1[0]) * (p[1] - cp1[1]) > (cp2[1] - cp1[1]) * (p[0] - cp1[0])
+            return (cp2[0] - cp1[0]) * (p[1] - cp1[1]) > (cp2[1] - cp1[1]) * (
+                p[0] - cp1[0]
+            )
 
         def computeIntersection():
             dc = [cp1[0] - cp2[0], cp1[1] - cp2[1]]
@@ -328,31 +332,29 @@ class SchismSetup(object):
                     outputList.append(computeIntersection())
                 s = e
             cp1 = cp2
-        return(outputList)
+        return outputList
 
     def creart_sources_from_user_input(self):
-        """ Create a source from a user input
-        """
+        """Create a source from a user input"""
         # Read a user input
         source_inputs = self._read_source_user_input()
         source_th_inputs = self._read_source_th_user_input()
-        out_fname = 'source_sink.in'
+        out_fname = "source_sink.in"
         self._write_source_file(source_inputs, out_fname)
-        out_fname = 'vsource.th'
+        out_fname = "vsource.th"
         self._write_volume_source_history_file(out_fname)
 
-    def _read_source_user_input(self, fname='source_sink.user'):
-        """ Read in a user input
-        """
-        f = open(fname, 'r')
+    def _read_source_user_input(self, fname="source_sink.user"):
+        """Read in a user input"""
+        f = open(fname, "r")
         inputs = []
         for l in f:
             l = l.strip()
-            if l[0] == '#':
+            if l[0] == "#":
                 continue
             tokens = l.split()
             if len(tokens) < 4:
-                raise Exception('the file is corrupted.')
+                raise Exception("the file is corrupted.")
             name = tokens[0]
             coord = (float(tokens[1]), float(tokens[2]))
             if tokens[3].upper() == "SOURCE":
@@ -360,22 +362,20 @@ class SchismSetup(object):
             elif tokens[3].upper() == "SINK":
                 type = -1
             else:
-                raise Exception('the file is corrupted.')
+                raise Exception("the file is corrupted.")
             inputs.append((name, coord, type))
         f.close()
         return inputs
 
-    def _read_source_th_user_input(self, fname='source_sink_th.user'):
-        """ Read in a user input for time history of source/sink
-        """
-        f = open(fname, 'r')
+    def _read_source_th_user_input(self, fname="source_sink_th.user"):
+        """Read in a user input for time history of source/sink"""
+        f = open(fname, "r")
 
         f.close()
 
-    def _write_source_file(self, inputs, fname='source_sink.in'):
-        """ Write a source/sink file with the give user input data
-        """
-        f = open(fname, 'w')
+    def _write_source_file(self, inputs, fname="source_sink.in"):
+        """Write a source/sink file with the give user input data"""
+        f = open(fname, "w")
         # Count the number of source/sink
         n_sources = sum(item[2] == 1 for item in inputs)
         n_sinks = sum(item[2] == -1 for item in inputs)
@@ -399,39 +399,39 @@ class SchismSetup(object):
         f.flush()
         f.close()
 
-    def _write_volume_source_history_file(self, fname='msource.th'):
-        """ Write a time history file of sources/sinks.
-        """
+    def _write_volume_source_history_file(self, fname="msource.th"):
+        """Write a time history file of sources/sinks."""
         pass
 
     def create_structures(self, structures, nudging=None):
-        """ Create structures
-        """
+        """Create structures"""
         self._input.clear_structures()
         self._input._nudging = nudging
         for item in structures:
             struct = SchismStructure()
-            name = item.get('name')
-            self._logger.info('Processing structure: {}'.format(name))
+            name = item.get("name")
+            self._logger.info("Processing structure: {}".format(name))
             struct.name = name
-            end_points = item.get('end_points')
+            end_points = item.get("end_points")
             if end_points is None:
                 self._logger.warning("No end_points in structure")
                 continue
             struct.coords = np.array(end_points)
-            struct.type = item['type'].lower()
-            struct.properties = item['configuration']
+            struct.type = item["type"].lower()
+            struct.properties = item["configuration"]
 
             # Find node pairs
-            up_path, down_path = \
-                self.mesh.find_two_neighboring_node_paths(struct.coords)
+            up_path, down_path = self.mesh.find_two_neighboring_node_paths(
+                struct.coords
+            )
             struct.node_pairs = list(zip(up_path, down_path))
             # Reference pair
-            ref = item.get('reference', 'self')
+            ref = item.get("reference", "self")
             struct.reference = ref
-            if ref == 'self':
-                struct.reference_pair = self._generate_reference_pair(up_path,
-                                                                      down_path)
+            if ref == "self":
+                struct.reference_pair = self._generate_reference_pair(
+                    up_path, down_path
+                )
             else:
                 struct.reference_pair = None
             self._input.add_structure(struct)
@@ -440,29 +440,29 @@ class SchismSetup(object):
             if struct.reference_pair is None:
                 found = False
                 for i, item in enumerate(structures):
-                    if struct.reference == item['name']:
+                    if struct.reference == item["name"]:
                         struct.reference_pair = copy.deepcopy(
-                            self._input.structures[i].reference_pair)
+                            self._input.structures[i].reference_pair
+                        )
                         found = True
                         break
                 if found is False:
-                    self._logger.error("Reference name not found: %s",
-                                       item['name'])
+                    self._logger.error("Reference name not found: %s", item["name"])
                     raise ValueError("Wrong reference name in structures")
 
     def write_structures(self, fname="hydraulics.in"):
-        """ Write a SCHISM structure file
-            fname = output file name
+        """Write a SCHISM structure file
+        fname = output file name
         """
         struct_writer = SchismStructureIO(self._input)
         struct_writer.write(fname)
 
     def _generate_reference_pair(self, up_path, down_path):
-        """ Generate a new referece pair from the current node pairs.
-            For now, it picks the neighboring nodes around the
-            middle node pair.
-            node_pairs = the list of node pairs
-            return = the new reference pair
+        """Generate a new referece pair from the current node pairs.
+        For now, it picks the neighboring nodes around the
+        middle node pair.
+        node_pairs = the list of node pairs
+        return = the new reference pair
         """
         ref_up = self._find_reference_node(up_path, down_path)
         ref_down = self._find_reference_node(down_path, up_path)
@@ -488,7 +488,7 @@ class SchismSetup(object):
             # is chosen.
             tangent = mesh.nodes[path1[-1]][:2] - mesh.nodes[path1[0]][:2]
             tangent /= np.linalg.norm(tangent)
-            min = 1.
+            min = 1.0
             hit = -1
             for c in candidates:
                 vec = mesh.nodes[c][:2] - mesh.nodes[center_node_i][:2]
@@ -500,8 +500,7 @@ class SchismSetup(object):
             return hit
 
     def _parse_attribute(self, expr):
-        """ Parse expression that can be understood by the tool
-        """
+        """Parse expression that can be understood by the tool"""
         expr = re.sub(r"(\b)x(\b)", "\g<1>mesh.nodes[nodes_sel, 0]\g<2>", expr)
         expr = re.sub(r"(\b)y(\b)", "\g<1>mesh.nodes[nodes_sel, 1]\g<2>", expr)
         expr = re.sub(r"(\b)z(\b)", "\g<1>mesh.nodes[nodes_sel, 2]\g<2>", expr)
@@ -509,61 +508,65 @@ class SchismSetup(object):
         expr = re.sub(r"(\b)max(\b)", "\g<1>numpy.maximum\g<2>", expr)
         return expr
 
-    def apply_linestring_ops(self,default,linestrings):
-        mesh = self.mesh             
+    def apply_linestring_ops(self, default, linestrings):
+        mesh = self.mesh
         attr = np.copy(mesh.nodes[:, 2])
-        
-        for istring,linestring in enumerate(linestrings):
-            line = linestring.get('coordinates')
-            name = linestring.get('name')
-            widen_left = linestring.get('widen_left')
-            widen= False if widen_left is None else widen_left
-             
+
+        for istring, linestring in enumerate(linestrings):
+            line = linestring.get("coordinates")
+            name = linestring.get("name")
+            widen_left = linestring.get("widen_left")
+            widen = False if widen_left is None else widen_left
+
             if name is None:
-                name = linestring.get('Name')
+                name = linestring.get("Name")
             npoint = len(line)
             attribute = str(linestring.get("attribute"))
             optype = linestring.get("type")
             if "local" in attribute:
                 optype = attribute
-                if attribute == 'local_min':
+                if attribute == "local_min":
                     op = np.min
-                elif attribute == 'local_max':
+                elif attribute == "local_max":
                     op = np.max
-                elif attribute == 'local_mean':
+                elif attribute == "local_mean":
                     op = np.mean
-                elif attribute == 'local_median':
+                elif attribute == "local_median":
                     op = np.median
                 else:
-                    raise ValueError(f"Attribute {attribute} is not known. Local operators like local_min cannot be part of a formula")
+                    raise ValueError(
+                        f"Attribute {attribute} is not known. Local operators like local_min cannot be part of a formula"
+                    )
             else:
                 expr = attribute
-                if optype in ["min","max"]:
-                        raise ValueError("Using type=min/max for linestring depth enforcement is be deprecated. Write the logic you'd like in the attribute field.")
+                if optype in ["min", "max"]:
+                    raise ValueError(
+                        "Using type=min/max for linestring depth enforcement is be deprecated. Write the logic you'd like in the attribute field."
+                    )
                 optype = "eval"
-              
-            
-            for ip in range(npoint-1):   # loop through segments on linestring
-                line_segment = np.array(line[ip:ip+2],dtype='d').flatten()
-                try: 
-                    on_line,neighbors = mesh.find_neighbors_on_segment(line_segment)
+
+            for ip in range(npoint - 1):  # loop through segments on linestring
+                line_segment = np.array(line[ip : ip + 2], dtype="d").flatten()
+                try:
+                    on_line, neighbors = mesh.find_neighbors_on_segment(line_segment)
                     if widen:
                         on_line = on_line + neighbors
                 except:
-                    raise ValueError("Elements or neighbors not found for linestring {}".format(name))  
-                
-  
+                    raise ValueError(
+                        "Elements or neighbors not found for linestring {}".format(name)
+                    )
+
                 node_local_nds = {}
                 for iel in on_line:
-                    elnodes=mesh.elem(iel)
+                    elnodes = mesh.elem(iel)
                     for inode in elnodes:
                         # list all the nodes on the element as being local to one another
                         # ultimately this list will include items pertinent to each node from
                         # multiple elements
                         if inode in node_local_nds:
                             node_local_nds[inode].update(elnodes)
-                        else: 
-                            node_local_nds[inode]=set(elnodes)
+                        else:
+                            node_local_nds[inode] = set(elnodes)
 
                 newglobals = {}
                 for item in newglobals:
@@ -571,44 +574,43 @@ class SchismSetup(object):
                 for inode in node_local_nds:
                     # inode is the node being calculated
                     support_nodes = list(node_local_nds[inode])
-                    
-                    if (optype.startswith("local")):
-                        orig = mesh.nodes[support_nodes,2]
+
+                    if optype.startswith("local"):
+                        orig = mesh.nodes[support_nodes, 2]
                         # TODO: implement deprecation warning, eventually delete the following if/elseif
                         if optype == "min":
-                            valreplace=max(opval, mesh.nodes[inode,2])
+                            valreplace = max(opval, mesh.nodes[inode, 2])
                         elif optype == "max":
-                            valreplace=min(opval, mesh.nodes[inode,2])
+                            valreplace = min(opval, mesh.nodes[inode, 2])
                         elif optype.startswith("local"):
-                            valreplace=op(orig)
-                        else: 
+                            valreplace = op(orig)
+                        else:
                             raise ValueError(f"Op type unknown: {optype}")
                     else:
-                        newglobals["z"] = mesh.nodes[inode,2]
-                        newglobals["y"] = mesh.nodes[inode,1] 
-                        newglobals["x"] = mesh.nodes[inode,0]                         
-                        valreplace = eval(expr,newglobals)                       
-                    attr[inode]=valreplace
+                        newglobals["z"] = mesh.nodes[inode, 2]
+                        newglobals["y"] = mesh.nodes[inode, 1]
+                        newglobals["x"] = mesh.nodes[inode, 0]
+                        valreplace = eval(expr, newglobals)
+                    attr[inode] = valreplace
         return attr
 
-
     def apply_polygons(self, polygons, default):
-        """ Partition the grid with the given polygons.
-            Each node (not element) will be assigned with an integer ID
-            which is the index of the polygons.
-            If some polygons overlap, the latter one will trump the former one.
-            The area that are not covered by any of the given polygons
-            will have a default negative one attribute.
+        """Partition the grid with the given polygons.
+        Each node (not element) will be assigned with an integer ID
+        which is the index of the polygons.
+        If some polygons overlap, the latter one will trump the former one.
+        The area that are not covered by any of the given polygons
+        will have a default negative one attribute.
 
-            Parameters
-            ----------
-            polygons: list
-                a list of polygon dict (from YAML most of time)
+        Parameters
+        ----------
+        polygons: list
+            a list of polygon dict (from YAML most of time)
 
-            Returns
-            -------
-            numpy.ndarray
-                attributes
+        Returns
+        -------
+        numpy.ndarray
+            attributes
         """
         mesh = self.mesh
         if default is None:
@@ -621,22 +623,20 @@ class SchismSetup(object):
             attr.fill(val)
 
         for polygon in polygons:
-            name = polygon.get('name')
-            imports_str = polygon.get('imports')
-            imports = ['numpy']
+            name = polygon.get("name")
+            imports_str = polygon.get("imports")
+            imports = ["numpy"]
             if isinstance(imports_str, str):
                 imports.extend(imports_str.split())
-            vertices = np.array(polygon.get('vertices'))
+            vertices = np.array(polygon.get("vertices"))
             if vertices.shape[1] != 2:
-                raise ValueError(
-                    'The number of coordinates in vertices are wrong.')
+                raise ValueError("The number of coordinates in vertices are wrong.")
             vertices = np.array(vertices)
-            poly_type = polygon['type'].lower() \
-                if 'type' in polygon else "none"
-            if poly_type == '':
-                poly_type = 'none'
-            attribute = polygon['attribute']
-            prop = {'name': name, 'type': poly_type, 'attribute': attribute}
+            poly_type = polygon["type"].lower() if "type" in polygon else "none"
+            if poly_type == "":
+                poly_type = "none"
+            attribute = polygon["attribute"]
+            prop = {"name": name, "type": poly_type, "attribute": attribute}
             poly = SchismPolygon(shell=vertices, prop=prop)
             if isinstance(attribute, str):
                 expr_str = self._parse_attribute(attribute)
@@ -646,9 +646,9 @@ class SchismSetup(object):
 
             ## Add global variables
             newglobals = {}
-            newglobals['imports'] = imports
-            newglobals['mesh'] = mesh
-            newglobals['polygon'] = poly
+            newglobals["imports"] = imports
+            newglobals["mesh"] = mesh
+            newglobals["polygon"] = poly
 
             # Evaluate
             try:
@@ -656,15 +656,13 @@ class SchismSetup(object):
             except:
                 self._logger.error("Polygon failed to evaluate: {}".format(name))
                 raise
-            # if 97346 in nodes_sel: 
-                # print(poly.type)
-                # print("Arrived in poly {}".format(name))
-                # for ii,isel in enumerate(nodes_sel):
-                    # if isel == 97346: 
-                        # print(ii,isel,mesh.nodes[isel,:],vals[ii])
-                        # #raise ValueError("Arrived. Poly type = {}".format(poly.type))
-                     
-                
+            # if 97346 in nodes_sel:
+            # print(poly.type)
+            # print("Arrived in poly {}".format(name))
+            # for ii,isel in enumerate(nodes_sel):
+            # if isel == 97346:
+            # print(ii,isel,mesh.nodes[isel,:],vals[ii])
+            # #raise ValueError("Arrived. Poly type = {}".format(poly.type))
 
             if nodes_sel is None or not len(nodes_sel):
                 msg = "This polygon contains no nodes: %s" % poly.name
@@ -676,16 +674,20 @@ class SchismSetup(object):
                     attr[nodes_sel] = vals
                 elif poly.type == "min":
                     attr[nodes_sel] = np.where(
-                        attr[nodes_sel] < vals, vals, attr[nodes_sel])
+                        attr[nodes_sel] < vals, vals, attr[nodes_sel]
+                    )
                 elif poly.type == "max":
                     attr[nodes_sel] = np.where(
-                        attr[nodes_sel] > vals, vals, attr[nodes_sel])
+                        attr[nodes_sel] > vals, vals, attr[nodes_sel]
+                    )
                 else:
                     raise Exception(
-                        "Not supported polygon type ({}) for polygon ({})".format(poly.type, name))
+                        "Not supported polygon type ({}) for polygon ({})".format(
+                            poly.type, name
+                        )
+                    )
             except:
-                self._logger.error(
-                    "Error applying formula in polygon: {}".format(name))
+                self._logger.error("Error applying formula in polygon: {}".format(name))
                 raise
         # TODO: Not implemented debug messaged yet.
         # n_missed = sum(1 for i, a in enumerate(attr) if a == default)
@@ -699,12 +701,12 @@ class SchismSetup(object):
         return attr
 
     def _evaluate_in_polygon(self, expr, polygon, globals):
-        mesh = globals['mesh']
-        imports = globals['imports']
+        mesh = globals["mesh"]
+        imports = globals["imports"]
         mod_names = {}
         # if imports is not None:
         for imp in imports:
-            iname = imp.split('.')[-1]
+            iname = imp.split(".")[-1]
             # ipack = '.'.join(imp.split('.')[0:-1])
             try:
                 # if len(ipack) > 0 else importlib.import_module(iname)
@@ -716,33 +718,37 @@ class SchismSetup(object):
 
         box = np.array(polygon.bounds)[[0, 2, 1, 3]]
         node_candidates = mesh.find_nodes_in_box(box)
-        nodes_in_polygon = [node_i for node_i in node_candidates
-                            if polygon.contains(Point(mesh.nodes[node_i]))]
-        globals['nodes_sel'] = nodes_in_polygon
+        nodes_in_polygon = [
+            node_i
+            for node_i in node_candidates
+            if polygon.contains(Point(mesh.nodes[node_i]))
+        ]
+        globals["nodes_sel"] = nodes_in_polygon
         vals = eval(expr, globals)
         return nodes_in_polygon, vals
 
     def create_node_partitioning(self, gr3_fname, polygons, default, smooth):
-        """ Create a gr3 file with node partitioning using
-            polygons in the polygon file.
-            gr3_fname = output gr3 file name
-            polygons = polygons
+        """Create a gr3 file with node partitioning using
+        polygons in the polygon file.
+        gr3_fname = output gr3 file name
+        polygons = polygons
         """
         from schimpy.laplace_smooth_data import laplace_smooth_data2
+
         attr = self.apply_polygons(polygons, default)
         if smooth is not None:
             self._logger.info("Smoothing data. This process can take several minutes")
-            attr=laplace_smooth_data2(self.mesh,data=attr,**smooth)
-        if gr3_fname != 'hgrid.gr3':
+            attr = laplace_smooth_data2(self.mesh, data=attr, **smooth)
+        if gr3_fname != "hgrid.gr3":
             self.write_hgrid(gr3_fname, attr, False)
         else:
             self.write_hgrid(gr3_fname, attr)
 
     def create_prop_partitioning(self, prop_fname, polygons, default):
-        """ Create a prop file with element partitioning using
-            polygons in the polygon file.
-            prop_fname = output prop file name
-            polygons = polygons
+        """Create a prop file with element partitioning using
+        polygons in the polygon file.
+        prop_fname = output prop file name
+        polygons = polygons
         """
         # option_name = 'default'
         # # default = polygon_data[option_name]
@@ -751,36 +757,34 @@ class SchismSetup(object):
         attr = self.apply_polygons(polygons, default)
         mesh = self.mesh
         elementflags = np.empty((mesh.n_elems(), 1))
-        elementflags.fill(0.)
+        elementflags.fill(0.0)
         for elem_i in range(mesh.n_elems()):
             elem = mesh.elem(elem_i)
             flags = attr[elem]
-            if np.amax(flags) == 1.:
-                elementflags[elem_i] = 1.
+            if np.amax(flags) == 1.0:
+                elementflags[elem_i] = 1.0
         index = np.arange(mesh.n_elems()).reshape((mesh.n_elems(), 1))
         index += 1
-        np.savetxt(prop_fname, np.concatenate(
-            (index, elementflags), axis=1), fmt="%d")
+        np.savetxt(prop_fname, np.concatenate((index, elementflags), axis=1), fmt="%d")
 
     def modify_depth(self, polygon_data):
-        """ Modify depth with the polygon information
-        """
-        polygons = polygon_data['polygons']
-        #attr = self._partition_nodes_with_polygons(polygons, None)
+        """Modify depth with the polygon information"""
+        polygons = polygon_data["polygons"]
+        # attr = self._partition_nodes_with_polygons(polygons, None)
         attr = self.apply_polygons(polygons, None)
         self.mesh.nodes[:, 2] = attr
 
-    def create_source_sink_in(self, source_sinks, out_fname='source_sink.in'):
-        """ Create source_sink.in from source/sink location information
-            in_fname = input file name
+    def create_source_sink_in(self, source_sinks, out_fname="source_sink.in"):
+        """Create source_sink.in from source/sink location information
+        in_fname = input file name
         """
         # TODO: I need to use a common source/sink I/O routines.
-        key = 'sources'
+        key = "sources"
         sources = source_sinks[key] if key in source_sinks else dict()
-        key = 'sinks'
+        key = "sinks"
         sinks = source_sinks[key] if key in source_sinks else dict()
 
-        fout = open(out_fname, 'w')
+        fout = open(out_fname, "w")
         buf = "%d ! total # of elems with sources\n" % len(sources)
         fout.write(buf)
         for name, coord in sources.items():
@@ -809,33 +813,37 @@ class SchismSetup(object):
         fout.close()
 
     def reorder_open_boundaries(self, order):
-        """ Reorder open boundaries with the given order
-            order = list of open boundary names
-            TODO: How to put the name of the boundaries is not settled.
+        """Reorder open boundaries with the given order
+        order = list of open boundary names
+        TODO: How to put the name of the boundaries is not settled.
         """
-        open_boundaries = list(boundary for boundary in self.mesh.boundaries
-                               if boundary.btype == OPEN_BOUNDARY)
+        open_boundaries = list(
+            boundary
+            for boundary in self.mesh.boundaries
+            if boundary.btype == OPEN_BOUNDARY
+        )
         names = []
         for boundary in open_boundaries:
             # extract names from the comments
-            p1 = boundary.comment.find("\"")
-            p2 = boundary.comment.find("\"", p1 + 1)
-            name = boundary.comment[p1 + 1:p2]
+            p1 = boundary.comment.find('"')
+            p2 = boundary.comment.find('"', p1 + 1)
+            name = boundary.comment[p1 + 1 : p2]
             names.append(name)
 
         new_order = [names.index(i) for i in order]
-        self.mesh.boundaries[:len(open_boundaries)] = \
-            [open_boundaries[i] for i in new_order]
+        self.mesh.boundaries[: len(open_boundaries)] = [
+            open_boundaries[i] for i in new_order
+        ]
 
     def _interpolate(self, times, data, dt_out, out_fname):
-        """ Interpolate tide data.
-            The code is copied and modified from interpolate_elev.py.
-            times = an array of time stamps
-            data = an array of tide data
-            dt_out = delta t for output
-            out_fname = output file name
+        """Interpolate tide data.
+        The code is copied and modified from interpolate_elev.py.
+        times = an array of time stamps
+        data = an array of tide data
+        dt_out = delta t for output
+        out_fname = output file name
 
-            TODO: The code may need to be cleaned up.
+        TODO: The code may need to be cleaned up.
         """
         ntimes = times.shape[0]
         stime = times[0]
@@ -846,7 +854,7 @@ class SchismSetup(object):
         nout = new_times.shape[0]
         self._logger.info("Interpolating to a new series of size %s" % nout)
 
-        g = open(out_fname, 'w')
+        g = open(out_fname, "w")
 
         # There is a limit on the size of the array for 1d
         # spline interpolation (interp1d).
@@ -892,8 +900,9 @@ class SchismSetup(object):
             if iout_end * dt_out > (iin_end - 1) * dt_in:
                 iout_end = (iin_end - 1) * dt_ratio
 
-            spline = interp1d(times[iin_start:iin_end],
-                              data[iin_start:iin_end], kind='cubic')
+            spline = interp1d(
+                times[iin_start:iin_end], data[iin_start:iin_end], kind="cubic"
+            )
             est_times = new_times[iout_start:iout_end]
             new_data = spline(est_times)
 
@@ -903,22 +912,22 @@ class SchismSetup(object):
         g.close()
 
     def _adjust_ocean_bc(self):
-        """
-        """
+        """ """
         # Read ocean map
-        fname = 'ocean.gr3'
+        fname = "ocean.gr3"
         gr3io = Gr3IO()
         ocean_mesh = gr3io.read(fname)
 
         # Read ocean tide harmonics
-        fname = 'ocean.ap'
-        f = open(fname, 'r')
+        fname = "ocean.ap"
+        f = open(fname, "r")
         f.readline()
         l = f.readline().strip()
         n_nodes = int(l)
         if n_nodes != ocean_mesh.n_nodes():
-            raise Exception('Node numbers in the mesh and tide harmonic files'
-                            ' are not identical.')
+            raise Exception(
+                "Node numbers in the mesh and tide harmonic files" " are not identical."
+            )
         l = f.readline().strip()
         n_harmonics = int(l)
         harmonics = {}
@@ -929,7 +938,7 @@ class SchismSetup(object):
             for j in range(n_nodes):
                 l = f.readline().strip()
                 tokens = l.split()
-                harmonic[j, ] = list(map(float, tokens))
+                harmonic[j,] = list(map(float, tokens))
             harmonics[name] = harmonic
 
         # Calculate weights
@@ -939,19 +948,19 @@ class SchismSetup(object):
             element_i = ocean_mesh.find_elem(self.mesh.nodes[node_i][:2])
             if element_i is None:
                 element_i = ocean_mesh.find_elem_with_tolerance(
-                    self.mesh.nodes[node_i][:2], 0.1)
+                    self.mesh.nodes[node_i][:2], 0.1
+                )
 
-    def interpolate_tide(self, time_start, time_end, dt,
-                         in_fname, out_fname):
-        """ Interpolate an observed tide time series with the given dt.
-            time_start = start time in Python datetime
-            time_end = end time in Python datetime
-            dt = delta t for the interpolation output
-            in_fname = input file name of tide records
-            out_fname = output file name
+    def interpolate_tide(self, time_start, time_end, dt, in_fname, out_fname):
+        """Interpolate an observed tide time series with the given dt.
+        time_start = start time in Python datetime
+        time_end = end time in Python datetime
+        dt = delta t for the interpolation output
+        in_fname = input file name of tide records
+        out_fname = output file name
         """
         # Read the tide input
-        f = open(in_fname, 'r')
+        f = open(in_fname, "r")
         # ignore first three header lines
         for i in range(3):
             f.readline()
@@ -960,7 +969,7 @@ class SchismSetup(object):
         hit = 0
         for l in f:
             # Parse it
-            tokens = l.split(',')
+            tokens = l.split(",")
             time_str = tokens[0] + "," + tokens[1]
             t = datetime.datetime.strptime(time_str, "%m/%d/%Y,%H:%M")
             if t < time_start:
@@ -981,43 +990,41 @@ class SchismSetup(object):
         self._interpolate(times, data, dt, out_fname)
 
     def create_open_boundaries(self, segments):
-        """ Create open boundaries with linestrings
-        """
+        """Create open boundaries with linestrings"""
         self.mesh.clear_boundaries()
         boundary_only = True
-        linestrings = segments.get('linestrings')
+        linestrings = segments.get("linestrings")
         if linestrings is None:
-            raise ValueError('Linestrings is required for open boundaries')
+            raise ValueError("Linestrings is required for open boundaries")
         for item in linestrings:
-            name = item.get('name')
+            name = item.get("name")
             if name is None:
-                name = item.get('Name')
-            p = np.array(item['coordinates'])
+                name = item.get("Name")
+            p = np.array(item["coordinates"])
             start = self.mesh.find_closest_nodes(p[0], 1, boundary_only)
             end = self.mesh.find_closest_nodes(p[1], 1, boundary_only)
-            path = self.mesh._build_boundary_node_string(
-                start, end, boundary_only)
-            comment = "! Open boundary \"%s\"" % name
+            path = self.mesh._build_boundary_node_string(start, end, boundary_only)
+            comment = '! Open boundary "%s"' % name
             self.mesh.add_boundary(path, BoundaryType.OPEN, comment)
 
     def trim_to_left_of_mesh(self, line_segments):
-        """ Trim mesh using line_segments.
-            This function trims the mesh on the left sides
-            of the line segments. The left side here means left when you look
-            at the second end point of a line segment from the first one.
-            An actual path to trimming is a nodal path that is on the
-            right side of the line segment.
-            To manage torus like mesh topology, the argument takes an array
-            of line segments. The user need to provides a set of line segments
-            to make sure the left side of the line segments does not
-            cover the whole mesh.
-            To trim multiple parts of a mesh, use this function
-            multiple times.
-            This function clears up any boundary definitions associated with
-            the original grid. It is user's responsibility to create them
-            again.
+        """Trim mesh using line_segments.
+        This function trims the mesh on the left sides
+        of the line segments. The left side here means left when you look
+        at the second end point of a line segment from the first one.
+        An actual path to trimming is a nodal path that is on the
+        right side of the line segment.
+        To manage torus like mesh topology, the argument takes an array
+        of line segments. The user need to provides a set of line segments
+        to make sure the left side of the line segments does not
+        cover the whole mesh.
+        To trim multiple parts of a mesh, use this function
+        multiple times.
+        This function clears up any boundary definitions associated with
+        the original grid. It is user's responsibility to create them
+        again.
 
-            line_segments = array of line segments defined by two end points
+        line_segments = array of line segments defined by two end points
         """
         self._logger.info("Trimming the mesh...")
         paths = []
@@ -1030,23 +1037,22 @@ class SchismSetup(object):
 
 
 def load_schism(dir):
-    """ A load function
-    """
+    """A load function"""
     s = SchismSetup()
     s.load(dir)
     return s
 
 
 def create_schism_setup(fname, logger=None):
-    """ Read a mesh and return a SCHISM input set-up instance.
+    """Read a mesh and return a SCHISM input set-up instance.
 
-        Parameters
-        ----------
-        fname: str
+    Parameters
+    ----------
+    fname: str
 
-        Returns
-        -------
-        SCHISM input set-up instance
+    Returns
+    -------
+    SCHISM input set-up instance
     """
     s = SchismSetup(logger)
     # Read the grid
@@ -1057,7 +1063,7 @@ def create_schism_setup(fname, logger=None):
 
 
 def check_similarity(testee, list_words):
-    """ Check similarity of a word """
+    """Check similarity of a word"""
     seq = difflib.SequenceMatcher()
     for word in list_words:
         for reserved in list_words:
@@ -1068,8 +1074,7 @@ def check_similarity(testee, list_words):
 
 
 def check_and_suggest(testees, list_words, logger=None):
-    """ Check testtees in list_words and if not suggest something if possible
-    """
+    """Check testtees in list_words and if not suggest something if possible"""
     for keyword in testees:
         if keyword not in list_words:
             msg = "Unrecognizable key word: '%s'" % (keyword)
@@ -1084,10 +1089,11 @@ def check_and_suggest(testees, list_words, logger=None):
                     logger.info(msg)
                 else:
                     print(msg)
-            msg = "Acceptable items in this section are: " + \
-                  ', '.join(list_words)
+            msg = "Acceptable items in this section are: " + ", ".join(list_words)
             if logger is not None:
                 logger.error(msg)
             else:
                 print(msg)
-            raise ValueError("Unrecognizable item (see log for details): ".format(keyword))
+            raise ValueError(
+                "Unrecognizable item (see log for details): ".format(keyword)
+            )

@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-""" Driver module to prepares input files for a SCHISM run.
-
-    
-"""
+"""Driver module to prepares input files for a SCHISM run."""
 
 from schimpy.schism_setup import create_schism_setup, check_and_suggest
 from schimpy.grid_opt import GridOptimizer
@@ -22,250 +19,268 @@ import warnings
 import shutil
 
 
-__all__ = ['prepare_schism']
+__all__ = ["prepare_schism"]
+
 
 def create_arg_parser():
-    """ Create ArgumentParser
-    """
-    parser = argparse.ArgumentParser(description='Prepare SCHISM input files.')
-    parser.add_argument(dest='main_inputfile', default=None,
-                        help='main input file name')
+    """Create ArgumentParser"""
+    parser = argparse.ArgumentParser(description="Prepare SCHISM input files.")
+    parser.add_argument(
+        dest="main_inputfile", default=None, help="main input file name"
+    )
     return parser
 
-def ensure_outdir(outdir,fname):
+
+def ensure_outdir(outdir, fname):
     if outdir in fname:
         outname = fname
     else:
-        outname = os.path.join(outdir,fname)
+        outname = os.path.join(outdir, fname)
     return outname
 
 
-
 def create_hgrid(s, inputs, logger):
-    """ Preprocess the hgrid file
-    """
-    section_name = 'mesh'
+    """Preprocess the hgrid file"""
+    section_name = "mesh"
     section = inputs.get(section_name)
     if section is not None:
-        split_param  = section.get("split_quad")
+        split_param = section.get("split_quad")
         if split_param is not None:
             # This should be an in-place
-            split_quad(s.mesh,logger=logger,**split_param)
+            split_quad(s.mesh, logger=logger, **split_param)
         small_area_param = section.get("small_areas")
         if small_area_param is not None:
             # This just emits warnings unless the fail threshold is met
-            small_areas(s.mesh,logger=logger,**small_area_param)
+            small_areas(s.mesh, logger=logger, **small_area_param)
 
-        open_boundaries = section.get('open_boundaries')
+        open_boundaries = section.get("open_boundaries")
         if open_boundaries is not None:
             logger.info("Processing open boundaries...")
-            check_and_suggest(open_boundaries, ('linestrings',))
+            check_and_suggest(open_boundaries, ("linestrings",))
             s.create_open_boundaries(open_boundaries)
 
         # Fill the missing land and island boundary information
         logger.info("Filling missing land and island boundaries...")
         s.mesh.fill_land_and_island_boundaries()
 
-
         # Volumetric optimization of mesh
-        option_name = 'depth_optimization'
+        option_name = "depth_optimization"
 
         # if option_name in section.keys():
         opt_params = section.get(option_name)
         default_depth_for_missing_dem = 2.0
         if opt_params is not None:
-            dem_list = section.get('dem_list')
+            dem_list = section.get("dem_list")
             if dem_list is None:
-                raise ValueError(
-                    "dem_list must be provided for the mesh optimization")
-            expected_items = ('damp',
-                              'damp_shoreline',
-                              'face_coeff',
-                              'volume_coeff')
+                raise ValueError("dem_list must be provided for the mesh optimization")
+            expected_items = ("damp", "damp_shoreline", "face_coeff", "volume_coeff")
             check_and_suggest(opt_params, expected_items)
             logger.info("Start optimizing the mesh...")
-            optimizer = GridOptimizer(mesh=s.mesh,
-                                      demfiles=dem_list,
-                                      na_fill=default_depth_for_missing_dem,
-                                      logger=logger)
+            optimizer = GridOptimizer(
+                mesh=s.mesh,
+                demfiles=dem_list,
+                na_fill=default_depth_for_missing_dem,
+                logger=logger,
+            )
             optimized_elevation = optimizer.optimize(opt_params)
             s.mesh.nodes[:, 2] = np.negative(optimized_elevation)
         else:
-            dem_list = section.get('dem_list')
+            dem_list = section.get("dem_list")
             if dem_list is not None:
-                s.mesh.nodes[:, 2] = np.negative(stacked_dem_fill(dem_list,
-                                                                  s.mesh.nodes[:, :2],
-                                                                  require_all=False,
-                                                                  na_fill=default_depth_for_missing_dem))
-        # This deprecation can be removed at some point                                                          
+                s.mesh.nodes[:, 2] = np.negative(
+                    stacked_dem_fill(
+                        dem_list,
+                        s.mesh.nodes[:, :2],
+                        require_all=False,
+                        na_fill=default_depth_for_missing_dem,
+                    )
+                )
+        # This deprecation can be removed at some point
         try:
             ee = section.get("elev_enforcement")
-        except: 
+        except:
             ee = None
-        if ee is not None: 
+        if ee is not None:
             raise ValueError("elev_enforcement has been renamed depth_enforcement")
-        
+
         depth_enforce_params = section.get("depth_enforcement")
         if depth_enforce_params is not None:
             if "polygons" in depth_enforce_params:
-                s.mesh.nodes[:,2] = s.apply_polygons(default=None,polygons=depth_enforce_params['polygons'])
+                s.mesh.nodes[:, 2] = s.apply_polygons(
+                    default=None, polygons=depth_enforce_params["polygons"]
+                )
             if "linestrings" in depth_enforce_params:
-                s.mesh.nodes[:,2] = s.apply_linestring_ops(default=None,linestrings=depth_enforce_params['linestrings'])
-        
+                s.mesh.nodes[:, 2] = s.apply_linestring_ops(
+                    default=None, linestrings=depth_enforce_params["linestrings"]
+                )
 
         # Write hgrid.gr3
-        output_dir = inputs['prepro_output_dir']
-        option_name = 'gr3_outputfile'
+        output_dir = inputs["prepro_output_dir"]
+        option_name = "gr3_outputfile"
         if option_name in section:
             logger.info("Writing hgrid file...")
-            hgrid_out_fpath = ensure_outdir(inputs['prepro_output_dir'],section[option_name])
-            s.write_hgrid(hgrid_out_fpath,boundary=True)
+            hgrid_out_fpath = ensure_outdir(
+                inputs["prepro_output_dir"], section[option_name]
+            )
+            s.write_hgrid(hgrid_out_fpath, boundary=True)
 
         # Write hgrid.ll
-        option_name = 'll_outputfile'
+        option_name = "ll_outputfile"
         if option_name in section:
             logger.info("Creating hgrid.ll file...")
-            hgrid_ll_fpath = ensure_outdir(inputs['prepro_output_dir'],section[option_name])
-            s.write_hgrid_ll(hgrid_ll_fpath,boundary=True)
+            hgrid_ll_fpath = ensure_outdir(
+                inputs["prepro_output_dir"], section[option_name]
+            )
+            s.write_hgrid_ll(hgrid_ll_fpath, boundary=True)
 
 
-
-
-
-def create_vgrid(s,inputs,logger):
-    section_name = 'vgrid'
+def create_vgrid(s, inputs, logger):
+    section_name = "vgrid"
     section = inputs.get(section_name)
     if section is not None:
-        output_dir = inputs['prepro_output_dir']
-        if 'hgrid' in section:
-            hgrid = section['hgrid']
-        else: 
+        output_dir = inputs["prepro_output_dir"]
+        if "hgrid" in section:
+            hgrid = section["hgrid"]
+        else:
             hgrid = s.mesh
-            # 
-            #msection = inputs.get('mesh')    
-            #if 'gr3_outputfile' in msection:
+            #
+            # msection = inputs.get('mesh')
+            # if 'gr3_outputfile' in msection:
             #    logger.info('Using gr3_outputfile from mesh section for generating vgrid')
             #    hgrid = msection['gr3_outputfile']
-            #elif 'mesh_inputfile' in msection:
+            # elif 'mesh_inputfile' in msection:
             #    logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
             #    hgrid  = msection['mesh_inputfile']
-        vgrid_out = section['vgrid_out']
-        section['vgrid_out'] = ensure_outdir(inputs['prepro_output_dir'],vgrid_out)
-        vgrid_gen(hgrid,**section)
+        vgrid_out = section["vgrid_out"]
+        section["vgrid_out"] = ensure_outdir(inputs["prepro_output_dir"], vgrid_out)
+        vgrid_gen(hgrid, **section)
+
 
 def create_source_sink(s, inputs, logger):
-    """ Create source_sink.in
-    """
-    dict_ss = inputs.get('sources_sinks')
+    """Create source_sink.in"""
+    dict_ss = inputs.get("sources_sinks")
     if dict_ss is None:
         return
     logger.info("Processing sources/sinks inputs...")
-    expected_items = ('sources', 'sinks', 'outputfile')
+    expected_items = ("sources", "sinks", "outputfile")
     check_and_suggest(dict_ss, expected_items)
-    sources = dict_ss.get('sources')
+    sources = dict_ss.get("sources")
     sources_sinks = {}
     if sources is not None:
-        sources_sinks['sources'] = sources
-    sinks = dict_ss.get('sinks')
+        sources_sinks["sources"] = sources
+    sinks = dict_ss.get("sinks")
     if sinks is not None:
-        sources_sinks['sinks'] = sinks
-    fname = dict_ss.get('outputfile')
-    
+        sources_sinks["sinks"] = sinks
+    fname = dict_ss.get("outputfile")
+
     if fname is not None:
-        output_dir = inputs['prepro_output_dir']
-        fname = ensure_outdir(output_dir,fname)
+        output_dir = inputs["prepro_output_dir"]
+        fname = ensure_outdir(output_dir, fname)
         logger.info("Creating %s..." % fname)
         s.create_source_sink_in(sources_sinks, fname)
 
 
 def create_gr3_with_polygons(s, inputs, logger):
-    """ Create GR3 files with polygons
-    """
-    dict_gr3 = inputs.get('gr3')
+    """Create GR3 files with polygons"""
+    dict_gr3 = inputs.get("gr3")
     if dict_gr3 is None:
         return
     logger.info("Processing gr3 outputs...")
-    expected_items = ('polygons', 'default','smooth')
-    output_dir = inputs['prepro_output_dir']
+    expected_items = ("polygons", "default", "smooth")
+    output_dir = inputs["prepro_output_dir"]
     for fname, item in dict_gr3.items():
         check_and_suggest(item, expected_items)
-        polygons = item.get('polygons', [])
+        polygons = item.get("polygons", [])
         if polygons is not None:
-            polygon_items = ('name', 'vertices', 'type', 'attribute','imports','smooth')
+            polygon_items = (
+                "name",
+                "vertices",
+                "type",
+                "attribute",
+                "imports",
+                "smooth",
+            )
             for polygon in polygons:
                 check_and_suggest(polygon, polygon_items)
     for fname, item in dict_gr3.items():
         if fname is None:
             logger.warning("No filename is given in one of the gr3 specs")
             continue
-        fname = ensure_outdir(inputs['prepro_output_dir'],fname)
-        polygons = item.get('polygons', [])
-        default = item.get('default')
+        fname = ensure_outdir(inputs["prepro_output_dir"], fname)
+        polygons = item.get("polygons", [])
+        default = item.get("default")
         logger.info("Creating %s..." % fname)
-        smooth = item.get('smooth')
+        smooth = item.get("smooth")
         s.create_node_partitioning(fname, polygons, default, smooth)
 
 
 def create_prop_with_polygons(s, inputs, logger):
-    """ Create prop files with polygons
-    """
-    dict_prop = inputs.get('prop')
+    """Create prop files with polygons"""
+    dict_prop = inputs.get("prop")
     if dict_prop is None:
         return
     logger.info("Processing prop outputs...")
-    expected_items = ('default', 'polygons')
-    output_dir = inputs['prepro_output_dir']
+    expected_items = ("default", "polygons")
+    output_dir = inputs["prepro_output_dir"]
     for fname, item in dict_prop.items():
         check_and_suggest(item, expected_items)
-        polygons = item.get('polygons', [])
+        polygons = item.get("polygons", [])
         if polygons is not None:
-            polygon_items = ('name', 'vertices', 'type', 'attribute')
+            polygon_items = ("name", "vertices", "type", "attribute")
             for polygon in polygons:
                 check_and_suggest(polygon, polygon_items)
     for fname, item in dict_prop.items():
         if fname is None:
             logger.warning("No filename is given in one of prop")
             continue
-        fname = ensure_outdir(inputs['prepro_output_dir'],fname)
-        polygons = item.get('polygons', [])
-        default = item.get('default')
+        fname = ensure_outdir(inputs["prepro_output_dir"], fname)
+        polygons = item.get("polygons", [])
+        default = item.get("default")
         logger.info("Creating %s..." % fname)
         s.create_prop_partitioning(fname, polygons, default)
 
 
 def create_structures(s, inputs, logger):
-    """ Create a structure file
-    """
-    dict_struct = inputs.get('hydraulics')
+    """Create a structure file"""
+    dict_struct = inputs.get("hydraulics")
     if dict_struct is None:
         return
     logger.info("Processing structures...")
-    expected_items = ('nudging', 'structures', 'outputfile')
-    output_dir = inputs['prepro_output_dir']
+    expected_items = ("nudging", "structures", "outputfile")
+    output_dir = inputs["prepro_output_dir"]
     check_and_suggest(dict_struct, expected_items)
-    structures = dict_struct.get('structures')
+    structures = dict_struct.get("structures")
     if structures is None:
         logger.error("No structures in hydraulics section")
         raise ValueError("No structures in hydraulics section")
-    structure_items = ('name', 'type', 'end_points',
-                       'configuration', 'reference')
-    configuration_items = ('n_duplicates', 'elevation', 'width', 'height',
-                           'radius', 'coefficient',
-                           'op_downstream', 'op_upstream',
-                           'use_time_series', 'coefficient_height',
-                           'culvert_n_duplicates', 
-                           'culvert_elevation', 'culvert_radius',
-                           'culvert_coefficient',
-                           'culvert_op_downstream', 'culvert_op_upstream')
-    nudging = dict_struct.get('nudging')
+    structure_items = ("name", "type", "end_points", "configuration", "reference")
+    configuration_items = (
+        "n_duplicates",
+        "elevation",
+        "width",
+        "height",
+        "radius",
+        "coefficient",
+        "op_downstream",
+        "op_upstream",
+        "use_time_series",
+        "coefficient_height",
+        "culvert_n_duplicates",
+        "culvert_elevation",
+        "culvert_radius",
+        "culvert_coefficient",
+        "culvert_op_downstream",
+        "culvert_op_upstream",
+    )
+    nudging = dict_struct.get("nudging")
     for structure in structures:
         check_and_suggest(structure, structure_items)
-        conf = structure.get('configuration')
+        conf = structure.get("configuration")
         if conf is not None:
             check_and_suggest(conf, configuration_items)
     s.create_structures(structures, nudging)
-    fname = dict_struct.get('outputfile')
-    fname = ensure_outdir(inputs['prepro_output_dir'],fname)
+    fname = dict_struct.get("outputfile")
+    fname = ensure_outdir(inputs["prepro_output_dir"], fname)
     if fname is not None:
         fname = os.path.expanduser(fname)
         logger.info("Creating %s..." % fname)
@@ -273,74 +288,79 @@ def create_structures(s, inputs, logger):
 
 
 def create_fluxflag(s, inputs, logger):
-    """ Create fluxflag.gr3
-    """
-    dict_flow = inputs.get('flow_outputs')
+    """Create fluxflag.gr3"""
+    dict_flow = inputs.get("flow_outputs")
     if dict_flow is None:
         return
     logger.info("Processing fluxflag outputs...")
-    expected_items = ('linestrings', 'outputfile')
-    output_dir = inputs['prepro_output_dir']
+    expected_items = ("linestrings", "outputfile")
+    output_dir = inputs["prepro_output_dir"]
     check_and_suggest(dict_flow, expected_items)
-    flowlines = dict_flow.get('linestrings')
+    flowlines = dict_flow.get("linestrings")
     if flowlines is None:
         raise ValueError("No flowlines in flow_outputs")
-    fname = dict_flow.get('outputfile')
+    fname = dict_flow.get("outputfile")
     if fname is None:
         logger.info("outputfile not given for flow_outputs. Using fluxflag.prop")
-        fname = 'fluxflag.prop'
-    fname = ensure_outdir(inputs['prepro_output_dir'],fname)
+        fname = "fluxflag.prop"
+    fname = ensure_outdir(inputs["prepro_output_dir"], fname)
     logger.info("Creating %s..." % fname)
     s.create_flux_regions(flowlines, fname)
-    with open(fname, 'a') as f:
+    with open(fname, "a") as f:
         for line in flowlines:
-            buf = '{}\n'.format(line['name'])
+            buf = "{}\n".format(line["name"])
             f.write(buf)
 
 
 def update_spatial_inputs(s, inputs, logger):
-    """ Create SCHISM grid inputs.
+    """Create SCHISM grid inputs.
 
-        Parameters
-        ----------
-        s: SchismSetup
-            schism setup object
-        inputs: dict
-            inputs from an input file
+    Parameters
+    ----------
+    s: SchismSetup
+        schism setup object
+    inputs: dict
+        inputs from an input file
     """
-    create_hgrid(s, inputs,  logger)
+    create_hgrid(s, inputs, logger)
     create_vgrid(s, inputs, logger)
-    create_gr3_with_polygons(s, inputs,  logger)
-    create_source_sink(s, inputs,  logger)
-    create_prop_with_polygons(s, inputs,  logger)
-    create_structures(s, inputs,  logger)
+    create_gr3_with_polygons(s, inputs, logger)
+    create_source_sink(s, inputs, logger)
+    create_prop_with_polygons(s, inputs, logger)
+    create_structures(s, inputs, logger)
     create_fluxflag(s, inputs, logger)
 
 
 def update_temporal_inputs(s, inputs):
-    """ Create temporal inputs. Under development
-    """
+    """Create temporal inputs. Under development"""
     # create in interpolated tide file
-    output_dir = inputs['prepro_output_dir']
+    output_dir = inputs["prepro_output_dir"]
     sf_tide_out_fpath = os.path.join(output_dir, sf_tide_out_fname)
-    s.interpolate_tide(time_start, time_end, dt,
-                       sf_tide_in_fpath, sf_tide_out_fpath)
+    s.interpolate_tide(time_start, time_end, dt, sf_tide_in_fpath, sf_tide_out_fpath)
     # Run the FORTRAN code to create elev2D.th
     hgrid_out_fpath = os.path.join(output_dir, hgrid_out_fname)
     webtide_grid_fpath = os.path.join(input_dir, webtide_grid_fname)
     webtide_fpath = os.path.join(input_dir, webtide_fname)
     elev2d_fpath = os.path.join(output_dir, elev2d_fname)
-    p = subprocess.Popen(["./gen_elev2D_4_NAVD88", sf_tide_out_fpath,
-                          hgrid_out_fpath, webtide_grid_fpath, webtide_fpath,
-                          elev2d_fpath],
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
+    p = subprocess.Popen(
+        [
+            "./gen_elev2D_4_NAVD88",
+            sf_tide_out_fpath,
+            hgrid_out_fpath,
+            webtide_grid_fpath,
+            webtide_fpath,
+            elev2d_fpath,
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     return_code = p.wait()
     if return_code != 0:
         for l in p.stdout:
             print(l)
         for l in p.stderr:
             print(l)
+
 
 def check_nested_match(node):
     for key, item in node.items():
@@ -349,27 +369,25 @@ def check_nested_match(node):
                 node[key] = item[key]
             check_nested_match(item)
 
+
 def item_exist(inputs, name):
     return True if name in inputs else False
 
 
 def setup_logger(outdir):
-    """ Set up a logger
-    """
+    """Set up a logger"""
     logging_level = logging.INFO
-    logging_fname = os.path.join(outdir,'prepare_schism.log')
-    logging.basicConfig(level=logging_level, filename=logging_fname,
-                        filemode='w')
+    logging_fname = os.path.join(outdir, "prepare_schism.log")
+    logging.basicConfig(level=logging_level, filename=logging_fname, filemode="w")
     console = logging.StreamHandler()
     console.setLevel(logging_level)
-    formatter = logging.Formatter('%(message)s')
+    formatter = logging.Formatter("%(message)s")
     console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)
+    logging.getLogger("").addHandler(console)
 
 
 def main():
-    """ main function
-    """
+    """main function"""
     parser = create_arg_parser()
     args = parser.parse_args()
     prepare_schism(args)
@@ -380,13 +398,16 @@ def process_output_dir(inputs):
     if "prepro_output_dir" in inputs:
         outdir = inputs["prepro_output_dir"]
         force = True
-    else: 
-        warnings.warn( "No output_dir specification. This will not be allowed in the future. \n" +
-            "Using '.' but specification of a separate directory recommended. ",FutureWarning)
-        outdir = '.'
-        inputs['prepro_output_dir']=outdir
+    else:
+        warnings.warn(
+            "No output_dir specification. This will not be allowed in the future. \n"
+            + "Using '.' but specification of a separate directory recommended. ",
+            FutureWarning,
+        )
+        outdir = "."
+        inputs["prepro_output_dir"] = outdir
     if os.path.exists(outdir):
-        created=False
+        created = False
     else:
         if force:
             os.mkdir(outdir)
@@ -394,70 +415,83 @@ def process_output_dir(inputs):
             raise ValueError("Output directory (output_dir) does not exist")
     return outdir
 
+
 def prepare_schism(args, use_logging=True):
     in_fname = args.main_inputfile
     if not os.path.exists(in_fname):
         raise ValueError("Main input file not found")
-    with open(in_fname, 'r') as f:
+    with open(in_fname, "r") as f:
         inputs = schism_yaml.load(f)
         outdir = process_output_dir(inputs)
 
     if use_logging is True:
         setup_logger(outdir)
-        logger = logging.getLogger('SCHISM')
+        logger = logging.getLogger("SCHISM")
     else:
-        logger = logging.getLogger('')
+        logger = logging.getLogger("")
     logger.info("Start pre-processing SCHISM inputs...")
     in_fname = args.main_inputfile
 
-    keys_top_level = ["config","env","prepro_output_dir","mesh", "gr3","vgrid",
-                      "prop", "hydraulics",
-                      "sources_sinks", "flow_outputs","copy_resources"] \
-        + schism_yaml.include_keywords
+    keys_top_level = [
+        "config",
+        "env",
+        "prepro_output_dir",
+        "mesh",
+        "gr3",
+        "vgrid",
+        "prop",
+        "hydraulics",
+        "sources_sinks",
+        "flow_outputs",
+        "copy_resources",
+    ] + schism_yaml.include_keywords
     logger.info("Processing the top level...")
     check_and_suggest(list(inputs.keys()), keys_top_level, logger)
 
     logger.info("Checking for matching nested keys...")
     check_nested_match(inputs)
 
-    out_fname = os.path.splitext(in_fname)[0] \
-        + '_echo' + os.path.splitext(in_fname)[1]
+    out_fname = os.path.splitext(in_fname)[0] + "_echo" + os.path.splitext(in_fname)[1]
 
-    out_fname = os.path.join(inputs['prepro_output_dir'],out_fname)
-    with open(out_fname, 'w') as f:
+    out_fname = os.path.join(inputs["prepro_output_dir"], out_fname)
+    with open(out_fname, "w") as f:
         f.write(schism_yaml.safe_dump(inputs))
 
     # Mesh section
-    if item_exist(inputs, 'mesh'):
+    if item_exist(inputs, "mesh"):
         logger.info("Processing mesh section...")
-        mesh_items = inputs['mesh']
-        keys_mesh_section = ["mesh_inputfile", "dem_list",
-                             "open_boundaries","split_quad","small_areas",
-                             "depth_optimization","depth_enforcement",
-                             "gr3_outputfile", "ll_outputfile"] \
-            + schism_yaml.include_keywords
+        mesh_items = inputs["mesh"]
+        keys_mesh_section = [
+            "mesh_inputfile",
+            "dem_list",
+            "open_boundaries",
+            "split_quad",
+            "small_areas",
+            "depth_optimization",
+            "depth_enforcement",
+            "gr3_outputfile",
+            "ll_outputfile",
+        ] + schism_yaml.include_keywords
         check_and_suggest(list(mesh_items.keys()), keys_mesh_section)
-        if item_exist(inputs['mesh'], 'mesh_inputfile'):
+        if item_exist(inputs["mesh"], "mesh_inputfile"):
             # Read the grid file to be processed
-            mesh_input_fpath = \
-                os.path.expanduser(mesh_items['mesh_inputfile'])
+            mesh_input_fpath = os.path.expanduser(mesh_items["mesh_inputfile"])
             s = create_schism_setup(mesh_input_fpath, logger)
             update_spatial_inputs(s, inputs, logger)
         else:
             raise ValueError("No mesh input file in the mesh section.")
     else:
         raise ValueError("No mesh section in the main input.")
-    
-    if item_exist(inputs, 'copy_resources'):
+
+    if item_exist(inputs, "copy_resources"):
         logger.info("Copying resources to output dir")
-        copy_spec = inputs['copy_resources']
-        for key,item in copy_spec.items():
-            outpath = os.path.join(outdir,item)
-            if os.path.normpath(key) == os.path.normpath(outpath): 
+        copy_spec = inputs["copy_resources"]
+        for key, item in copy_spec.items():
+            outpath = os.path.join(outdir, item)
+            if os.path.normpath(key) == os.path.normpath(outpath):
                 continue
             logger.info(f"copy_resources: copying {key} to {outpath}")
-            shutil.copyfile(key,outpath)
-            
+            shutil.copyfile(key, outpath)
 
     logger.info("Done.")
 
