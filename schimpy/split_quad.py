@@ -3,11 +3,13 @@
 """PoC of quad splitting"""
 
 
-from . import schism_mesh
+from schimpy import schism_mesh
+from schimpy.schism_setup import ensure_outdir
 import copy
 import numpy as np
 import argparse
 import os
+from pathlib import Path
 
 import sys
 
@@ -214,6 +216,14 @@ def create_arg_parser():
         "meshoutput", type=str, help="Output mesh file name in gr3 format."
     )
     parser.add_argument(
+        "--outdir",
+        dest="outdir",
+        type=Path,
+        default="./",
+        help="Output directory for the mesh file and prop file.",
+    )
+    parse
+    parser.add_argument(
         "--skewness",
         dest="skewness",
         type=float,
@@ -252,6 +262,7 @@ def create_arg_parser():
 
 def split_quad(
     mesh,
+    out_dir,
     skewness=None,
     minangle=None,
     maxangle=None,
@@ -310,8 +321,10 @@ def split_quad(
     split_quads(mesh, elems_to_split)
     print("Writing output file...")
     if meshout is not None:
+        meshout = ensure_outdir(out_dir, meshout)
         schism_mesh.write_mesh(mesh, meshout)
     if propfile is not None:
+        propfile = ensure_outdir(out_dir, propfile)
         write_prop(elems_to_split, n_elems_ori, propfile)
 
     return mesh
@@ -329,7 +342,10 @@ def main():
     skewness = args.skewness
     minangle = args.minangle
     maxangle = args.maxangle
-    newmesh = split_quad(meshin, skewness, minangle, maxangle, meshout, fpath_prop)
+    outdir = args.outdir
+    newmesh = split_quad(
+        meshin, outdir, skewness, minangle, maxangle, meshout, fpath_prop
+    )
     return
 
 

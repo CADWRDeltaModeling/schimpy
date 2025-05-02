@@ -17,7 +17,9 @@ from schimpy.schism_mesh import read_mesh, write_mesh
 from schimpy.schism_polygon import read_polygons
 from schimpy.lsc2 import default_num_layers
 from schimpy.vgrid_opt2 import *
+from schimpy.schism_setup import ensure_outdir
 import numpy as np
+import os
 import scipy.spatial
 
 fix_minmax = False
@@ -156,6 +158,10 @@ def vgrid_gen(
     else:
         print(f"Version of vgrid is {vgrid_version}")
 
+    # specify nlayer output dir:
+    out_dir = os.path.dirname(vgrid_out)
+    nlayer_gr3 = ensure_outdir(out_dir, nlayer_gr3)
+
     meshfun = BilinearMeshDensity()
 
     dummydepth = np.linspace(0, 14, 15)
@@ -245,7 +251,7 @@ def vgrid_gen(
         maxlayer = nlayer * 0 + fixed_max  # np.max(maxlayer)
 
     sigma2, nlayer_revised = gen_sigma(
-        nlayer, minlayer, maxlayer, eta, h0, mesh, meshfun
+        nlayer, minlayer, maxlayer, eta, h0, mesh, meshfun, out_dir=out_dir
     )
     print("Returned nlayer revised: {}".format(np.max(nlayer_revised)))
     nlayer = nlayer_revised

@@ -26,6 +26,8 @@ given as arrays) or globally (if provided as scalars).
 
 import numpy as np
 from schimpy.laplace_smooth_data import *
+from schimpy.schism_setup import ensure_outdir
+from pathlib import Path
 
 showlist = [0, 1, 2]  # ,419,28778,28923,237892,237893,232311]
 showlist = [7942, 7967, 7968, 7969, 7972]
@@ -383,7 +385,7 @@ def process_orphans(mesh, nlayer, depth, hcor):
     return nlayer
 
 
-def smooth_bed(mesh, eta, h, hcor, nlevel, speed):
+def smooth_bed(mesh, eta, h, hcor, nlevel, speed, out_dir="./"):
 
     nsmoothlev = 1
     i = 0
@@ -409,7 +411,8 @@ def smooth_bed(mesh, eta, h, hcor, nlevel, speed):
     latest_layer = np.maximum(old_layer + 0.5 * speed, new_layer)
     zsmooth[:, nsmoothlev - 2 - i] = latest_layer
     old_layer = latest_layer
-    np.savetxt("zsmoothsave.txt", zsmooth)
+    zsmooth_fn = ensure_outdir(out_dir, "zsmoothsave.txt")
+    np.savetxt(zsmooth_fn, zsmooth)
     # Now generate new mesh depths using the smoothed elevations as a pseudo-bed
     # and one fewer layers
     # Mind that the outcome from the previous step is in z coordinates, not depth
@@ -419,7 +422,9 @@ def smooth_bed(mesh, eta, h, hcor, nlevel, speed):
     return pseudo_bed_depth
 
 
-def gen_sigma(nlayer, minlayer, maxlayer, eta, h, mesh, meshfun, nsmoothlay=0):
+def gen_sigma(
+    nlayer, minlayer, maxlayer, eta, h, mesh, meshfun, nsmoothlay=0, out_dir="./"
+):
     """ " Generate local sigma coordinates based on # layers, reference surface and depth
 
     Parameters
@@ -442,6 +447,8 @@ def gen_sigma(nlayer, minlayer, maxlayer, eta, h, mesh, meshfun, nsmoothlay=0):
         S coordinate parameter b
 
     nsmoothlay: how many layers to smooth on the bottom
+
+    out_dir: Path
 
     hc: float
         S coordinate parameter hc (do not alter)
@@ -649,7 +656,7 @@ def gen_sigma(nlayer, minlayer, maxlayer, eta, h, mesh, meshfun, nsmoothlay=0):
 
     smooth_bed_clip = True
     if smooth_bed_clip:
-        smoothed_bed = smooth_bed(mesh, eta, h, hcor, nlevel, dh_meshfun)
+        smoothed_bed = smooth_bed(mesh, eta, h, hcor, nlevel, dh_meshfun, out_dir)
 
         for inode in range(npoint):
             if hcor[inode, (nlevel[inode] - 2)] > smoothed_bed[inode]:

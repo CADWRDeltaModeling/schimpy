@@ -3,7 +3,7 @@
 
 """Driver module to prepares input files for a SCHISM run."""
 
-from schimpy.schism_setup import create_schism_setup, check_and_suggest
+from schimpy.schism_setup import create_schism_setup, check_and_suggest, ensure_outdir
 from schimpy.grid_opt import GridOptimizer
 from schimpy.stacked_dem_fill import stacked_dem_fill
 from schimpy.small_areas import small_areas
@@ -31,14 +31,6 @@ def create_arg_parser():
     return parser
 
 
-def ensure_outdir(outdir, fname):
-    if outdir in fname:
-        outname = fname
-    else:
-        outname = os.path.join(outdir, fname)
-    return outname
-
-
 def create_hgrid(s, inputs, logger):
     """Preprocess the hgrid file"""
     section_name = "mesh"
@@ -47,7 +39,9 @@ def create_hgrid(s, inputs, logger):
         split_param = section.get("split_quad")
         if split_param is not None:
             # This should be an in-place
-            split_quad(s.mesh, logger=logger, **split_param)
+            split_quad(
+                s.mesh, inputs["prepro_output_dir"], logger=logger, **split_param
+            )
         small_area_param = section.get("small_areas")
         if small_area_param is not None:
             # This just emits warnings unless the fail threshold is met
@@ -91,6 +85,7 @@ def create_hgrid(s, inputs, logger):
                     stacked_dem_fill(
                         dem_list,
                         s.mesh.nodes[:, :2],
+                        inputs["prepro_output_dir"],
                         require_all=False,
                         na_fill=default_depth_for_missing_dem,
                     )

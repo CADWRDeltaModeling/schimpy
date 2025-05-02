@@ -9,6 +9,8 @@ except ImportError:
     import gdal
     from gdalconst import *
 
+from schimpy.schism_setup import ensure_outdir
+
 import numpy as np
 import sys
 import os
@@ -17,7 +19,7 @@ DEFAULT_NA_FILL = 2.0
 
 
 def stacked_dem_fill(
-    files, points, values=None, negate=False, require_all=True, na_fill=None
+    files, points, out_dir, values=None, negate=False, require_all=True, na_fill=None
 ):
     """Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
     This routine controls prioritization of the dems, gradually filling points
@@ -29,6 +31,8 @@ def stacked_dem_fill(
         list of files. Existence is checked and ValueError for bad file
     points: np.ndarray
         this is a numpy array of points, nrow = num of points and ncol = 2 (x,y).
+    out_dir: Path
+        directory to write the output files
     values: np.ndarray
         values at each point -- this is an output, but this gives an opportunity to use an existing data structure to receive
     negate: bool
@@ -74,7 +78,8 @@ def stacked_dem_fill(
     if negate:
         values = np.negative(values)
     if any(np.isnan(values)):
-        f = open("dem_misses.txt", "w")
+        f_out = ensure_outdir(out_dir, "dem_misses.txt")
+        f = open(f_out, "w")
         for p in points[np.isnan(values)]:
             f.write("%s,%s\n" % tuple(p))
             message = "DEMs provided do not cover all the points. See file dem_misses.txt for locations"
@@ -187,12 +192,13 @@ def test_main():
         stacked_dem_fill(
             ["bay_delta_mini.tif", "bay_delta_west.tif", "bay_delta_east.tif"],
             points[:, :2],
+            "./",
             points[:, 2],
         )
     )
 
 
-def filelist_main(demlistfile, pointlistfile, sep=""):
+def filelist_main(demlistfile, pointlistfile, out_dir="./", sep=""):
     """higher level driver routine that parses the names of the DEMs from demfilelist
     points ( x,y or x,y,z ) from pointlistfile
     """
@@ -214,7 +220,7 @@ def filelist_main(demlistfile, pointlistfile, sep=""):
         # points.resize((pshape[0],3),refcheck=False)
     points[:, 2] = np.nan
     print(points)
-    points = stacked_dem_fill(filelist, points[:, :2], points[:, 2])
+    points = stacked_dem_fill(filelist, points[:, :2], out_dir, points[:, 2])
     print(points)
     return points
 
@@ -242,7 +248,12 @@ def fill_2dm(infile, outfile, files, na_fill=DEFAULT_NA_FILL):
     )
     pts[:, 2] = np.nan
     values = stacked_dem_fill(
-        files, pts[:, :2], pts[:, 2], require_all=False, na_fill=na_fill
+        files,
+        pts[:, :2],
+        os.path.dirname(outfile),
+        pts[:, 2],
+        require_all=False,
+        na_fill=na_fill,
     )
 
     all_lines[firstndx:endndx] = (
@@ -277,6 +288,7 @@ def fill_gr3(infile, outfile, files, elev2depth=True, na_fill=DEFAULT_NA_FILL):
     values = stacked_dem_fill(
         files,
         pts[:, :2],
+        os.path.dirname(outfile),
         pts[:, 2],
         require_all=False,
         na_fill=na_fill,

@@ -1097,3 +1097,11 @@ def check_and_suggest(testees, list_words, logger=None):
             raise ValueError(
                 "Unrecognizable item (see log for details): ".format(keyword)
             )
+
+
+def ensure_outdir(outdir, fname):
+    if outdir in fname:
+        outname = fname
+    else:
+        outname = os.path.join(outdir, fname)
+    return outname
