@@ -149,7 +149,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.convert_polygons">schimpy.convert_polygons module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_polygons.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.convert_polygons.convert_polys"><code class="docutils literal notranslate"><span class="pre">convert_polys()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.convert_sav_class_to_number">schimpy.convert_sav_class_to_number module</a><ul>
@@ -464,6 +464,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_setup.check_and_suggest"><code class="docutils literal notranslate"><span class="pre">check_and_suggest()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_setup.check_similarity"><code class="docutils literal notranslate"><span class="pre">check_similarity()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_setup.create_schism_setup"><code class="docutils literal notranslate"><span class="pre">create_schism_setup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_setup.ensure_outdir"><code class="docutils literal notranslate"><span class="pre">ensure_outdir()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.schism_setup.load_schism"><code class="docutils literal notranslate"><span class="pre">load_schism()</span></code></a></li>
 </ul>
 </li>
@@ -1014,8 +1015,8 @@ to Shapefile and vice versa</p>
 <p>Command line tool to convert SCHISM polygons in YAML
 to Shapefile and vice versa</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.convert_polygons.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.convert_polygons.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_polygons.main" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="schimpy.convert_polygons.convert_polys">
+<span class="sig-prename descclassname"><span class="pre">schimpy.convert_polygons.</span></span><span class="sig-name descname"><span class="pre">convert_polys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.convert_polygons.convert_polys" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -3296,7 +3297,7 @@ So it needs to be flipped for further use.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.lsc2.gen_sigma">
-<span class="sig-prename descclassname"><span class="pre">schimpy.lsc2.</span></span><span class="sig-name descname"><span class="pre">gen_sigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nlayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minlayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshfun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsmoothlay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.lsc2.gen_sigma" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">schimpy.lsc2.</span></span><span class="sig-name descname"><span class="pre">gen_sigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nlayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minlayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meshfun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsmoothlay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.lsc2.gen_sigma" title="Link to this definition"></a></dt>
 <dd><p>“ Generate local sigma coordinates based on # layers, reference surface and depth</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3314,6 +3315,7 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dt><strong>meshfun: float</strong></dt><dd><p>S coordinate parameter b</p>
 </dd>
 <dt><strong>nsmoothlay: how many layers to smooth on the bottom</strong></dt><dd></dd>
+<dt><strong>out_dir: Path</strong></dt><dd></dd>
 <dt><strong>hc: float</strong></dt><dd><p>S coordinate parameter hc (do not alter)</p>
 </dd>
 </dl>
@@ -3358,7 +3360,7 @@ as a standard S grid theta although it will be varied according to depth</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.lsc2.smooth_bed">
-<span class="sig-prename descclassname"><span class="pre">schimpy.lsc2.</span></span><span class="sig-name descname"><span class="pre">smooth_bed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hcor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlevel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.lsc2.smooth_bed" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">schimpy.lsc2.</span></span><span class="sig-name descname"><span class="pre">smooth_bed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hcor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlevel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.lsc2.smooth_bed" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -8106,6 +8108,11 @@ fname = output file name</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="schimpy.schism_setup.ensure_outdir">
+<span class="sig-prename descclassname"><span class="pre">schimpy.schism_setup.</span></span><span class="sig-name descname"><span class="pre">ensure_outdir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_setup.ensure_outdir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.schism_setup.load_schism">
 <span class="sig-prename descclassname"><span class="pre">schimpy.schism_setup.</span></span><span class="sig-name descname"><span class="pre">load_schism</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_setup.load_schism" title="Link to this definition"></a></dt>
 <dd><p>A load function</p>
@@ -8862,7 +8869,7 @@ raster: the data</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.stacked_dem_fill.filelist_main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">filelist_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demlistfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointlistfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.filelist_main" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">filelist_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demlistfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pointlistfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.filelist_main" title="Link to this definition"></a></dt>
 <dd><p>higher level driver routine that parses the names of the DEMs from demfilelist
 points ( x,y or x,y,z ) from pointlistfile</p>
 </dd></dl>
@@ -8884,9 +8891,9 @@ points ( x,y or x,y,z ) from pointlistfile</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.stacked_dem_fill.stacked_dem_fill">
-<span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">stacked_dem_fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">na_fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.stacked_dem_fill" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">stacked_dem_fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">na_fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.stacked_dem_fill" title="Link to this definition"></a></dt>
 <dd><p>Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
-This routine controls prioritization of the dems, gradually filling points 
+This routine controls prioritization of the dems, gradually filling points
 that are still marked <cite>nan</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -8894,6 +8901,8 @@ that are still marked <cite>nan</cite></p>
 <dt><strong>files:  list[str]</strong></dt><dd><p>list of files. Existence is checked and ValueError for bad file</p>
 </dd>
 <dt><strong>points: np.ndarray</strong></dt><dd><p>this is a numpy array of points, nrow = num of points and ncol = 2 (x,y).</p>
+</dd>
+<dt><strong>out_dir: Path</strong></dt><dd><p>directory to write the output files</p>
 </dd>
 <dt><strong>values: np.ndarray</strong></dt><dd><p>values at each point – this is an output, but this gives an opportunity to use an existing data structure to receive</p>
 </dd>
