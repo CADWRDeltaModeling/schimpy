@@ -400,9 +400,7 @@ class BatchMetrics(object):
         outputs_dir = params["outputs_dir"]
         if isinstance(outputs_dir, str):
             outputs_dir = outputs_dir.split()
-        time_basis = [
-            process_time_str(date_str) for date_str in params["time_basis"].split()
-        ]
+        time_basis = [process_time_str(date_str) for date_str in params["time_basis"]]
         stations_input = params.get("stations_input")
         if stations_input is None:
             stations_input = (
