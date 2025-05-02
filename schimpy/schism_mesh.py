@@ -742,6 +742,28 @@ class SchismMesh(TriQuadMesh):
             sca_plt = ax.scatter(xy[:, 0], xy[:, 1], c=var, s=size, **kwargs)
         return sca_plt
 
+    def plot_open_boundaries(self, ax=None, edgecolor="blue", **kwargs):
+        """
+        Plot the open boundaries of the computational grid.
+        """
+        open_boundaries = [b for b in self._boundaries if b.btype == BoundaryType.OPEN]
+        patch = []
+        for boundary in open_boundaries:
+            nodes = boundary.nodes
+            cxy = np.asarray(self.nodes[nodes, :2])
+            polyline = patches.Polygon(cxy, closed=False)
+            patch.append(polyline)
+
+        p = PatchCollection(patch, facecolor="none", edgecolor=edgecolor, **kwargs)
+        if not ax:
+            fig, ax = plt.subplots()
+            bounds = self.merged_mesh().bounds
+            ax.set_xlim((bounds[0], bounds[2]))
+            ax.set_ylim((bounds[1], bounds[3]))
+        ax.add_collection(p)
+        plt.axis("equal")
+        return p
+
     def plot_mesh_boundary(self, ax=None, edgecolor="k", **kwargs):
         """
         Plot the edge of the computational grid.
