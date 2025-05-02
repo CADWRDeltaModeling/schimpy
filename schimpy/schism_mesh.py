@@ -633,10 +633,10 @@ class SchismMesh(TriQuadMesh):
         merge all the meshes to create a boundary polygon
         """
         if self._merged_mesh is None:
-            from shapely.ops import cascaded_union
+            from shapely.ops import unary_union
 
             self._create_2d_polygons()
-            self._merged_mesh = cascaded_union(self._polygons)
+            self._merged_mesh = unary_union(self._polygons)
         return self._merged_mesh
 
     def to_geopandas(
