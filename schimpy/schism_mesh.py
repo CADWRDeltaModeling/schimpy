@@ -690,7 +690,7 @@ class SchismMesh(TriQuadMesh):
         if var is None,just plot the grid.
         """
         xy = [self._nodes[e, :2] for e in self.elems]
-        if len(xy) != len(var):
+        if var is not None and (len(xy) != len(var)):
             raise ValueError("input var has different len compared to input elem")
         if inpoly is not None:
             # xy = np.asarray(xy)[inpoly]
@@ -703,11 +703,14 @@ class SchismMesh(TriQuadMesh):
         else:
             if plot_nan:
                 coll = PolyCollection(xy, array=var, **kwargs)
-            else:
+            elif var is not None:
                 inpoly = ~np.isnan(var)
                 # xy = np.asarray(xy)[inpoly]
                 xy = [xy[i] for i in range(len(xy)) if inpoly[i]]
                 coll = PolyCollection(xy, array=var[inpoly], **kwargs)
+            else:
+                # just plot grid
+                coll = PolyCollection(xy, **kwargs)
         if not ax:
             fig, ax = plt.subplots()
         ax.add_collection(coll)
