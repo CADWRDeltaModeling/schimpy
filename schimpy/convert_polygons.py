@@ -24,10 +24,10 @@ import click
 @click.help_option("-h", "--help")
 def convert_polygons_cli(input, output):
     """CLI wrapper for converting polygon files."""
-    main(input, output)
+    convert_polys(input, output)
 
 
-def main(input, output):
+def convert_polys(input, output):
     if input.endswith(".yaml"):
         polygons = read_polygons(input)
         if output.endswith(".shp"):
