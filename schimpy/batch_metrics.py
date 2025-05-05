@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """Create metrics plots in batch mode"""
@@ -400,7 +399,14 @@ class BatchMetrics(object):
         outputs_dir = params["outputs_dir"]
         if isinstance(outputs_dir, str):
             outputs_dir = outputs_dir.split()
-        time_basis = [process_time_str(date_str) for date_str in params["time_basis"]]
+        if isinstance(params["time_basis"], list):
+            assert len(outputs_dir) == len(params["time_basis"])
+
+            time_basis = [
+                process_time_str(date_str) for date_str in params["time_basis"]
+            ]
+        else:
+            time_basis = [process_time_str(params["time_basis"])] * len(outputs_dir)
         stations_input = params.get("stations_input")
         if stations_input is None:
             stations_input = (
