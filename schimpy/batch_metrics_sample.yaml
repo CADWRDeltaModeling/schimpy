@@ -8,11 +8,10 @@ labels:
   - Obs
   - 74b
   - 74b windx2
+# Start times for the simulations (if only one simulation, then set as in-line, else set as list as per outputs_dir)
+time_basis: 2013-08-28   # ISO date (datetime)
 # Station database
-stations_csv: 
-  - ../../Data/stations_utm.csv
-time_basis: 
-  - 2013-08-28   # ISO date (datetime)
+stations_csv: ../../Data/stations_utm.csv
 # Database of the field data file
 obs_links_csv: ../../Data/2013/obs_links.csv
 # Time frame of plot data
