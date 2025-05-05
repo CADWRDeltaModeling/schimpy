@@ -1,22 +1,35 @@
 # Batch metrics sample YAML
 # Outputs directories. They should contains station.in or flowlines.yaml.
-outputs_dir: ../outputs.control ../outputs.experiment
-# Station database
-stations_csv: ../../Data/stations_utm.csv
-# Database of the field data file
-obs_links_csv: ../../Data/2013/obs_links.csv
-time_basis: 2013-08-28   # ISO date (datetime)
-start_inst: 2013-12-01   # ISO date (datetime)
-end_inst:   2013-12-15   # ISO date (datetime)
-start_avg:  2013-11-01   # ISO date (datetime)
-end_avg:    2014-01-20   # ISO date (datetime)
-variable: salt  # one of elev, salt, flow
-labels: # Three labels for field data and two runs
+outputs_dir: 
+  - ../outputs.control 
+  - ../outputs.experiment
+# Labels for the outputs (first is Observed, second is first outputs_dir, third is second outputs_dir)
+labels:
   - Obs
   - 74b
   - 74b windx2
+# Station database
+stations_csv: 
+  - ../../Data/stations_utm.csv
+time_basis: 
+  - 2013-08-28   # ISO date (datetime)
+# Database of the field data file
+obs_links_csv: ../../Data/2013/obs_links.csv
+# Time frame of plot data
+# Instantaneous plot window
+start_inst: 2013-12-01   # ISO date (datetime)
+end_inst:   2013-12-15   # ISO date (datetime)
+# Filtered/Averaged plot window
+start_avg:  2013-11-01   # ISO date (datetime)
+end_avg:    2014-01-20   # ISO date (datetime)
+# Variable to plot
+variable: salt  # one of elev, salt, flow
+
+# Stations to plot
 # selected_stations: CCS
 # excluded_stations: CLC
+
+# Plotting options
 # plot_format: simple
 palette: custom
 custom_palette:
