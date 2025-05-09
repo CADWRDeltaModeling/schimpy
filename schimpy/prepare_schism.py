@@ -75,6 +75,7 @@ def create_hgrid(s, inputs, logger):
                 demfiles=dem_list,
                 na_fill=default_depth_for_missing_dem,
                 logger=logger,
+                out_dir=inputs["prepro_output_dir"]
             )
             optimized_elevation = optimizer.optimize(opt_params)
             s.mesh.nodes[:, 2] = np.negative(optimized_elevation)
@@ -480,10 +481,10 @@ def prepare_schism(args, use_logging=True):
 
     if item_exist(inputs, "copy_resources"):
         logger.info("Copying resources to output dir")
-        copy_spec = inputs["copy_resources"]
-        for key, item in copy_spec.items():
-            outpath = os.path.join(outdir, item)
-            if os.path.normpath(key) == os.path.normpath(outpath):
+        copy_spec = inputs['copy_resources']
+        for key,item in copy_spec.items():
+            outpath = os.path.join(outdir,item)
+            if os.path.normpath(key) == os.path.normpath(outpath): 
                 continue
             logger.info(f"copy_resources: copying {key} to {outpath}")
             shutil.copyfile(key, outpath)

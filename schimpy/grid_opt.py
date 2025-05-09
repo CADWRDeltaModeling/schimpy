@@ -63,6 +63,8 @@ class GridOptimizer(object):
         self.logger = kwargs.get('logger')
         self.order_quadrature_tri_dem = 4
         self.order_quadrature_quad_dem = 5
+        self.out_dir=kwargs['out_dir']
+        
 
     def select_solver(self, solver):
         """ Select solver
@@ -161,7 +163,7 @@ class GridOptimizer(object):
                 list of elevation vectors
         """
         pts = np.vstack(list_of_points)
-        elev = stacked_dem_fill(self.demfiles, pts, require_all=False, na_fill=self.na_fill)
+        elev = stacked_dem_fill(self.demfiles, pts, self.out_dir, require_all=False, na_fill=self.na_fill)
         row_i = 0
         list_of_elev = []
         for arr in list_of_points:
