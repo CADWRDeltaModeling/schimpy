@@ -249,8 +249,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.hotstart_inventory">schimpy.hotstart_inventory module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.hotstart_inventory.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.hotstart_inventory.expected_hotstarts"><code class="docutils literal notranslate"><span class="pre">expected_hotstarts()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.hotstart_inventory.hotstart_inventory"><code class="docutils literal notranslate"><span class="pre">hotstart_inventory()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.hotstart_inventory.hotstart_inventory2"><code class="docutils literal notranslate"><span class="pre">hotstart_inventory2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.hotstart_inventory.hotstart_inventory_exist"><code class="docutils literal notranslate"><span class="pre">hotstart_inventory_exist()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.hotstart_inventory.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 </ul>
 </li>
@@ -2889,43 +2890,110 @@ This gradient is a vector the same size as x.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="schimpy.hotstart_inventory.expected_hotstarts">
+<span class="sig-prename descclassname"><span class="pre">schimpy.hotstart_inventory.</span></span><span class="sig-name descname"><span class="pre">expected_hotstarts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nday</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hot_freq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hotstart_inventory.expected_hotstarts" title="Link to this definition"></a></dt>
+<dd><p>Generate expected hotstarts based on run parameters.
+Parameters
+———-
+run_start : datetime</p>
+<blockquote>
+<div><p>The start time of the simulation run.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>dt<span class="classifier">int</span></dt><dd><p>The time step in seconds.</p>
+</dd>
+<dt>nday<span class="classifier">int</span></dt><dd><p>The number of days for the simulation run.</p>
+</dd>
+<dt>hot_freq<span class="classifier">pandas.tseries.offsets.DateOffset</span></dt><dd><p>The frequency at which hotstarts are generated.</p>
+</dd>
+</dl>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pandas.DataFrame</dt><dd><p>A DataFrame with a DatetimeIndex representing the expected hotstart times
+and a column “iteration” indicating the corresponding iteration numbers.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>This function calculates the expected hotstart times and their corresponding
+iteration numbers based on the provided simulation parameters. It does not
+perform any file inventory or check for existing hotstart files.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.hotstart_inventory.hotstart_inventory">
-<span class="sig-prename descclassname"><span class="pre">schimpy.hotstart_inventory.</span></span><span class="sig-name descname"><span class="pre">hotstart_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nday</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paramfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hot_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hotstart_inventory.hotstart_inventory" title="Link to this definition"></a></dt>
-<dd><p>Create an inventory of existing hotstarts or expected hotstarts</p>
-<p>Existing vs expected depends on whether workdir is an outputs or study dir.</p>
+<span class="sig-prename descclassname"><span class="pre">schimpy.hotstart_inventory.</span></span><span class="sig-name descname"><span class="pre">hotstart_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nday</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paramfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hot_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hotstart_inventory.hotstart_inventory" title="Link to this definition"></a></dt>
+<dd><p>Create an inventory of existing hotstarts or expected hotstarts.</p>
+<p>Whether the inventory is for existing or expected hotstarts depends on 
+whether the workdir is an outputs directory or a study directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>start</strong><span class="classifier">Convertible to Datetime</span></dt><dd><p>Start date of run. If None inferred from paramfile. Error if</p>
+<dt><strong>run_start</strong><span class="classifier">str or pandas.Timestamp, optional</span></dt><dd><p>The start time of the simulation run in ISO-like format (e.g., ‘2013-12-03’).</p>
 </dd>
-<dt><strong>dt</strong><span class="classifier">float</span></dt><dd><p>dt in seconds, for instance perhaps 90s for clinic or 120s for tropic. This
-is needed to intepret the so-called iteration number in the hotstart labels 
-which are really time step numbers.</p>
+<dt><strong>dt</strong><span class="classifier">int, optional</span></dt><dd><p>The time step in seconds of the model. Default is None.</p>
 </dd>
-<dt><strong>workdir</strong><span class="classifier">str</span></dt><dd><p>Directory to inventory. If it is an outputs directory, the inventory</p>
+<dt><strong>nday</strong><span class="classifier">int, optional</span></dt><dd><p>The number of days in the simulation run or the maximum to catalog. Default is None.</p>
 </dd>
-<dt><strong>comprise existing hotstarts.</strong></dt><dd></dd>
-<dt><strong>paramfile</strong><span class="classifier">str</span></dt><dd><p>Name of param.nml file, expected in workdir or workdir/.. If None, then
-both start and dt must be supplied. If all three are None, the name “param.nml” will
-be attempted</p>
+<dt><strong>workdir</strong><span class="classifier">str, optional</span></dt><dd><p>The working directory, which may be a launch or outputs directory. Default is ‘.’.</p>
+</dd>
+<dt><strong>paramfile</strong><span class="classifier">str, optional</span></dt><dd><p>The name of the param.nml file if it is used to infer runtime. Default is None.</p>
+</dd>
+<dt><strong>hot_freq</strong><span class="classifier">str or pandas.tseries.offsets.DateOffset, optional</span></dt><dd><p>The hotstart frequency in pandas frequency terms (e.g., ‘5D’). Default is None.</p>
+</dd>
+<dt><strong>expected</strong><span class="classifier">bool, optional</span></dt><dd><p>Flag to generate expected hotstarts instead of an inventory of existing files. Default is False.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>Dataframe, if programatic, listing hotstarts.  Should look like “Date, Iteration” pairs. CLI should print it out.</dt><dd></dd>
+<dt>pandas.DataFrame or None</dt><dd><p>A DataFrame containing the inventory of hotstarts with a DatetimeIndex and a column “iteration”.
+If no hotstarts are found and <cite>expected</cite> is False, returns None.</p>
+</dd>
 </dl>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>If the listing is done in the run dir, this will be the expected hotstarts. If 
-it is in the outputs dir, it will be an inventory of existing hotstarts.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.hotstart_inventory.hotstart_inventory2">
-<span class="sig-prename descclassname"><span class="pre">schimpy.hotstart_inventory.</span></span><span class="sig-name descname"><span class="pre">hotstart_inventory2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hotstart_inventory.hotstart_inventory2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="schimpy.hotstart_inventory.hotstart_inventory_exist">
+<span class="sig-prename descclassname"><span class="pre">schimpy.hotstart_inventory.</span></span><span class="sig-name descname"><span class="pre">hotstart_inventory_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hotstart_inventory.hotstart_inventory_exist" title="Link to this definition"></a></dt>
+<dd><p>Check for the existence of hotstart inventory files and generate a DataFrame 
+mapping iterations to corresponding datetime values.
+Parameters
+———-
+start : str or pandas.Timestamp</p>
+<blockquote>
+<div><p>The start time as a string or pandas.Timestamp object.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>dt<span class="classifier">int, optional</span></dt><dd><p>Time step in seconds between iterations (default is 90).</p>
+</dd>
+<dt>workdir<span class="classifier">str, optional</span></dt><dd><p>Directory to search for hotstart files (default is ‘.’).</p>
+</dd>
+<dt>do_print<span class="classifier">bool, optional</span></dt><dd><p>Whether to print the iterations and corresponding times (default is True).</p>
+</dd>
+</dl>
+<section id="id1">
+<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>pandas.DataFrame</dt><dd><p>A DataFrame with datetime as the index and iteration numbers as the column.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>The function searches for hotstart files in the specified <cite>workdir</cite> directory.</p></li>
+<li><p>If no files are found in <cite>workdir</cite>, it searches in the current directory.</p></li>
+<li><p>The function assumes hotstart files follow the naming pattern 
+“hotstart_000000_&lt;iteration&gt;.nc”.</p></li>
+</ul>
+</section>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.hotstart_inventory.main">
