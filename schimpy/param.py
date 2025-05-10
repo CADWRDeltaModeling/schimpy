@@ -46,7 +46,7 @@ class Params(object):
     def get_interval(self,name):
         dt = self['dt']
         sec=self[name]*dt
-        freq = pd.Timedelta(sec,unit='S')
+        freq = pd.Timedelta(sec,unit='s')
 
         return pd.tseries.frequencies.to_offset(freq)
 
