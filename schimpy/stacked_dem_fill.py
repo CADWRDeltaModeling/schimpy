@@ -2,6 +2,7 @@
 
 try:
     from osgeo import gdal
+    gdal.UseExceptions()
     from osgeo.gdalconst import *
 
     gdal.TermProgress = gdal.TermProgress_nocb
