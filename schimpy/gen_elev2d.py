@@ -14,6 +14,7 @@ from netCDF4 import Dataset
 from schimpy.separate_species import separate_species
 from schimpy.schism_mesh import read_mesh
 from vtools import hours, days, seconds
+from vtools.data.gap import describe_null
 from dms_datastore.read_ts import read_noaa, read_ts
 import numpy as np
 from datetime import datetime
@@ -271,6 +272,7 @@ def gen_elev2D(hgrid_fpath, outfile, pt_reyes_fpath, monterey_fpath, start, end,
 
     pt_reyes.interpolate(limit=max_gap, inplace=True)
     if pt_reyes.isna().any(axis=None):
+        describe_null(pt_reyes,"Pt Reyes")
         raise ValueError("pt_reyes has gaps larger than fill limit")
     if pt_reyes.empty:
         raise ValueError(
@@ -299,6 +301,7 @@ def gen_elev2D(hgrid_fpath, outfile, pt_reyes_fpath, monterey_fpath, start, end,
 
     monterey.interpolate(limit=max_gap, inplace=True)
     if monterey.isna().any(axis=None):
+        describe_null(monterey,"Monterey")
         raise ValueError("monterey has gaps larger than fill limit")
     if monterey.empty:
         raise ValueError("No data loaded for Monterey. Check file path and date range.")
