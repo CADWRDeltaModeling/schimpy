@@ -545,6 +545,7 @@ class SchismSetup(object):
                     )
                 optype = "eval"
 
+            
             for ip in range(npoint - 1):  # loop through segments on linestring
                 line_segment = np.array(line[ip : ip + 2], dtype="d").flatten()
                 try:
@@ -552,8 +553,8 @@ class SchismSetup(object):
                     if widen:
                         on_line = on_line + neighbors
                 except:
-                    raise ValueError(
-                        "Elements or neighbors not found for linestring {}".format(name)
+                    self._logger.warning(
+                        "Elements not found for linestring {}".format(name)
                     )
 
                 node_local_nds = {}
@@ -666,7 +667,6 @@ class SchismSetup(object):
 
             if nodes_sel is None or not len(nodes_sel):
                 msg = "This polygon contains no nodes: %s" % poly.name
-                self._logger.error(poly)
                 self._logger.error(msg)
                 continue
             try:
