@@ -118,7 +118,6 @@ def read_staout(
         else:
             staout.columns = [f"{loc}_{subloc}" for loc, subloc in staout.columns]
     f = pd.infer_freq(staout.index)
-    f = pd.infer_freq(staout.index)
     if f is None:
         # raise ValueError("Could not determine the time frequency of staoutfile")
         f2 = pd.infer_freq(staout.iloc[0:10, 0].index)
@@ -557,11 +556,14 @@ def read_flux_out(fpath, names, reftime):
         names=["time"] + names,
         dtype="d",
     )
+    print("ref",reftime)
     if reftime is not None:
-        data = elapsed_datetime(data, reftime=reftime, time_unit="d")
-        data.index = data.index.round(freq="s")
-        f = pd.infer_freq(data.index)
-        data = data.asfreq(f)
+        dtsec = round((data.index[1] - data.index[0])*86400)
+        freqstr = f"{dtsec}s"
+        newindex=pd.date_range(start=reftime, freq=freqstr, periods = len(data))
+        data.index=newindex
+        #data = elapsed_datetime(data, reftime=reftime, time_unit="d")
+        data = data.asfreq(freqstr)
 
     # todo: freq when start is none?
     return data
