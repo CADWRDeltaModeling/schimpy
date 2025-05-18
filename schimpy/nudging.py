@@ -1011,9 +1011,9 @@ class Nudging(object):
         if data.endswith("csv"):
             obs = pd.read_csv(data, index_col="datetime", parse_dates=["datetime"])
             obs.index.name = "time"
-            obs = obs[
+            obs = obs.loc[
                 (obs.index >= self.start_date)
-                & (obs.index < pd.to_datetime(self.end_date))
+                & (obs.index < pd.to_datetime(self.end_date)),:
             ]
             # time interpolation
             obs = obs.resample(self.nudge_step).nearest()
