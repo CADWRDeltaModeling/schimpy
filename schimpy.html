@@ -104,13 +104,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.combine"><code class="docutils literal notranslate"><span class="pre">combine()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.combine_consume"><code class="docutils literal notranslate"><span class="pre">combine_consume()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.combine_hotstart"><code class="docutils literal notranslate"><span class="pre">combine_hotstart()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.detect_min_max_index"><code class="docutils literal notranslate"><span class="pre">detect_min_max_index()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.do_combine"><code class="docutils literal notranslate"><span class="pre">do_combine()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.do_combine_hotstart"><code class="docutils literal notranslate"><span class="pre">do_combine_hotstart()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.failed_incomplete"><code class="docutils literal notranslate"><span class="pre">failed_incomplete()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.gather_ppf_names"><code class="docutils literal notranslate"><span class="pre">gather_ppf_names()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.prune_ppf_files"><code class="docutils literal notranslate"><span class="pre">prune_ppf_files()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.setup"><code class="docutils literal notranslate"><span class="pre">setup()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.combine_consume.split"><code class="docutils literal notranslate"><span class="pre">split()</span></code></a></li>
@@ -813,19 +811,13 @@ written, blocking the query in time was very inefficient</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.combine_consume.combine_consume">
-<span class="sig-prename descclassname"><span class="pre">schimpy.combine_consume.</span></span><span class="sig-name descname"><span class="pre">combine_consume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.combine_consume.combine_consume" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">schimpy.combine_consume.</span></span><span class="sig-name descname"><span class="pre">combine_consume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fbase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hotstart</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hotstart_only</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consume</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assume_done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combiner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hot_combiner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sndx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sndx_hot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endx_hot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datefile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks_per_day</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.combine_consume.combine_consume" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.combine_consume.combine_hotstart">
 <span class="sig-prename descclassname"><span class="pre">schimpy.combine_consume.</span></span><span class="sig-name descname"><span class="pre">combine_hotstart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combine_hotstart_exe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minstep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxstep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">99999999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consume</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.combine_consume.combine_hotstart" title="Link to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.combine_consume.create_arg_parser">
-<span class="sig-prename descclassname"><span class="pre">schimpy.combine_consume.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.combine_consume.create_arg_parser" title="Link to this definition"></a></dt>
-<dd><p>Create argument parser for</p>
-</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.combine_consume.detect_min_max_index">
@@ -850,11 +842,6 @@ written, blocking the query in time was very inefficient</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.combine_consume.gather_ppf_names">
 <span class="sig-prename descclassname"><span class="pre">schimpy.combine_consume.</span></span><span class="sig-name descname"><span class="pre">gather_ppf_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.combine_consume.gather_ppf_names" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.combine_consume.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.combine_consume.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.combine_consume.main" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
