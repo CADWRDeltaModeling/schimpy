@@ -8,6 +8,7 @@ import glob
 import time
 from shutil import copyfile
 import datetime as dtm
+import click
 
 FBASE_5_6 = ["schout.nc"]
 
@@ -33,8 +34,8 @@ def do_combine_hotstart(wdir, step):
 
 
 def split(alist, n):
-    k, m = divmod(len(a), n)
-    return (a[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)] for i in xrange(n))
+    k, m = divmod(len(alist), n)
+    return (alist[i * k + min(i, m) : (i + 1) * k + min(i + 1, m)] for i in range(n))
 
 
 def appears_done(wdir, fb, exten, firstblock, lastblock):
@@ -330,104 +331,38 @@ def detect_min_max_index(wdir, sample_fbase):
     return ndxmin, ndxmax
 
 
-def create_arg_parser():
-    """Create argument parser for"""
-    import argparse
+def combine_consume(
+    start,
+    dir,
+    fbase,
+    hotstart,
+    hotstart_only,
+    consume,
+    assume_done,
+    combiner,
+    hot_combiner,
+    sndx,
+    endx,
+    sndx_hot,
+    endx_hot,
+    datefile,
+    blocks_per_day,
+    is_test=False,
+):
+    combine_exe = combiner
+    combine_hotstart_exe = hot_combiner
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--start", type=str, help="start date of simulation in format like yyyy-mm-dd"
-    )
-    parser.add_argument(
-        "--dir",
-        default=".",
-        type=str,
-        help="directory in which output will be processed",
-    )
-    parser.add_argument(
-        "--fbase",
-        type=str,
-        default=["schout.nc"],
-        nargs="+",
-        help="File base name. This will either be 'schout.nc' or a list of files like 'elev.61,hvel.64,salt.63'. ",
-    )
-    parser.add_argument(
-        "--hotstart", action="store_true", help="Combine hotstart in addition to fbase"
-    )
-    parser.add_argument(
-        "--hotstart_only",
-        action="store_true",
-        help="Only combine hotstart -- avoids file search errors when nothing left to combine",
-    )
-    parser.add_argument(
-        "--consume",
-        action="store_true",
-        help="Delete combined files or unrequested files",
-    )
-    parser.add_argument(
-        "--assume_done",
-        action="store_true",
-        help="Assume that the simulation is finished, so incomplete blocks can be deleted",
-    )
-    parser.add_argument(
-        "--combiner", default=f"{combine_exe}", help="Executable for combine_output."
-    )
-    parser.add_argument(
-        "--hot_combiner",
-        default=f"{combine_hotstart_exe}",
-        help="Executable for combine_output.",
-    )
-    parser.add_argument(
-        "--sndx", default=None, type=int, help="First index to consider for processing."
-    )
-    parser.add_argument(
-        "--endx", default=None, type=int, help="Last index to consider for processing."
-    )
-    parser.add_argument(
-        "--sndx_hot",
-        default=None,
-        type=int,
-        help="First index to consider for processing.",
-    )
-    parser.add_argument(
-        "--endx_hot",
-        default=None,
-        type=int,
-        help="Last index to consider for processing.",
-    )
+    wdir = dir
+    blocks_per_day = blocks_per_day
+    start = dtm.datetime.strptime(start, "%Y-%m-%d")
+    consume = consume
 
-    parser.add_argument(
-        "--datefile",
-        type=str,
-        help="File containing list of dates. Each line can have a single date or comma-separated pair indicating block start and end. Blank lines are ignored and # is comment character that can comment the entire line or be placed at the side of a line after the date(s). ",
-    )
-    parser.add_argument(
-        "--blocks_per_day",
-        type=int,
-        default=1,
-        help="Blocks used to store 1 day worth of output.",
-    )
-    return parser
-
-
-def combine_consume(is_test=False):
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    combine_exe = args.combiner
-    combine_hotstart_exe = args.hot_combiner
-
-    wdir = args.dir
-    fbase = args.fbase
-    blocks_per_day = args.blocks_per_day
-    start = dtm.datetime.strptime(args.start, "%Y-%m-%d")
-    consume = args.consume
-
-    hotstart = args.hotstart or args.hotstart_only
-    hotstart_only = args.hotstart_only
-    datefile = args.datefile.strip()
-    sndx = args.sndx
-    endx = args.endx
-    assume_done = args.assume_done
+    hotstart = hotstart or hotstart_only
+    hotstart_only = hotstart_only
+    datefile = datefile.strip() if datefile else None
+    sndx = sndx
+    endx = endx
+    assume_done = assume_done
 
     if is_test:
         setup(wdir, fbase)
@@ -451,7 +386,6 @@ def combine_consume(is_test=False):
             wanted.update(range(b[0], b[1] + 1))
         u = range(ndxmin, ndxmax + 1)
         unwanted = [ii for ii in u if not ii in wanted]
-        unwanted = [ii for ii in u if not ii in wanted]
         wanted = list(wanted)
         wanted.sort()
         unwanted.sort()
@@ -464,11 +398,108 @@ def combine_consume(is_test=False):
         combine_hotstart(wdir, combine_hotstart_exe, consume=consume)
 
 
-def main():
-    combine_consume()
+@click.command()
+@click.option(
+    "--start",
+    required=True,
+    type=str,
+    help="start date of simulation in format like yyyy-mm-dd",
+)
+@click.option(
+    "--dir",
+    "dir",
+    default=".",
+    type=click.Path(),
+    help="directory in which output will be processed",
+)
+@click.option(
+    "--fbase",
+    multiple=True,
+    default=["schout.nc"],
+    help="File base name. This will either be 'schout.nc' or a list of files like 'elev.61,hvel.64,salt.63'. ",
+)
+@click.option("--hotstart", is_flag=True, help="Combine hotstart in addition to fbase")
+@click.option(
+    "--hotstart_only",
+    is_flag=True,
+    help="Only combine hotstart -- avoids file search errors when nothing left to combine",
+)
+@click.option(
+    "--consume", is_flag=True, help="Delete combined files or unrequested files"
+)
+@click.option(
+    "--assume_done",
+    is_flag=True,
+    help="Assume that the simulation is finished, so incomplete blocks can be deleted",
+)
+@click.option(
+    "--combiner", default=f"{combine_exe}", help="Executable for combine_output."
+)
+@click.option(
+    "--hot_combiner",
+    default=f"{combine_hotstart_exe}",
+    help="Executable for combine_output.",
+)
+@click.option(
+    "--sndx", default=None, type=int, help="First index to consider for processing."
+)
+@click.option(
+    "--endx", default=None, type=int, help="Last index to consider for processing."
+)
+@click.option(
+    "--sndx_hot", default=None, type=int, help="First index to consider for processing."
+)
+@click.option(
+    "--endx_hot", default=None, type=int, help="Last index to consider for processing."
+)
+@click.option(
+    "--datefile",
+    type=str,
+    help="File containing list of dates. Each line can have a single date or comma-separated pair indicating block start and end. Blank lines are ignored and # is comment character that can comment the entire line or be placed at the side of a line after the date(s). ",
+)
+@click.option(
+    "--blocks_per_day",
+    type=int,
+    default=1,
+    help="Blocks used to store 1 day worth of output.",
+)
+def combine_consume_cli(
+    start,
+    dir,
+    fbase,
+    hotstart,
+    hotstart_only,
+    consume,
+    assume_done,
+    combiner,
+    hot_combiner,
+    sndx,
+    endx,
+    sndx_hot,
+    endx_hot,
+    datefile,
+    blocks_per_day,
+):
+    combine_consume(
+        start,
+        dir,
+        list(fbase),
+        hotstart,
+        hotstart_only,
+        consume,
+        assume_done,
+        combiner,
+        hot_combiner,
+        sndx,
+        endx,
+        sndx_hot,
+        endx_hot,
+        datefile,
+        blocks_per_day,
+    )
 
 
 if __name__ == "__main__":
-    wdir = "./test_archive"
-    fbase = FBASE_5_6
-    combine_consume()
+    # wdir = "./test_archive"
+    # fbase = FBASE_5_6
+    combine_consume_cli()

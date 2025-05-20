@@ -6,8 +6,8 @@ from schimpy.convert_mesh import convert_mesh_cli
 from schimpy.convert_polygons import convert_polygons_cli
 from schimpy.convert_linestrings import convert_linestrings_cli
 from schimpy.convert_points import convert_points_cli
+from schimpy.combine_consume import combine_consume
 
-# from schimpy.combine_consume import combine_consume
 # from schimpy.prepare_schism import prepare_schism
 # from schimpy.hotstart_inventory import hotstart_inventory
 # from schimpy.create_vgrid_lsc2 import create_vgrid_lsc2
@@ -39,7 +39,7 @@ cli.add_command(convert_mesh_cli, "convert_mesh")
 cli.add_command(convert_polygons_cli, "convert_polygons")
 cli.add_command(convert_linestrings_cli, "convert_linestrings")
 cli.add_command(convert_points_cli, "convert_points")
-# cli.add_command(combine_consume, "combine_consume")
+cli.add_command(combine_consume_cli, "combine_consume")
 # cli.add_command(prepare_schism, "prepare_schism")
 # cli.add_command(hotstart_inventory, "hotstart_inventory")
 # cli.add_command(create_vgrid_lsc2, "create_vgrid_lsc2")
