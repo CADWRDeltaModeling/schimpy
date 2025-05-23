@@ -338,7 +338,7 @@ class hotstart(object):
             if self.output_fn is None:
                 outfile = f"hotstart.{restart_timestr}.{nsteps}.nc"
                 self.output_fn = outfile
-            ds = xr.Dataset({'time': ('one', [restart_sec]),
+            ds = xr.Dataset({'time': ('one', [int(restart_sec)]),
                               'iths': ('one', [nsteps]),
                               'ifile': ('one', [1]),
                               'idry_e': ('elem', idry_e),
