@@ -96,6 +96,10 @@ class hotstart(object):
         self.vgrid_fn = hotstart_info['vgrid_input_file']
         variables = list(hotstart_info.keys())
 
+        if 'restart_time' in hotstart_info.keys():
+            self.restart_time = hotstart_info['restart_time']
+        else:
+            self.restart_time = None
         if 'crs' in hotstart_info.keys():
             self.crs = hotstart_info['crs']
 
@@ -130,7 +134,7 @@ class hotstart(object):
 
         # remove these items from the list.
         rfl = ['hgrid_input_file', 'vgrid_input_file', 'date', 'vgrid_version',
-               'crs', 'param_nml', 'modules', 'output_fn','run_start','time_step','sediment_input_file']
+               'crs', 'param_nml', 'modules', 'output_fn','run_start','restart_time','time_step','sediment_input_file']
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
         # 5.8 and below is the old version
@@ -322,7 +326,11 @@ class hotstart(object):
                 self.run_start=self.date
             run_start = pd.to_datetime(self.run_start)
             run_start_str = run_start.strftime("%Y-%m-%dT%H:%M")
-            restart_time = pd.to_datetime(self.date)
+
+            if self.restart_time is not None:
+                restart_time = pd.to_datetime(self.restart_time)
+            else:
+                restart_time = pd.to_datetime(self.date)
             restart_sec = (restart_time - run_start).total_seconds()
             restart_timestr = restart_time.strftime("%Y%m%d")
             dt = self.time_step
