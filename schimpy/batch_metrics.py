@@ -607,7 +607,10 @@ class BatchMetrics(object):
                 self.logger.error("None of time series have data.")
                 continue
             self.logger.info("Start plotting...")
-            source = db_obs.loc[(station_id, subloc, variable), "agency"].upper()
+            if ts_obs is not None:
+                source = db_obs.loc[(station_id, subloc, variable), "agency"].upper()
+            else:
+                source = "None"
             figtitle = self.create_title(
                 db_stations, station_id, source, variable, vert_pos
             )
@@ -838,4 +841,7 @@ def generate_metricsplots(main_inputfile):
 
 
 if __name__ == "__main__":
-    batch_metrics_cli()
+    # batch_metrics_cli()
+    generate_metricsplots(
+        "/scratch/tomkovic/DSP_code/scripts/post-processing/input/batch_metric_dsp_case_4.yaml"
+    )
