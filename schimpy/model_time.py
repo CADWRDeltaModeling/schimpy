@@ -2,6 +2,7 @@
 """Script to make model date conversion convenient, converting elapsed model seconds to or from dates"""
 
 import datetime
+import pandas as pd
 import re
 import sys
 import os.path
@@ -401,6 +402,90 @@ def describe_elapsed(times, start, dt=None):
                 print("Model step:    %s\n" % int(msec / dt))
         else:
             print("\n")
+
+
+def elapsed_to_timestamp(input, time_basis, elapsed_unit="s"):
+    """Take input dataframe or th file and convert to timestamp, returns dataframe"""
+
+    if elapsed_unit == "s":
+        elapsed_fac = 1.0
+    elif elapsed_unit == "d":
+        elapsed_fac = 24 * 3600
+    else:
+        raise ValueError("elapsed_unit must be 's' or 'd'")
+
+    if type(time_basis) == str:
+        time_basis = datetime.datetime(*list(map(int, re.split("[^\d]", time_basis))))
+
+    if not isinstance(input, (pd.DataFrame, pd.Series)):
+        in_df = pd.read_table(input, sep="\s+", comment="#", index_col=0, header=None)
+
+    out_df = in_df.copy()
+    out_df.index = pd.to_datetime(time_basis) + pd.to_timedelta(
+        round(in_df.index.to_series() * elapsed_fac), unit="s"
+    )
+
+    return out_df
+
+
+def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s"):
+    """Read input file and return dataframe.
+    Automatically converts to timestamp if time_basis is supplied unless to_timestamp is False
+    """
+
+    # check if first line contains headers (and thus is elapsed)
+    with open(input, "r") as f:
+        first_line = f.readline().strip()
+    is_elapsed = all(re.match(r"^[-+]?\d*\.?\d+$", s) for s in first_line.split())
+
+    if is_elapsed:
+        # read elapsed file
+        if time_basis is None:
+            raise ValueError(
+                f"The input file {input} is an elapsed .th file and there's no time_basis specified."
+            )
+        if to_timestamp:
+            out_df = elapsed_to_timestamp(input, time_basis, elapsed_unit=elapsed_unit)
+        else:
+            out_df = pd.read_table(
+                infile, sep="\s+", comment="#", index_col=0, header=None
+            )
+
+    else:
+        # read timestamped file
+        out_df = pd.read_table(input, sep="\s+", index_col="datetime", comment="#")
+        out_df.index = pd.to_datetime(out_df.index, format="%Y-%m-%dT%H:%M")
+
+    # monotonic increase check, finds any repeat datetimes and/or a mixup of order
+    mon_inc = all(x < y for x, y in zip(out_df.index, out_df.index[1:]))
+    if not mon_inc:
+        # prints the row(s) where monotonicity is broken
+        bad_rows = in_df.loc[
+            in_df.index.to_series().diff() < pd.to_timedelta("0 seconds")
+        ]
+        raise ValueError(f"Non-monotonic datetime index found:\n{bad_rows}")
+
+    return out_df
+
+
+def get_headers(infile, no_index=True):
+    if infile.split(".")[-1] == "th":
+        with open(infile, "r") as headin:
+            for line in headin:
+                if line.startswith("#"):
+                    continue
+                headers = line.split()
+                if len(headers) == 1:
+                    headers = line.split(",")
+                break
+
+        if no_index:
+            headers = headers[1:]
+    elif infile.split(".")[-1] == "in":
+        ss_in = read_source_sink_in(infile)[0]
+        headers = ss_in.name.values
+
+    return headers
 
 
 def describe_timestamps(timestamps, start, dt=None):
