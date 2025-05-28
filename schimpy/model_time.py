@@ -1,232 +1,167 @@
 #!/usr/bin/env python
 """Script to make model date conversion convenient, converting elapsed model seconds to or from dates"""
 
-import argparse
 import datetime
 import re
-import textwrap
 import sys
 import os.path
+import click
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        prog="model_time.py",
-        description=textwrap.dedent(
-            """
-      Interpret model times in elapsed seconds and translate 
-      between calendar time and elapsed. The script requires
-      a subcommand like: $ model_time.py to_elapsed. You can also 
-      get subject-specific help on a subcommand by typing
-      $ model_time.py subcommand --help
-      """
-        ),
-    )
-
-    subparsers = parser.add_subparsers(
-        title="subcommands",
-        help="sub-commands indicating the particular action required. ",
-        dest="subcommand",
-    )
-
-    parser_elapsed = subparsers.add_parser(
-        "to_elapsed",
-        help="Convert input datetime string or *.th file with datetime column to equivalent output in elapsed seconds.",
-    )
-    parser_elapsed.add_argument(
-        "dated_input",
-        default=None,
-        nargs="+",
-        help="One or more dates to be converted in ISO-like format 2009-03-12T00:00:00 (time can be ommitted) or the name of a *.th file with the time column in this format.",
-    )
-
-    parser_elapsed.add_argument(
-        "--start",
-        required=False,
-        type=str,
-        help="Starting date and time basis for output if the input is a file. Allows a larger database with readable times to be clipped",
-    )
-    parser_elapsed.add_argument("--annotate", default=False, action="store_true")
-    parser_elapsed.set_defaults(func=to_elapsed)
-    parser_elapsed.add_argument(
-        "--step",
-        default=None,
-        nargs="?",
-        type=float,
-        help="Model time step. If given, answer will be the integer time step.",
-    )
-    parser_elapsed.add_argument(
-        "--out",
-        default=None,
-        type=str,
-        help="Name of output file. If input is a *.th file the file will be converted and output to this file, otherwise printed to screen",
-    )
-    parser_elapsed.add_argument(
-        "--skip_nan", default=False, type=bool, help="Skip a record with nan if True"
-    )
-
-    parser_date = subparsers.add_parser(
-        "to_date",
-        help="Convert input elapsed seconds or *.th file with elapsed seconds as the time column to equivalent output with a datetime or annotated with datetimes.",
-    )
-    parser_date.add_argument(
-        "--start",
-        required=True,
-        type=str,
-        help="Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.",
-    )
-    parser_date.add_argument(
-        "--step",
-        default=None,
-        nargs="?",
-        type=float,
-        help="Model time step in seconds. If given, answer will be the integer time step.",
-    )
-    parser_date.add_argument(
-        "elapsed_input",
-        default=None,
-        nargs="+",
-        help="One or more numbers representing elapsed seconds since the start argument or the name of a *.th file with the time column in elapsed seconds.",
-    )
-    default_date = "Time format for output, e.g. the default is %%Y-%%m-%%dT%%H:%%M:%%S for 2009-03-14T22:40:00. Only used when converting fields."
-    parser_date.add_argument(
-        "--elapsed_unit",
-        default="s",
-        help="Time unit of input file. Must be either 's' for seconds or 'd' for days. Only used for files",
-    )
-    parser_date.add_argument(
-        "--time_format", default="%Y-%m-%dT%H:%M", help=default_date
-    )
-    parser_date.add_argument("--annotate", default=False, action="store_true")
-    parser_date.add_argument(
-        "--out",
-        default=None,
-        type=str,
-        help="Name of output file. If input is a *.th file the file will be converted and output to this file, otherwise printed to screen",
-    )
-    parser_date.set_defaults(func=to_datetime)
-
-    parser_clip = subparsers.add_parser(
-        "clip",
-        help="Clip (subset) an input file in elapsed time to a new, later, start date",
-    )
-
-    parser_clip.add_argument(
-        "--start",
-        required=True,
-        help="Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.",
-    )
-    parser_clip.add_argument(
-        "--clip_start", required=True, help="Starting date for output."
-    )
-    parser_clip.add_argument(
-        "--out",
-        default=None,
-        type=str,
-        help="Name of output file. If input is a *.th file the file will be converted and output to this file, otherwise printed to screen",
-    )
-    parser_clip.add_argument(
-        "elapsed_input",
-        default=None,
-        nargs="+",
-        help="One or more numbers representing elapsed seconds since the start argument or the name of a *.th file with the time column in elapsed seconds.",
-    )
-    parser_clip.set_defaults(func=clip)
-    return parser
+@click.group()
+@click.help_option("-h", "--help")
+def model_time_cli():
+    """Convert elapsed model seconds to or from dates"""
+    pass
 
 
-def to_elapsed(args):
-    """Convert dated inputs to elapsed times"""
-    s = args.start
-    inputfile = args.dated_input
-    dt = args.step
-    # convert start time string input to datetime
+@model_time_cli.command(
+    help="Interpret model times in elapsed seconds and translate between calendar time and elapsed. The script requires a subcommand like: $ model_time.py to_elapsed. You can also get subject-specific help on a subcommand by typing $ model_time.py subcommand --help"
+)
+@click.argument("dated_input", nargs=-1, required=True)
+@click.option(
+    "--start",
+    required=False,
+    type=str,
+    help="Starting date and time basis for output if the input is a file.",
+)
+@click.option("--annotate", is_flag=True, default=False, help="Annotate output.")
+@click.option(
+    "--step",
+    default=None,
+    type=float,
+    help="Model time step. If given, answer will be the integer time step.",
+)
+@click.option(
+    "--out",
+    default=None,
+    type=str,
+    help="Name of output file. If input is a *.th file the file will be converted and output to this file, otherwise printed to screen",
+)
+@click.option(
+    "--skip_nan", is_flag=True, default=False, help="Skip a record with nan if True"
+)
+@click.help_option("-h", "--help")
+def to_elapsed(dated_input, start, annotate, step, out, skip_nan):
+    """Convert input datetime string or *.th file with datetime column to equivalent output in elapsed seconds."""
+    s = start
+    inputfile = list(dated_input)
+    dt = step
     try:
-        sdtime = datetime.datetime(*list(map(int, re.split(r"[^\d]", args.start))))
-    except:
-        raise ValueError(
-            "Could not convert start time to datetime: {}".format(args.start)
-        )
-    print("Model start time given: %s" % sdtime)
-    # Some correctness checking
+        sdtime = datetime.datetime(*list(map(int, re.split(r"[^\d]", s))))
+    except Exception:
+        raise click.ClickException(f"Could not convert start time to datetime: {s}")
+    click.echo(f"Model start time given: {sdtime}")
     if len(inputfile) > 1 and inputfile[0].endswith(".th"):
-        raise ValueError("Only one file argument allowed at a time")
-
-    th = len(inputfile) == 1 and inputfile[0].endswith(".th")
+        raise click.ClickException("Only one file argument allowed at a time")
     th = len(inputfile) == 1 and os.path.exists(inputfile[0])
-    # NOTE: the second th above overrides the first one.
-    outpath = args.out
+    outpath = out
     if outpath and not th:
-        raise ValueError("Outfile option only allowed if the input is a *.th file")
-
-    # Delegate chore based on the input (file, timestamp string or elapsed
-    # time)
-    annotate = args.annotate
-    skip_nan = args.skip_nan
+        raise click.ClickException(
+            "Outfile option only allowed if the input is a *.th file"
+        )
     if th:
         infile = inputfile[0]
-        if to_elapsed:
-            file_to_elapsed(infile, s, outpath, annotate, skip_nan)
+        file_to_elapsed(infile, s, outpath, annotate, skip_nan)
     else:
         describe_timestamps(inputfile, s, dt)
 
 
-def to_datetime(args):
-    """Convert elapsed inputs to dated"""
-    print(args.subcommand)
-    s = args.start
-    input = args.elapsed_input
-    dt = args.step
-    annotate = args.annotate
-
-    # convert start time string input to datetime
-    sdtime = datetime.datetime(*list(map(int, re.split("[^\d]", args.start))))
-    "Model start time given: %s" % sdtime
-    # Some correctness checking
+@model_time_cli.command()
+@click.argument("elapsed_input", nargs=-1, required=True)
+@click.option(
+    "--start",
+    required=True,
+    type=str,
+    help="Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.",
+)
+@click.option(
+    "--step",
+    default=None,
+    type=float,
+    help="Model time step in seconds. If given, answer will be the integer time step.",
+)
+@click.option(
+    "--elapsed_unit",
+    default="s",
+    help="Time unit of input file. Must be either 's' for seconds or 'd' for days. Only used for files",
+)
+@click.option(
+    "--time_format",
+    default="%Y-%m-%dT%H:%M",
+    help="Time format for output, e.g. the default is %%Y-%%m-%%dT%%H:%%M:%%S for 2009-03-14T22:40:00. Only used when converting fields.",
+)
+@click.option("--annotate", is_flag=True, default=False, help="Annotate output.")
+@click.option(
+    "--out",
+    default=None,
+    type=str,
+    help="Name of output file. If input is a *.th file the file will be converted and output to this file, otherwise printed to screen",
+)
+@click.help_option("-h", "--help")
+def to_date(elapsed_input, start, step, elapsed_unit, time_format, annotate, out):
+    """Convert input elapsed seconds or *.th file with elapsed seconds as the time column to equivalent output with a datetime or annotated with datetimes."""
+    s = start
+    input = list(elapsed_input)
+    dt = step
+    try:
+        sdtime = datetime.datetime(*list(map(int, re.split("[^\d]", s))))
+    except Exception:
+        raise click.ClickException(f"Could not convert start time to datetime: {s}")
     if len(input) > 1 and input[0].endswith(".th"):
-        raise ValueError("Only one file argument allowed at a time")
-
-    th = len(input) == 1 and input[0].endswith(".th")
+        raise click.ClickException("Only one file argument allowed at a time")
     th = len(input) == 1 and os.path.exists(input[0])
-    mt = re.match("\\d{4}\-", input[0])
-    outpath = args.out
+    outpath = out
     if outpath and not th:
-        raise ValueError("Outfile option only allowed if the input is a *.th file")
-
+        raise click.ClickException(
+            "Outfile option only allowed if the input is a *.th file"
+        )
     if annotate and not th:
-        raise ValueError("Annotate option only allowed if the input is a *.th file")
-
-    # Delegate chore based on the input (file, timestamp string or elapsed
-    # time)
+        raise click.ClickException(
+            "Annotate option only allowed if the input is a *.th file"
+        )
     if th:
         infile = input[0]
-        elapsed_unit = args.elapsed_unit
-        time_format = args.time_format
         file_to_timestamp(
-            infile, s, outpath, elapsed_unit=elapsed_unit, time_format=time_format
+            infile,
+            s,
+            outpath,
+            annotate=annotate,
+            elapsed_unit=elapsed_unit,
+            time_format=time_format,
         )
     else:
-        # inputs (hopefully) were elapsed time
         describe_elapsed(input, s, dt)
 
 
-def clip(args):
-    """Clip file to dates"""
-    infile = args.elapsed_input
-    input = args.elapsed_input
-
-    # convert start time string input to datetime
-    start = datetime.datetime(*list(map(int, re.split("[^\d]", args.start))))
-    scliptime = datetime.datetime(*list(map(int, re.split("[^\d]", args.clip_start))))
-
-    th = len(input) == 1 and input[0].endswith(".th")
+@model_time_cli.command()
+@click.argument("elapsed_input", nargs=-1, required=True)
+@click.option(
+    "--start",
+    required=True,
+    help="Start time in ISO-like format 2009-03-12T00:00:00. Time part is optional.",
+)
+@click.option("--clip_start", required=True, help="Starting date for output.")
+@click.option(
+    "--out",
+    default=None,
+    type=str,
+    help="Name of output file. If input is a *.th file the file will be converted and output to this file, otherwise printed to screen",
+)
+@click.help_option("-h", "--help")
+def clip(elapsed_input, start, clip_start, out):
+    """Clip (subset) an input file in elapsed time to a new, later, start date"""
+    input = list(elapsed_input)
+    try:
+        start_dt = datetime.datetime(*list(map(int, re.split("[^\d]", start))))
+        scliptime = datetime.datetime(*list(map(int, re.split("[^\d]", clip_start))))
+    except Exception:
+        raise click.ClickException("Could not convert start or clip_start to datetime.")
     th = len(input) == 1 and os.path.exists(input[0])
     if not th:
-        raise ValueError("Clipping command requires file (.th) input")
+        raise click.ClickException("Clipping command requires file (.th) input")
     infile = input[0]
-    outpath = args.out
-
+    outpath = out
     if not outpath:
         outfile = sys.stdout
     else:
@@ -247,7 +182,7 @@ def clip(args):
                 splitline = line.split()
                 timestr = splitline[0]
                 msec_orig = float(timestr)
-                mdtm = start + datetime.timedelta(seconds=msec_orig)
+                mdtm = start_dt + datetime.timedelta(seconds=msec_orig)
                 mdelta = mdtm - scliptime
                 msec = mdelta.total_seconds()
                 exact = msec == 0.0
@@ -495,13 +430,5 @@ def describe_timestamps(timestamps, start, dt=None):
             print("\n")
 
 
-# driver for standalone use
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    func = args.func
-    func(args)
-
-
 if __name__ == "__main__":
-    main()
+    model_time_cli()
