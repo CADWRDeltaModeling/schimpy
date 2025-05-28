@@ -327,10 +327,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.model_time">schimpy.model_time module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_elapsed"><code class="docutils literal notranslate"><span class="pre">describe_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_timestamps"><code class="docutils literal notranslate"><span class="pre">describe_timestamps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.elapsed_to_timestamp"><code class="docutils literal notranslate"><span class="pre">elapsed_to_timestamp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.file_to_elapsed"><code class="docutils literal notranslate"><span class="pre">file_to_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.file_to_timestamp"><code class="docutils literal notranslate"><span class="pre">file_to_timestamp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.get_headers"><code class="docutils literal notranslate"><span class="pre">get_headers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.multi_file_to_elapsed"><code class="docutils literal notranslate"><span class="pre">multi_file_to_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.prune_dated"><code class="docutils literal notranslate"><span class="pre">prune_dated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.read_th"><code class="docutils literal notranslate"><span class="pre">read_th()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.nml">schimpy.nml module</a><ul>
@@ -581,6 +584,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.subset_schism_output"><code class="docutils literal notranslate"><span class="pre">subset_schism_output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.subset_schism_scribeIO_output"><code class="docutils literal notranslate"><span class="pre">subset_schism_scribeIO_output()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.subset_schism_output.write_global_local_maps"><code class="docutils literal notranslate"><span class="pre">write_global_local_maps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.th_calcs">schimpy.th_calcs module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.calc_net_source_sink"><code class="docutils literal notranslate"><span class="pre">calc_net_source_sink()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.combine_flux"><code class="docutils literal notranslate"><span class="pre">combine_flux()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.read_flux"><code class="docutils literal notranslate"><span class="pre">read_flux()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.three_point_linear_norm">schimpy.three_point_linear_norm module</a><ul>
@@ -3536,6 +3545,12 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="schimpy.model_time.elapsed_to_timestamp">
+<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">elapsed_to_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.elapsed_to_timestamp" title="Link to this definition"></a></dt>
+<dd><p>Take input dataframe or th file and convert to timestamp, returns dataframe</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.model_time.file_to_elapsed">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">file_to_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_nan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.file_to_elapsed" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -3543,6 +3558,11 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.model_time.file_to_timestamp">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">file_to_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outpath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%Y-%m-%dT%H:%M</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.file_to_timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.model_time.get_headers">
+<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">get_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.get_headers" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -3554,6 +3574,13 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dt class="sig sig-object py" id="schimpy.model_time.prune_dated">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">prune_dated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.prune_dated" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.model_time.read_th">
+<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">read_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.read_th" title="Link to this definition"></a></dt>
+<dd><p>Read input file and return dataframe.
+Automatically converts to timestamp if time_basis is supplied unless to_timestamp is False</p>
+</dd></dl>
 
 </section>
 <section id="module-schimpy.nml">
@@ -9445,6 +9472,32 @@ to a subset subdirectory.</p>
 <span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">write_global_local_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_global</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.write_global_local_maps" title="Link to this definition"></a></dt>
 <dd><p>writes maps out in the schism + visit format. Note that the global owner 
 of a shared node is the lowest rank that contains it.</p>
+</dd></dl>
+
+</section>
+<section id="module-schimpy.th_calcs">
+<span id="schimpy-th-calcs-module"></span><h2>schimpy.th_calcs module<a class="headerlink" href="#module-schimpy.th_calcs" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.th_calcs.calc_net_source_sink">
+<span class="sig-prename descclassname"><span class="pre">schimpy.th_calcs.</span></span><span class="sig-name descname"><span class="pre">calc_net_source_sink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vsource_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vsource.th'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsink_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'vsink.th'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsource_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vsink_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_term</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.th_calcs.calc_net_source_sink" title="Link to this definition"></a></dt>
+<dd><p>Calculate the net source/sink terms supplied by the vsource.th and vsink.th files.
+Files can be specified, elapsed, or timestamped.
+By default it will look for vsource.th and vsink.th - the default source/sink inputs for SCHISM.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.th_calcs.combine_flux">
+<span class="sig-prename descclassname"><span class="pre">schimpy.th_calcs.</span></span><span class="sig-name descname"><span class="pre">combine_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.th_calcs.combine_flux" title="Link to this definition"></a></dt>
+<dd><p>Combine flux data,
+comb_dict is a dictionary that combines the headers in the list into a single value with the header of the dictionary key.
+An example of this would be comb_dict={‘Northern’:[‘this’,’that’,’other’]}</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.th_calcs.read_flux">
+<span class="sig-prename descclassname"><span class="pre">schimpy.th_calcs.</span></span><span class="sig-name descname"><span class="pre">read_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flux.th'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.th_calcs.read_flux" title="Link to this definition"></a></dt>
+<dd><p>Read in the flux.th, use flux_head to assign headers to dataframe.
+If no flux_head, then the resultant dataframe will have no headers.</p>
 </dd></dl>
 
 </section>

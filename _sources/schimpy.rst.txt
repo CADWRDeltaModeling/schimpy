@@ -522,6 +522,14 @@ schimpy.subset\_schism\_output module
    :show-inheritance:
    :undoc-members:
 
+schimpy.th\_calcs module
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: schimpy.th_calcs
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 schimpy.three\_point\_linear\_norm module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
