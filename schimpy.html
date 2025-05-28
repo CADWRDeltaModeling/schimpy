@@ -325,17 +325,12 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.model_time">schimpy.model_time module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.clip"><code class="docutils literal notranslate"><span class="pre">clip()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_elapsed"><code class="docutils literal notranslate"><span class="pre">describe_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_timestamps"><code class="docutils literal notranslate"><span class="pre">describe_timestamps()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.file_to_elapsed"><code class="docutils literal notranslate"><span class="pre">file_to_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.file_to_timestamp"><code class="docutils literal notranslate"><span class="pre">file_to_timestamp()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.multi_file_to_elapsed"><code class="docutils literal notranslate"><span class="pre">multi_file_to_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.prune_dated"><code class="docutils literal notranslate"><span class="pre">prune_dated()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.to_datetime"><code class="docutils literal notranslate"><span class="pre">to_datetime()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.to_elapsed"><code class="docutils literal notranslate"><span class="pre">to_elapsed()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.nml">schimpy.nml module</a><ul>
@@ -3531,17 +3526,6 @@ as a standard S grid theta although it will be varied according to depth</p>
 <span id="schimpy-model-time-module"></span><h2>schimpy.model_time module<a class="headerlink" href="#module-schimpy.model_time" title="Link to this heading"></a></h2>
 <p>Script to make model date conversion convenient, converting elapsed model seconds to or from dates</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.model_time.clip">
-<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">clip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.clip" title="Link to this definition"></a></dt>
-<dd><p>Clip file to dates</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.model_time.create_arg_parser">
-<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.create_arg_parser" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.model_time.describe_elapsed">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">describe_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.describe_elapsed" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -3562,11 +3546,6 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.model_time.main">
-<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.main" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.model_time.multi_file_to_elapsed">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">multi_file_to_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prune_dated'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.multi_file_to_elapsed" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -3575,18 +3554,6 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dt class="sig sig-object py" id="schimpy.model_time.prune_dated">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">prune_dated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.prune_dated" title="Link to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.model_time.to_datetime">
-<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">to_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.to_datetime" title="Link to this definition"></a></dt>
-<dd><p>Convert elapsed inputs to dated</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.model_time.to_elapsed">
-<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">to_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.to_elapsed" title="Link to this definition"></a></dt>
-<dd><p>Convert dated inputs to elapsed times</p>
-</dd></dl>
 
 </section>
 <section id="module-schimpy.nml">
