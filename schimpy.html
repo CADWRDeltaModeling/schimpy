@@ -331,6 +331,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.file_to_elapsed"><code class="docutils literal notranslate"><span class="pre">file_to_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.file_to_timestamp"><code class="docutils literal notranslate"><span class="pre">file_to_timestamp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.get_headers"><code class="docutils literal notranslate"><span class="pre">get_headers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.is_elapsed"><code class="docutils literal notranslate"><span class="pre">is_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.multi_file_to_elapsed"><code class="docutils literal notranslate"><span class="pre">multi_file_to_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.prune_dated"><code class="docutils literal notranslate"><span class="pre">prune_dated()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.read_th"><code class="docutils literal notranslate"><span class="pre">read_th()</span></code></a></li>
@@ -3564,6 +3565,14 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dt class="sig sig-object py" id="schimpy.model_time.get_headers">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">get_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">infile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.get_headers" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.model_time.is_elapsed">
+<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">is_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.is_elapsed" title="Link to this definition"></a></dt>
+<dd><p>Check whether the input file is ‘elapsed’ or ‘timestamped’.
+Uses the first line of the file to determine this.
+If there are any non-numeric characters then that’s a timestamped file and is_elapsed would return False</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.model_time.multi_file_to_elapsed">
