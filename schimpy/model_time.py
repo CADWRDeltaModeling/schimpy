@@ -428,17 +428,26 @@ def elapsed_to_timestamp(input, time_basis, elapsed_unit="s"):
     return out_df
 
 
+def is_elapsed(input):
+    """Check whether the input file is 'elapsed' or 'timestamped'.
+    Uses the first line of the file to determine this.
+    If there are any non-numeric characters then that's a timestamped file and is_elapsed would return False
+    """
+
+    with open(input, "r") as f:
+        first_line = f.readline().strip()
+    is_elapsed = all(re.match(r"^[-+]?\d*\.?\d+$", s) for s in first_line.split())
+
+    return is_elapsed
+
+
 def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s"):
     """Read input file and return dataframe.
     Automatically converts to timestamp if time_basis is supplied unless to_timestamp is False
     """
 
-    # check if first line contains headers (and thus is elapsed)
-    with open(input, "r") as f:
-        first_line = f.readline().strip()
-    is_elapsed = all(re.match(r"^[-+]?\d*\.?\d+$", s) for s in first_line.split())
-
-    if is_elapsed:
+    # check if first line contains headers (and thus is elapsed)s
+    if is_elapsed(input):
         # read elapsed file
         if time_basis is None:
             raise ValueError(
