@@ -306,6 +306,11 @@ class hotstart(object):
                 params = read_param_nml(self.sediment_fn)
                 self.Nbed = params['Nbed']
             kwargs_options.update({'Nbed': self.Nbed})
+
+            if 'nsed' not in self.__dict__.keys():
+                params = read_param_nml(self.param_nml)
+                self.nsed = params['sed_class']
+            kwargs_options.update({'nsed': self.nsed})
         if kwargs_options:
             var = VariableField(v_meta, variable, self.mesh,
                                 self.depths, self.date, self.crs,
@@ -468,8 +473,10 @@ class VariableField(object):
 
         if vname in ['SED3D_bed', 'SED3D_bedfrac']:
             self.Nbed = kwargs['Nbed']
+            self.nsed = kwargs['nsed']
         else:
             self.Nbed = 1
+            self.nsed = 1
         self.grid = self.get_grid()  # grid can be nodes/elems/edges
         self.n_hgrid = list(self.grid.values())[0][0]
         self.n_vgrid = list(self.grid.values())[1][0]
@@ -529,7 +536,7 @@ class VariableField(object):
                                      'MBEDP': (3, ['layer thickness', 'layer age', 'layer porosity'])},
                              'bedfrac': {'elem': (self.n_elems, self.elem),
                                          'Nbed': (self.Nbed, 0),
-                                         'nsed': (3, 0)}}
+                                         'nsed': (self.nsed, 0)}}
 
         if self.centering == 'edge':
             centering_options['edge'] = {'side': (self.n_edges, self.edge),
@@ -568,7 +575,7 @@ class VariableField(object):
                                      'MBEDP': (3, ['layer thickness', 'layer age', 'layer porosity'])},
                              'bedfrac': {'elem': (mesh.n_elems, mesh_elem),
                                          'Nbed': (self.Nbed, 0),
-                                         'nsed': (3, 0)}}
+                                         'nsed': (self.nsed, 0)}}
         if self.centering == 'edge':
             edge_depths = (mesh_depth[mesh.edges[:, 0]] +
                            mesh_depth[mesh.edges[:, 1]])/2
@@ -669,6 +676,13 @@ class VariableField(object):
         else:
             n_hgrid = self.n_hgrid
 
+        if self.variable_name in ['SED3D_bedfrac']:
+            value = str(value) # if a single float value is given, it needs to be converted to a string
+
+            # trigger an error if number of values is not equal to nsed
+            if len(value.split(',')) != self.nsed:
+                raise ValueError(
+                    "Number of values in %s does not match with nsed (%d)" % (value, self.nsed))
         if isinstance(value, (float, int)):
             # initialize the 3D field
             v_ini = np.full((n_hgrid, self.n_vgrid), value)
