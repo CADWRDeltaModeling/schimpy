@@ -2,6 +2,7 @@ config:
   var1: sub1
   var2: ${var3}
   var3: $var1
-  var4: $var5
+  var4: $var5  # var5 is not defined, so it will raise an exception
 mesh:
-  a:   ${var1}/baydelta72.2dm
+  a: ${var1}/baydelta72.2dm
+  b: ${var4}/baydelta72.gr3

@@ -86,7 +86,12 @@ def test_argparse_action(argv_backup):
 
 
 def test_argparse_action_overwrite1(argv_backup):
-    """Test YAML for argparse with overwriting (YAML first)"""
+    """Test YAML for argparse with overwriting (YAML first)
+
+    When a parameter is specified in both the YAML file and the command line,
+    the command line argument should take precedence only when the argument
+    comes after the yaml file.
+    """
     fname = os.path.join(dir_testdata, "argparse.yaml")
     sys.argv.extend(("--yaml", "%s" % fname))
     sys.argv.extend(("--input1", "2"))
@@ -98,7 +103,12 @@ def test_argparse_action_overwrite1(argv_backup):
 
 
 def test_argparse_action_overwrite2(argv_backup):
-    """Test YAML for argparse with overwriting (YAML last)"""
+    """Test YAML for argparse with overwriting (YAML last)
+
+    When a parameter is specified in both the YAML file and the command line,
+    the yaml file argument should take precedence when the argument comes
+    before the yaml file.
+    """
     fname = os.path.join(dir_testdata, "argparse.yaml")
     sys.argv.extend(("--input1", "2"))
     sys.argv.extend(("--yaml", "%s" % fname))
@@ -221,3 +231,64 @@ def test_multiple_argparse_yaml(argv_backup):
     assert args.input1 == "4"  # Overwrite with the latter value
     assert args.input2 == "2"
     assert args.start == "2009/08/23"
+
+
+def test_envvar_in_argument(argv_backup):
+    """Test environment variables from the command line
+
+    When a config variable is given in the command line, it should be
+    substituted into the YAML file.
+    """
+    fname = os.path.join(dir_testdata, "env_wo_sub.yaml")
+
+    with open(fname, "r") as f:
+        params = load(f, envvar={"var5": "/home"})
+
+    assert params["mesh"]["b"] == "/home/baydelta72.gr3"
+
+
+def test_envvar_in_argparse_argument(argv_backup):
+    """Test environment variables from the command line
+
+    When a config variable is given in the command line, it should be
+    substituted into the YAML file.
+    """
+    fname = os.path.join(dir_testdata, "env_wo_sub.yaml")
+
+    sys.argv.append((fname))
+    sys.argv.extend(("--var5", "/home"))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename")
+    args, extra = parser.parse_known_args()
+
+    def parse_extra_args(extra_args):
+        """
+        Converts a list like ['--a', '1', '--b=2', '--c', '3']
+        into a dictionary: {'a': '1', 'b': '2', 'c': '3'}
+        Raises ValueError for unpaired or malformed args.
+        """
+        result = {}
+        i = 0
+        while i < len(extra_args):
+            arg = extra_args[i]
+            if arg.startswith("--"):
+                if "=" in arg:
+                    key, val = arg[2:].split("=", 1)
+                    result[key] = val
+                    i += 1
+                else:
+                    if i + 1 >= len(extra_args) or extra_args[i + 1].startswith("--"):
+                        raise ValueError(f"Missing value for argument: {arg}")
+                    key = arg[2:]
+                    val = extra_args[i + 1]
+                    result[key] = val
+                    i += 2
+            else:
+                raise ValueError(f"Unexpected argument format: {arg}")
+        return result
+
+    envvar = parse_extra_args(extra)
+    with open(args.filename, "r") as f:
+        params = load(f, envvar=envvar)
+
+    assert params["mesh"]["b"] == "/home/baydelta72.gr3"

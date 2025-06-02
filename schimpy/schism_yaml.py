@@ -239,7 +239,7 @@ yaml.add_constructor(BaseResolver.DEFAULT_MAPPING_TAG,
                      dict_constructor, Loader=RawLoader)
 
 
-def load(stream):
+def load(stream, envvar=None):
     """ Load a schism YAML
     """
     # First round to get environmental variables
@@ -255,6 +255,10 @@ def load(stream):
     for key in substitute_keywords:
         if key in data:
             env.update(data[key])
+    # If envvar is provided, update the environment variables
+    # with the provided variables
+    if envvar is not None:
+        env.update(envvar)
     substitute_env(env)
     loader = SubstituteLoader(stream, env)
     try:
