@@ -1,5 +1,5 @@
-""" A customized version of YAML parser for SCHISM
-    It stores document in an ordered dict and supports variable substitution.
+"""A customized version of YAML parser for SCHISM
+It stores document in an ordered dict and supports variable substitution.
 """
 
 import yaml
@@ -21,31 +21,37 @@ import argparse
 import sys
 
 __all__ = ["load", "dump", "YamlAction", "ArgumentParserYaml"]
-include_keywords = ["include",]
-substitute_keywords = ["config", "env",]
-yaml_extensions = [".yaml",]
+include_keywords = [
+    "include",
+]
+substitute_keywords = [
+    "config",
+    "env",
+]
+yaml_extensions = [
+    ".yaml",
+]
+
 
 def check_env(env):
-    """ Check the integrity of environment variables
-    """
+    """Check the integrity of environment variables"""
     msg = ""
     n_errors = 0
     for k, v in env.items():
-        if '$' in k:
-            msg += "A Name of environment variable cannot be a variable: " \
-                   "%s\n" % k
+        if "$" in k:
+            msg += "A Name of environment variable cannot be a variable: " "%s\n" % k
             n_errors += 1
         if not isinstance(v, str):
-            msg += "Environment variables do not accept non-scalar " \
-                   "variables: %s\n" % k
+            msg += (
+                "Environment variables do not accept non-scalar " "variables: %s\n" % k
+            )
             n_errors += 1
     if n_errors > 0:
         raise ValueError(msg)
 
 
 def substitute_env(env):
-    """ Substitute environmental variables
-    """
+    """Substitute environmental variables"""
     if env is None:
         return
     check_env(env)
@@ -62,8 +68,8 @@ def substitute_env(env):
 
 
 class SubstituteComposer(Composer):
-    """ Composer with substitution
-    """
+    """Composer with substitution"""
+
     def __init__(self, env=None):
         self.env = env
         super(SubstituteComposer, self).__init__()
@@ -73,39 +79,45 @@ class SubstituteComposer(Composer):
             return super(SubstituteComposer, self).compose_scalar_node(anchor)
         event = self.get_event()
         tag = event.tag
-        if tag is None or tag == '!':
+        if tag is None or tag == "!":
             tag = self.resolve(ScalarNode, event.value, event.implicit)
         template = string.Template(event.value)
         value = template.safe_substitute(**self.env)
-        if '$' in value:
-            raise ComposerError("Expected a substitution",
-                                event.start_mark,
-                                "No corresponding config variable")
-        node = ScalarNode(tag, value,
-                event.start_mark, event.end_mark, style=event.style)
+        if "$" in value:
+            raise ComposerError(
+                "Expected a substitution",
+                event.start_mark,
+                "No corresponding config variable",
+            )
+        node = ScalarNode(
+            tag, value, event.start_mark, event.end_mark, style=event.style
+        )
         if anchor is not None:
             self.anchors[anchor] = node
         return node
 
 
 class SubstituteConstructor(SafeConstructor):
-    """ Customized constructor for including.
-        If a key value is one of include_keywords, a following YAML file
-        will be included.
+    """Customized constructor for including.
+    If a key value is one of include_keywords, a following YAML file
+    will be included.
     """
+
     def __init__(self, env=None):
         self.env = env
         super(SubstituteConstructor, self).__init__()
         # super(SubstituteConstructor, self).add_constructor('!include',
-                                              # SubstituteConstructor.include)
+        # SubstituteConstructor.include)
 
     def construct_pairs(self, node, deep=False):
-        """ Overridden construct_pairs function with substitution
-        """
+        """Overridden construct_pairs function with substitution"""
         if not isinstance(node, MappingNode):
-            raise ConstructorError(None, None,
-                    "expected a mapping node, but found %s" % node.id,
-                    node.start_mark)
+            raise ConstructorError(
+                None,
+                None,
+                "expected a mapping node, but found %s" % node.id,
+                node.start_mark,
+            )
         pairs = []
         for key_node, value_node in node.value:
             if key_node.value in include_keywords:
@@ -121,15 +133,15 @@ class SubstituteConstructor(SafeConstructor):
         return pairs
 
     def include(self, node):
-        """ Process a node with !include tag.
-            This code is copied from Stackoverflow.
+        """Process a node with !include tag.
+        This code is copied from Stackoverflow.
         """
         if isinstance(node, yaml.ScalarNode):
             return self.extractFile(self.construct_scalar(node))
         elif isinstance(node, yaml.SequenceNode):
             fns = self.construct_sequence(node)
-            if '.yaml' in fns[0]:
-                result = {} # create dictionary to store all values in .yaml list
+            if ".yaml" in fns[0]:
+                result = {}  # create dictionary to store all values in .yaml list
                 for filename in self.construct_sequence(node):
                     tmp_rslt = self.extractFile(filename)
                     for key in tmp_rslt.keys():
@@ -152,30 +164,27 @@ class SubstituteConstructor(SafeConstructor):
             raise ConstructorError
 
     def extractFile(self, filename):
-        """ Load an yaml file to include
-        """
+        """Load an yaml file to include"""
         filepath = os.path.join(self.root, filename)
         if os.path.exists(filepath):
-            with open(filepath, 'r') as f:
+            with open(filepath, "r") as f:
                 loader = SubstituteLoader(f, self.env)
                 return loader.get_single_data()
         else:
             print("Error: cannot find the file:" + filename)
-            raise ValueError('Cannot find included file: {}'.format(filename))
+            raise ValueError("Cannot find included file: {}".format(filename))
 
 
-SubstituteConstructor.add_constructor('!include',
-                                      SubstituteConstructor.include)
+SubstituteConstructor.add_constructor("!include", SubstituteConstructor.include)
 
 
-class SubstituteLoader(Reader, Scanner, Parser,
-                       SubstituteComposer, SubstituteConstructor,
-                       Resolver):
-    """ Raw Loader with substitute.
-    """
+class SubstituteLoader(
+    Reader, Scanner, Parser, SubstituteComposer, SubstituteConstructor, Resolver
+):
+    """Raw Loader with substitute."""
+
     def __init__(self, stream, env):
-        """ Constructor
-        """
+        """Constructor"""
         self.root = os.path.split(stream.name)[0]
         Reader.__init__(self, stream)
         Scanner.__init__(self)
@@ -185,14 +194,13 @@ class SubstituteLoader(Reader, Scanner, Parser,
         Resolver.__init__(self)
 
 
-class SubstituteRawLoader(Reader, Scanner, Parser,
-                          SubstituteComposer, SubstituteConstructor,
-                          BaseResolver):
-    """ Raw Loader with substitute.
-    """
+class SubstituteRawLoader(
+    Reader, Scanner, Parser, SubstituteComposer, SubstituteConstructor, BaseResolver
+):
+    """Raw Loader with substitute."""
+
     def __init__(self, stream, env):
-        """ Constructor
-        """
+        """Constructor"""
         self.root = os.path.split(stream.name)[0]
         Reader.__init__(self, stream)
         Scanner.__init__(self)
@@ -202,11 +210,9 @@ class SubstituteRawLoader(Reader, Scanner, Parser,
         BaseResolver.__init__(self)
 
 
-class RawLoader(Reader, Scanner, Parser,
-                Composer, SubstituteConstructor,
-                BaseResolver):
-    """ Raw Loader, No automatic resolving.
-    """
+class RawLoader(Reader, Scanner, Parser, Composer, SubstituteConstructor, BaseResolver):
+    """Raw Loader, No automatic resolving."""
+
     def __init__(self, stream):
         self.root = os.path.split(stream.name)[0]
         Reader.__init__(self, stream)
@@ -218,30 +224,29 @@ class RawLoader(Reader, Scanner, Parser,
 
 
 def dict_constructor(loader, node):
-    """ Constructor with OrderedDict
-    """
+    """Constructor with OrderedDict"""
     return collections.OrderedDict(loader.construct_pairs(node))
 
 
 def dict_representer(dumper, data):
-    """ Dumper with OrderedDict
-    """
-    return dumper.represent_mapping(BaseResolver.DEFAULT_MAPPING_TAG,
-                                    iter(data.items()))
+    """Dumper with OrderedDict"""
+    return dumper.represent_mapping(
+        BaseResolver.DEFAULT_MAPPING_TAG, iter(data.items())
+    )
 
 
 # Add constructor and representer
-yaml.add_representer(collections.OrderedDict, dict_representer,
-                     Dumper=SafeDumper)
-yaml.add_constructor(BaseResolver.DEFAULT_MAPPING_TAG,
-                     dict_constructor, Loader=SubstituteLoader)
-yaml.add_constructor(BaseResolver.DEFAULT_MAPPING_TAG,
-                     dict_constructor, Loader=RawLoader)
+yaml.add_representer(collections.OrderedDict, dict_representer, Dumper=SafeDumper)
+yaml.add_constructor(
+    BaseResolver.DEFAULT_MAPPING_TAG, dict_constructor, Loader=SubstituteLoader
+)
+yaml.add_constructor(
+    BaseResolver.DEFAULT_MAPPING_TAG, dict_constructor, Loader=RawLoader
+)
 
 
 def load(stream, envvar=None):
-    """ Load a schism YAML
-    """
+    """Load a schism YAML"""
     # First round to get environmental variables
     loader = RawLoader(stream)
     try:
@@ -269,8 +274,7 @@ def load(stream, envvar=None):
 
 
 def load_raw(stream):
-    """ Load a schism YAML
-    """
+    """Load a schism YAML"""
     # First round to get environmental variables
     loader = RawLoader(stream)
     try:
@@ -310,16 +314,16 @@ def safe_dump(data, stream=None, **kwds):
 
 
 class YamlAction(argparse.Action):
-    """ Custom action to parse YAML files for argparse.
-        This action reads in simple pairs of data from a YAML file, and
-        feeds them to the parser. A YAML file must be a list of pairs
-        without multiple levels of tree.
-        Example:
-        parser.add_argument("--yaml", action=YamlAction)
+    """Custom action to parse YAML files for argparse.
+    This action reads in simple pairs of data from a YAML file, and
+    feeds them to the parser. A YAML file must be a list of pairs
+    without multiple levels of tree.
+    Example:
+    parser.add_argument("--yaml", action=YamlAction)
     """
+
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super(YamlAction, self).__init__(option_strings, dest,
-                                         nargs=nargs, **kwargs)
+        super(YamlAction, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         if not isinstance(values, list):
@@ -343,62 +347,73 @@ class YamlAction(argparse.Action):
 
 
 class ArgumentParserYaml(argparse.ArgumentParser):
-    """ Extended parser to handle YAML file as file input for ArgumentParser.
-        If a file input given with 'fromfile_prefix_chars' has a YAML extension,
-        '.yaml', it will be handled as optional pairs for ArgumentParser.
-        For example, 'script.py' can use a YAML file for an input file of 
-        ArgumentParser as follow:
-        parser = schism_yaml.ArgumentParserYaml(fromfile_prefix_chars='@')
-        parser.parse_arg()
+    """Extended parser to handle YAML file as file input for ArgumentParser.
+    If a file input given with 'fromfile_prefix_chars' has a YAML extension,
+    '.yaml', it will be handled as optional pairs for ArgumentParser.
+    For example, 'script.py' can use a YAML file for an input file of
+    ArgumentParser as follow:
+    parser = schism_yaml.ArgumentParserYaml(fromfile_prefix_chars='@')
+    parser.parse_arg()
 
-        $script.py @args.yaml
+    $script.py @args.yaml
 
-        And when 'args.yaml' contains:
-        input1: 1
-        input2: 2 3
+    And when 'args.yaml' contains:
+    input1: 1
+    input2: 2 3
 
-        it has the same effect as
-        $script.py --input1 1 --input2 2 3
+    it has the same effect as
+    $script.py --input1 1 --input2 2 3
     """
-    def __init__(self,
-                 prog=None,
-                 usage=None,
-                 description=None,
-                 epilog=None,
-                 version=None,
-                 parents=[],
-                 formatter_class=argparse.HelpFormatter,
-                 prefix_chars='-',
-                 fromfile_prefix_chars=None,
-                 argument_default=None,
-                 conflict_handler='error',
-                 add_help=True):
+
+    def __init__(
+        self,
+        prog=None,
+        usage=None,
+        description=None,
+        epilog=None,
+        version=None,
+        parents=[],
+        formatter_class=argparse.HelpFormatter,
+        prefix_chars="-",
+        fromfile_prefix_chars=None,
+        argument_default=None,
+        conflict_handler="error",
+        add_help=True,
+    ):
         if sys.version_info[0] == 2:
-            super(ArgumentParserYaml, self).__init__(prog, usage,
-                                                    description, epilog,
-                                                    version, parents,
-                                                    formatter_class,
-                                                    prefix_chars,
-                                                    fromfile_prefix_chars,
-                                                    argument_default,
-                                                    conflict_handler,
-                                                    add_help)
+            super(ArgumentParserYaml, self).__init__(
+                prog,
+                usage,
+                description,
+                epilog,
+                version,
+                parents,
+                formatter_class,
+                prefix_chars,
+                fromfile_prefix_chars,
+                argument_default,
+                conflict_handler,
+                add_help,
+            )
         elif sys.version_info[0] == 3:
-            super(ArgumentParserYaml, self).__init__(prog, usage,
-                                                    description, epilog,
-                                                    parents,
-                                                    formatter_class,
-                                                    prefix_chars,
-                                                    fromfile_prefix_chars,
-                                                    argument_default,
-                                                    conflict_handler,
-                                                    add_help)
+            super(ArgumentParserYaml, self).__init__(
+                prog,
+                usage,
+                description,
+                epilog,
+                parents,
+                formatter_class,
+                prefix_chars,
+                fromfile_prefix_chars,
+                argument_default,
+                conflict_handler,
+                add_help,
+            )
         else:
             raise NotImplementedError("Not supported Python version")
 
     def _read_args_from_files(self, arg_strings):
-        """ Override this function to handle YAML files
-        """
+        """Override this function to handle YAML files"""
         # expand arguments referencing files
         new_arg_strings = []
         for arg_string in arg_strings:
@@ -419,9 +434,13 @@ class ArgumentParserYaml(argparse.ArgumentParser):
                                 loader.dispose()
                             for k, v in data.items():
                                 if re.search(r"[\s]", k):
-                                    raise ValueError("No whitespace is allowed in the key.")
+                                    raise ValueError(
+                                        "No whitespace is allowed in the key."
+                                    )
                                 if not isinstance(v, str):
-                                    raise ValueError("Only plain string is allowed in the value.")
+                                    raise ValueError(
+                                        "Only plain string is allowed in the value."
+                                    )
                                 arg = "--%s %s" % (k, v)
                                 arg = arg.split()
                                 # No recursive call
@@ -450,10 +469,11 @@ class ArgumentParserYaml(argparse.ArgumentParser):
 
 
 def create_arg_parser():
-    """ Create a command line argument parser
-    """
+    """Create a command line argument parser"""
     parser = argparse.ArgumentParser()
-    parser.add_argument('filename', type=str, help="A YAML file that follows SCHSIM YAML.")
+    parser.add_argument(
+        "filename", type=str, help="A YAML file that follows SCHSIM YAML."
+    )
     return parser
 
 
@@ -461,6 +481,6 @@ if __name__ == "__main__":
     parser_ = create_arg_parser()
     args_ = parser_.parse_args()
     fname_ = args_.filename
-    with open(fname_, 'r') as f:
+    with open(fname_, "r") as f:
         data_ = load(f)
         print(yaml.safe_dump(data_))
