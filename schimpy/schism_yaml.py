@@ -51,7 +51,7 @@ def check_env(env):
 
 
 def substitute_env(env):
-    """Substitute environmental variables"""
+    """Substitute environmental variables. Automatically modifies env in place."""
     if env is None:
         return
     check_env(env)
@@ -245,6 +245,27 @@ yaml.add_constructor(
 )
 
 
+def check_unsubstituted_vars(data, path=None, found=None):
+    """Recursively check for unsubstituted {var} in any string in the data structure."""
+    import re
+
+    if found is None:
+        found = []
+    if path is None:
+        path = []
+    if isinstance(data, dict):
+        for k, v in data.items():
+            check_unsubstituted_vars(v, path + [str(k)], found)
+    elif isinstance(data, (list, tuple)):
+        for idx, v in enumerate(data):
+            check_unsubstituted_vars(v, path + [str(idx)], found)
+    elif isinstance(data, str):
+        matches = re.findall(r"\{[^{}]+\}", data)
+        if matches:
+            found.append((".".join(path), matches))
+    return found
+
+
 def load(stream, envvar=None):
     """Load a schism YAML"""
     # First round to get environmental variables
@@ -268,6 +289,12 @@ def load(stream, envvar=None):
     loader = SubstituteLoader(stream, env)
     try:
         data = loader.get_single_data()
+        unsub = check_unsubstituted_vars(data)
+        if unsub:
+            msg = [f"Unsubstituted variables found in YAML:"]
+            for path, matches in unsub:
+                msg.append(f"  {path}: {matches}")
+            raise ValueError("\n".join(msg))
         return data
     finally:
         loader.dispose()
