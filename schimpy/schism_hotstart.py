@@ -47,7 +47,7 @@ import datetime
 
 from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader, compare_mesh
 from schimpy import geo_tools
-from schimpy import schism_yaml
+from schimpy.util.yaml_load import yaml_from_file
 
 
 class SCHISMHotstart(object):
@@ -67,7 +67,7 @@ class hotstart(object):
     """
 
     # will change these into yaml file on
-    def __init__(self, input=None, modules=None, crs=None):
+    def __init__(self, input=None, modules=None, crs=None, envvar=None):
         # read input from yaml files;
         # create elev.ic if it does not exist or not used as an input
         self.input = input
@@ -76,19 +76,24 @@ class hotstart(object):
         self.crs = crs
         self._hotstart_cache = {}
         self._mesh_cache = {}  # hgrid_fn -> mesh object
+        if envvar is None:
+            self.envvar = {}
+        else:
+            if not isinstance(envvar, dict):
+                raise ValueError("envvar must be a dictionary if provided.")
+            self.envvar = envvar
 
     def read_yaml(self):
         """
         read yaml and load mesh grid
         """
         print(self.input)
-        with open(self.input, "r") as f:
-            info = schism_yaml.load(f)
+        info = yaml_from_file(self.input, envvar=self.envvar)
         hotstart_info = info["hotstart"]
         self.info = hotstart_info
         self.date = hotstart_info["date"]
         self.run_start = hotstart_info["run_start"]
-        self.time_step = hotstart_info["time_step"]
+        self.time_step = int(hotstart_info["time_step"])
         self.hgrid_fn = hotstart_info["hgrid_input_file"]
         self.vgrid_fn = hotstart_info["vgrid_input_file"]
         variables = list(hotstart_info.keys())
