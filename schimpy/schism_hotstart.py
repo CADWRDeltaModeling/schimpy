@@ -249,7 +249,7 @@ class hotstart(object):
         )  # this is required to get depths for elevation
         self.hotstart_ini = {}
         for v in self.variables:
-            print("creating hotstart for %s" % v)
+            print("Creating hotstart for %s" % v)
             initializer = self.info[v]["initializer"]
 
             if (
@@ -1272,9 +1272,9 @@ class VariableField(object):
             mesh1_idx = cKDTree(hgrid1)
 
             # Bulk query
-            print("interpolating horizontal grid from %s" % (hgrid_fn))
+            print("\tinterpolating horizontal grid from %s" % (hgrid_fn))
             dist, indices = mesh1_idx.query(hgrid2)
-            print("horizontal interpolation completed!")
+            print("\thorizontal interpolation completed!")
             dist = np.asarray(dist, dtype=float)
             indices = np.asarray(indices)
 
@@ -1305,7 +1305,7 @@ class VariableField(object):
                                 kind="nearest",
                             )
                             vout[j, p, :] = f(z2)
-                    print("vertical grid interpolation completed!")
+                    print("\tvertical grid interpolation completed!")
                 else:  # nearest or equation
                     x = hgrid2[diff_points, 0]
                     y = hgrid2[diff_points, 1]
