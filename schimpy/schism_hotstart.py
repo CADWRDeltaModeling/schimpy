@@ -35,6 +35,7 @@ Required data files:
 """
 
 import yaml
+import io
 import numpy as np
 import xarray as xr
 import pandas as pd
@@ -44,10 +45,14 @@ from scipy.spatial import cKDTree
 import matplotlib.pyplot as plt
 import os
 import datetime
+import logging
 
+from schimpy.prepare_schism import create_gr3_with_polygons, setup_logger
+from schimpy.schism_setup import create_schism_setup
 from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader, compare_mesh
 from schimpy import geo_tools
-from schimpy.util.yaml_load import yaml_from_file
+from schimpy.schism_yaml import load
+from schimpy.util.yaml_load import yaml_from_file, yaml_from_dict
 
 
 class SCHISMHotstart(object):
@@ -69,7 +74,6 @@ class hotstart(object):
     # will change these into yaml file on
     def __init__(self, input=None, modules=None, crs=None, envvar=None):
         # read input from yaml files;
-        # create elev.ic if it does not exist or not used as an input
         self.input = input
         self.nc_dataset = None
         self.modules = modules
@@ -83,12 +87,26 @@ class hotstart(object):
                 raise ValueError("envvar must be a dictionary if provided.")
             self.envvar = envvar
 
-    def read_yaml(self):
+    def read_yaml(self, use_logging=True):
         """
         read yaml and load mesh grid
         """
         print(self.input)
         info = yaml_from_file(self.input, envvar=self.envvar)
+
+        if "out_dir" in info.keys():
+            self.out_dir = info["out_dir"]
+        else:
+            self.out_dir = "./"
+            print("No out_dir specified, using current directory as output directory.")
+        self.use_logging = use_logging
+        if self.use_logging:
+            setup_logger(self.out_dir)
+            self.logger = logging.getLogger("SCHISM")
+        else:
+            self.logger = logging.getLogger("")
+        self.logger.info("Start generating SCHISM hotstart...")
+
         hotstart_info = info["hotstart"]
         self.info = hotstart_info
         self.date = hotstart_info["date"]
@@ -97,6 +115,16 @@ class hotstart(object):
         self.hgrid_fn = hotstart_info["hgrid_input_file"]
         self.vgrid_fn = hotstart_info["vgrid_input_file"]
         variables = list(hotstart_info.keys())
+
+        # create elev.ic if it does not exist or not used as an input
+        if "elev.ic" in variables:
+            inputs = {
+                "gr3": {"elev.ic": hotstart_info["elev.ic"]},
+                "prepro_output_dir": self.out_dir,
+            }
+            inputs = yaml_from_dict(inputs, envvar=self.envvar)
+            s = create_schism_setup(self.hgrid_fn, self.logger)
+            create_gr3_with_polygons(s, inputs, self.logger)
 
         if "restart_time" in hotstart_info.keys():
             self.restart_time = hotstart_info["restart_time"]
@@ -1987,18 +2015,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # os.chdir("PATH/TO/HOTSTART/FILES")
+    # h = hotstart("./hotstart_2018.yaml")
+    # h.read_yaml()
+    # h.create_hotstart()
 
-
-# if __name__ == '__main__':
-#     h = hotstart('hotstart.yaml', modules=['TEM', 'SAL'],crs='EPSG:26910',param_nml="param.nml")
-#     #h = hotstart('hotstart_test.yaml')
-#     h.read_yaml()
-#     h.create_hotstart()
-#     v1 = h.nc_dataset
-
-#     # %% making plot
-#     coll = h.mesh.plot_elems(v1['tr_el'].values[:, -1, 1])
-#     cb = plt.colorbar(coll)
-#     plt.axis('off')
-#     plt.title('Regional Temperature')
-#     plt.tight_layout(pad=1)
+    # # %% making plot
+    # v1 = h.nc_dataset
+    # coll = h.mesh.plot_elems(v1['tr_el'].values[:, -1, 1])
+    # cb = plt.colorbar(coll)
+    # plt.axis('off')
+    # plt.title('Regional Temperature')
+    # plt.tight_layout(pad=1)
