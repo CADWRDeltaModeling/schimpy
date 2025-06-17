@@ -2,6 +2,8 @@ from schimpy.schism_yaml import load, dump
 from pathlib import Path
 import pandas as pd
 import string
+import yaml
+import io
 
 
 def csv_from_file(filename, envvar=None, **kwargs):
@@ -45,6 +47,34 @@ def csv_from_file(filename, envvar=None, **kwargs):
         )
 
     return df
+
+
+class NamedStringIO(io.StringIO):
+    def __init__(self, value, name="in_memory.yaml"):
+        super().__init__(value)
+        self.name = name
+
+
+def yaml_from_dict(input_dict, envvar=None):
+    """
+    Convert a dictionary to a YAML string with environment variable substitution.
+
+    Parameters
+    ----------
+    input_dict : dict
+        The dictionary to convert to YAML.
+    envvar : dict, optional
+        Environment variables to substitute in the YAML output.
+
+    Returns
+    -------
+    str
+        The YAML representation of the dictionary.
+    """
+    yaml_str = yaml.safe_dump(input_dict)
+    stream = NamedStringIO(yaml_str, name="in_memory.yaml")
+
+    return load(stream)
 
 
 def yaml_from_file(filename, envvar=None):
