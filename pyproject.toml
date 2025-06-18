@@ -63,6 +63,13 @@ test = [
     "tox",
     "click"
 ]
+build = [
+    "build",
+    "pip",
+    "setuptools",
+    "wheel",
+    "setuptools-scm"
+]
 [project.urls]
 Homepage = "https://cadwrdeltamodeling.github.io/schimpy/"
 
