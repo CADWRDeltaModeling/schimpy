@@ -6,7 +6,7 @@ from schimpy.convert_mesh import convert_mesh_cli
 from schimpy.convert_polygons import convert_polygons_cli
 from schimpy.convert_linestrings import convert_linestrings_cli
 from schimpy.convert_points import convert_points_cli
-from schimpy.combine_consume import combine_consume
+from schimpy.combine_consume import combine_consume_cli
 from schimpy.model_time import model_time_cli
 
 # from schimpy.prepare_schism import prepare_schism
