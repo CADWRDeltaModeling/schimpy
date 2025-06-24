@@ -125,6 +125,7 @@ class hotstart(object):
             inputs = yaml_from_dict(inputs, envvar=self.envvar)
             s = create_schism_setup(self.hgrid_fn, self.logger)
             create_gr3_with_polygons(s, inputs, self.logger)
+            variables.remove("elev.ic")
 
         if "restart_time" in hotstart_info.keys():
             self.restart_time = hotstart_info["restart_time"]
