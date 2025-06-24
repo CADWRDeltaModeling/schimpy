@@ -7,7 +7,7 @@ channels:
   - defaults               # For predictable behavior, set your conda config
   - cadwr-dms
 dependencies:
-  - python>=3.9,<3.12
+  - python>=3.9,<=3.13
   - schimpy>=1.6.5         # Recommended for compatibility with current code. Please coordinate with schism_env.yml
   - vtools3
   - dms-datastore>=0.0.16
@@ -17,7 +17,7 @@ dependencies:
   - netcdf4>=1.5.7
   - dask>=2025.0
   - numba>=0.56
-  - scipy>=1.8,<1.11
+  - scipy>=1.8
   - statsmodels>=0.13.2
   - pip>=22.2
   - geopandas>0.9

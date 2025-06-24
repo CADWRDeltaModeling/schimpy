@@ -30,7 +30,7 @@ dependencies = [
     "gdal",
     "xarray",
     "netcdf4",
-    "scipy>=1.8,<1.11",
+    "scipy>=1.8",
     "matplotlib",
     "statsmodels",
     "palettable",
@@ -45,7 +45,7 @@ dependencies = [
     "param",
     "rtree",
     "click",
-    "dask>=2022.11,<2023.5",
+    "dask>=2022.11",
     "pyshp",
     "numpy>=1.23"
 ]
