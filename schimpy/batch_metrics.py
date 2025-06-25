@@ -841,7 +841,4 @@ def generate_metricsplots(main_inputfile):
 
 
 if __name__ == "__main__":
-    # batch_metrics_cli()
-    generate_metricsplots(
-        "/scratch/tomkovic/DSP_code/scripts/post-processing/input/batch_metric_dsp_case_4.yaml"
-    )
+    batch_metrics_cli()
