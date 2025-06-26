@@ -24,7 +24,6 @@ requirements:
   host:
     - python {{ project['requires-python'] }}
     - pip
-    - numpy >=1.23
     {% for dep in pyproject['build-system']['requires'] %}
     - {{ dep.lower() }}
     {% endfor %}
@@ -35,10 +34,9 @@ requirements:
     - setuptools_scm
     - pyproj
     - pytest-runner >=5.0
-    - numpy >=1.23
+    - numpy >=2.0
   run:
     - python {{ project['requires-python'] }}
-    - numpy >=1.23
     {% for dep in project.get('dependencies', []) %}
     - {{ dep.lower() }}
     {% endfor %}

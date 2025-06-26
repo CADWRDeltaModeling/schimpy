@@ -46,8 +46,7 @@ dependencies = [
     "rtree",
     "click",
     "dask>=2022.11",
-    "pyshp",
-    "numpy>=1.23"
+    "numpy>=2.0"
 ]
 
 [project.optional-dependencies]
