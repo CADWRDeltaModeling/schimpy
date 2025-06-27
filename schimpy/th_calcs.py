@@ -118,7 +118,7 @@ def combine_flux(
 
     # Read through comb_dict items and output that dataframe
     for col_name, flux_cols in comb_dict.items():
-        print(f"Combining {col_name} from {','.join(flux_cols)}")
+        print(f"\tCombining {col_name} from {','.join(flux_cols)}")
 
         combtemp = flux_df.loc[:, flux_cols].copy()
         out_df[col_name] = combtemp.sum(axis=1)
