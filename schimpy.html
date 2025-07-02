@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modules &mdash; schimpy 1.12.2.dev7+g5b852fd documentation</title>
+  <title>Modules &mdash; schimpy 1.12.2.dev8+gca78b92 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5f0d69d2"></script>
+      <script src="_static/documentation_options.js?v=5ad862ad"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -68,10 +68,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.base_io.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.batch_metrics">schimpy.batch_metrics module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.batch_metrics.generate_metricsplots"><code class="docutils literal notranslate"><span class="pre">generate_metricsplots()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#schimpy-batch-metrics-module">schimpy.batch_metrics module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.bctide">schimpy.bctide module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.bctide.load_boundary"><code class="docutils literal notranslate"><span class="pre">load_boundary()</span></code></a></li>
 </ul>
@@ -319,11 +316,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.metricsplot">schimpy.metricsplot module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.metricsplot.plot_comparison"><code class="docutils literal notranslate"><span class="pre">plot_comparison()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.metricsplot.plot_metrics"><code class="docutils literal notranslate"><span class="pre">plot_metrics()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#schimpy-metricsplot-module">schimpy.metricsplot module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.model_time">schimpy.model_time module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_elapsed"><code class="docutils literal notranslate"><span class="pre">describe_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_timestamps"><code class="docutils literal notranslate"><span class="pre">describe_timestamps()</span></code></a></li>
@@ -334,6 +327,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.is_elapsed"><code class="docutils literal notranslate"><span class="pre">is_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.multi_file_to_elapsed"><code class="docutils literal notranslate"><span class="pre">multi_file_to_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.prune_dated"><code class="docutils literal notranslate"><span class="pre">prune_dated()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.read_elapsed"><code class="docutils literal notranslate"><span class="pre">read_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.read_th"><code class="docutils literal notranslate"><span class="pre">read_th()</span></code></a></li>
 </ul>
 </li>
@@ -590,7 +584,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.th_calcs">schimpy.th_calcs module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.calc_net_source_sink"><code class="docutils literal notranslate"><span class="pre">calc_net_source_sink()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.combine_flux"><code class="docutils literal notranslate"><span class="pre">combine_flux()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.normalize_df"><code class="docutils literal notranslate"><span class="pre">normalize_df()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.read_flux"><code class="docutils literal notranslate"><span class="pre">read_flux()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.th_calcs.struct_open_props"><code class="docutils literal notranslate"><span class="pre">struct_open_props()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.three_point_linear_norm">schimpy.three_point_linear_norm module</a><ul>
@@ -689,16 +685,8 @@
 </dd></dl>
 
 </section>
-<section id="module-schimpy.batch_metrics">
-<span id="schimpy-batch-metrics-module"></span><h2>schimpy.batch_metrics module<a class="headerlink" href="#module-schimpy.batch_metrics" title="Link to this heading"></a></h2>
-<p>Create metrics plots in batch mode</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.batch_metrics.generate_metricsplots">
-<span class="sig-prename descclassname"><span class="pre">schimpy.batch_metrics.</span></span><span class="sig-name descname"><span class="pre">generate_metricsplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_inputfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.batch_metrics.generate_metricsplots" title="Link to this definition"></a></dt>
-<dd><p>Create metrics plots in batch mode.</p>
-<p>MAIN_INPUTFILE: Path to the main input YAML file.</p>
-</dd></dl>
-
+<section id="schimpy-batch-metrics-module">
+<h2>schimpy.batch_metrics module<a class="headerlink" href="#schimpy-batch-metrics-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-schimpy.bctide">
 <span id="schimpy-bctide-module"></span><h2>schimpy.bctide module<a class="headerlink" href="#module-schimpy.bctide" title="Link to this heading"></a></h2>
@@ -3492,45 +3480,8 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-schimpy.metricsplot">
-<span id="schimpy-metricsplot-module"></span><h2>schimpy.metricsplot module<a class="headerlink" href="#module-schimpy.metricsplot" title="Link to this heading"></a></h2>
-<p>Metrics plot</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.metricsplot.plot_comparison">
-<span class="sig-prename descclassname"><span class="pre">schimpy.metricsplot.</span></span><span class="sig-name descname"><span class="pre">plot_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style_palette</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.metricsplot.plot_comparison" title="Link to this definition"></a></dt>
-<dd><p>Create a simple comparison plot without metrics calculation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>*args: variable number of TimeSeries</strong></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>matplotlib.pyplot.figure.Figure</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="schimpy.metricsplot.plot_metrics">
-<span class="sig-prename descclassname"><span class="pre">schimpy.metricsplot.</span></span><span class="sig-name descname"><span class="pre">plot_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tssim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style_palette</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.metricsplot.plot_metrics" title="Link to this definition"></a></dt>
-<dd><p>Create a metrics plot</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>*args: variable number of TimeSeries</strong></dt><dd></dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>matplotlib.pyplot.figure.Figure</dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="schimpy-metricsplot-module">
+<h2>schimpy.metricsplot module<a class="headerlink" href="#schimpy-metricsplot-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-schimpy.model_time">
 <span id="schimpy-model-time-module"></span><h2>schimpy.model_time module<a class="headerlink" href="#module-schimpy.model_time" title="Link to this heading"></a></h2>
@@ -3585,8 +3536,14 @@ If there are any non-numeric characters then that’s a timestamped file and is_
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="schimpy.model_time.read_elapsed">
+<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">read_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.read_elapsed" title="Link to this definition"></a></dt>
+<dd><p>Take input dataframe or th filename, returns dataframe</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.model_time.read_th">
-<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">read_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.read_th" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">read_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.read_th" title="Link to this definition"></a></dt>
 <dd><p>Read input file and return dataframe.
 Automatically converts to timestamp if time_basis is supplied unless to_timestamp is False</p>
 </dd></dl>
@@ -8527,6 +8484,7 @@ create_source_sink_in function in schimpy preprocessor</p>
 <dt><strong>name</strong></dt><dd></dd>
 <dt><strong>node_pairs</strong></dt><dd></dd>
 <dt><strong>properties</strong></dt><dd></dd>
+<dt><strong>property_names</strong></dt><dd></dd>
 <dt><strong>reference</strong></dt><dd></dd>
 <dt><strong>reference_pair</strong></dt><dd></dd>
 <dt><strong>type</strong></dt><dd></dd>
@@ -8570,6 +8528,11 @@ create_source_sink_in function in schimpy preprocessor</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="schimpy.schism_structure.SchismStructure.properties">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">properties</span></span><a class="headerlink" href="#schimpy.schism_structure.SchismStructure.properties" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="schimpy.schism_structure.SchismStructure.property_names">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">property_names</span></span><a class="headerlink" href="#schimpy.schism_structure.SchismStructure.property_names" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -9504,11 +9467,23 @@ Optionally subset by start_date and end_date.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="schimpy.th_calcs.normalize_df">
+<span class="sig-prename descclassname"><span class="pre">schimpy.th_calcs.</span></span><span class="sig-name descname"><span class="pre">normalize_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.th_calcs.normalize_df" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.th_calcs.read_flux">
 <span class="sig-prename descclassname"><span class="pre">schimpy.th_calcs.</span></span><span class="sig-name descname"><span class="pre">read_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flux.th'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux_head</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.th_calcs.read_flux" title="Link to this definition"></a></dt>
 <dd><p>Read in the flux.th, use flux_head to assign headers to dataframe.
 If no flux_head, then the resultant dataframe will have no headers.
 Optionally subset by start_date and end_date.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.th_calcs.struct_open_props">
+<span class="sig-prename descclassname"><span class="pre">schimpy.th_calcs.</span></span><span class="sig-name descname"><span class="pre">struct_open_props</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">th_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'15min'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.th_calcs.struct_open_props" title="Link to this definition"></a></dt>
+<dd><p>Determine the structure header properties that are used to determine ‘relative openness’ of the structure
+For instance, a simple gate might just be (width * height)/(max(width) * max(height))</p>
 </dd></dl>
 
 </section>
