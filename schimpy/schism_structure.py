@@ -16,23 +16,24 @@ OP_DOWN = 3
 OP_UP = 4
 HEIGHT = 5
 
+
 class SchismStructure(object):
-    """ A class to hold structure information
-    """
+    """A class to hold structure information"""
+
     def __init__(self):
         self._name = None
         self._reference = None
         self._ref_pair = (None, None)
         self._pairs = []
-        self._type = None             # Just lower case name
+        self._type = None  # Just lower case name
         self._n_duplicate = 0
         self._properties = None
         self._timeseries = None
-        self._coords = None           # Pair of physical coords
+        self._coords = None  # Pair of physical coords
 
-#     def __str__(self):
-#         return "%s %s %s" % (self._name, self._type,
-#                              " ".join(map(str,self._properties)))
+    #     def __str__(self):
+    #         return "%s %s %s" % (self._name, self._type,
+    #                              " ".join(map(str,self._properties)))
 
     @property
     def name(self):
@@ -111,20 +112,19 @@ class SchismStructure(object):
 
 
 class SchismStructureIO(BaseIO):
-    """ A class to manage hydraulic structure I/O files
-    """
+    """A class to manage hydraulic structure I/O files"""
+
     def __init__(self, input):
         """
-            input = a SCHISM input instance
+        input = a SCHISM input instance
         """
         super(SchismStructureIO, self).__init__()
         self._input = input
 
     def read(self, fname):
-        """ Read in 'hydraulics.in' file.
-        """
+        """Read in 'hydraulics.in' file."""
         print("Reading in" + fname + "...")
-        f = open(fname, 'r')
+        f = open(fname, "r")
         # # of blocks
         tokens, ok = self._read_and_parse_line(f, 1)
         n_structures = int(tokens[0])
@@ -142,7 +142,7 @@ class SchismStructureIO(BaseIO):
             # # of pairs and reference pairs
             tokens, ok = self._read_and_parse_line(f, 3)
             n_pairs = int(tokens[0])
-            ref_pair = (int(tokens[1]) - 1 , int(tokens[2]) - 1)
+            ref_pair = (int(tokens[1]) - 1, int(tokens[2]) - 1)
             struct.reference_pair = ref_pair
             pairs = []
             # Pairs
@@ -177,8 +177,7 @@ class SchismStructureIO(BaseIO):
                 coeff = float(tokens[0])
                 op_down = float(tokens[1])
                 op_up = float(tokens[2])
-                struct.properties = [elevation, width, height,
-                                     coeff, op_down, op_up]
+                struct.properties = [elevation, width, height, coeff, op_down, op_up]
             elif struct_type == "transfer":
                 tokens, ok = self._read_and_parse_line(f, 1)
                 flow = float(tokens[0])
@@ -196,10 +195,9 @@ class SchismStructureIO(BaseIO):
         f.close()
         print("Done reading a structure file.")
 
-    def write(self, fname='hydraulics.in'):
-        """ Write out 'hydraulics.in' file.
-        """
-        f = open(fname, 'w')
+    def write(self, fname="hydraulics.in"):
+        """Write out 'hydraulics.in' file."""
+        f = open(fname, "w")
         buf = "%d !# of structures\n" % self._input.n_structures()
         f.write(buf)
         buf = "%f  !Nudging factor\n" % self._input.nudging
@@ -211,11 +209,15 @@ class SchismStructureIO(BaseIO):
             buf = "%d %s\n" % (i, struct.name)
             f.write(buf)
             # # of node pairs and reference nodes
-            buf = "%d %d %d !  # of node-pairs, 2 ref." \
-                  "nodes (global indices) for 2 faces\n" \
-                  % (struct.n_node_pairs(),
-                     struct.reference_pair[0] + 1,
-                     struct.reference_pair[1] + 1)
+            buf = (
+                "%d %d %d !  # of node-pairs, 2 ref."
+                "nodes (global indices) for 2 faces\n"
+                % (
+                    struct.n_node_pairs(),
+                    struct.reference_pair[0] + 1,
+                    struct.reference_pair[1] + 1,
+                )
+            )
             f.write(buf)
             # node pairs
             for pair in struct.node_pairs:
@@ -225,75 +227,92 @@ class SchismStructureIO(BaseIO):
             buf = "%s ! struct type\n" % struct.type
             f.write(buf)
             # nduplicate
-            k = 'n_duplicates'
-            n_duplicates = struct.properties[k] if k in struct.properties else 0.
+            k = "n_duplicates"
+            n_duplicates = struct.properties[k] if k in struct.properties else 0.0
             buf = "%d ! n_duplicates\n" % n_duplicates
             f.write(buf)
             # parameters
             if struct.type == "weir" or struct.type == "culvert":
-                val = struct.properties['width'] if struct.type == "weir" else struct.properties['radius']
-                buf = "%f %f ! elevation, width or radius\n" % \
-                      (struct.properties['elevation'],
-                       val)
+                val = (
+                    struct.properties["width"]
+                    if struct.type == "weir"
+                    else struct.properties["radius"]
+                )
+                buf = "%f %f ! elevation, width or radius\n" % (
+                    struct.properties["elevation"],
+                    val,
+                )
                 f.write(buf)
-                buf = "%f %f %f ! coef, op_downstream, op_upstream\n" % \
-                      (struct.properties['coefficient'],
-                       struct.properties['op_downstream'],
-                       struct.properties['op_upstream'])
+                buf = "%f %f %f ! coef, op_downstream, op_upstream\n" % (
+                    struct.properties["coefficient"],
+                    struct.properties["op_downstream"],
+                    struct.properties["op_upstream"],
+                )
                 f.write(buf)
             elif struct.type == "radial" or struct.type == "orifice":
-                buf = "%f %f %f ! elevation, width, height or radius\n" % \
-                      (struct.properties['elevation'],
-                       struct.properties['width'],
-                       struct.properties['height'])
+                buf = "%f %f %f ! elevation, width, height or radius\n" % (
+                    struct.properties["elevation"],
+                    struct.properties["width"],
+                    struct.properties["height"],
+                )
                 f.write(buf)
-                buf = "%f %f %f ! coef, op_downstream, op_upstream\n" % \
-                      (struct.properties['coefficient'],
-                       struct.properties['op_downstream'],
-                       struct.properties['op_upstream'])
+                buf = "%f %f %f ! coef, op_downstream, op_upstream\n" % (
+                    struct.properties["coefficient"],
+                    struct.properties["op_downstream"],
+                    struct.properties["op_upstream"],
+                )
                 f.write(buf)
             elif struct.type == "radial_relheight":
-                buf = "%f %f %f ! elevation, width, height\n" % \
-                      (struct.properties['elevation'],
-                       struct.properties['width'],
-                       struct.properties['height'])
+                buf = "%f %f %f ! elevation, width, height\n" % (
+                    struct.properties["elevation"],
+                    struct.properties["width"],
+                    struct.properties["height"],
+                )
                 f.write(buf)
-                buf = "%f %f ! coef, coef_height\n" % \
-                      (struct.properties['coefficient'],
-                       struct.properties['coefficient_height'])
+                buf = "%f %f ! coef, coef_height\n" % (
+                    struct.properties["coefficient"],
+                    struct.properties["coefficient_height"],
+                )
                 f.write(buf)
-                buf = "%f %f ! op_downstream, op_upstream\n" % \
-                      (struct.properties['op_downstream'],
-                       struct.properties['op_upstream'])
+                buf = "%f %f ! op_downstream, op_upstream\n" % (
+                    struct.properties["op_downstream"],
+                    struct.properties["op_upstream"],
+                )
                 f.write(buf)
             elif struct.type == "weir_culvert":
-                buf = "%f %f ! elevation and width for weir\n" % \
-                       (struct.properties['elevation'],
-                        struct.properties['width'])
+                buf = "%f %f ! elevation and width for weir\n" % (
+                    struct.properties["elevation"],
+                    struct.properties["width"],
+                )
                 f.write(buf)
-                buf = "%f %f %f ! coef, op_downstream, op_upstream for weirs\n" % \
-                      (struct.properties['coefficient'],
-                       struct.properties['op_downstream'],
-                       struct.properties['op_upstream'])
+                buf = "%f %f %f ! coef, op_downstream, op_upstream for weirs\n" % (
+                    struct.properties["coefficient"],
+                    struct.properties["op_downstream"],
+                    struct.properties["op_upstream"],
+                )
                 f.write(buf)
                 buf = "%d ! n_duplicates for culverts\n" % (
-                    struct.properties['culvert_n_duplicates'])
+                    struct.properties["culvert_n_duplicates"]
+                )
                 f.write(buf)
-                buf = "%f %f\n" % (struct.properties['culvert_elevation'],
-                                   struct.properties['culvert_radius'])
+                buf = "%f %f\n" % (
+                    struct.properties["culvert_elevation"],
+                    struct.properties["culvert_radius"],
+                )
                 f.write(buf)
-                buf = "%f %f %f ! coef, op_downstream, op_upstream for culverts\n" % \
-                      (struct.properties['culvert_coefficient'],
-                       struct.properties['culvert_op_downstream'],
-                       struct.properties['culvert_op_upstream'])
+                buf = "%f %f %f ! coef, op_downstream, op_upstream for culverts\n" % (
+                    struct.properties["culvert_coefficient"],
+                    struct.properties["culvert_op_downstream"],
+                    struct.properties["culvert_op_upstream"],
+                )
                 f.write(buf)
             elif struct.type == "transfer":
-                buf = "%f ! flow\n" % struct.properties['flow']
+                buf = "%f ! flow\n" % struct.properties["flow"]
                 f.write(buf)
             else:
                 raise Exception("Not supported structure type")
 
-            buf = "%d ! time series enabled\n" % struct.properties['use_time_series']
+            buf = "%d ! time series enabled\n" % struct.properties["use_time_series"]
             f.write(buf)
 
         f.flush()
@@ -301,8 +320,8 @@ class SchismStructureIO(BaseIO):
 
     def _read_line_and_split(self, f, lc, expected_count=0):
         """
-           returns: (tokens, lc), tokens are parsed items and lc is
-           the line counter after reading a line.
+        returns: (tokens, lc), tokens are parsed items and lc is
+        the line counter after reading a line.
         """
         tokens = f.readline().split()
         lc += 1
@@ -310,4 +329,3 @@ class SchismStructureIO(BaseIO):
             print("Line #: {}".format(lc))
             raise Exception("Line is corrupted.")
         return tokens, lc
-
