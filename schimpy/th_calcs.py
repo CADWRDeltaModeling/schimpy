@@ -124,3 +124,98 @@ def combine_flux(
         out_df[col_name] = combtemp.sum(axis=1)
 
     return out_df
+
+
+def normalize_df(df):
+    normed = df.copy()
+    for col in normed.columns:
+        col_min = normed[col].min()
+        col_max = normed[col].max()
+        if col_max == col_min:
+            if col_min != 0:
+                normed[col] = 1
+            else:
+                normed[col] = 0
+        else:
+            normed[col] = (normed[col] - col_min) / (col_max - col_min)
+    return normed
+
+
+def struct_open_props(struct, th_data, out_freq="15min", datetime_idx=None):
+    """Determine the structure header properties that are used to determine 'relative openness' of the structure
+    For instance, a simple gate might just be (width * height)/(max(width) * max(height))
+    """
+
+    if struct.type == "weir":
+        # width, elevation, op_down, op_up
+        up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "width"]
+        down_cols_to_multiply = ["install", "ndup", "op_down", "elev", "width"]
+    elif struct.type == "radial":
+        # width, height, elevation, op_down, op_up
+        up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "width", "height"]
+        down_cols_to_multiply = [
+            "install",
+            "ndup",
+            "op_down",
+            "elev",
+            "width",
+            "height",
+        ]
+    elif struct.type == "culvert":
+        # rad, elevation, op_down, op_up
+        up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "rad"]
+        down_cols_to_multiply = ["install", "ndup", "op_down", "elev", "rad"]
+    elif struct.type == "radial_relheight":
+        # width, height, elevation, op_down, op_up
+        up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "width", "height"]
+        down_cols_to_multiply = [
+            "install",
+            "ndup",
+            "op_down",
+            "elev",
+            "width",
+            "height",
+        ]
+    elif struct.type == "weir_culvert":
+        # elevation, width, op_down, op_up - weirs
+        # elevation, width, op_up, op_down - culvert
+        up_cols_to_multiply = [
+            "install",
+            "ndup_weir",
+            "ndup_pipe",
+            "elev_weir",
+            "elev_pipe",
+            "width_weir",
+            "radius_pipe",
+            "op_up_weir",
+            "up_op_pipe",
+        ]
+        down_cols_to_multiply = [
+            "install",
+            "ndup_weir",
+            "ndup_pipe",
+            "elev_weir",
+            "elev_pipe",
+            "width_weir",
+            "radius_pipe",
+            "op_down_weir",
+            "down_op_pipe",
+        ]
+    else:
+        raise ValueError(f"structure type {struct.type} is not yet supported!")
+
+    # Take the dataframe and normalize to max/min of each column
+    norm_df = normalize_df(th_data)
+    norm_df["open_up"] = norm_df[up_cols_to_multiply].prod(axis=1)
+    norm_df["open_down"] = -norm_df[down_cols_to_multiply].prod(axis=1)
+    norm_df = norm_df.resample(out_freq).ffill()
+    if datetime_idx is not None:
+        norm_df = norm_df.reindex(datetime_idx)
+        norm_df = norm_df.ffill()
+
+    up_df = norm_df[["open_up"]].copy()
+    up_df.columns = [f"{struct.name}_up"]
+    down_df = norm_df[["open_down"]].copy()
+    down_df.columns = [f"{struct.name}_down"]
+
+    return up_df, down_df
