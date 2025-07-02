@@ -1,4 +1,4 @@
-from schimpy.model_time import read_th, get_headers
+from schimpy.model_time import read_th
 import pandas as pd
 import os
 
@@ -19,15 +19,20 @@ def calc_net_source_sink(
     By default it will look for vsource.th and vsink.th - the default source/sink inputs for SCHISM.
     """
 
-    vsrc = read_th(vsource_file, time_basis=time_basis, elapsed_unit=elapsed_unit)
-    vsink = read_th(vsink_file, time_basis=time_basis, elapsed_unit=elapsed_unit)
+    vsrc = read_th(
+        vsource_file,
+        time_basis=time_basis,
+        elapsed_unit=elapsed_unit,
+        head=vsource_head,
+    )
+    vsink = read_th(
+        vsink_file, time_basis=time_basis, elapsed_unit=elapsed_unit, head=vsink_head
+    )
 
     # subset by the search_term (eg: a region of source/sink terms)
     if search_term is not None:
-        src_head = get_headers(vsource_head)
-        vsrc = vsrc.loc[:, [search_term in x for x in src_head]]
-        sink_head = get_headers(vsink_head)
-        vsink = vsink.loc[:, [search_term in x for x in sink_head]]
+        vsrc = vsrc.loc[:, [search_term in x for x in vsrc.columns]]
+        vsink = vsink.loc[:, [search_term in x for x in vsink.columns]]
 
     # clip to time constraint
     if start_date is None:
@@ -60,16 +65,9 @@ def read_flux(
     Optionally subset by start_date and end_date.
     """
 
-    flux_df = read_th(flux, time_basis=time_basis, elapsed_unit=elapsed_unit)
-
-    if flux_head is not None:
-        # Assign headers
-        headers = get_headers(flux_head)
-        if len(headers) != len(flux_df.columns):
-            raise ValueError(
-                f"{os.path.basename(flux)} has {len(flux_df.columns)} columns and the header calls for {len(headers)}!"
-            )
-        flux_df.columns = headers
+    flux_df = read_th(
+        flux, time_basis=time_basis, elapsed_unit=elapsed_unit, head=flux_head
+    )
 
     # Clip to time constraint
     if start_date is None:
