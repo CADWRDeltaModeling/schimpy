@@ -5,6 +5,7 @@
 ##
 
 from .base_io import *
+import copy
 
 # Some constants
 ELEVATION = 0
@@ -95,6 +96,14 @@ class SchismStructure(object):
         self._properties = value
 
     @property
+    def property_names(self):
+        return self._property_names
+
+    @property_names.setter
+    def property_names(self, value):
+        self._property_names = value
+
+    @property
     def use_timeseries(self):
         return self._timeseries
 
@@ -123,7 +132,7 @@ class SchismStructureIO(BaseIO):
 
     def read(self, fname):
         """Read in 'hydraulics.in' file."""
-        print("Reading in" + fname + "...")
+        print("Reading in " + fname + "...")
         f = open(fname, "r")
         # # of blocks
         tokens, ok = self._read_and_parse_line(f, 1)
@@ -133,6 +142,7 @@ class SchismStructureIO(BaseIO):
         nudging = float(tokens[0])
         # Loof for structure
         for struct_i in range(n_structures):
+            struct2 = False
             struct = SchismStructure()
             # index and name
             tokens, ok = self._read_and_parse_line(f, 2)
@@ -168,6 +178,13 @@ class SchismStructureIO(BaseIO):
                 op_down = float(tokens[1])
                 op_up = float(tokens[2])
                 struct.properties = [elevation, width, coeff, op_down, op_up]
+                struct.property_names = [
+                    "elevation",
+                    "width",
+                    "coeff",
+                    "op_down",
+                    "op_up",
+                ]
             elif struct_type == "radial" or struct_type == "orifice":
                 tokens, ok = self._read_and_parse_line(f, 3)
                 elevation = float(tokens[0])
@@ -178,12 +195,79 @@ class SchismStructureIO(BaseIO):
                 op_down = float(tokens[1])
                 op_up = float(tokens[2])
                 struct.properties = [elevation, width, height, coeff, op_down, op_up]
+                struct.property_names = [
+                    "elevation",
+                    "width",
+                    "height",
+                    "coeff",
+                    "op_down",
+                    "op_up",
+                ]
             elif struct_type == "transfer":
                 tokens, ok = self._read_and_parse_line(f, 1)
                 flow = float(tokens[0])
                 struct.properties = [flow]
+                struct.property_names = ["flow"]
+            elif struct_type == "radial_relheight":
+                tokens, ok = self._read_and_parse_line(f, 3)
+                elevation = float(tokens[0])
+                width = float(tokens[1])
+                height = float(tokens[2])
+                tokens, ok = self._read_and_parse_line(f, 2)
+                coeff = float(tokens[0])
+                coef_height = float(tokens[1])
+                tokens, ok = self._read_and_parse_line(f, 2)
+                op_down = float(tokens[0])
+                op_up = float(tokens[1])
+                struct.properties = [elevation, width, height, coeff, op_down, op_up]
+                struct.property_names = [
+                    "elevation",
+                    "width",
+                    "height",
+                    "coeff",
+                    "op_down",
+                    "op_up",
+                ]
+            elif struct_type == "weir_culvert":
+                # get weir data first
+                tokens, ok = self._read_and_parse_line(f, 2)
+                elevation = float(tokens[0])
+                width = float(tokens[1])
+                tokens, ok = self._read_and_parse_line(f, 3)
+                coeff = float(tokens[0])
+                op_down = float(tokens[1])
+                op_up = float(tokens[2])
+                struct.properties = [elevation, width, height, coeff, op_down, op_up]
+                struct.property_names = [
+                    "elevation",
+                    "width",
+                    "height",
+                    "coeff",
+                    "op_down",
+                    "op_up",
+                ]
+                struct2 = copy.deepcopy(struct)
+                struct2.n_duplicate = n_duplicate
+                # n_duplicates for culvert
+                tokens, ok = self._read_and_parse_line(f, 1)
+                cn_duplicate = int(tokens[0])
+                tokens, ok = self._read_and_parse_line(f, 2)
+                elevation = float(tokens[0])
+                width = float(tokens[1])
+                tokens, ok = self._read_and_parse_line(f, 3)
+                coeff = float(tokens[0])
+                op_down = float(tokens[1])
+                op_up = float(tokens[2])
+                struct2.properties = [elevation, width, coeff, op_down, op_up]
+                struct2.property_names = [
+                    "elevation",
+                    "width",
+                    "coeff",
+                    "op_down",
+                    "op_up",
+                ]
             else:
-                raise Exception("Not supported structure type")
+                raise Exception(f"Not supported structure type {struct_type}")
 
             # Time series
             tokens, ok = self._read_and_parse_line(f, 1)
@@ -191,6 +275,9 @@ class SchismStructureIO(BaseIO):
             struct.use_timeseries = timeseries
             # Add the structure
             self._input.add_structure(struct)
+            if struct2:
+                struct2.use_timeseries = timeseries
+                self._input.add_structure(struct2)
 
         f.close()
         print("Done reading a structure file.")
@@ -295,7 +382,7 @@ class SchismStructureIO(BaseIO):
                     struct.properties["culvert_n_duplicates"]
                 )
                 f.write(buf)
-                buf = "%f %f\n" % (
+                buf = "%f %f! elevation and width for culverts\n" % (
                     struct.properties["culvert_elevation"],
                     struct.properties["culvert_radius"],
                 )
