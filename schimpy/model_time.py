@@ -428,6 +428,15 @@ def elapsed_to_timestamp(input, time_basis, elapsed_unit="s"):
     return out_df
 
 
+def read_elapsed(input):
+    """Take input dataframe or th filename, returns dataframe"""
+
+    if not isinstance(input, (pd.DataFrame, pd.Series)):
+        in_df = pd.read_table(input, sep="\s+", comment="#", index_col=0, header=None)
+
+    return out_df
+
+
 def is_elapsed(input):
     """Check whether the input file is 'elapsed' or 'timestamped'.
     Uses the first line of the file to determine this.
@@ -441,7 +450,7 @@ def is_elapsed(input):
     return is_elapsed
 
 
-def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s"):
+def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s", head=None):
     """Read input file and return dataframe.
     Automatically converts to timestamp if time_basis is supplied unless to_timestamp is False
     """
@@ -456,9 +465,17 @@ def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s"):
         if to_timestamp:
             out_df = elapsed_to_timestamp(input, time_basis, elapsed_unit=elapsed_unit)
         else:
-            out_df = pd.read_table(
-                infile, sep="\s+", comment="#", index_col=0, header=None
-            )
+            out_df = read_elapsed(input)
+        if head is not None:
+            headers = get_headers(head)
+            if len(headers) != len(out_df.columns):
+                raise ValueError(
+                    f"{os.path.basename(input)} has {len(out_df.columns)} columns and the header calls for {len(headers)}!"
+                )
+            out_df.columns = headers
+            out_df.index.name = "datetime"
+        else:
+            out_df = read_elapsed(input)
 
     else:
         # read timestamped file
@@ -469,8 +486,8 @@ def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s"):
     mon_inc = all(x < y for x, y in zip(out_df.index, out_df.index[1:]))
     if not mon_inc:
         # prints the row(s) where monotonicity is broken
-        bad_rows = in_df.loc[
-            in_df.index.to_series().diff() < pd.to_timedelta("0 seconds")
+        bad_rows = out_df.loc[
+            out_df.index.to_series().diff() < pd.to_timedelta("0 seconds")
         ]
         raise ValueError(f"Non-monotonic datetime index found:\n{bad_rows}")
 
