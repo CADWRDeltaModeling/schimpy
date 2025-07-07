@@ -767,7 +767,7 @@ def gen_sigma(
 
                 if inode in showlist:
                     print(
-                        "\msigmaratio stuff: inode={} sigmaratio={} nlevel={} nlevel2={} nlevel3={} few4smooth={} nnonbndlev={}".format(
+                        "\nsigmaratio stuff: inode={} sigmaratio={} nlevel={} nlevel2={} nlevel3={} few4smooth={} nnonbndlev={}".format(
                             inode,
                             sigmaratio,
                             nlevel[inode],

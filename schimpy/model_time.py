@@ -106,7 +106,7 @@ def to_date(elapsed_input, start, step, elapsed_unit, time_format, annotate, out
     input = list(elapsed_input)
     dt = step
     try:
-        sdtime = datetime.datetime(*list(map(int, re.split("[^\d]", s))))
+        sdtime = datetime.datetime(*list(map(int, re.split(r"[^\d]", s))))
     except Exception:
         raise click.ClickException(f"Could not convert start time to datetime: {s}")
     if len(input) > 1 and input[0].endswith(".th"):
@@ -154,8 +154,8 @@ def clip(elapsed_input, start, clip_start, out):
     """Clip (subset) an input file in elapsed time to a new, later, start date"""
     input = list(elapsed_input)
     try:
-        start_dt = datetime.datetime(*list(map(int, re.split("[^\d]", start))))
-        scliptime = datetime.datetime(*list(map(int, re.split("[^\d]", clip_start))))
+        start_dt = datetime.datetime(*list(map(int, re.split(r"[^\d]", start))))
+        scliptime = datetime.datetime(*list(map(int, re.split(r"[^\d]", clip_start))))
     except Exception:
         raise click.ClickException("Could not convert start or clip_start to datetime.")
     th = len(input) == 1 and os.path.exists(input[0])
@@ -289,7 +289,7 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
                 use = True
                 try:
                     mdtm = datetime.datetime(
-                        *list(map(int, re.split("[^\d]", timestr)))
+                        *list(map(int, re.split(r"[^\d]", timestr)))
                     )
                 except:
                     print(line)
@@ -342,7 +342,7 @@ def file_to_timestamp(
         raise ValueError("elapsed_unit must be 's' or 'd'")
 
     if type(start) == str:
-        start = datetime.datetime(*list(map(int, re.split("[^\d]", start))))
+        start = datetime.datetime(*list(map(int, re.split(r"[^\d]", start))))
     if not outpath:
         outfile = sys.stdout
     else:
@@ -373,7 +373,7 @@ def file_to_timestamp(
 
 def describe_elapsed(times, start, dt=None):
     if type(start) == str:
-        start = datetime.datetime(*list(map(int, re.split("[^\d]", start))))
+        start = datetime.datetime(*list(map(int, re.split(r"[^\d]", start))))
     for elapsed in times:
         elapsed = elapsed.lower()
         if elapsed.endswith("d") or elapsed.endswith("days") or elapsed.endswith("day"):
@@ -415,10 +415,10 @@ def elapsed_to_timestamp(input, time_basis, elapsed_unit="s"):
         raise ValueError("elapsed_unit must be 's' or 'd'")
 
     if type(time_basis) == str:
-        time_basis = datetime.datetime(*list(map(int, re.split("[^\d]", time_basis))))
+        time_basis = datetime.datetime(*list(map(int, re.split(r"[^\d]", time_basis))))
 
     if not isinstance(input, (pd.DataFrame, pd.Series)):
-        in_df = pd.read_table(input, sep="\s+", comment="#", index_col=0, header=None)
+        in_df = pd.read_table(input, sep=r"\s+", comment="#", index_col=0, header=None)
 
     out_df = in_df.copy()
     out_df.index = pd.to_datetime(time_basis) + pd.to_timedelta(
@@ -432,7 +432,7 @@ def read_elapsed(input):
     """Take input dataframe or th filename, returns dataframe"""
 
     if not isinstance(input, (pd.DataFrame, pd.Series)):
-        in_df = pd.read_table(input, sep="\s+", comment="#", index_col=0, header=None)
+        in_df = pd.read_table(input, sep=r"\s+", comment="#", index_col=0, header=None)
 
     return out_df
 
@@ -479,7 +479,7 @@ def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s", head=No
 
     else:
         # read timestamped file
-        out_df = pd.read_table(input, sep="\s+", index_col="datetime", comment="#")
+        out_df = pd.read_table(input, sep=r"\s+", index_col="datetime", comment="#")
         out_df.index = pd.to_datetime(out_df.index, format="%Y-%m-%dT%H:%M")
 
     # monotonic increase check, finds any repeat datetimes and/or a mixup of order
@@ -516,12 +516,12 @@ def get_headers(infile, no_index=True):
 
 def describe_timestamps(timestamps, start, dt=None):
     if type(start) == str:
-        start = datetime.datetime(*list(map(int, re.split("[^\d]", start))))
+        start = datetime.datetime(*list(map(int, re.split(r"[^\d]", start))))
     if not type(timestamps) == list:
         timestampse = [timestamps]
     for stamp in timestamps:
         # assume mtime argument is a date time and try to parse to datetime
-        mdtime = datetime.datetime(*list(map(int, re.split("[^\d]", stamp))))
+        mdtime = datetime.datetime(*list(map(int, re.split(r"[^\d]", stamp))))
         mdelta = mdtime - start
         msec = mdelta.total_seconds()
         print("Datetime:      %s" % mdtime)

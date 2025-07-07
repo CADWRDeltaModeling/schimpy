@@ -501,11 +501,11 @@ class SchismSetup(object):
 
     def _parse_attribute(self, expr):
         """Parse expression that can be understood by the tool"""
-        expr = re.sub(r"(\b)x(\b)", "\g<1>mesh.nodes[nodes_sel, 0]\g<2>", expr)
-        expr = re.sub(r"(\b)y(\b)", "\g<1>mesh.nodes[nodes_sel, 1]\g<2>", expr)
-        expr = re.sub(r"(\b)z(\b)", "\g<1>mesh.nodes[nodes_sel, 2]\g<2>", expr)
-        expr = re.sub(r"(\b)min(\b)", "\g<1>numpy.minimum\g<2>", expr)
-        expr = re.sub(r"(\b)max(\b)", "\g<1>numpy.maximum\g<2>", expr)
+        expr = re.sub(r"(\b)x(\b)", r"\g<1>mesh.nodes[nodes_sel, 0]\g<2>", expr)
+        expr = re.sub(r"(\b)y(\b)", r"\g<1>mesh.nodes[nodes_sel, 1]\g<2>", expr)
+        expr = re.sub(r"(\b)z(\b)", r"\g<1>mesh.nodes[nodes_sel, 2]\g<2>", expr)
+        expr = re.sub(r"(\b)min(\b)", r"\g<1>numpy.minimum\g<2>", expr)
+        expr = re.sub(r"(\b)max(\b)", r"\g<1>numpy.maximum\g<2>", expr)
         return expr
 
     def apply_linestring_ops(self, default, linestrings):
@@ -1074,7 +1074,7 @@ def check_similarity(testee, list_words):
 
 
 def check_and_suggest(testees, list_words, logger=None):
-    """Check testtees in list_words and if not suggest something if possible"""
+    """Check testees in list_words and if not suggest something if possible"""
     for keyword in testees:
         if keyword not in list_words:
             msg = "Unrecognizable key word: '%s'" % (keyword)

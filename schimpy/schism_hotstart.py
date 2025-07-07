@@ -18,7 +18,7 @@ Options:
 
 2. Initializer:
 
-    * text_init: 2D map input from either \*.prop or \*.ic files; require input text file.
+    * text_init: 2D map input from either *.prop or *.ic files; require input text file.
     * simple_trend: can either be a number or an equation that depends on x (lat) and y(lon). e.g,: 0.97 + 1.e-5*x
     * patch_init: regional-based method. Polygon shapefile input required.
     * extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects.
