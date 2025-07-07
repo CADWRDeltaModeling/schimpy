@@ -68,7 +68,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.base_io.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-batch-metrics-module">schimpy.batch_metrics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.batch_metrics">schimpy.batch_metrics module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.batch_metrics.generate_metricsplots"><code class="docutils literal notranslate"><span class="pre">generate_metricsplots()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.bctide">schimpy.bctide module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.bctide.load_boundary"><code class="docutils literal notranslate"><span class="pre">load_boundary()</span></code></a></li>
 </ul>
@@ -316,7 +319,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#schimpy-metricsplot-module">schimpy.metricsplot module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.metricsplot">schimpy.metricsplot module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.metricsplot.plot_comparison"><code class="docutils literal notranslate"><span class="pre">plot_comparison()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.metricsplot.plot_metrics"><code class="docutils literal notranslate"><span class="pre">plot_metrics()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.model_time">schimpy.model_time module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_elapsed"><code class="docutils literal notranslate"><span class="pre">describe_elapsed()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.model_time.describe_timestamps"><code class="docutils literal notranslate"><span class="pre">describe_timestamps()</span></code></a></li>
@@ -685,8 +692,16 @@
 </dd></dl>
 
 </section>
-<section id="schimpy-batch-metrics-module">
-<h2>schimpy.batch_metrics module<a class="headerlink" href="#schimpy-batch-metrics-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.batch_metrics">
+<span id="schimpy-batch-metrics-module"></span><h2>schimpy.batch_metrics module<a class="headerlink" href="#module-schimpy.batch_metrics" title="Link to this heading"></a></h2>
+<p>Create metrics plots in batch mode</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.batch_metrics.generate_metricsplots">
+<span class="sig-prename descclassname"><span class="pre">schimpy.batch_metrics.</span></span><span class="sig-name descname"><span class="pre">generate_metricsplots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_inputfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.batch_metrics.generate_metricsplots" title="Link to this definition"></a></dt>
+<dd><p>Create metrics plots in batch mode.</p>
+<p>MAIN_INPUTFILE: Path to the main input YAML file.</p>
+</dd></dl>
+
 </section>
 <section id="module-schimpy.bctide">
 <span id="schimpy-bctide-module"></span><h2>schimpy.bctide module<a class="headerlink" href="#module-schimpy.bctide" title="Link to this heading"></a></h2>
@@ -1651,7 +1666,7 @@ Ordering is counter-clockwise direction</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>numpy.array</dt><dd><p>matrix of shape function derivative wrt xi value at (*, eta)</p>
+<dt>numpy.array</dt><dd><p>matrix of shape function derivative wrt xi value at (<a href="#id1"><span class="problematic" id="id2">*</span></a>, eta)</p>
 </dd>
 </dl>
 </dd>
@@ -1792,7 +1807,7 @@ Ordering is counter-clockwise direction</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>numpy.array</dt><dd><p>matrix of shape function derivative wrt xi value at (*, eta)</p>
+<dt>numpy.array</dt><dd><p>matrix of shape function derivative wrt xi value at (<a href="#id3"><span class="problematic" id="id4">*</span></a>, eta)</p>
 </dd>
 </dl>
 </dd>
@@ -1953,7 +1968,7 @@ Ordering is counter-clockwise direction</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>numpy.array</dt><dd><p>matrix of shape function derivative wrt xi value at (*, eta)</p>
+<dt>numpy.array</dt><dd><p>matrix of shape function derivative wrt xi value at (<a href="#id5"><span class="problematic" id="id6">*</span></a>, eta)</p>
 </dd>
 </dl>
 </dd>
@@ -2576,7 +2591,7 @@ The first two columns are used.</p>
 <p>Steps:</p>
 <ol class="arabic simple">
 <li><p>derive max elevation within connected elements</p></li>
-<li><p>compare with the reference calculated by calculate_reference_surface() 
+<li><p>compare with the reference calculated by calculate_reference_surface()
 and use the higher value between the two</p></li>
 </ol>
 <dl class="field-list simple">
@@ -2957,15 +2972,15 @@ start : str or pandas.Timestamp</p>
 <dt>do_print<span class="classifier">bool, optional</span></dt><dd><p>Whether to print the iterations and corresponding times (default is True).</p>
 </dd>
 </dl>
-<section id="id1">
-<h3>Returns<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id7">
+<h3>Returns<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
 <dl class="simple">
 <dt>pandas.DataFrame</dt><dd><p>A DataFrame with datetime as the index and iteration numbers as the column.</p>
 </dd>
 </dl>
 </section>
-<section id="id2">
-<h3>Notes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id8">
+<h3>Notes<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>The function searches for hotstart files in the specified <cite>workdir</cite> directory.</p></li>
 <li><p>If no files are found in <cite>workdir</cite>, it searches in the current directory.</p></li>
@@ -3480,8 +3495,45 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dd></dd></dl>
 
 </section>
-<section id="schimpy-metricsplot-module">
-<h2>schimpy.metricsplot module<a class="headerlink" href="#schimpy-metricsplot-module" title="Link to this heading"></a></h2>
+<section id="module-schimpy.metricsplot">
+<span id="schimpy-metricsplot-module"></span><h2>schimpy.metricsplot module<a class="headerlink" href="#module-schimpy.metricsplot" title="Link to this heading"></a></h2>
+<p>Metrics plot</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.metricsplot.plot_comparison">
+<span class="sig-prename descclassname"><span class="pre">schimpy.metricsplot.</span></span><span class="sig-name descname"><span class="pre">plot_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style_palette</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.metricsplot.plot_comparison" title="Link to this definition"></a></dt>
+<dd><p>Create a simple comparison plot without metrics calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>*args: variable number of TimeSeries</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>matplotlib.pyplot.figure.Figure</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.metricsplot.plot_metrics">
+<span class="sig-prename descclassname"><span class="pre">schimpy.metricsplot.</span></span><span class="sig-name descname"><span class="pre">plot_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tssim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">style_palette</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.metricsplot.plot_metrics" title="Link to this definition"></a></dt>
+<dd><p>Create a metrics plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>*args: variable number of TimeSeries</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>matplotlib.pyplot.figure.Figure</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-schimpy.model_time">
 <span id="schimpy-model-time-module"></span><h2>schimpy.model_time module<a class="headerlink" href="#module-schimpy.model_time" title="Link to this heading"></a></h2>
@@ -5945,7 +5997,7 @@ is for stations.</p>
 <li><p>Initializer:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>text_init: 2D map input from either *.prop or *.ic files; require input text file.</p></li>
+<li><p>text_init: 2D map input from either <a href="#id9"><span class="problematic" id="id10">*</span></a>.prop or <a href="#id11"><span class="problematic" id="id12">*</span></a>.ic files; require input text file.</p></li>
 <li><p>simple_trend: can either be a number or an equation that depends on x (lat) and y(lon). e.g,: 0.97 + 1.e-5*x</p></li>
 <li><p>patch_init: regional-based method. Polygon shapefile input required.</p></li>
 <li><p>extrude_casts: 3D nearest neighbourhood interpolation based on Polaris cruise transects.</p></li>
@@ -8104,7 +8156,7 @@ fname = output file name</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.schism_setup.check_and_suggest">
 <span class="sig-prename descclassname"><span class="pre">schimpy.schism_setup.</span></span><span class="sig-name descname"><span class="pre">check_and_suggest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">testees</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_words</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_setup.check_and_suggest" title="Link to this definition"></a></dt>
-<dd><p>Check testtees in list_words and if not suggest something if possible</p>
+<dd><p>Check testees in list_words and if not suggest something if possible</p>
 </dd></dl>
 
 <dl class="py function">
