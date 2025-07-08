@@ -294,6 +294,7 @@ def load(stream, envvar=None):
             msg = [f"Unsubstituted variables found in YAML:"]
             for path, matches in unsub:
                 msg.append(f"  {path}: {matches}")
+            msg.append(r"This could be an issue of using {var} instead of ${var}")
             raise ValueError("\n".join(msg))
         return data
     finally:
