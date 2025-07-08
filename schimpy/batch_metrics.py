@@ -463,6 +463,21 @@ class BatchMetrics(object):
             "station, RMSE, lag, bias, NSE, Willmott_skill, Correlation\n"
         )
 
+        if selected_stations is not None:
+            idx = pd.IndexSlice
+            sim_outputs[0] = sim_outputs[0].loc[:, idx[selected_stations, :]]
+            self.logger.info("==================================================")
+            self.logger.info("'selected_stations' enabled. Only following will be processed.")
+            for station_id in selected_stations:
+                self.logger.info(" {}".format(station_id))
+
+        if excluded_stations is not None:
+            sim_outputs[0] = sim_outputs[0].loc[:, idx[~sim_outputs[0].columns.get_level_values(0).isin(excluded_stations), :]]
+            self.logger.info("==================================================")
+            self.logger.info("'excluded_stations' enabled. Following will be skipped.")
+            for station_id in excluded_stations:
+                self.logger.info(" {}".format(station_id))
+
         # Iterate through the stations in the first simulation outputs
         for stn in sim_outputs[0].columns:
             station_id = stn[0].lower() if type(stn) == tuple else stn.lower()
@@ -470,21 +485,6 @@ class BatchMetrics(object):
             self.logger.info("==================================================")
 
             self.logger.info("Start processing station: {}".format(station_id))
-
-            if selected_stations is not None:
-                if station_id not in selected_stations:
-                    self.logger.info(
-                        "Skipping..." " Not in the list of the selected stations: %s",
-                        station_id,
-                    )
-                    continue
-            if excluded_stations is not None:
-                if station_id in excluded_stations:
-                    self.logger.info(
-                        "Skipping... " "In the list of the excluded stations: %s",
-                        station_id,
-                    )
-                    continue
 
             if not station_id.lower() in db_stations.index:
                 self.logger.warning(
