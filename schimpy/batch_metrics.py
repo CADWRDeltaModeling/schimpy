@@ -806,6 +806,7 @@ def init_logger():
 
 def shutdown_logger():
     for handler in logging.root.handlers:
+        handler.close()
         logging.root.removeHandler(handler)
 
 
