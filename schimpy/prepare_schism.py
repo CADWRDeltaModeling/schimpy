@@ -75,7 +75,7 @@ def create_hgrid(s, inputs, logger):
                 demfiles=dem_list,
                 na_fill=default_depth_for_missing_dem,
                 logger=logger,
-                out_dir=inputs["prepro_output_dir"]
+                out_dir=inputs["prepro_output_dir"],
             )
             optimized_elevation = optimizer.optimize(opt_params)
             s.mesh.nodes[:, 2] = np.negative(optimized_elevation)
@@ -249,6 +249,20 @@ def create_structures(s, inputs, logger):
     if structures is None:
         logger.error("No structures in hydraulics section")
         raise ValueError("No structures in hydraulics section")
+    nudging = dict_struct.get("nudging")
+    structures = get_structures_from_yaml(structures)
+    s.create_structures(structures, nudging)
+    fname = dict_struct.get("outputfile")
+    fname = ensure_outdir(inputs["prepro_output_dir"], fname)
+    if fname is not None:
+        fname = os.path.expanduser(fname)
+        logger.info("Creating %s..." % fname)
+        s.write_structures(fname)
+
+
+def get_structures_from_yaml(inputs):
+    """Get structures from hydraulic_structures.yaml file"""
+    structures = inputs.copy()
     structure_items = ("name", "type", "end_points", "configuration", "reference")
     configuration_items = (
         "n_duplicates",
@@ -268,19 +282,13 @@ def create_structures(s, inputs, logger):
         "culvert_op_downstream",
         "culvert_op_upstream",
     )
-    nudging = dict_struct.get("nudging")
     for structure in structures:
         check_and_suggest(structure, structure_items)
         conf = structure.get("configuration")
         if conf is not None:
             check_and_suggest(conf, configuration_items)
-    s.create_structures(structures, nudging)
-    fname = dict_struct.get("outputfile")
-    fname = ensure_outdir(inputs["prepro_output_dir"], fname)
-    if fname is not None:
-        fname = os.path.expanduser(fname)
-        logger.info("Creating %s..." % fname)
-        s.write_structures(fname)
+
+    return structures
 
 
 def create_fluxflag(s, inputs, logger):
