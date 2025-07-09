@@ -481,10 +481,10 @@ def prepare_schism(args, use_logging=True):
 
     if item_exist(inputs, "copy_resources"):
         logger.info("Copying resources to output dir")
-        copy_spec = inputs['copy_resources']
-        for key,item in copy_spec.items():
-            outpath = os.path.join(outdir,item)
-            if os.path.normpath(key) == os.path.normpath(outpath): 
+        copy_spec = inputs["copy_resources"]
+        for key, item in copy_spec.items():
+            outpath = os.path.join(outdir, item)
+            if os.path.normpath(key) == os.path.normpath(outpath):
                 continue
             logger.info(f"copy_resources: copying {key} to {outpath}")
             shutil.copyfile(key, outpath)
