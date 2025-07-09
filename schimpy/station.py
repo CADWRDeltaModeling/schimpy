@@ -410,6 +410,12 @@ def merge_station_subloc(station_dbase, station_subloc, default_z):
 
 def read_obs_links(fpath):
     """Read an obs_links csv file which has comma as delimiter and (id,subloc,variable) as index"""
+
+    actual_columns = pd.read_csv(fpath, nrows=0).columns.tolist()
+    assert set(["station_id", "subloc", "variable"]).issubset(
+        actual_columns
+    ), f"The 'obs_links' file '{fpath}' must have columns: 'station_id', 'subloc', and 'variable'. Found: {actual_columns}"
+
     df = pd.read_csv(
         fpath,
         sep=",",
