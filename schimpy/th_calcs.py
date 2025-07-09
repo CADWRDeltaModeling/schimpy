@@ -157,11 +157,11 @@ def struct_open_props(struct, th_data, out_freq="15min", datetime_idx=None):
     For instance, a simple gate might just be (width * height)/(max(width) * max(height))
     """
 
-    if struct.type == "weir":
+    if struct["type"] == "weir":
         # width, elevation, op_down, op_up
         up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "width"]
         down_cols_to_multiply = ["install", "ndup", "op_down", "elev", "width"]
-    elif struct.type == "radial":
+    elif struct["type"] == "radial":
         # width, height, elevation, op_down, op_up
         up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "width", "height"]
         down_cols_to_multiply = [
@@ -172,11 +172,11 @@ def struct_open_props(struct, th_data, out_freq="15min", datetime_idx=None):
             "width",
             "height",
         ]
-    elif struct.type == "culvert":
+    elif struct["type"] == "culvert":
         # rad, elevation, op_down, op_up
         up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "rad"]
         down_cols_to_multiply = ["install", "ndup", "op_down", "elev", "rad"]
-    elif struct.type == "radial_relheight":
+    elif struct["type"] == "radial_relheight":
         # width, height, elevation, op_down, op_up
         up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "width", "height"]
         down_cols_to_multiply = [
@@ -187,7 +187,7 @@ def struct_open_props(struct, th_data, out_freq="15min", datetime_idx=None):
             "width",
             "height",
         ]
-    elif struct.type == "weir_culvert":
+    elif struct["type"] == "weir_culvert":
         # elevation, width, op_down, op_up - weirs
         # elevation, width, op_up, op_down - culvert
         up_cols_to_multiply = [
@@ -213,7 +213,7 @@ def struct_open_props(struct, th_data, out_freq="15min", datetime_idx=None):
             "down_op_pipe",
         ]
     else:
-        raise ValueError(f"structure type {struct.type} is not yet supported!")
+        raise ValueError(f"structure type {struct['type']} is not yet supported!")
 
     # Take the dataframe and normalize to max/min of each column
     norm_df = normalize_df(th_data)
@@ -225,8 +225,8 @@ def struct_open_props(struct, th_data, out_freq="15min", datetime_idx=None):
         norm_df = norm_df.ffill()
 
     up_df = norm_df[["open_up"]].copy()
-    up_df.columns = [f"{struct.name}_up"]
+    up_df.columns = [f"{struct['name']}_up"]
     down_df = norm_df[["open_down"]].copy()
-    down_df.columns = [f"{struct.name}_down"]
+    down_df.columns = [f"{struct['name']}_down"]
 
     return up_df, down_df
