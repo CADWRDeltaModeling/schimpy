@@ -39,6 +39,13 @@ def calc_net_source_sink(
         start_date = vsrc.index[0]
     if end_date is None:
         end_date = vsrc.index[-1]
+
+    if (vsrc.index[0] > pd.to_datetime(end_date)) or (
+        vsrc.index[-1] < pd.to_datetime(start_date)
+    ):
+        raise ValueError(
+            f"File: {vsource_file} does not cover the dates requested. \n\tRequested dates are: {start_date} to {end_date}, \n\tand the file covers {vsrc.index[0]} to {vsrc.index[-1]}"
+        )
     vsrc = vsrc[start_date:end_date]
     vsink = vsink[start_date:end_date]
 
