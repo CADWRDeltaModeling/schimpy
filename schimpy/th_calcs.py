@@ -81,6 +81,12 @@ def read_flux(
         start_date = flux_df.index[0]
     if end_date is None:
         end_date = flux_df.index[-1]
+    if (flux_df.index[0] > pd.to_datetime(end_date)) or (
+        flux_df.index[-1] < pd.to_datetime(start_date)
+    ):
+        raise ValueError(
+            f"File: {flux} does not cover the dates requested. \n\tRequested dates are: {start_date} to {end_date}, \n\tand the file covers {flux_df.index[0]} to {flux_df.index[-1]}"
+        )
     flux_df = flux_df[start_date:end_date]
 
     return flux_df
