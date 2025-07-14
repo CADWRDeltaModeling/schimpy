@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-""" unit tests of schism_mesh
-"""
+"""unit tests of schism_mesh"""
 from schimpy.schism_mesh import SchismMesh, read_mesh, write_mesh, BoundaryType
 import numpy as np
 import unittest
@@ -9,8 +8,7 @@ import os
 
 
 class TestSchismMesh(unittest.TestCase):
-    """ Unit test class for TriSchismMesh
-    """
+    """Unit test class for TriSchismMesh"""
 
     def setUp(self):
         self.testdata_dir = os.path.join(os.path.dirname(__file__), "testdata")
@@ -18,11 +16,11 @@ class TestSchismMesh(unittest.TestCase):
         self.fpath_vmesh_sz = os.path.join(self.testdata_dir, "vgrid_sz.in")
 
     def test_schism_mesh_sms_reader(self):
-        fpath_mesh = os.path.join(self.testdata_dir, 'testmesh.2dm')
+        fpath_mesh = os.path.join(self.testdata_dir, "testmesh.2dm")
         mesh = read_mesh(fpath_mesh)
         self.assertEqual(mesh.n_nodes(), 112)
         self.assertEqual(mesh.n_elems(), 135)
-        self.assertTrue(np.allclose(mesh.node(0), np.array([0., 100., 0.])))
+        self.assertTrue(np.allclose(mesh.node(0), np.array([0.0, 100.0, 0.0])))
         self.assertTrue(np.array_equal(mesh.elem(0), np.array([2, 0, 4])))
 
     def test_find_two_neigboring_node_paths(self):
@@ -41,10 +39,8 @@ class TestSchismMesh(unittest.TestCase):
         # Mixed area
         line_segment = (-1.0, 1.0, 101.0, 9.0)
         up_path, down_path = mesh.find_two_neighboring_node_paths(line_segment)
-        self.assertListEqual(up_path,
-                             [52, 60, 68, 76, 84, 91, 97, 102, 106, 109, 111])
-        self.assertListEqual(down_path,
-                             [44, 53, 61, 69, 77, 85, 92, 98, 103, 107, 110])
+        self.assertListEqual(up_path, [52, 60, 68, 76, 84, 91, 97, 102, 106, 109, 111])
+        self.assertListEqual(down_path, [44, 53, 61, 69, 77, 85, 92, 98, 103, 107, 110])
         # Ill-defined, tri
         line_segment = (31.0, 71.0, 39.0, 101.0)
         up_path, down_path = mesh.find_two_neighboring_node_paths(line_segment)
@@ -56,7 +52,7 @@ class TestSchismMesh(unittest.TestCase):
         self.assertListEqual(up_path, [73, 82, 90])
         self.assertListEqual(down_path, [65, 74, 83])
         # Diagonal corner cut
-        line_segment = (82., -3, 103., 18.)
+        line_segment = (82.0, -3, 103.0, 18.0)
         up_path, down_path = mesh.find_two_neighboring_node_paths(line_segment)
         self.assertListEqual(up_path, [109, 111, 110])
         self.assertListEqual(down_path, [106, 103, 107, 104, 108])
@@ -76,18 +72,23 @@ class TestSchismMesh(unittest.TestCase):
         fpath_mesh = self.fpath_mesh
         fpath_vmesh = self.fpath_vmesh_sz
         mesh = read_mesh(fpath_mesh, fpath_vmesh)
-        self.assertEqual(mesh.vmesh.param['nvrt'], 12)
-        self.assertEqual(mesh.vmesh.param['kz'], 2)
-        self.assertEqual(mesh.vmesh.param['h_s'], 80.)
-        self.assertEqual(mesh.vmesh.param['h_c'], 5.0)
-        self.assertTrue(np.allclose(mesh.vmesh.sigma, np.array(
-            [-1.00, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.])))
+        self.assertEqual(mesh.vmesh.param["nvrt"], 12)
+        self.assertEqual(mesh.vmesh.param["kz"], 2)
+        self.assertEqual(mesh.vmesh.param["h_s"], 80.0)
+        self.assertEqual(mesh.vmesh.param["h_c"], 5.0)
+        self.assertTrue(
+            np.allclose(
+                mesh.vmesh.sigma,
+                np.array(
+                    [-1.00, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0.0]
+                ),
+            )
+        )
 
     def test_schism_mesh_gr3_writer(self):
         fpath_mesh = self.fpath_mesh
         mesh = read_mesh(fpath_mesh)
-        fpath_mesh_out = os.path.join(
-            os.path.dirname(__file__), "testdata/meshout.gr3")
+        fpath_mesh_out = os.path.join(os.path.dirname(__file__), "testdata/meshout.gr3")
         write_mesh(mesh, fpath_mesh_out, write_boundary=True)
         meshout = read_mesh(fpath_mesh_out)
         self.assertEqual(meshout.n_nodes(), 112)
@@ -99,8 +100,7 @@ class TestSchismMesh(unittest.TestCase):
     def test_schism_mesh_shp_writer(self):
         fpath_mesh = self.fpath_mesh
         mesh = read_mesh(fpath_mesh)
-        fpath_mesh_out = os.path.join(
-            os.path.dirname(__file__), "testdata/meshout.shp")
+        fpath_mesh_out = os.path.join(os.path.dirname(__file__), "testdata/meshout.shp")
         write_mesh(mesh, fpath_mesh_out, write_boundary=True)
         # meshout = read_mesh(fpath_mesh_out)
         # self.assertEqual(meshout.n_nodes(), 112)
@@ -113,25 +113,25 @@ class TestSchismMesh(unittest.TestCase):
         fpath_mesh = self.fpath_mesh
         mesh = read_mesh(fpath_mesh)
         areas = mesh.areas()
-        self.assertEqual(areas[0], 50.)
-        self.assertEqual(areas[60], 100.)
+        self.assertEqual(areas[0], 50.0)
+        self.assertEqual(areas[60], 100.0)
 
     def test_schism_mesh_edge_len(self):
         fpath_mesh = self.fpath_mesh
         mesh = read_mesh(fpath_mesh)
         edge_lens = mesh.edge_len()
         self.assertAlmostEqual(edge_lens[0], 14.14213562)
-        self.assertAlmostEqual(edge_lens[1], 10.)
+        self.assertAlmostEqual(edge_lens[1], 10.0)
 
     def test_schism_mesh_centroids(self):
         fpath_mesh = self.fpath_mesh
         mesh = read_mesh(fpath_mesh)
         centroids = mesh.centroids()
         np.testing.assert_almost_equal(
-            centroids[0, :], np.array([6.66666667, 96.66666667]))
-        np.testing.assert_almost_equal(
-            centroids[60, :], np.array([75., 45.]))
+            centroids[0, :], np.array([6.66666667, 96.66666667])
+        )
+        np.testing.assert_almost_equal(centroids[60, :], np.array([75.0, 45.0]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
