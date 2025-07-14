@@ -18,6 +18,7 @@ import string
 import re
 import os
 import argparse
+import warnings
 import sys
 
 __all__ = ["load", "dump", "YamlAction", "ArgumentParserYaml"]
@@ -41,10 +42,8 @@ def check_env(env):
         if "$" in k:
             msg += "A Name of environment variable cannot be a variable: " "%s\n" % k
             n_errors += 1
-        if not isinstance(v, str):
-            msg += (
-                "Environment variables do not accept non-scalar " "variables: %s\n" % k
-            )
+        if not isinstance(v, (str, float, int)):
+            msg += "Environment variables do not accept non-scalar variables: %s\n" % k
             n_errors += 1
     if n_errors > 0:
         raise ValueError(msg)
@@ -295,7 +294,7 @@ def load(stream, envvar=None):
             for path, matches in unsub:
                 msg.append(f"  {path}: {matches}")
             msg.append(r"This could be an issue of using {var} instead of ${var}")
-            raise ValueError("\n".join(msg))
+            warnings.warn("\n".join(msg))
         return data
     finally:
         loader.dispose()
