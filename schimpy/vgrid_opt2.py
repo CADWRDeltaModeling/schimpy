@@ -2,7 +2,7 @@
 """
 Package for optimising vgrid smoothness, shape and completeness
 """
-from scipy.ndimage.filters import gaussian_filter1d
+from scipy.ndimage import gaussian_filter1d
 from schimpy.lsc2 import *
 
 

@@ -100,10 +100,10 @@ class Params(object):
         dt = int(self["dt"])
         if type(freq) in (str, pd.Timedelta):
             freq = pd.tseries.frequencies.to_offset(freq)
-            dt = pd.tseries.frequencies.to_offset(f"{dt}S")
+            dt = pd.tseries.frequencies.to_offset(f"{dt}s")
             nspool = freq / dt
         elif isinstance(freq, pd.offsets.DateOffset):
-            dt = pd.tseries.frequencies.to_offset(f"{dt}S")
+            dt = pd.tseries.frequencies.to_offset(f"{dt}s")
             nspool = freq / dt
             if abs(nspool - round(nspool)) > 0.01:
                 raise ValueError("Output interval not divisible by dt")
@@ -326,7 +326,7 @@ def test_param():
     print(parms.run_start)
     print("Stack")
     print(parms.nc_stack)
-    parms.nc_stack = "8H"
+    parms.nc_stack = "8h"
     print(parms.nc_stack)
     print("IHFSKIP")
     print(parms["ihfskip"])
@@ -335,7 +335,7 @@ def test_param():
     parms.station_out = None
     print(parms.station_out_freq)
     print(parms["iout_sta"])
-    parms.station_out_freq = "15T"
+    parms.station_out_freq = "15min"
     print(parms.station_out_freq)
     print(parms["iout_sta"])
 

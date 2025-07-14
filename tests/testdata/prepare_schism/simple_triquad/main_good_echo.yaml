@@ -1,3 +1,4 @@
+prepro_output_dir: ./
 mesh:
   mesh_inputfile: testmesh.2dm
   open_boundaries:

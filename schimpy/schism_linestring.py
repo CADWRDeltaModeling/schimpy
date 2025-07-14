@@ -12,9 +12,12 @@ from osgeo.ogr import (
     wkbLineString,
     Feature,
     CreateGeometryFromWkb,
+    UseExceptions,
 )
 import os
 import copy
+
+UseExceptions()  # Enable exceptions (recommended)
 
 
 class LineString(shapely.geometry.LineString):
@@ -182,7 +185,7 @@ class LineStringShapefileWriter(LineStringIo):
                 if val is not None:
                     feature.SetField(j, val)
             layer.CreateFeature(feature)
-        datasource.Destroy()
+        datasource.Close()
 
 
 class LineStringIoFactory(object):

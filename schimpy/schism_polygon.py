@@ -14,9 +14,12 @@ from osgeo.ogr import (
     wkbPolygon,
     FieldDefn,
     Feature,
+    UseExceptions,
 )
 import numpy as np
 import os
+
+UseExceptions()  # Enable exceptions (recommended)
 
 
 class SchismPolygon(Polygon):
@@ -291,7 +294,7 @@ class SchismPolygonShapefileWriter(SchismPolygonIo):
             feature.SetField(1, polygon.type)
             feature.SetField(2, polygon.attribute)
             layer.CreateFeature(feature)
-        datasource.Destroy()
+        datasource.Close()
 
 
 class SchismPolygonIoFactory(object):

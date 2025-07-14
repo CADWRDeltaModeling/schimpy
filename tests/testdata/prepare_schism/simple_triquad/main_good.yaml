@@ -1,4 +1,5 @@
 # Main input file of SELFE pre-processor
+prepro_output_dir: ./
 mesh:
   mesh_inputfile:       testmesh.2dm
   # mesh input file:       baydelta73.gr3

@@ -34,8 +34,8 @@ def test_param_special(datadir):
     assert parms["rnday"] == 3000
     parms.run_start = "2010-02-04"
     assert parms.run_start == pd.Timestamp(2010, 2, 4)
-    parms.nc_stack = "8H"
-    assert parms.nc_stack == pd.tseries.frequencies.to_offset("8H")
+    parms.nc_stack = "8h"
+    assert parms.nc_stack == pd.tseries.frequencies.to_offset("8h")
     parms.nc_stack = pd.tseries.frequencies.to_offset("1D")
     assert parms["ihfskip"] == 86400 / 90
     parms.hotstart_freq = None
@@ -44,12 +44,12 @@ def test_param_special(datadir):
     assert parms["nhot"] == 1
     assert parms["nhot_write"] == (5 * 86400 / parms["dt"])
 
-    parms.station_out_freq = "30T"
+    parms.station_out_freq = "30min"
     assert parms["iout_sta"] == 1
     assert parms["nspool_sta"] == 20
     parms.station_out_freq = None
     assert parms["iout_sta"] == 0
-    parms.station_out_freq = "15T"
+    parms.station_out_freq = "15min"
 
     print(parms.hotstart_freq)
     print(parms["nhot"])
