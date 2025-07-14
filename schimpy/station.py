@@ -469,6 +469,8 @@ def flux_stations_from_yaml(inp):
     if os.path.exists(inp):
         with open(inp) as f:
             content = yaml.full_load(f)
+    elif inp.endswith("yml") | inp.endswith(".yaml"):
+        raise ValueError(f"Could not find file {inp}")
     else:
         content = inp
         if not "linestrings" in content:
