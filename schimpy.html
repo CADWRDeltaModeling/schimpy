@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modules &mdash; schimpy 1.12.2.dev8+gca78b92 documentation</title>
+  <title>Subpackages &mdash; schimpy 1.12.2.dev8+gca78b92 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -23,7 +23,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="History" href="history.html" />
+    <link rel="next" title="Modules" href="schimpy.util.html" />
     <link rel="prev" title="Command Line Tools" href="schimpy_cli.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
@@ -63,7 +63,11 @@
 <li class="toctree-l1"><a class="reference internal" href="direct_use.html">Using Python Pre-processing Script Programatically</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Module Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="schimpy_cli.html">Command Line Tools</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Modules</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.util.html">Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#modules">Modules</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.base_io">schimpy.base_io module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.base_io.BaseIO"><code class="docutils literal notranslate"><span class="pre">BaseIO</span></code></a></li>
 </ul>
@@ -666,7 +670,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="modules">
+  <section id="subpackages">
+<h1>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="schimpy.util.html">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="schimpy.util.html#module-schimpy.util.yaml_load">schimpy.util.yaml_load module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.util.html#schimpy.util.yaml_load.NamedStringIO"><code class="docutils literal notranslate"><span class="pre">NamedStringIO</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.util.html#schimpy.util.yaml_load.csv_from_file"><code class="docutils literal notranslate"><span class="pre">csv_from_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.util.html#schimpy.util.yaml_load.yaml_from_dict"><code class="docutils literal notranslate"><span class="pre">yaml_from_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.util.html#schimpy.util.yaml_load.yaml_from_file"><code class="docutils literal notranslate"><span class="pre">yaml_from_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.util.html#schimpy.util.yaml_load.yaml_to_yaml"><code class="docutils literal notranslate"><span class="pre">yaml_to_yaml()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="modules">
 <h1>Modules<a class="headerlink" href="#modules" title="Link to this heading"></a></h1>
 <section id="module-schimpy.base_io">
 <span id="schimpy-base-io-module"></span><h2>schimpy.base_io module<a class="headerlink" href="#module-schimpy.base_io" title="Link to this heading"></a></h2>
@@ -3973,7 +3995,7 @@ to gaussian</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>diff</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>Data with multi index for section and parameter, including only parameters that 
+<dt><strong>diff</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>Data with multi index for section and parameter, including only parameters that
 are different, including possibly one being absent from one Param set</p>
 </dd>
 </dl>
@@ -4039,7 +4061,7 @@ are different, including possibly one being absent from one Param set</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>default</strong><span class="classifier">str or Param instance or ‘repo’</span></dt><dd><p>If default is ‘repo’, default is the GitHub repo version. If it is a filename, that name is evaluated. 
+<dt><strong>default</strong><span class="classifier">str or Param instance or ‘repo’</span></dt><dd><p>If default is ‘repo’, default is the GitHub repo version. If it is a filename, that name is evaluated.
 If it is a templated version, that version is read. (config part of this not done yet)</p>
 </dd>
 </dl>
@@ -10772,7 +10794,7 @@ is generated with the cdec_header helper function</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="schimpy_cli.html" class="btn btn-neutral float-left" title="Command Line Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="history.html" class="btn btn-neutral float-right" title="History" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="schimpy.util.html" class="btn btn-neutral float-right" title="Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
