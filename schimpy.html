@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subpackages &mdash; schimpy 1.12.2.dev8+gca78b92 documentation</title>
+  <title>Subpackages &mdash; schimpy 1.12.2.dev31+g7c4b4e0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5ad862ad"></script>
+      <script src="_static/documentation_options.js?v=6d396c34"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -3595,8 +3595,8 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dt class="sig sig-object py" id="schimpy.model_time.is_elapsed">
 <span class="sig-prename descclassname"><span class="pre">schimpy.model_time.</span></span><span class="sig-name descname"><span class="pre">is_elapsed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.model_time.is_elapsed" title="Link to this definition"></a></dt>
 <dd><p>Check whether the input file is ‘elapsed’ or ‘timestamped’.
-Uses the first line of the file to determine this.
-If there are any non-numeric characters then that’s a timestamped file and is_elapsed would return False</p>
+Uses the first non-comment, non-blank line of the file to determine this.
+Ignores any text after a ‘#’ comment marker.</p>
 </dd></dl>
 
 <dl class="py function">
