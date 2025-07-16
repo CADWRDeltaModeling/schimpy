@@ -418,7 +418,7 @@ def elapsed_to_timestamp(input, time_basis, elapsed_unit="s"):
         time_basis = datetime.datetime(*list(map(int, re.split(r"[^\d]", time_basis))))
 
     if not isinstance(input, (pd.DataFrame, pd.Series)):
-        in_df = pd.read_table(input, sep=r"\s+", comment="#", index_col=0, header=None)
+        in_df = read_elapsed(input)
 
     out_df = in_df.copy()
     out_df.index = pd.to_datetime(time_basis) + pd.to_timedelta(
@@ -432,22 +432,30 @@ def read_elapsed(input):
     """Take input dataframe or th filename, returns dataframe"""
 
     if not isinstance(input, (pd.DataFrame, pd.Series)):
-        in_df = pd.read_table(input, sep=r"\s+", comment="#", index_col=0, header=None)
+        out_df = pd.read_table(
+            input, sep=r"\s+", comment="#", index_col=0, header=None, dtype=float
+        )
 
     return out_df
 
 
 def is_elapsed(input):
     """Check whether the input file is 'elapsed' or 'timestamped'.
-    Uses the first line of the file to determine this.
-    If there are any non-numeric characters then that's a timestamped file and is_elapsed would return False
+    Uses the first non-comment, non-blank line of the file to determine this.
+    Ignores any text after a '#' comment marker.
     """
-
     with open(input, "r") as f:
-        first_line = f.readline().strip()
-    is_elapsed = all(re.match(r"^[-+]?\d*\.?\d+$", s) for s in first_line.split())
-
-    return is_elapsed
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue  # Skip blank or comment lines
+            # Ignore comments after '#'
+            line = line.split("#", 1)[0].strip()
+            is_elapsed = all(
+                re.match(r"^[-+]?\d*\.?\d+$", s) for s in line.split() if s
+            )
+            return is_elapsed
+    return False  # If no data lines found
 
 
 def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s", head=None):
