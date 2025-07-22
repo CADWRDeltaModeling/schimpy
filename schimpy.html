@@ -749,7 +749,7 @@ At the end of this script, there is a synthetic example which demonstrates the f
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.cencoos_download.cencoos_schism_opendap">
 <span class="sig-prename descclassname"><span class="pre">schimpy.cencoos_download.</span></span><span class="sig-name descname"><span class="pre">cencoos_schism_opendap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_lo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_lo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat_hi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon_hi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_cache</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.cencoos_download.cencoos_schism_opendap" title="Link to this definition"></a></dt>
-<dd><p>Download cencoos opendap data for all time based on a bounding set of lat/lon 
+<dd><p>Download cencoos opendap data for all time based on a bounding set of lat/lon
 file_base : str prefix for files
 to_cache :  bool whether to stash data in numpy arrays to make it easier next time
 from_cache : use cache rather than download)</p>
@@ -2944,7 +2944,7 @@ perform any file inventory or check for existing hotstart files.</p>
 <dt class="sig sig-object py" id="schimpy.hotstart_inventory.hotstart_inventory">
 <span class="sig-prename descclassname"><span class="pre">schimpy.hotstart_inventory.</span></span><span class="sig-name descname"><span class="pre">hotstart_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">run_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nday</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paramfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hot_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hotstart_inventory.hotstart_inventory" title="Link to this definition"></a></dt>
 <dd><p>Create an inventory of existing hotstarts or expected hotstarts.</p>
-<p>Whether the inventory is for existing or expected hotstarts depends on 
+<p>Whether the inventory is for existing or expected hotstarts depends on
 whether the workdir is an outputs directory or a study directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2978,7 +2978,7 @@ If no hotstarts are found and <cite>expected</cite> is False, returns None.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.hotstart_inventory.hotstart_inventory_exist">
 <span class="sig-prename descclassname"><span class="pre">schimpy.hotstart_inventory.</span></span><span class="sig-name descname"><span class="pre">hotstart_inventory_exist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_print</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.hotstart_inventory.hotstart_inventory_exist" title="Link to this definition"></a></dt>
-<dd><p>Check for the existence of hotstart inventory files and generate a DataFrame 
+<dd><p>Check for the existence of hotstart inventory files and generate a DataFrame
 mapping iterations to corresponding datetime values.
 Parameters
 ———-
@@ -3006,7 +3006,7 @@ start : str or pandas.Timestamp</p>
 <ul class="simple">
 <li><p>The function searches for hotstart files in the specified <cite>workdir</cite> directory.</p></li>
 <li><p>If no files are found in <cite>workdir</cite>, it searches in the current directory.</p></li>
-<li><p>The function assumes hotstart files follow the naming pattern 
+<li><p>The function assumes hotstart files follow the naming pattern
 “hotstart_000000_&lt;iteration&gt;.nc”.</p></li>
 </ul>
 </section>
@@ -3122,7 +3122,7 @@ start : str or pandas.Timestamp</p>
 </table>
 <p class="rubric">Examples</p>
 <p>tree = interp_2d.Invdisttree(obs_xy) # initialize KDTree with observational points
-tree.weights(node_xy)  # calculate weights for each node. 
+tree.weights(node_xy)  # calculate weights for each node.
 values_v = tree.interp(obs.temperature.values)   # perform spatial interpolation with the calculated weights from the previous step</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="schimpy.interp_2d.Invdisttree.interp">
@@ -3154,7 +3154,7 @@ The default is 6.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>node_xy</strong><span class="classifier">np.ndarray, shape (n,2)</span></dt><dd><p>Coordinates of the query points 
+<dt><strong>node_xy</strong><span class="classifier">np.ndarray, shape (n,2)</span></dt><dd><p>Coordinates of the query points
 n is the number of query points</p>
 </dd>
 <dt><strong>eps</strong><span class="classifier">positive float, optional</span></dt><dd><p>approximate nearest, dist &lt;= (1 + eps) * true nearest. The default is 0.</p>
@@ -3192,8 +3192,8 @@ The default is None.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.interpolate_structure.interpolate_structure">
 <span class="sig-prename descclassname"><span class="pre">schimpy.interpolate_structure.</span></span><span class="sig-name descname"><span class="pre">interpolate_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template_th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['install',</span> <span class="pre">'ndup_weir',</span> <span class="pre">'ndup_culvert',</span> <span class="pre">'ndup_pipe']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.interpolate_structure.interpolate_structure" title="Link to this definition"></a></dt>
-<dd><p>Interpolate a dated th “template” for a structure 
-The interpolation adds time detail, maintain data types. 
+<dd><p>Interpolate a dated th “template” for a structure
+The interpolation adds time detail, maintain data types.
 Comments are removed and floating precision is hardwired to two digits</p>
 <p>The input template file must have a header and time stamps that are neat
 with respect to dt. This is checked.</p>
@@ -3636,14 +3636,14 @@ Automatically converts to timestamp if time_basis is supplied unless to_timestam
 <dt class="sig sig-object py" id="schimpy.nml.TopLevelNamelist">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.nml.</span></span><span class="sig-name descname"><span class="pre">TopLevelNamelist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nml.TopLevelNamelist" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>TopLevelNamelist is a class for the top-level elements of the dictionary, and Namelist is a class for all other nested elements. 
+<p>TopLevelNamelist is a class for the top-level elements of the dictionary, and Namelist is a class for all other nested elements.
 The TopLevelNamelist class creates attributes for each key-value pair in the dictionary and, if the value is itself a dictionary, creates a new Namelist object with the nested dictionary.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.nml.map_to_dict">
 <span class="sig-prename descclassname"><span class="pre">schimpy.nml.</span></span><span class="sig-name descname"><span class="pre">map_to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nml.map_to_dict" title="Link to this definition"></a></dt>
-<dd><p>This function takes an object of type TopLevelNamelist as input and returns a dictionary representation of the object. 
+<dd><p>This function takes an object of type TopLevelNamelist as input and returns a dictionary representation of the object.
 The function uses the vars built-in function to get a dictionary of attributes and values for the object, and then iterates over the key-value pairs in the dictionary.
 If the value is an instance of the Namelist class, it recursively maps the Namelist object to a dictionary using the map_to_dict function. If the value is not an instance of the Namelist class, it simply adds the key-value pair to the dictionary.
 This way, you can easily map an object of type TopLevelNamelist back to a dictionary representation, preserving the structure of the original dictionary.</p>
@@ -3652,19 +3652,19 @@ This way, you can easily map an object of type TopLevelNamelist back to a dictio
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.nml.map_to_object">
 <span class="sig-prename descclassname"><span class="pre">schimpy.nml.</span></span><span class="sig-name descname"><span class="pre">map_to_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nml.map_to_object" title="Link to this definition"></a></dt>
-<dd><p>In this example, TopLevelNamelist is a class for the top-level elements of the dictionary, and Namelist is a class for all other nested elements. 
-The TopLevelNamelist class creates attributes for each key-value pair in the dictionary and, if the value is itself a dictionary, 
+<dd><p>In this example, TopLevelNamelist is a class for the top-level elements of the dictionary, and Namelist is a class for all other nested elements.
+The TopLevelNamelist class creates attributes for each key-value pair in the dictionary and, if the value is itself a dictionary,
 creates a new Namelist object with the nested dictionary. The Namelist class simply creates an attribute for each key-value pair in the dictionary.</p>
 <p>The map_to_object function takes a dictionary d as input and returns a new TopLevelNamelist object with the values from d.</p>
-<p>This way, you can easily map the dictionary returned by parse_namelist to objects, with different classes for the top-level and nested elements, 
+<p>This way, you can easily map the dictionary returned by parse_namelist to objects, with different classes for the top-level and nested elements,
 and access the values in the dictionary as attributes of the objects.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.nml.parse">
 <span class="sig-prename descclassname"><span class="pre">schimpy.nml.</span></span><span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_content</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.nml.parse" title="Link to this definition"></a></dt>
-<dd><p>Here’s a simple implementation of a parser for the Fortran namelist format 
-If there’s a line starting with !, the parser will store it as the full_line_comment and attach it to the next key-value pair it encounters. 
+<dd><p>Here’s a simple implementation of a parser for the Fortran namelist format
+If there’s a line starting with !, the parser will store it as the full_line_comment and attach it to the next key-value pair it encounters.
 If there’s an inline comment starting with !, it will be stored as inline_comment.</p>
 <p>For the most part this parser is comment preserving; you might notice some whitespace and blank line(s) being eliminated in the round trip through write method below</p>
 </dd></dl>
@@ -5963,7 +5963,7 @@ max_depth is the maximum depth, data assumed to be</p>
 <section id="module-schimpy.read_output_xyt">
 <span id="schimpy-read-output-xyt-module"></span><h2>schimpy.read_output_xyt module<a class="headerlink" href="#module-schimpy.read_output_xyt" title="Link to this heading"></a></h2>
 <p>Read outputs from read_output*_xyt and create a neat list of
-Vtools time series. This module depends on deprecated vtools code and is 
+Vtools time series. This module depends on deprecated vtools code and is
 scheduled for removal</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.read_output_xyt.read_depth_avg_from_output7b_xyt">
@@ -8459,7 +8459,7 @@ without sorting.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.schism_sources_sinks.write_source_sink_in">
 <span class="sig-prename descclassname"><span class="pre">schimpy.schism_sources_sinks.</span></span><span class="sig-name descname"><span class="pre">write_source_sink_in</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_sink_yaml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hgrid_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_sink_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'source_sink.in'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.schism_sources_sinks.write_source_sink_in" title="Link to this definition"></a></dt>
-<dd><p>Create source_sink.in based on hgrid and source_sink.yaml using the 
+<dd><p>Create source_sink.in based on hgrid and source_sink.yaml using the
 create_source_sink_in function in schimpy preprocessor</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -8810,8 +8810,8 @@ If stream is None, return the produced string instead.</p>
 <span id="schimpy-separate-species-module"></span><h2>schimpy.separate_species module<a class="headerlink" href="#module-schimpy.separate_species" title="Link to this heading"></a></h2>
 <p>Separation of tidal data into species
 The key function in this module is separate_species, which decomposes
-tides into subtidal, diurnal, semidiurnal and noise components. 
-A demo function is also provided that reads tide series (6min intervl) 
+tides into subtidal, diurnal, semidiurnal and noise components.
+A demo function is also provided that reads tide series (6min intervl)
 from input files, seperates  the species, writes results and optionally plots
 an example</p>
 <dl class="py function">
@@ -8832,8 +8832,8 @@ an example</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.separate_species.run_example">
 <span class="sig-prename descclassname"><span class="pre">schimpy.separate_species.</span></span><span class="sig-name descname"><span class="pre">run_example</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.separate_species.run_example" title="Link to this definition"></a></dt>
-<dd><p>This is the data for the example. 
-Note that you want the data to 
+<dd><p>This is the data for the example.
+Note that you want the data to
 be at least 4 days longer than the desired output</p>
 </dd></dl>
 
@@ -9455,7 +9455,7 @@ return: argparse.ArgumentParser</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.subset_schism_output.create_partition">
 <span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">create_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_exact</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.create_partition" title="Link to this definition"></a></dt>
-<dd><p>Takes a mesh and list of polygons and partitions according to where the centroids (mesh.centroids in schimpy) fall. 
+<dd><p>Takes a mesh and list of polygons and partitions according to where the centroids (mesh.centroids in schimpy) fall.
 Parameters
 ————
 mesh : schimpy.SchismMesh The mesh to partition</p>
@@ -9470,18 +9470,18 @@ Requires a unique, complete partition. Initially not implemented for True</p>
 <span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">partition_schout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_Schout_Files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_shp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combined</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'salt_depth_ave':</span> <span class="pre">('depth_ave',</span> <span class="pre">'salt')}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.partition_schout" title="Link to this definition"></a></dt>
 <dd><p>Partitions schout binary output files (start with combined) into a set of smaller schout files corresponding to each partition.</p>
 <p>Initially implementation will be nodal variables but ultimately native centered (edge centered velocity, prism centered tracers).</p>
-<p>Transform is an opportunity to generate new variables that are well determined with the data from one time step, 
+<p>Transform is an opportunity to generate new variables that are well determined with the data from one time step,
 but not based on time-stenciled operations.</p>
-<p>Exclude would be an opportunity to prune variables not desired by dropping variables, although certain variables that are required 
-for well-formedness (zcor, wet-dry) and visualization would not be “excludable” so exclude = “all_data” could be used to exclude all 
-but the non-excludable. No output, but side effect is production of files. 
+<p>Exclude would be an opportunity to prune variables not desired by dropping variables, although certain variables that are required
+for well-formedness (zcor, wet-dry) and visualization would not be “excludable” so exclude = “all_data” could be used to exclude all
+but the non-excludable. No output, but side effect is production of files.
 p0000/schout_1.nc.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.subset_schism_output.partition_scribeio">
 <span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">partition_scribeio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_shp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['out2d',</span> <span class="pre">'zCoordinates',</span> <span class="pre">'salinity',</span> <span class="pre">'horizontalVelX',</span> <span class="pre">'horizontalVelY',</span> <span class="pre">'verticalVelocity']</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.partition_scribeio" title="Link to this definition"></a></dt>
-<dd><p>Partitioning scribio format output files  into a set of smaller 
+<dd><p>Partitioning scribio format output files  into a set of smaller
 files corresponding to each partitions. This function will loop
 all the schism scribeIO output files that contains varaibles defined
 by the input variables, and result subset outputs will be saved
@@ -9516,7 +9516,7 @@ to a subset subdirectory.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.subset_schism_output.write_global_local_maps">
 <span class="sig-prename descclassname"><span class="pre">schimpy.subset_schism_output.</span></span><span class="sig-name descname"><span class="pre">write_global_local_maps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_local</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_global</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.subset_schism_output.write_global_local_maps" title="Link to this definition"></a></dt>
-<dd><p>writes maps out in the schism + visit format. Note that the global owner 
+<dd><p>writes maps out in the schism + visit format. Note that the global owner
 of a shared node is the lowest rank that contains it.</p>
 </dd></dl>
 
