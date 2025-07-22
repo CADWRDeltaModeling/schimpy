@@ -14,11 +14,11 @@ import types
 
 
 def enum(**enums):
-    """ A enum type definition
+    """A enum type definition
 
-        Copied from http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python
+    Copied from http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python
     """
-    return type('Enum', (), enums)
+    return type("Enum", (), enums)
 
 
 # Edge trait (or marker)
@@ -29,12 +29,7 @@ def enum(**enums):
 # ISLAND_EDGE = 4
 # CUT_EDGE = 99
 
-EdgeType = enum(INTERNAL=0,
-                BOUNDARY=1,
-                OPEN=2,
-                LAND=3,
-                ISLAND=4,
-                CUT=-1)
+EdgeType = enum(INTERNAL=0, BOUNDARY=1, OPEN=2, LAND=3, ISLAND=4, CUT=-1)
 
 # Boundary type
 # INVALID_BOUNDARY = -1
@@ -42,13 +37,11 @@ EdgeType = enum(INTERNAL=0,
 # LAND_BOUNDARY = 2
 # ISLAND_BOUNDARY = 3
 
-BoundaryType = enum(INVALID=-1,
-                    NO_TYPE=0,
-                    OPEN=1,
-                    LAND=2,
-                    ISLAND=3)
+BoundaryType = enum(INVALID=-1, NO_TYPE=0, OPEN=1, LAND=2, ISLAND=3)
 
-NodeType = enum(INVALID=-1,)
+NodeType = enum(
+    INVALID=-1,
+)
 
 _XXYY = [0, 0, 1, 1]
 _X1X2Y1Y2 = [0, 2, 1, 3]
@@ -57,12 +50,10 @@ MAX_NODES = 4
 
 
 class TriQuadMesh(object):
-    """ Class that holds a triangular and quadrilateral mesh information
-    """
+    """Class that holds a triangular and quadrilateral mesh information"""
 
     def __init__(self, logger=None):
-        """ Constructor of TriQuadMesh
-        """
+        """Constructor of TriQuadMesh"""
         self._logger = logger
         self._elems = None
         self._nodes = None
@@ -75,37 +66,37 @@ class TriQuadMesh(object):
 
     @property
     def nodes(self):
-        """ Node array consisting of three-dimensional coordinates of each node.
-            The shape of the array is (# of nodes, 3)
+        """Node array consisting of three-dimensional coordinates of each node.
+        The shape of the array is (# of nodes, 3)
 
-            :getter: Get the array of the nodes.
-            :type: Numpy float array.
+        :getter: Get the array of the nodes.
+        :type: Numpy float array.
         """
         return self._nodes
-    
+
     @nodes.setter
     def nodes(self, newnodes):
         self._nodes = newnodes
 
     @property
     def elems(self):
-        """ Array of node indexes of all elements.
-            The shape of the array is (# of elems, 5).
+        """Array of node indexes of all elements.
+        The shape of the array is (# of elems, 5).
 
-            Returns
-            -------
-            list of Numpy integer array
-                list of node indexes for all elements
+        Returns
+        -------
+        list of Numpy integer array
+            list of node indexes for all elements
         """
         return [self.elem(i) for i in range(self._elems.shape[0])]
         # return self._elems
 
     @property
     def edges(self):
-        """ Get the array of edges
+        """Get the array of edges
 
-            :getter: Get the array of the edges.
-            :type: Numpy integer array
+        :getter: Get the array of the edges.
+        :type: Numpy integer array
         """
         if self._edges is None:
             self.build_edges_from_elems()
@@ -118,24 +109,24 @@ class TriQuadMesh(object):
         return self._node2elems
 
     def node(self, node_i):
-        """ Selects a single node"""
-        
+        """Selects a single node"""
+
         return self._nodes[node_i]
 
     def elem(self, elem_i):
-        """ Get connectivity of an element
+        """Get connectivity of an element
 
-            Parameters
-            ----------
-            elem_i: int
-                element index
+        Parameters
+        ----------
+        elem_i: int
+            element index
 
 
-            Returns
-            -------
-            Numpy int32 array
-                connectivity of the element (node indexes of the element)
-                None, if the element is marked as deleted
+        Returns
+        -------
+        Numpy int32 array
+            connectivity of the element (node indexes of the element)
+            None, if the element is marked as deleted
         """
         if self._elems[elem_i, 0] == NodeType.INVALID:
             return None
@@ -143,57 +134,58 @@ class TriQuadMesh(object):
             return self._elems[elem_i, self._elems[elem_i] > NodeType.INVALID]
 
     def mark_elem_deleted(self, elem_i):
-        """ Mark an element as deleted or invalid.
+        """Mark an element as deleted or invalid.
 
-            Parameters
-            ----------
-            elem_i: int
-                element index to mark
+        Parameters
+        ----------
+        elem_i: int
+            element index to mark
         """
         self._elems[elem_i, 0] = NodeType.INVALID
 
     def allocate(self, n_elems, n_nodes):
-        """ Allocate memory for nodes and elems
+        """Allocate memory for nodes and elems
 
-            Parameters
-            ----------
-            n_elems: int
-                Total number of elems
-            n_nodes: int
-                Total number of nodes
+        Parameters
+        ----------
+        n_elems: int
+            Total number of elems
+        n_nodes: int
+            Total number of nodes
         """
         self._nodes = np.full((n_nodes, 3), np.nan, dtype=np.float64)
         # Elements up to 2,147,483,647 (int32)
         # # of nodes in the element, and connectivities
-        self._elems = np.full((n_elems, MAX_NODES),
-                              np.iinfo(np.int32).min, dtype=np.int32)
+        self._elems = np.full(
+            (n_elems, MAX_NODES), np.iinfo(np.int32).min, dtype=np.int32
+        )
 
     def set_node(self, index, coords):
-        """ Set one node information.
-            Memory for nodes must be allocated already.
+        """Set one node information.
+        Memory for nodes must be allocated already.
 
-            Parameters
-            ----------
-            index: integer
-                Zero-based node index
-            coords: Numpy array
-                a Numpy array of node coordinates
+        Parameters
+        ----------
+        index: integer
+            Zero-based node index
+        coords: Numpy array
+            a Numpy array of node coordinates
         """
         if not index < self._nodes.shape[0]:
             raise ValueError("Accessing out of bound in node array")
-        self._nodes[index, ] = coords
+        self._nodes[index,] = coords
 
     def set_elem(self, index, connectivity):
-        """ Set element connectivity information.
-            Memory for elems must be allocated already.
+        """Set element connectivity information.
+        Memory for elems must be allocated already.
 
-            Parameters
-            ----------
-            index: integer
-                Zero-based element index
-            connectivity: Numpy array
-                a Numpy array of element connectivity, which means node
-                indexes in the element.
+        Parameters
+        ----------
+        index: integer
+            Zero-based element index
+        connectivity: Numpy array
+            a Numpy array of element connectivity, which means node
+            indexes in the element.
         """
         if not index < self._elems.shape[0]:
             raise ValueError("Accessing out of bound in node array")
@@ -202,36 +194,32 @@ class TriQuadMesh(object):
             raise ValueError("Not enough connectivity information.")
         if n_nodes > MAX_NODES:
             raise ValueError("Too many connectivity information.")
-        self._elems[index, :len(connectivity)] = np.array(
-            connectivity, dtype=np.int32)
+        self._elems[index, : len(connectivity)] = np.array(connectivity, dtype=np.int32)
 
     def n_nodes(self):
-        """ Get the total number of nodes.
-        """
+        """Get the total number of nodes."""
         return self._nodes.shape[0]
 
     def n_elems(self):
-        """ Get the total number of elements.
-        """
+        """Get the total number of elements."""
         return self._elems.shape[0]
 
     def n_edges(self):
-        """ Get the total number of edges.
-        """
+        """Get the total number of edges."""
         return self.edges.shape[0]
 
     def compare(self, mesh):
-        """ Compare the mesh with another
+        """Compare the mesh with another
 
-            Parameters
-            ----------
-            mesh: triquadmesh.TriQuadMesh
-                a mesh to compare
+        Parameters
+        ----------
+        mesh: triquadmesh.TriQuadMesh
+            a mesh to compare
 
-            Returns
-            -------
-            boolean
-                True if they have identical node and element array
+        Returns
+        -------
+        boolean
+            True if they have identical node and element array
         """
         if (self._nodes == mesh._nodes).all() and (self._elems == mesh._elems).all():
             return True
@@ -275,7 +263,8 @@ class TriQuadMesh(object):
                 # the intersection is us and our neighbor
                 # so difference out ourselves...
                 adj_elem_of_edge = elem_ball_node_a.intersection(
-                    elem_ball_node_b).difference(my_set)
+                    elem_ball_node_b
+                ).difference(my_set)
                 # and maybe we get a neighbor, maybe not (we're a boundary)
                 n_neighbors = len(adj_elem_of_edge)
                 if n_neighbors == 1:
@@ -283,14 +272,23 @@ class TriQuadMesh(object):
                 elif n_neighbors == 0:
                     adj_elem_i = -1
                 else:
-                    raise RuntimeError("Cannot have more than two neighbors "
-                                       "of one edge.")
+                    raise RuntimeError(
+                        "Cannot have more than two neighbors " "of one edge."
+                    )
                 if adj_elem_i == -1 or elem_i < adj_elem_i:
-                    edges.append((node_a,
-                                  node_b,
-                                  EdgeType.BOUNDARY
-                                  if adj_elem_i == -1 else EdgeType.INTERNAL,
-                                  elem_i, adj_elem_i))
+                    edges.append(
+                        (
+                            node_a,
+                            node_b,
+                            (
+                                EdgeType.BOUNDARY
+                                if adj_elem_i == -1
+                                else EdgeType.INTERNAL
+                            ),
+                            elem_i,
+                            adj_elem_i,
+                        )
+                    )
 
         self._edges = np.array(edges, dtype=np.int32)
 
@@ -301,9 +299,11 @@ class TriQuadMesh(object):
             # assemble points into list of (id, [x x y y], None)
             # but new rtree allows for interleaved coordinates all the time.
             # best solution probably to specify interleaved=False
-            tuples = [(i, self._nodes[i, _XXYY], None)
-                      for i in range(self.n_nodes())
-                      if np.isfinite(self._nodes[i, 0])]
+            tuples = [
+                (i, self._nodes[i, _XXYY], None)
+                for i in range(self.n_nodes())
+                if np.isfinite(self._nodes[i, 0])
+            ]
             self._node_index = rtree.Rtree(tuples, interleaved=False)
 
     def _build_elem_index(self):
@@ -332,8 +332,7 @@ class TriQuadMesh(object):
             self._elem_index = rtree.Rtree(tuples, interleaved=False)
 
     def build_elem_balls(self):
-        """ Build balls of elements around each node
-        """
+        """Build balls of elements around each node"""
         if self._node2elems is not None:
             if self._logger is not None:
                 self._logger.info("Remapping nodes to elements...")
@@ -349,36 +348,36 @@ class TriQuadMesh(object):
                 self._node2elems[node_index].add(elem_i)
 
     def get_elems_i_from_node(self, node_i):
-        """ Get the ball of elements around a node, node_i
+        """Get the ball of elements around a node, node_i
 
-            Parameters
-            ----------
-            node_i: int
-                node index (zero-based)
+        Parameters
+        ----------
+        node_i: int
+            node index (zero-based)
 
-            Returns
-            -------
-            set
-                set of element indexes
+        Returns
+        -------
+        set
+            set of element indexes
         """
         if self._node2elems is None:
             self.build_elem_balls()
         return self._node2elems[int(node_i)]
 
     def find_edge(self, nodes, direction=False):
-        """ Find an edge index with the two given node indexes.
+        """Find an edge index with the two given node indexes.
 
-            Parameters
-            ----------
-            nodes: array-like
-                two node indexes
-            direction:
-                match the ordering of the nodes when an edge is found.
+        Parameters
+        ----------
+        nodes: array-like
+            two node indexes
+        direction:
+            match the ordering of the nodes when an edge is found.
 
-            Returns
-            -------
-            int
-                an edge index, None if not found
+        Returns
+        -------
+        int
+            an edge index, None if not found
         """
         el0 = self.get_edges_from_node(nodes[0])
         if direction is True:
@@ -427,16 +426,16 @@ class TriQuadMesh(object):
         self._node2edges = n2e
 
     def get_edges_from_node(self, node_i):
-        """ Get edge indexes related to node_i
+        """Get edge indexes related to node_i
 
-            Parameters
-            ----------
-            node_i: int
-                Node index (zero-based)
-            Returns
-            -------
-            list
-                a list of edges
+        Parameters
+        ----------
+        node_i: int
+            Node index (zero-based)
+        Returns
+        -------
+        list
+            a list of edges
         """
         if self._node2edges is None:
             self._build_node2edges()
@@ -446,8 +445,7 @@ class TriQuadMesh(object):
             return []
 
     def get_neighbor_nodes(self, node_i):
-        """ Get neighboring node indexes from the given node index.
-        """
+        """Get neighboring node indexes from the given node index."""
         if self._node2edges is None:
             self._build_node2edges()
         nodes = []
@@ -461,20 +459,17 @@ class TriQuadMesh(object):
         return nodes
 
     def add_boundary(self, nodes, btype):
-        """ Add boundary types to an edge with the given array of node indexes
-        """
+        """Add boundary types to an edge with the given array of node indexes"""
         node_prev_i = nodes[0]
         for node_i in nodes[1:]:
             edge_i = self.find_edge([node_prev_i, node_i])
             if edge_i is None:
-                raise Exception('No edge found with the given nodes')
+                raise Exception("No edge found with the given nodes")
             if -1 not in self.edges[edge_i, 3:5]:
-                raise Exception('Trying to tag a non-boundary edge '
-                                'as boundary')
+                raise Exception("Trying to tag a non-boundary edge " "as boundary")
             if btype == BoundaryType.OPEN:
                 self.edges[edge_i, 2] = EdgeType.OPEN
-            elif btype == BoundaryType.LAND \
-                    or btype == BoundaryType.ISLAND:
+            elif btype == BoundaryType.LAND or btype == BoundaryType.ISLAND:
                 self.edges[edge_i, 2] = EdgeType.LAND
             else:
                 raise Exception("Unsupported boundary type")
@@ -508,8 +503,7 @@ class TriQuadMesh(object):
             # Note that this will include interprocessor boundary
             # nodes, too.
             boundary_nodes = np.unique(self.edges[self.edges[:, 2] > 0, :2])
-            dists = np.sum((pos - self._nodes[boundary_nodes, 0:2]) ** 2,
-                           axis=1)
+            dists = np.sum((pos - self._nodes[boundary_nodes, 0:2]) ** 2, axis=1)
             order = np.argsort(dists)
             closest = boundary_nodes[order[:count]]
             # print "   done with boundary node search"
@@ -582,8 +576,7 @@ class TriQuadMesh(object):
                     e = self.find_edge((best, node_i))
                     if self.edges[e, 2] < EdgeType.BOUNDARY:
                         continue
-                dist = np.sqrt(
-                    ((self._nodes[node_i] - self._nodes[best])**2).sum())
+                dist = np.sqrt(((self._nodes[node_i] - self._nodes[best]) ** 2).sum())
                 new_cost = best_cost + dist
                 if node_i not in queue:
                     queue[node_i] = np.inf
@@ -601,8 +594,7 @@ class TriQuadMesh(object):
             for nbr in all_nodes_i:
                 if nbr == node_i or nbr not in done:
                     continue
-                dist = np.sqrt(
-                    ((self._nodes[node_i] - self._nodes[nbr])**2).sum())
+                dist = np.sqrt(((self._nodes[node_i] - self._nodes[nbr]) ** 2).sum())
                 if done[node_i] == done[nbr] + dist:
                     path.append(nbr)
                     found_prev = True
@@ -623,11 +615,12 @@ class TriQuadMesh(object):
                     box[0, i] = p[i]
                 if box[1, i] < p[i]:
                     box[1, i] = p[i]
-        return np.transpose(box).reshape(4,)
+        return np.transpose(box).reshape(
+            4,
+        )
 
     def find_intersecting_elems_with_line(self, line_segment):
-        """ Format of the line segment: start_x, start_y, end_x, end_y
-        """
+        """Format of the line segment: start_x, start_y, end_x, end_y"""
         if self._elem_index is None:
             self._build_elem_index()
 
@@ -638,17 +631,16 @@ class TriQuadMesh(object):
         # Test which one is actually intersect
         real_hits = []
         for hit in hits:
-            nodes_hit = np.array(self.elem(hit),dtype = 'i')
-            nodes = self._nodes[nodes_hit,0:2]                
-            signs = np.sign(np.dot(normal, \
-                    np.transpose(np.subtract(nodes, x[0, ]))))
+            nodes_hit = np.array(self.elem(hit), dtype="i")
+            nodes = self._nodes[nodes_hit, 0:2]
+            signs = np.sign(np.dot(normal, np.transpose(np.subtract(nodes, x[0,]))))
             if not np.all(signs == signs[0]):
                 real_hits.append(hit)
 
         return real_hits
 
     def find_neighbors_on_segment(self, line_segment):
-        """ Find elements on the line_segment and neighbors that are all to the left (downstream)
+        """Find elements on the line_segment and neighbors that are all to the left (downstream)
         Format of the line segment: start_x, start_y, end_x, end_y
         Returns a list of elements on the segment and a list of neighbors. The lists are not guarateed to be ordered spatially
         """
@@ -659,47 +651,44 @@ class TriQuadMesh(object):
         normal = np.array((x[0, 1] - x[1, 1], x[1, 0] - x[0, 0]))
         box = self._box_from_points(x)
         hits = list(self._elem_index.intersection(box))
-        if len(hits) == 0: 
+        if len(hits) == 0:
             raise ValueError("No hits for line_segment")
         # Test which one is actually intersect
         neighborset = set()
         real_hits = []
         for hit in hits:
-            nodes_hit = np.array(self.elem(hit),dtype = 'i')
-            
-            nodes = self._nodes[nodes_hit,0:2]                
-            signs = np.sign(np.dot(normal, \
-                                   np.transpose(np.subtract(nodes, x[0, ]))))
-            if np.all(signs == signs[0]): 
+            nodes_hit = np.array(self.elem(hit), dtype="i")
+
+            nodes = self._nodes[nodes_hit, 0:2]
+            signs = np.sign(np.dot(normal, np.transpose(np.subtract(nodes, x[0,]))))
+            if np.all(signs == signs[0]):
                 # nodes of polygon all on same side of line, no real intersection
                 continue
             real_hits.append(hit)
             candidate_edges = self.element2edges(hit)
             for ee in candidate_edges:
-                # neighbor elemets accepted if their adjoining edges are all on downstream side of 
+                # neighbor elemets accepted if their adjoining edges are all on downstream side of
                 # the segment
                 edge_info = self._edges[ee]
-                nodes_ee = np.array(edge_info[0:2],dtype = 'i')  
-                nodes2 = self._nodes[nodes_ee,0:2]                  
-                signs2 = np.sign(np.dot(normal, \
-                                   np.transpose(np.subtract(nodes2, x[0, ]))))
+                nodes_ee = np.array(edge_info[0:2], dtype="i")
+                nodes2 = self._nodes[nodes_ee, 0:2]
+                signs2 = np.sign(
+                    np.dot(normal, np.transpose(np.subtract(nodes2, x[0,])))
+                )
                 all_left = np.all(signs2 > 0)
                 if all_left:
-                    els =edge_info[3:5]
-                    if not hit in els: 
+                    els = edge_info[3:5]
+                    if not hit in els:
                         raise Exception("Boundary case not handled")
                     other = els[0] if (els[0] != hit) else els[1]
                     neighborset.add(other)
-                    
+
         return real_hits, list(neighborset)
 
-
-
-
     def find_elem(self, pos):
-        """ Find a element index from a coordinate
-            pos = A coordinate (2D)
-            return = element index
+        """Find a element index from a coordinate
+        pos = A coordinate (2D)
+        return = element index
         """
         if self._elem_index is None:
             self._build_elem_index()
@@ -732,15 +721,15 @@ class TriQuadMesh(object):
 
                 # This test returns positive if a dot is on the element border.
                 # And it return anything that is tested first.
-                if (u >= 0.) and (v >= 0.) and (u + v <= 1.):
+                if (u >= 0.0) and (v >= 0.0) and (u + v <= 1.0):
                     return hit
         return None
 
     def _build_boundary_node_string(self, n1, n2, ccw=True):
-        """ This function builds a node string of boundary nodes from
-            node n1 to n2 in CCW direction.
-            CAVEAT: The node order in the mesh file is assumed CCW.
-            return = array of node_i
+        """This function builds a node string of boundary nodes from
+        node n1 to n2 in CCW direction.
+        CAVEAT: The node order in the mesh file is assumed CCW.
+        return = array of node_i
         """
         ns = []
         ns.append(n1)
@@ -758,16 +747,15 @@ class TriQuadMesh(object):
         return ns
 
     def _clear_edge_types(self):
-        """ Clear edge types
-        """
+        """Clear edge types"""
         if self._edges is not None:
             for edge in self._edges:
                 if edge[2] > EdgeType.INTERNAL:
                     edge[2] = EdgeType.BOUNDARY
 
     def _get_next_node_on_boundary(self, node_i, ccw=True):
-        """ This function gets a node index next to the given one
-            on the boundary.
+        """This function gets a node index next to the given one
+        on the boundary.
         """
         edges_i = self.get_edges_from_node(node_i)
         for edge_i in edges_i:
@@ -781,19 +769,19 @@ class TriQuadMesh(object):
         return None
 
     def find_closest_elems(self, pos, count=1):
-        """ Find indexes of the closet elems with the given position.
-            The distance is measured with the element mass center.
-            All triangular elems is assumed.
+        """Find indexes of the closet elems with the given position.
+        The distance is measured with the element mass center.
+        All triangular elems is assumed.
 
-            Parameters
-            ----------
-            pos: array-like
-                2D position
+        Parameters
+        ----------
+        pos: array-like
+            2D position
 
-            Returns
-            -------
-            int or list
-                element index or indexes
+        Returns
+        -------
+        int or list
+            element index or indexes
 
         """
         if self._elemcenter_index is None:
@@ -834,7 +822,7 @@ class TriQuadMesh(object):
         # mark the cut edges:
         for path in paths:
             for i in range(len(path) - 1):
-                e = self.find_edge(path[i:i + 2])
+                e = self.find_edge(path[i : i + 2])
                 if self._edges[e, 2] == EdgeType.INTERNAL:
                     # or self._edges[e, 2] == EdgeType.CUT:
                     # record at least ones that is really cut,
@@ -856,14 +844,15 @@ class TriQuadMesh(object):
         other_point1 = np.setdiff1d(self.elem(elem1_i), cut_edge[:2])[0]
         other_point2 = np.setdiff1d(self.elem(elem2_i), cut_edge[:2])[0]
 
-        parallel = (b - a)
+        parallel = b - a
         # manually rotate 90deg CCW
         bad = np.array([-parallel[1], parallel[0]])
 
         left = True if left is None else False
 
-        if np.dot(self._nodes[other_point1, :2], bad) \
-                > np.dot(self._nodes[other_point2, :2], bad):
+        if np.dot(self._nodes[other_point1, :2], bad) > np.dot(
+            self._nodes[other_point2, :2], bad
+        ):
             bad_elem = elem1_i if left is True else elem2_i
         else:
             bad_elem = elem2_i if left is True else elem1_i
@@ -899,8 +888,10 @@ class TriQuadMesh(object):
             n_nodes = len(conn)
 
             # get their edges
-            my_edges = [self.find_edge((conn[i], conn[(i + 1) % n_nodes]))
-                        for i in range(n_nodes)]
+            my_edges = [
+                self.find_edge((conn[i], conn[(i + 1) % n_nodes]))
+                for i in range(n_nodes)
+            ]
             # mark it deleted:
             self.mark_elem_deleted(elem_i)
             del_count += 1
@@ -946,8 +937,7 @@ class TriQuadMesh(object):
         # remove lonesome nodes
         active_nodes = np.unique(np.ravel(self._elems[:, :MAX_NODES]))[1:]
         if np.any(active_nodes) <= 0:
-            raise Exception(
-                "renumber: Active nodes includes some negative indexes.")
+            raise Exception("renumber: Active nodes includes some negative indexes.")
 
         old_indexes = -np.ones(self.n_nodes(), np.int32)
 
@@ -961,12 +951,12 @@ class TriQuadMesh(object):
         old_indexes[active_nodes] = new_indexes
         # map onto the new indexes
         flag_active_nodes = np.greater_equal(self._elems[:, :MAX_NODES], 0)
-        self._elems[flag_active_nodes] = old_indexes[
-            self._elems[flag_active_nodes]]
+        self._elems[flag_active_nodes] = old_indexes[self._elems[flag_active_nodes]]
 
         if np.any(self._elems) < 0:
             raise Exception(
-                "renumber: after remapping indexes, have negative node index in elems")
+                "renumber: after remapping indexes, have negative node index in elems"
+            )
 
         # clear out stale data
         self._clear_stale_data()
@@ -975,39 +965,40 @@ class TriQuadMesh(object):
         self.build_edges_from_elems()
 
         # return the mappings so that subclasses can catch up
-        return {'valid_elems': new_elems, 'pointmap': old_indexes,
-                'valid_nodes': active_nodes}
+        return {
+            "valid_elems": new_elems,
+            "pointmap": old_indexes,
+            "valid_nodes": active_nodes,
+        }
 
     def _clear(self):
-        """ Clear up the data
-        """
+        """Clear up the data"""
         self._nodes = None
         self._elems = None
         self._edges = None
         self._clear_stale_data()
 
     def _clear_stale_data(self):
-        """ Clear up the memory
-        """
+        """Clear up the memory"""
         self._node2elems = None
         self._node_index = None
         self._elem_index = None
         self._node2edges = None
 
     def is_elem_on_boundary(self, elem_i):
-        """ Check if the given element with index elem_i is on the boundary
-        
-            Parameters
-            ----------
-            
-            elem_i : int
-                element index
-            
-            Returns
-            -------
-            is_on_boundary : bool
-            True if the element is on the boundary, otherwise False
-            
+        """Check if the given element with index elem_i is on the boundary
+
+        Parameters
+        ----------
+
+        elem_i : int
+            element index
+
+        Returns
+        -------
+        is_on_boundary : bool
+        True if the element is on the boundary, otherwise False
+
         """
         is_on_boundary = False
         for edge_i in self.element2edges(elem_i):
@@ -1030,17 +1021,18 @@ class TriQuadMesh(object):
         """
         elem = self.elem(elem_i)
         n_nodes = len(elem)
-        edges = [self.find_edge((elem[i], elem[(i + 1) % n_nodes]))
-                 for i in range(n_nodes)]
+        edges = [
+            self.find_edge((elem[i], elem[(i + 1) % n_nodes])) for i in range(n_nodes)
+        ]
         return edges
 
     def build_edgecenters(self):
-        """ Build centers of sides
+        """Build centers of sides
 
-            Returns
-            -------
-            numpy.array
-                list of side centers
+        Returns
+        -------
+        numpy.array
+            list of side centers
         """
         edges = np.array([edge[:2] for edge in self._edges])
         nodes = self._nodes[edges]

@@ -3,10 +3,11 @@
 This module handles SCHISM input data which are a mesh, structures,
 and sources/sinks.
 @author: Kijin Nam, knam@water.ca.gov
- """
+"""
 from . import schism_mesh
 from . import schism_structure
 from . import schism_source
+
 
 class SchismInput(object):
     def __init__(self, logger=None):
@@ -26,7 +27,8 @@ class SchismInput(object):
     @mesh.setter
     def mesh(self, value):
         self._mesh = value
-#        self.adopt_new_mesh(value)
+
+    #        self.adopt_new_mesh(value)
 
     @property
     def structures(self):
@@ -47,10 +49,14 @@ class SchismInput(object):
         return self._sources
 
     def n_sources(self):
-        return self._countmatching(self._sources, lambda a: a.type == schism_source.SOURCE)
+        return self._countmatching(
+            self._sources, lambda a: a.type == schism_source.SOURCE
+        )
 
     def n_sinks(self):
-        return self._countmatching(self._sources, lambda a: a.type == schism_source.SINK)
+        return self._countmatching(
+            self._sources, lambda a: a.type == schism_source.SINK
+        )
 
     @property
     def time_start(self):
@@ -72,4 +78,3 @@ class SchismInput(object):
 
     def n_structures(self):
         return len(self._structures)
-    

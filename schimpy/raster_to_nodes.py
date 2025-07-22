@@ -7,12 +7,17 @@ from rasterio.mask import mask
 from shapely.geometry import Polygon, mapping
 import itertools
 
-def raster_to_nodes(mesh, nodes_sel, path_raster,
-                    bins=None,
-                    mapped_values=None,
-                    mask_value=None,
-                    fill_value=None,
-                    band=1):
+
+def raster_to_nodes(
+    mesh,
+    nodes_sel,
+    path_raster,
+    bins=None,
+    mapped_values=None,
+    mask_value=None,
+    fill_value=None,
+    band=1,
+):
     """
     Applies raster values to mesh by calculating means over surrounding elements.
 
@@ -36,8 +41,12 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
         classify_raster = True
 
     # Step 2: Precompute node balls (cache)
-    elements_in_balls = {node_i: list(mesh.get_elems_i_from_node(node_i)) for node_i in nodes_sel}
-    elements_in_polygon = sorted(set(itertools.chain.from_iterable(elements_in_balls.values())))
+    elements_in_balls = {
+        node_i: list(mesh.get_elems_i_from_node(node_i)) for node_i in nodes_sel
+    }
+    elements_in_polygon = sorted(
+        set(itertools.chain.from_iterable(elements_in_balls.values()))
+    )
 
     # Step 3: Build element polygons
     element_polygons = {}
@@ -48,13 +57,15 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
 
     # Step 4: Open raster
     with rasterio.open(path_raster) as src:
-        nodata = src.nodatavals[band-1] if src.nodatavals else None
-        
+        nodata = src.nodatavals[band - 1] if src.nodatavals else None
+
         # Read full raster band if binning is needed
         if classify_raster:
             raster_array = src.read(band)
             if mask_value is not None:
-                raster_array = np.where(raster_array == mask_value, fill_value, raster_array)
+                raster_array = np.where(
+                    raster_array == mask_value, fill_value, raster_array
+                )
             digitized = np.digitize(raster_array, bins, right=False)
             classified_array = np.array(mapped_values)[digitized]
         else:
@@ -65,15 +76,17 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
         for elem_i, polygon in element_polygons.items():
             geom = [mapping(polygon)]
             if classify_raster is False:
-                out_image, out_transform = mask(src, geom, crop=True, indexes=band, nodata=nodata)
+                out_image, out_transform = mask(
+                    src, geom, crop=True, indexes=band, nodata=nodata
+                )
                 data = out_image[0]
             else:
                 # Clip manually from classified_array
                 bounds = polygon.bounds  # (minx, miny, maxx, maxy)
                 row_min, col_min = src.index(bounds[0], bounds[3])  # (xmin, ymax)
                 row_max, col_max = src.index(bounds[2], bounds[1])  # (xmax, ymin)
-                rows = slice(min(row_min, row_max), max(row_min, row_max)+1)
-                cols = slice(min(col_min, col_max), max(col_min, col_max)+1)
+                rows = slice(min(row_min, row_max), max(row_min, row_max) + 1)
+                cols = slice(min(col_min, col_max), max(col_min, col_max) + 1)
                 if rows.start == rows.stop or cols.start == cols.stop:
                     sav_in_elements[elem_i] = 0.0
                     continue
@@ -83,20 +96,24 @@ def raster_to_nodes(mesh, nodes_sel, path_raster,
                     sav_in_elements[elem_i] = 0.0
                     continue
                 # Build temporary profile
-                transform = src.window_transform(((rows.start, rows.stop), (cols.start, cols.stop)))
+                transform = src.window_transform(
+                    ((rows.start, rows.stop), (cols.start, cols.stop))
+                )
                 with rasterio.io.MemoryFile() as memfile:
                     with memfile.open(
-                        driver='GTiff',
+                        driver="GTiff",
                         height=window.shape[0],
                         width=window.shape[1],
                         count=1,
                         dtype=window.dtype,
                         transform=transform,
                         crs=src.crs,
-                        nodata=-999
+                        nodata=-999,
                     ) as dataset:
                         dataset.write(window, 1)
-                        out_image, out_transform = mask(dataset, geom, crop=True, indexes=1, nodata=-999)
+                        out_image, out_transform = mask(
+                            dataset, geom, crop=True, indexes=1, nodata=-999
+                        )
                         data = out_image[0]
 
             masked = np.ma.masked_array(data, mask=(data == nodata))

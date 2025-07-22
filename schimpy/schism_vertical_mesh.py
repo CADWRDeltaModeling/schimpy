@@ -7,12 +7,13 @@ import numpy as np
 import warnings
 import os
 
-__all__ = ['read_vmesh', ]
+__all__ = [
+    "read_vmesh",
+]
 
 
 class SchismVerticalMesh(object):
-    """ SchismVerticalMesh abstract class
-    """
+    """SchismVerticalMesh abstract class"""
 
     def __init__(self):
         pass
@@ -22,8 +23,7 @@ class SchismVerticalMesh(object):
 
 
 class SchismSzVerticalMesh(SchismVerticalMesh):
-    """ Memory model of S-Z hybrid grid for vertical grid
-    """
+    """Memory model of S-Z hybrid grid for vertical grid"""
 
     def __init__(self):
         super(SchismSzVerticalMesh, self).__init__()
@@ -31,8 +31,7 @@ class SchismSzVerticalMesh(SchismVerticalMesh):
         self.reset()
 
     def reset(self):
-        """ Reset variables
-        """
+        """Reset variables"""
         self.param = {}
         self.sigma = None
         self.ztot = None
@@ -44,8 +43,7 @@ class SchismSzVerticalMesh(SchismVerticalMesh):
 
 
 class SchismLocalVerticalMesh(SchismVerticalMesh):
-    """ Memory model of localized vertical grid
-    """
+    """Memory model of localized vertical grid"""
 
     def __init__(self, *args, **kwargs):
         super(SchismLocalVerticalMesh, self).__init__()
@@ -61,8 +59,7 @@ class SchismLocalVerticalMesh(SchismVerticalMesh):
         self.build_kbps(sigma)
 
     def reset(self):
-        """ Reset variables
-        """
+        """Reset variables"""
         self.param = {}
         self.sigma = None
         self.kbps = None
@@ -72,36 +69,37 @@ class SchismLocalVerticalMesh(SchismVerticalMesh):
         return self.sigma.shape[1]
 
     def build_kbps(self, sigma):
-        """ Build a vertical mesh from sigma
+        """Build a vertical mesh from sigma
 
-            Parameters
-            ----------
-            sigma: np.array
+        Parameters
+        ----------
+        sigma: np.array
         """
         self.sigma = sigma
         nan = np.isnan(self.sigma)
-        self.kbps = (self.n_vert_levels() -
-                     np.apply_along_axis(lambda x: np.argmax(x > 0), 1, nan))
+        self.kbps = self.n_vert_levels() - np.apply_along_axis(
+            lambda x: np.argmax(x > 0), 1, nan
+        )
         self.kbps[self.kbps == self.n_vert_levels()] = 0
 
-    def build_z(self, mesh, elev=0.):
-        """ Build vertical z-coord with the mesh
+    def build_z(self, mesh, elev=0.0):
+        """Build vertical z-coord with the mesh
 
-            Parameters
-            ----------
-            mesh: schism_mesh.SchismMesh
-                Corresponding horizontal mesh
-            elev: np.ndarray, optional
-                Reference surface elevation
+        Parameters
+        ----------
+        mesh: schism_mesh.SchismMesh
+            Corresponding horizontal mesh
+        elev: np.ndarray, optional
+            Reference surface elevation
 
-            Returns
-            -------
-            np.ndarray
-                Vertical coordinates in the fashion in SCHISM
-                the shape of the array is (n_nodes, n_vert_levels)
-                z values from the surface are filled from the right.
-                
-            todo: behavior with dry locations not described
+        Returns
+        -------
+        np.ndarray
+            Vertical coordinates in the fashion in SCHISM
+            the shape of the array is (n_nodes, n_vert_levels)
+            z values from the surface are filled from the right.
+
+        todo: behavior with dry locations not described
         """
         # if self.sigma is None:
         #     raise ValueError("Sigma values are not provided")
@@ -113,31 +111,31 @@ class SchismLocalVerticalMesh(SchismVerticalMesh):
         #     self._z[i] = -node[2]
         #     self._z[i, self.kbps[i]:] = (
         #         eta+(eta + node[2]) * self.sigma[i, :n_vert - self.kbps[i]])
-        # return self._z    
+        # return self._z
         vert_grid = mesh.vmesh
-        nvrt = vert_grid.param['nvrt']
+        nvrt = vert_grid.param["nvrt"]
         depths = np.full([mesh.n_nodes(), nvrt], np.finfo(np.float32).min)
         if type(elev) == float:
-            elev = np.ones((mesh.n_nodes(), ))*elev
-            
+            elev = np.ones((mesh.n_nodes(),)) * elev
+
         if vert_grid.ivcor == 1:
             if nvrt < 3:
                 raise ValueError()
 
             for i, node in enumerate(mesh.nodes):
-                hmod2 = max(0.1, node[2]+elev[i])
+                hmod2 = max(0.1, node[2] + elev[i])
                 kbps = vert_grid.kbps[i]
-                depths[i, kbps:] = hmod2 * vert_grid.sigma[i, :nvrt-kbps]
+                depths[i, kbps:] = hmod2 * vert_grid.sigma[i, : nvrt - kbps]
                 depths[i, :kbps] = depths[i, kbps]
             self._z = depths
             return self._z
         elif vert_grid.ivcor == 2:
-            h_s = vert_grid.param['h_s']
-            h_c = vert_grid.param['h_c']
-            kz = vert_grid.param['kz']
+            h_s = vert_grid.param["h_s"]
+            h_c = vert_grid.param["h_c"]
+            kz = vert_grid.param["kz"]
             c_s = vert_grid.c_s
             for i, node in enumerate(mesh.nodes):
-                depth = node[2]+elev[i]                
+                depth = node[2] + elev[i]
                 # S-level
                 hmod2 = max(0.1, min(depth, h_s))
                 for k, s in enumerate(vert_grid.sigma):
@@ -157,9 +155,11 @@ class SchismLocalVerticalMesh(SchismVerticalMesh):
 
 
 class SchismVerticalMeshIoFactory(object):
-    registered_readers = {'sz': 'SchismSzVerticalMeshReader',
-                          'local': 'SchismLocalVerticalMeshReader'}
-    registered_writers = {'local': 'SchismLocalVerticalMeshWriter'}
+    registered_readers = {
+        "sz": "SchismSzVerticalMeshReader",
+        "local": "SchismLocalVerticalMeshReader",
+    }
+    registered_writers = {"local": "SchismLocalVerticalMeshWriter"}
 
     def get_reader(self, name):
         if name in self.registered_readers:
@@ -181,50 +181,47 @@ class SchismSzVerticalMeshReader(object):
         self._vgrid = None
 
     def _check_first_group(self):
-        """ Check the first group
-        """
+        """Check the first group"""
         vgrid = self._vgrid
-        nvrt = vgrid.param['nvrt']
+        nvrt = vgrid.param["nvrt"]
         if nvrt < 3:
             raise ValueError("Wrong nvrt: nvrt < 3")
-        kz = vgrid.param['kz']
+        kz = vgrid.param["kz"]
         if kz < 1:
             raise ValueError("Wrong kz: kz < 1")
         if kz > nvrt - 2:
             raise ValueError("Wrong kz: kz > nvrt - 2")
-        h_s = vgrid.param['h_s']
-        if h_s < 10.:
+        h_s = vgrid.param["h_s"]
+        if h_s < 10.0:
             raise ValueError("Wrong h_s: h_s < 10")
 
     def _check_second_group(self):
-        """ Check the second group
-        """
+        """Check the second group"""
         vgrid = self._vgrid
-        h_c = vgrid.param['h_c']
-        if h_c < 5.:
+        h_c = vgrid.param["h_c"]
+        if h_c < 5.0:
             raise ValueError("Wrong h_c: h_c < 5.")
-        theta_b = vgrid.param['theta_b']
-        if theta_b < 0.:
+        theta_b = vgrid.param["theta_b"]
+        if theta_b < 0.0:
             raise ValueError("Wrong theta_b: theta_b < 0.")
-        if theta_b > 1.:
+        if theta_b > 1.0:
             raise ValueError("Wrong theta_b: theta_b > 1.")
-        theta_f = vgrid.param['theta_f']
-        if theta_f <= 0.:
+        theta_f = vgrid.param["theta_f"]
+        if theta_f <= 0.0:
             raise ValueError("Wrong theta_f: theta_f <= 0.")
 
-    def read(self, fpath='vgrid.in'):
-        """ Read vgrid.in
-        """
+    def read(self, fpath="vgrid.in"):
+        """Read vgrid.in"""
         vgrid = SchismSzVerticalMesh()
         self._vgrid = vgrid
-        with open(fpath, 'r') as fin:
+        with open(fpath, "r") as fin:
             ivcor = int(fin.readline().split()[0])
             nvrt, kz, h_s = list(map(float, fin.readline().split()[:3]))
             nvrt = int(nvrt)
-            vgrid.param['nvrt'] = nvrt
+            vgrid.param["nvrt"] = nvrt
             kz = int(kz)
-            vgrid.param['kz'] = kz
-            vgrid.param['h_s'] = h_s
+            vgrid.param["kz"] = kz
+            vgrid.param["h_s"] = h_s
             self._check_first_group()
             fin.readline()  # Z levels
             ztot = []
@@ -243,9 +240,9 @@ class SchismSzVerticalMeshReader(object):
 
             fin.readline()  # S levels
             h_c, theta_b, theta_f = list(map(float, fin.readline().split()[:3]))
-            vgrid.param['h_c'] = h_c
-            vgrid.param['theta_b'] = theta_b
-            vgrid.param['theta_f'] = theta_f
+            vgrid.param["h_c"] = h_c
+            vgrid.param["theta_b"] = theta_b
+            vgrid.param["theta_f"] = theta_f
             self._check_second_group()
             nsig = nvrt - len(ztot) + 1
             sigma = []
@@ -256,20 +253,24 @@ class SchismSzVerticalMeshReader(object):
                 if k > 1:
                     if s <= sigma[-1]:
                         raise ValueError("Wrong sigma: sigma level inverted")
-                    if s > 0.:
+                    if s > 0.0:
                         raise ValueError("Wrong sigma: simga > 0")
                 sigma.append(s)
-            if sigma[0] != -1.:
+            if sigma[0] != -1.0:
                 warnings.warn("The first sigma must be -1")
-                sigma[0] = -1.
-            if sigma[-1] != 0.:
+                sigma[0] = -1.0
+            if sigma[-1] != 0.0:
                 warnings.warn("The last sigma must be 0")
-                sigma[-1] = 0.
+                sigma[-1] = 0.0
             sigma = np.array(sigma)
             vgrid.sigma = sigma
-            c_s = (1. - theta_b) * np.sinh(theta_f * sigma) / np.sinh(theta_f) \
-                + theta_b * (np.tanh(theta_f * (sigma + 0.5))
-                             - np.tanh(theta_f * 0.5)) * 0.5 / np.tanh(theta_f * 0.5)
+            c_s = (1.0 - theta_b) * np.sinh(theta_f * sigma) / np.sinh(
+                theta_f
+            ) + theta_b * (
+                np.tanh(theta_f * (sigma + 0.5)) - np.tanh(theta_f * 0.5)
+            ) * 0.5 / np.tanh(
+                theta_f * 0.5
+            )
             vgrid.c_s = c_s
         return vgrid
 
@@ -281,48 +282,45 @@ class SchismLocalVerticalMeshReader(object):
         self._vgrid = None
 
     def _check_first_group(self):
-        """ Check the first group
-        """
+        """Check the first group"""
         vgrid = self._vgrid
-        nvrt = vgrid.param['nvrt']
+        nvrt = vgrid.param["nvrt"]
         if nvrt < 3:
             raise ValueError("Wrong nvrt: nvrt < 3")
-        kz = vgrid.param['kz']
+        kz = vgrid.param["kz"]
         if kz < 1:
             raise ValueError("Wrong kz: kz < 1")
         if kz > nvrt - 2:
             raise ValueError("Wrong kz: kz > nvrt - 2")
-        h_s = vgrid.param['h_s']
-        if h_s < 10.:
+        h_s = vgrid.param["h_s"]
+        if h_s < 10.0:
             raise ValueError("Wrong h_s: h_s < 10")
 
     def _check_second_group(self):
-        """ Check the second group
-        """
+        """Check the second group"""
         vgrid = self._vgrid
-        h_c = vgrid.param['h_c']
-        if h_c < 5.:
+        h_c = vgrid.param["h_c"]
+        if h_c < 5.0:
             raise ValueError("Wrong h_c: h_c < 5.")
-        theta_b = vgrid.param['theta_b']
-        if theta_b < 0.:
+        theta_b = vgrid.param["theta_b"]
+        if theta_b < 0.0:
             raise ValueError("Wrong theta_b: theta_b < 0.")
-        if theta_b > 1.:
+        if theta_b > 1.0:
             raise ValueError("Wrong theta_b: theta_b > 1.")
-        theta_f = vgrid.param['theta_f']
-        if theta_f <= 0.:
+        theta_f = vgrid.param["theta_f"]
+        if theta_f <= 0.0:
             raise ValueError("Wrong theta_f: theta_f <= 0.")
 
-    def read(self, fpath='vgrid.in', vgrid_version=None):
-        """ Read vgrid.in
-        """
+    def read(self, fpath="vgrid.in", vgrid_version=None):
+        """Read vgrid.in"""
         vgrid = SchismLocalVerticalMesh()
         self._vgrid = vgrid
         if vgrid_version is None:
             raise ValueError("vgrid_version input is required!")
-        with open(fpath, 'r') as fin:
+        with open(fpath, "r") as fin:
             ivcor = int(fin.readline().split()[0])
             nvrt = int(fin.readline().strip().split()[0])
-            vgrid.param['nvrt'] = nvrt
+            vgrid.param["nvrt"] = nvrt
             sigmas = list()
             kbps = list()
             # this is the old style of vgrid input
@@ -334,7 +332,7 @@ class SchismLocalVerticalMeshReader(object):
                     kbp = int(tkns[1]) - 1
                     kbps.append(kbp)
                     sigma = np.full((nvrt,), np.nan)
-                    sigma[:nvrt - kbp] = list(map(float, tkns[2:nvrt - kbp + 2]))
+                    sigma[: nvrt - kbp] = list(map(float, tkns[2 : nvrt - kbp + 2]))
                     sigmas.append(sigma)
                 vgrid.sigma = np.array(sigmas)
                 vgrid.kbps = np.array(kbps)
@@ -350,7 +348,7 @@ class SchismLocalVerticalMeshReader(object):
                 kbps = np.array(kbps).astype(int) - 1
                 sigma_sort = np.ones_like(sigmas) * np.nan
                 for k, s in enumerate(sigmas):
-                    sigma_sort[k, :nvrt - kbps[k]] = s[kbps[k]:]
+                    sigma_sort[k, : nvrt - kbps[k]] = s[kbps[k] :]
                 vgrid.sigma = np.array(sigma_sort)
                 vgrid.kbps = kbps
             else:
@@ -363,15 +361,14 @@ class SchismLocalVerticalMeshWriter(object):
     def __init__(self, logger=None):
         self.logger = logger
 
-    def write(self, vmesh, fpath='vgrid.in', vgrid_version=None):
-        """ Write vgrid.in
-        """
+    def write(self, vmesh, fpath="vgrid.in", vgrid_version=None):
+        """Write vgrid.in"""
         if vgrid_version is None or not isinstance(vgrid_version, str):
             raise ValueError("vgrid_version input is required and must be string.")
         else:
             print("vgrid_version=", vgrid_version)
-        if vgrid_version == '5.8':
-            with open(fpath, 'w') as f:
+        if vgrid_version == "5.8":
+            with open(fpath, "w") as f:
                 buf = "{}\n".format(vmesh.ivcor)
                 f.write(buf)
                 n_max_levels = vmesh.n_vert_levels()
@@ -381,74 +378,77 @@ class SchismLocalVerticalMeshWriter(object):
                     kbps = vmesh.kbps[i]
                     n_levels = n_max_levels - kbps
                     buf = "{}\t{}\t".format(i + 1, kbps + 1)
-                    buf += '\t'.join(['{:.6f}'.format(d)
-                                      for d in vmesh.sigma[i][:n_levels]])
-                    buf += '\n'
+                    buf += "\t".join(
+                        ["{:.6f}".format(d) for d in vmesh.sigma[i][:n_levels]]
+                    )
+                    buf += "\n"
                     f.write(buf)
-        elif vgrid_version == '5.10':
+        elif vgrid_version == "5.10":
             nmesh = len(vmesh.sigma)
             kbps = vmesh.kbps
             nvrt = vmesh.n_vert_levels()
-            with open(fpath, 'w') as f:
+            with open(fpath, "w") as f:
                 buf = "{}\n".format(vmesh.ivcor)
                 f.write(buf)
                 n_max_levels = vmesh.n_vert_levels()
                 buf = "{}\n".format(n_max_levels)
                 f.write(buf)
-                buf =" ".join(["%10d"%(i+1) for i in kbps])
-                buf += '\n'
-                f.write(buf)            
+                buf = " ".join(["%10d" % (i + 1) for i in kbps])
+                buf += "\n"
+                f.write(buf)
                 sigma = vmesh.sigma
-                sigma_sort = -9.*np.ones_like(sigma)             
-                for k,s in enumerate(sigma):
-                    sigma_sort[k,kbps[k]:] = s[:nvrt - kbps[k]] 
+                sigma_sort = -9.0 * np.ones_like(sigma)
+                for k, s in enumerate(sigma):
+                    sigma_sort[k, kbps[k] :] = s[: nvrt - kbps[k]]
                 # transpose the matrix for output
-                sigma_sort = sigma_sort.T 
-                #sigma_sort[np.isnan(sigma_sort)]=-9.0
+                sigma_sort = sigma_sort.T
+                # sigma_sort[np.isnan(sigma_sort)]=-9.0
                 for k in range(nvrt):
-                    one_based_k=k+1
-                    buf = "%10d "% one_based_k + " ".join(["%14.6f"%s for s in sigma_sort[k]]) 
-                    buf += '\n'
+                    one_based_k = k + 1
+                    buf = "%10d " % one_based_k + " ".join(
+                        ["%14.6f" % s for s in sigma_sort[k]]
+                    )
+                    buf += "\n"
                     f.write(buf)
         else:
             raise ValueError(f"Unknown vgrid format: {vgrid_version}")
 
+
 def read_vmesh(fpath_vmesh, vgrid_version=None):
-    """ Read a vgrid file
-    """
+    """Read a vgrid file"""
     if fpath_vmesh is None:
         raise ValueError("File not given")
     if not os.path.exists(fpath_vmesh):
         raise ValueError("File not found: %s" % fpath_vmesh)
     if vgrid_version is None:
         vgrid_version = "5.10"
-    with open(fpath_vmesh, 'r') as f:
+    with open(fpath_vmesh, "r") as f:
         ivcor = int(f.readline().strip().split()[0])
 
     if ivcor == 1:
-        reader = SchismVerticalMeshIoFactory().get_reader('local')
+        reader = SchismVerticalMeshIoFactory().get_reader("local")
         return reader.read(fpath_vmesh, vgrid_version)
     elif ivcor == 2:
-        reader = SchismVerticalMeshIoFactory().get_reader('sz')
+        reader = SchismVerticalMeshIoFactory().get_reader("sz")
         return reader.read(fpath_vmesh)
     else:
-        raise ValueError('Unsupported vgrid type')
+        raise ValueError("Unsupported vgrid type")
 
 
-def write_vmesh(vmesh, fpath_vmesh='vgrid.in', vgrid_version="5.10"):
+def write_vmesh(vmesh, fpath_vmesh="vgrid.in", vgrid_version="5.10"):
     if vgrid_version is None:
         raise ValueError("vgrid_version is a required input!")
     if vmesh.ivcor == 1:
-        writer = SchismVerticalMeshIoFactory().get_writer('local')
+        writer = SchismVerticalMeshIoFactory().get_writer("local")
         writer.write(vmesh, fpath_vmesh, vgrid_version)
     else:
-        raise ValueError('Unsupported vgrid type')
+        raise ValueError("Unsupported vgrid type")
 
 
-def convert_vmesh(vmesh_in, vmesh_out, input_vgrid_version="5.10",
-                  output_vgrid_version="5.10"):
-    """conversion between old and new style of vgrid.in
-    """
+def convert_vmesh(
+    vmesh_in, vmesh_out, input_vgrid_version="5.10", output_vgrid_version="5.10"
+):
+    """conversion between old and new style of vgrid.in"""
     vgrid = read_vmesh(vmesh_in, input_vgrid_version)
     write_vmesh(vgrid, vmesh_out, output_vgrid_version)
 
@@ -469,7 +469,7 @@ def compare_vmesh(v1, v2):
 
     """
     equal = True
-    if v1.param['nvrt'] != v2.param['nvrt']:
+    if v1.param["nvrt"] != v2.param["nvrt"]:
         equal = False
         print("The number of vertical layers are not equal between the two meshes")
 

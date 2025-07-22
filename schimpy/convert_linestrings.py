@@ -6,6 +6,7 @@ to Shapefile and vice versa
 from schimpy.schism_linestring import read_linestrings, write_linestrings
 import click
 
+
 def convert_linestrings_main(input, output):
     """Function for converting line string files."""
     if input.endswith(".yaml"):
@@ -29,6 +30,7 @@ def convert_linestrings_main(input, output):
             "Unsupported input file type. Only YAML (.yaml) or Shapefile (.shp) are supported."
         )
 
+
 @click.command(help="Convert SCHISM line strings between YAML and Shapefile formats.")
 @click.help_option("-h", "--help")
 @click.option(
@@ -43,10 +45,10 @@ def convert_linestrings_main(input, output):
     type=click.Path(),
     help="Output file (YAML or Shapefile).",
 )
-
 def convert_linestrings_cli(input, output):
     """CLI wrapper for converting line string files."""
     convert_linestrings_main(input, output)
+
 
 if __name__ == "__main__":
     convert_linestrings_cli()

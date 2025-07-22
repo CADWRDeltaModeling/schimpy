@@ -8,8 +8,7 @@ import datetime as dtm
 import os
 import pandas as pd
 from schimpy.param import *
-from vtools import days,seconds
-
+from vtools import days, seconds
 
 
 def expected_hotstarts(run_start, dt, nday, hot_freq):
@@ -59,17 +58,19 @@ def expected_hotstarts(run_start, dt, nday, hot_freq):
     return df
 
 
-def hotstart_inventory(run_start=None,
-                       dt=None,
-                       nday=None,
-                       workdir='.',
-                       paramfile=None,
-                       hot_freq=None,
-                       expected=False):
+def hotstart_inventory(
+    run_start=None,
+    dt=None,
+    nday=None,
+    workdir=".",
+    paramfile=None,
+    hot_freq=None,
+    expected=False,
+):
     """
     Create an inventory of existing hotstarts or expected hotstarts.
 
-    Whether the inventory is for existing or expected hotstarts depends on 
+    Whether the inventory is for existing or expected hotstarts depends on
     whether the workdir is an outputs directory or a study directory.
 
     Parameters
@@ -101,22 +102,33 @@ def hotstart_inventory(run_start=None,
         hot_freq = pd.tseries.frequencies.to_offset(hot_freq)
 
     hots = glob.glob(os.path.join(workdir, "hotstart_000000_*.nc"))
-    is_existing = (len(hots) > 0)
+    is_existing = len(hots) > 0
     print(workdir)
-    param_needed = (dt is None) or (run_start is None) or (hot_freq is None and not is_existing) or pd.isnull(run_start)
-    print("Existing hotstarts found:", is_existing, " params read from file: " + str(param_needed))
+    param_needed = (
+        (dt is None)
+        or (run_start is None)
+        or (hot_freq is None and not is_existing)
+        or pd.isnull(run_start)
+    )
+    print(
+        "Existing hotstarts found:",
+        is_existing,
+        " params read from file: " + str(param_needed),
+    )
     if param_needed:
         if paramfile is None or paramfile == "":
-            paramfile = 'param.nml'
+            paramfile = "param.nml"
         print("got here", paramfile, workdir)
         if os.path.exists(os.path.join(workdir, "..", paramfile)):
             paramfile = os.path.join(workdir, "..", paramfile)
         params = read_params(paramfile)
-        dt_param = params['dt']
+        dt_param = params["dt"]
         run_start_param = params.run_start
-        run_len_param = params['rnday']
+        run_len_param = params["rnday"]
         hot_freq_param = params.hotstart_freq
-        print(f"dt={dt_param}, run_start={run_start_param}, run_len={run_len_param}, hot_freq={hot_freq_param}")
+        print(
+            f"dt={dt_param}, run_start={run_start_param}, run_len={run_len_param}, hot_freq={hot_freq_param}"
+        )
         if run_start is None or pd.isnull(run_start):
             run_start = run_start_param
         if dt is None:
@@ -137,10 +149,9 @@ def hotstart_inventory(run_start=None,
         return None
 
 
-
-def hotstart_inventory_exist(start,dt=90,workdir='.',do_print=True):
+def hotstart_inventory_exist(start, dt=90, workdir=".", do_print=True):
     """
-    Check for the existence of hotstart inventory files and generate a DataFrame 
+    Check for the existence of hotstart inventory files and generate a DataFrame
     mapping iterations to corresponding datetime values.
     Parameters
     ----------
@@ -160,48 +171,85 @@ def hotstart_inventory_exist(start,dt=90,workdir='.',do_print=True):
     -----
     - The function searches for hotstart files in the specified `workdir` directory.
     - If no files are found in `workdir`, it searches in the current directory.
-    - The function assumes hotstart files follow the naming pattern 
+    - The function assumes hotstart files follow the naming pattern
       "hotstart_000000_<iteration>.nc".
     """
 
     print("Hotstart Inventory")
-    if isinstance(start,str):
+    if isinstance(start, str):
         start = pd.Timestamp(start)
-    hots = glob.glob(os.path.join(workdir,"hotstart_000000_*.nc"))
+    hots = glob.glob(os.path.join(workdir, "hotstart_000000_*.nc"))
     if len(hots) == 0:
         hots = glob.glob(os.path.join("hotstart_0000_*.nc"))
     hots.sort()
-    iters = [int(x.split("_")[2].replace(".nc","")) for x in hots]
+    iters = [int(x.split("_")[2].replace(".nc", "")) for x in hots]
 
     iters.sort()
-    times = [start + seconds(x*dt) for x in iters]
-    df = pd.DataFrame(index=times,data=iters)
-    df.columns=["iteration"]
-    df.index.name="datetime"
+    times = [start + seconds(x * dt) for x in iters]
+    df = pd.DataFrame(index=times, data=iters)
+    df.columns = ["iteration"]
+    df.index.name = "datetime"
 
     if do_print:
-        for it,t in zip(iters,times):
-            print("{}: {}".format(it,t))
+        for it, t in zip(iters, times):
+            print("{}: {}".format(it, t))
 
     return df
-   
-def create_arg_parser():
-    parser = argparse.ArgumentParser("Lookup station metadata by partial string match on id or name")
-    parser.add_argument('--dt', default=90, type=int, help="Time step in seconds of model")
-    parser.add_argument('--run_start', default="", help='Start time in iso-like format, e.g. 2013-12-03')
-    parser.add_argument('--nday', default=0, type=int, help='Number of days in simulation (rnday) or maximum to catalog')
-    parser.add_argument('--workdir', default='.', type=str, help="Working directory, which is the outputs dir")
-    parser.add_argument('--paramfile', default="", type=str, help='Name of param.nml file if file is used to infer runtime. If neither params nor paramfile provided, ./param.nmo or ../param.nml will be tried. ')
-    parser.add_argument('--hot_freq', default=None, help="Hotstart frequency in pandas freq terms (e.g. '5D')")
-    parser.add_argument('--expected', action='store_true', help="Flag to generate expected hotstarts instead of inventory of existing files")
-    return parser
 
+
+def create_arg_parser():
+    parser = argparse.ArgumentParser(
+        "Lookup station metadata by partial string match on id or name"
+    )
+    parser.add_argument(
+        "--dt", default=90, type=int, help="Time step in seconds of model"
+    )
+    parser.add_argument(
+        "--run_start", default="", help="Start time in iso-like format, e.g. 2013-12-03"
+    )
+    parser.add_argument(
+        "--nday",
+        default=0,
+        type=int,
+        help="Number of days in simulation (rnday) or maximum to catalog",
+    )
+    parser.add_argument(
+        "--workdir",
+        default=".",
+        type=str,
+        help="Working directory, which is the outputs dir",
+    )
+    parser.add_argument(
+        "--paramfile",
+        default="",
+        type=str,
+        help="Name of param.nml file if file is used to infer runtime. If neither params nor paramfile provided, ./param.nmo or ../param.nml will be tried. ",
+    )
+    parser.add_argument(
+        "--hot_freq",
+        default=None,
+        help="Hotstart frequency in pandas freq terms (e.g. '5D')",
+    )
+    parser.add_argument(
+        "--expected",
+        action="store_true",
+        help="Flag to generate expected hotstarts instead of inventory of existing files",
+    )
+    return parser
 
 
 def main():
     parser = create_arg_parser()
     args = parser.parse_args()
-    hotstart_inventory(args.run_start,args.dt,args.nday,args.workdir,args.paramfile,args.hot_freq,args.expected)
+    hotstart_inventory(
+        args.run_start,
+        args.dt,
+        args.nday,
+        args.workdir,
+        args.paramfile,
+        args.hot_freq,
+        args.expected,
+    )
 
 
 if __name__ == "__main__":

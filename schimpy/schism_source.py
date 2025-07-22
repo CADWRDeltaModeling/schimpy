@@ -7,10 +7,11 @@
 SOURCE = 0
 SINK = 1
 
-def _read_line_and_split(f, lc, expected_count = 0):
+
+def _read_line_and_split(f, lc, expected_count=0):
     """
-       returns: (tokens, lc), tokens are parsed items and lc is
-       the line counter after reading a line.
+    returns: (tokens, lc), tokens are parsed items and lc is
+    the line counter after reading a line.
     """
     splits = f.readline().split()
     comment = False
@@ -20,20 +21,22 @@ def _read_line_and_split(f, lc, expected_count = 0):
         if comment:
             note += " " + item
         else:
-            if item[0] == '!':
+            if item[0] == "!":
                 comment = True
             else:
                 tokens.append(item)
-            
+
     lc += 1
     if expected_count > 0 and len(tokens) < expected_count:
         print("Line #: {}".format(lc))
-        raise Exception(f"Line is corrupted. Expected {expected_count} sources and got {len(tokens)}")
+        raise Exception(
+            f"Line is corrupted. Expected {expected_count} sources and got {len(tokens)}"
+        )
     return tokens, lc, note
 
 
 def read_sources(fname):
-    f = open(fname, 'r')
+    f = open(fname, "r")
     linecount = 0
     (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
     n_sources = int(tokens[0])
@@ -43,10 +46,10 @@ def read_sources(fname):
         source = SchismSource()
         source.type = SOURCE
         source.element_id = int(tokens[0]) - 1
-        source.note=note
+        source.note = note
         sources.append(source)
 
-    f.readline()                    # Blank line
+    f.readline()  # Blank line
     (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
     n_sinks = int(tokens[0])
     sinks = list()
@@ -54,20 +57,20 @@ def read_sources(fname):
 
     for i in range(n_sinks):
         (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
-    
+
         source = SchismSource()
         source.type = SINK
         source.element_id = int(tokens[0]) - 1
         source.note = note
         sinks.append(source)
-        
+
     f.close()
-    return sources,sinks
+    return sources, sinks
 
 
 class SchismSource(object):
-    """ A class to hold structure information
-    """  
+    """A class to hold structure information"""
+
     def __init__(self):
         self._element_id = None
         self._type = None
@@ -108,15 +111,15 @@ class SchismSource(object):
 
 
 class SchismSourceIO(object):
-    """ A class to manage source/sink I/O
-    """
+    """A class to manage source/sink I/O"""
+
     def __init__(self, input):
         self._input = input
 
     def read(self, fname):
-        f = open(fname, 'r')
+        f = open(fname, "r")
         linecount = 0
-        (tokens, linecount, note) =_read_line_and_split(f, linecount, 1)
+        (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
         n_sources = int(tokens[0])
         for i in range(n_sources):
             (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
@@ -127,34 +130,32 @@ class SchismSourceIO(object):
 
         (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
         n_sinks = int(tokens[0])
-        f.readline()                    # Blank line
+        f.readline()  # Blank line
         for i in range(n_sinks):
             (tokens, linecount, note) = _read_line_and_split(f, linecount, 1)
             source = SchismSource()
             source.type = SINK
             source.element_id = int(tokens[0]) - 1
             self._input.sources.append(source)
-            
+
         f.close()
         return self._input.sources
 
-    def write(self, fname = 'source_sink.in'):
-        f = open(fname, 'w')
+    def write(self, fname="source_sink.in"):
+        f = open(fname, "w")
         buf = "%d ! total # of elements with sources\n" % self._input.n_sources()
         f.write(buf)
         for source in self._input.sources:
             if source.type == SOURCE:
                 buf = "%d\n" % (source.element_id + 1)
                 f.write(buf)
-        f.write('\n')                   # Blank line
+        f.write("\n")  # Blank line
         buf = "%d ! total # of elements with sinks\n" % self._input.n_sinks()
         f.write(buf)
         for source in self._input.sources:
             if source.type == SINK:
                 buf = "%d\n" % (source.element_id + 1)
                 f.write(buf)
-                    
+
         f.flush()
         f.close()
-
-
