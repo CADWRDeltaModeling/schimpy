@@ -719,7 +719,9 @@ class SchismMesh(TriQuadMesh):
 
     def plot_nodes(self, var, ax=None, inpoly=None, plot_nan=False, **kwargs):
         if len(self.nodes) != len(var):
-            raise ValueError("input var has different len compared to input node")
+            raise ValueError(
+                f"input var has different len ({len(var)} compared to input node {len(self.nodes)}"
+            )
         velem = np.asarray([var[el].mean(axis=0) for el in self.elems])
         if inpoly is not None:
             inpoly = np.asarray([np.all(inpoly[el]) for el in self.elems])
