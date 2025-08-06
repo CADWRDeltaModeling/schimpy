@@ -35,6 +35,7 @@ showlist = [67, 71, 72, 73, 76]
 showlist = [29914, 29915, 30094, 30774]
 showlist = [16948, 16949, 207525, 207526]
 showlist = [245201]
+showlist = [0]
 
 
 def szcoord(s, h, eta, theta, b, hc):
