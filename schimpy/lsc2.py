@@ -148,7 +148,7 @@ def example2():
 
 def mesh_function_depths(nlayer, depth, mesh, meshfun):
 
-    print("Entering mesh_functino_depths")
+    print("Entering mesh_function_depths")
     for inode in showlist:
         print("inode={} depth={} nlayer={}".format(inode, depth[inode], nlayer[inode]))
 
