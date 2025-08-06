@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "schimpy"
-dynamic = ["version"] # Placeholder; versioneer will manage this
+dynamic = ["version"] # Placeholder; setuptools-scm will manage this
 description = "Python package for SCHISM"
 readme = "README.rst"
 license = "MIT"
@@ -75,6 +75,9 @@ Homepage = "https://cadwrdeltamodeling.github.io/schimpy/"
 
 [tool.flake8]
 exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["NPY201"]
 
 [tool.setuptools.packages.find]
 include = ["schimpy"]

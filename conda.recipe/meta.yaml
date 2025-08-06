@@ -5,7 +5,7 @@
 
 package:
   name: schimpy
-  version: {{ version }}
+  version: {{ SETUPTOOLS_SCM_PRETEND_VERSION }}
 
 source:
   #git_url: https://github.com/CADWRDeltaModeling/schimpy.git
@@ -28,18 +28,20 @@ requirements:
     - {{ dep.lower() }}
     {% endfor %}
   build:
-    - python
+    - python {{ project['requires-python'] }}
     - pip
     - setuptools
     - setuptools_scm
     - pyproj
-    - pytest-runner >=5.0
+    - ruff>=0.4.8
+    # - pytest-runner >=5.0
     - numpy >=2.0
   run:
     - python {{ project['requires-python'] }}
     {% for dep in project.get('dependencies', []) %}
     - {{ dep.lower() }}
     {% endfor %}
+    - numpy >=2.0
 
 test:
   imports:
@@ -51,7 +53,7 @@ test:
     - {{ dep.lower() }}
     {% endfor %}
   commands:
-    - (setlocal && cd tests && pytest && endlocal) # [win]
+    - (cd tests && pytest) # [win]
     - (cd tests; pytest) # [unix]
     
 about:
