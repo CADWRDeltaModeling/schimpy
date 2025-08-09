@@ -1313,7 +1313,7 @@ class VariableField(object):
             same_points = np.where(dist <= dist_th)[0]
             diff_points = np.where(dist > dist_th)[0]
             if self.mesh.n_vert_levels != mesh1.n_vert_levels:
-                raise (
+                raise Exception(
                     "distance threshold should only be defined when the two grids have the same vertical layer numbers"
                 )
             # vin is array for variable from hotstart file
