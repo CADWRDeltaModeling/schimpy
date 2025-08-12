@@ -201,6 +201,9 @@ class Nudging(object):
     ):
 
         write_to_log("---concatenate_nudge---\n")
+        if len(var_newlist) == 0:
+            print("No new variables to merge. Exiting..")
+            return
 
         for i, v in enumerate(var_newlist):
             # merge all the mapping values
