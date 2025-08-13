@@ -382,7 +382,7 @@ class SchismStructureIO(BaseIO):
                     struct.properties["culvert_n_duplicates"]
                 )
                 f.write(buf)
-                buf = "%f %f! elevation and width for culverts\n" % (
+                buf = "%f %f ! elevation and width for culverts\n" % (
                     struct.properties["culvert_elevation"],
                     struct.properties["culvert_radius"],
                 )
