@@ -4,7 +4,6 @@ import os
 import sys
 import pandas as pd
 import geopandas as gpd
-import shapefile
 from shapely.geometry import Point
 from vtools.functions.unit_conversions import *
 from dms_datastore.dstore_config import *
@@ -193,17 +192,19 @@ def read_station_shp(fpath, pop_xy=True):
     """
 
     if os.path.exists(fpath):
-        sf = shapefile.Reader(fpath)
-        fields = [x[0] for x in sf.fields][1:]
-        records = [y[:] for y in sf.records()]
-        shps = [s.points[0] for s in sf.shapes()]
+        import pyogrio
 
-        df = pd.DataFrame(columns=fields, data=records)
+        # Read the shapefile into a GeoDataFrame
+        gdf = pyogrio.read_dataframe(fpath)
+
+        # Convert to regular DataFrame (drop geometry for now)
+        df = gdf.drop(columns=["geometry"]).copy()
 
         if pop_xy:
-            for index, row in df.iterrows():
-                df.loc[index, "x"] = round(shps[index][0], 2)
-                df.loc[index, "y"] = round(shps[index][1], 2)
+            # Extract coordinates from geometry
+            coords = gdf.geometry.get_coordinates()
+            df["x"] = coords["x"].round(2)
+            df["y"] = coords["y"].round(2)
 
         return df
 
