@@ -104,7 +104,7 @@ def read_staout(
         raise ValueError(
             "Duplicate id/subloc pair in station.in file {}".format(station_infile)
         )
-    staout = pd.read_csv(fname, index_col=0, sep="\s+", header=None)
+    staout = pd.read_csv(fname, index_col=0, sep=r"\s+", header=None)
     # todo: hardwire
     staout.mask(staout <= -999.0, inplace=True)
     staout.columns = station_index
@@ -259,7 +259,7 @@ def read_station_in(fpath):
         n_entry = f.readline()
         stations = pd.read_csv(
             f,
-            sep="\s+",
+            sep=r"\s+",
             header=None,
             names=["index", "x", "y", "z", "excl", "id", "subloc", "name"],
             usecols=["x", "y", "z", "id", "subloc", "name"],
@@ -449,7 +449,7 @@ def read_station_out(fpath_base, stationinfo, var=None, start=None):
     data = pd.read_csv(
         fname,
         var,
-        sep="\s+",
+        sep=r"\s+",
         index_col=0,
         header=None,
         names=stationinfo.index,
@@ -543,13 +543,13 @@ def read_flux_out(fpath, names, reftime):
         raise ValueError("Duplicate station names.")
     names = [x.lower() for x in names]
     nstation = len(names)
-    # probe = pd.read_csv(fpath,sep="\s+",index_col=0,header=None,dtype='d',nrows=2)
+    # probe = pd.read_csv(fpath,sep=r"\s+",index_col=0,header=None,dtype='d',nrows=2)
     # ncolfile = probe.shape[1]
 
     cols = [0, *(range(1, nstation + 1))]
     data = pd.read_csv(
         fpath,
-        sep="\s+",
+        sep=r"\s+",
         index_col=0,
         header=None,
         usecols=cols,
