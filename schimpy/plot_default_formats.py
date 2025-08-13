@@ -282,9 +282,9 @@ def set_dual_axes_temp(ax1, filtered=False):
     return ax2
 
 
-EC_LABEL = "EC ($\mathsf{\mu}$S/cm)"
+EC_LABEL = r"EC ($\mathsf{\mu}$S/cm)"
 PSU_LABEL = "Salinity (PSU)"
-FILTERED_EC_LABEL = "Tidal Avg EC ($\mathsf{\mu}$S/cm)"
+FILTERED_EC_LABEL = r"Tidal Avg EC ($\mathsf{\mu}$S/cm)"
 FILTERED_PSU_LABEL = "Tidal Avg Salinity (PSU)"
 salt_axis_labels = [[None, PSU_LABEL], [None, EC_LABEL]]
 salt_filtered_axis_labels = [[None, FILTERED_PSU_LABEL], [None, FILTERED_EC_LABEL]]

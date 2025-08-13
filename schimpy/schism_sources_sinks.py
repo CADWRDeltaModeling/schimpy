@@ -251,7 +251,7 @@ def read_source_sink_th(th_fn, source_or_sink_df):
     Parameters
     ----------
     th_fn : STR
-        \*.th file
+        *.th file
     source_or_sink_df : PANDAS DATAFRAME
         source_df or sink_df produced by read_source_sink_in.
 
