@@ -133,7 +133,7 @@ def clip_dem(
             else:
                 shift = ""
             iout += 1
-            quiet = "" if verbose else "-quiet"
+            quiet = "" if verbose else "--quiet"
             command = "gdal_translate %s -projwin %s %s %s %s %s -of %s %s %s" % (
                 quiet,
                 win_xlo[0],
