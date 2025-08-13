@@ -8,7 +8,6 @@ import click
 
 
 @click.command(help="Convert SCHISM polygons between YAML and Shapefile formats.")
-@click.help_option("-h", "--help")
 @click.option(
     "--input",
     required=True,
