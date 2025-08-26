@@ -19,7 +19,14 @@ def create_arg_parser():
     return parser
 
 
-def small_areas(mesh, warn=10.0, fail=1.0, logger=None, write_out_smalls=False):
+def small_areas(
+    mesh,
+    warn=10.0,
+    fail=1.0,
+    logger=None,
+    write_out_smalls=False,
+    prepro_output_dir="./",
+):
     if logger is not None:
         logger.info(
             "Checking for elements with small areas. Thresholds: warn={}, fail={}".format(
@@ -52,21 +59,23 @@ def small_areas(mesh, warn=10.0, fail=1.0, logger=None, write_out_smalls=False):
 
     if areas_sorted[0] < fail:
         if write_out_smalls:
-            import shapefile as shp
+            import geopandas as gpd
+            from shapely.geometry import Point
 
             sm_centroids = centroids[areas < fail]
             sm_areas = areas[areas < fail]
 
-            w = shp.Writer("small_area_centroids.shp", shp.POINT)
-            w.autoBalance = 1  # ensures gemoetry and attributes match
-            w.field("FID", "N")
-            w.field("x", "F", 10, 8)
-            w.field("y", "F", 10, 8)
-            w.field("area", "F", 10, 8)
-            for i, smc in enumerate(sm_centroids):
-                w.point(smc[0], smc[1])  # write the geometry
-                w.record(i, smc[0], smc[1], sm_areas[i])
-            w.close()
+            gdf = gpd.GeoDataFrame(
+                {
+                    "FID": range(len(sm_centroids)),
+                    "x": sm_centroids[:, 0],
+                    "y": sm_centroids[:, 1],
+                    "area": sm_areas,
+                },
+                geometry=[Point(xy) for xy in sm_centroids],
+                crs="EPSG:4326",  # Change if you know the mesh CRS
+            )
+            gdf.to_file(f"{prepro_output_dir}/small_area_centroids.shp")
 
         raise ValueError(
             "Mesh contains areas smaller than the failure threshold. Consult the log or printout above for areas and warnings"

@@ -44,6 +44,7 @@ def create_hgrid(s, inputs, logger):
             )
         small_area_param = section.get("small_areas")
         if small_area_param is not None:
+            small_area_param["prepro_output_dir"] = inputs["prepro_output_dir"]
             # This just emits warnings unless the fail threshold is met
             small_areas(s.mesh, logger=logger, **small_area_param)
 
