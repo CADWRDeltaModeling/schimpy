@@ -730,11 +730,11 @@ def process_prepare_yaml(in_fname, use_logging=True):
         f.write(echo_file_header())
         f.write(schism_yaml.safe_dump(inputs))
 
-    return inputs, logger
+    return inputs, outdir, logger
 
 
 def prepare_schism(args, use_logging=True):
-    inputs, logger = process_prepare_yaml(args.main_inputfile, use_logging)
+    inputs, outdir, logger = process_prepare_yaml(args.main_inputfile, use_logging)
 
     # Mesh section
     if item_exist(inputs, "mesh"):
