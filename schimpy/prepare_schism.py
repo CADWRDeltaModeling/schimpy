@@ -421,8 +421,9 @@ def process_output_dir(inputs):
     return outdir
 
 
-def prepare_schism(args, use_logging=True):
-    in_fname = args.main_inputfile
+def process_prepare_yaml(in_fname, use_logging=True):
+    """Process the main input YAML file and return the inputs dict without processing any SCHISM inputs."""
+
     if not os.path.exists(in_fname):
         raise ValueError("Main input file not found")
     with open(in_fname, "r") as f:
@@ -435,7 +436,6 @@ def prepare_schism(args, use_logging=True):
     else:
         logger = logging.getLogger("")
     logger.info("Start pre-processing SCHISM inputs...")
-    in_fname = args.main_inputfile
 
     keys_top_level = [
         "config",
@@ -461,6 +461,12 @@ def prepare_schism(args, use_logging=True):
     out_fname = os.path.join(inputs["prepro_output_dir"], out_fname)
     with open(out_fname, "w") as f:
         f.write(schism_yaml.safe_dump(inputs))
+
+    return inputs, logger
+
+
+def prepare_schism(args, use_logging=True):
+    inputs, logger = process_prepare_yaml(args.main_inputfile, use_logging)
 
     # Mesh section
     if item_exist(inputs, "mesh"):
