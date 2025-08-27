@@ -14,6 +14,8 @@ from schimpy.schism_setup import ensure_outdir
 import numpy as np
 import sys
 import os
+import geopandas as gpd
+from shapely.geometry import Point
 
 DEFAULT_NA_FILL = 2.0
 
@@ -79,17 +81,26 @@ def stacked_dem_fill(
         values = np.negative(values)
     if any(np.isnan(values)):
         f_out = ensure_outdir(out_dir, "dem_misses.txt")
+        miss_idx = np.isnan(values)
+        miss_points = points[miss_idx]
         f = open(f_out, "w")
-        for p in points[np.isnan(values)]:
+        for p in miss_points:
             f.write("%s,%s\n" % tuple(p))
             message = "DEMs provided do not cover all the points. See file dem_misses.txt for locations"
         f.close()
+
+        gdf = gpd.GeoDataFrame(
+            {"x": miss_points[:, 0], "y": miss_points[:, 1]},
+            geometry=[Point(xy) for xy in miss_points],
+            crs="EPSG:4326",  # Change if your coordinates are not WGS84
+        )
+        gdf.to_file(os.path.join(out_dir, "dem_misses.shp"))
         if require_all:
             raise ValueError(message)
         else:
             print(message)
     if na_fill is not None:
-        values[np.isnan(values)] = na_fill
+        values[miss_idx] = na_fill
     return values
 
 
