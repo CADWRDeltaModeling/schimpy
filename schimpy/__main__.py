@@ -8,13 +8,13 @@ from schimpy.convert_linestrings import convert_linestrings_cli
 from schimpy.convert_points import convert_points_cli
 from schimpy.combine_consume import combine_consume_cli
 from schimpy.model_time import model_time_cli
+from schimpy.gen_elev2d import gen_elev2d_cli
 
 # from schimpy.prepare_schism import prepare_schism
 # from schimpy.hotstart_inventory import hotstart_inventory
 # from schimpy.create_vgrid_lsc2 import create_vgrid_lsc2
 # from schimpy.schism_hotstart import schism_hotstart
 # from schimpy.split_quad import split_quad
-# from schimpy.gen_elev2d import gen_elev2d
 # from schimpy.small_areas import small_areas
 # from schimpy.station import station
 # from schimpy.nudging import create_nudging
@@ -41,12 +41,12 @@ cli.add_command(convert_linestrings_cli, "convert_linestrings")
 cli.add_command(convert_points_cli, "convert_points")
 cli.add_command(combine_consume_cli, "combine_consume")
 cli.add_command(model_time_cli, "model_time")
+cli.add_command(gen_elev2d_cli, "gen_elev2d")
 # cli.add_command(prepare_schism, "prepare_schism")
 # cli.add_command(hotstart_inventory, "hotstart_inventory")
 # cli.add_command(create_vgrid_lsc2, "create_vgrid_lsc2")
 # cli.add_command(schism_hotstart, "schism_hotstart")
 # cli.add_command(split_quad, "split_quad")
-# cli.add_command(gen_elev2d, "gen_elev2d")
 # cli.add_command(small_areas, "small_areas")
 # cli.add_command(station, "station")
 # cli.add_command(create_nudging, "create_nudging")

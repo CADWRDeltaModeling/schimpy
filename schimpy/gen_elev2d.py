@@ -19,6 +19,8 @@ import numpy as np
 from datetime import datetime
 import struct, argparse, re
 import time
+import click
+import warnings
 
 ################# command line application #####################
 
@@ -31,10 +33,10 @@ def create_arg_parser():
         epilog=textwrap.dedent(
             """
          ============== Example ==================
-      > gen_elev2D.py --outfile elev2D.nc --stime=2009-03-12 --etime=2010-01-01 9415020_gageheight.csv 9413450_gageheight.csv
+      > gen_elev2D.py --outfile elev2D.th.nc --stime=2009-03-12 --etime=2010-01-01 9415020_gageheight.csv 9413450_gageheight.csv
       """
         ),
-        description="""Script to create elev2D.th boundary condition from Point Reyes and Monterey NOAA file""",
+        description="""Script to create elev2D.th.nc boundary condition from Point Reyes and Monterey NOAA file""",
     )
     parser.add_argument(
         "--stime",
@@ -164,20 +166,42 @@ class NetCDFTHWriter(THWriter):
         self.outfile.close()
 
 
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    monterey_fpath = args.monterey
-    pt_reyes_fpath = args.pt_reyes
-    hgrid_fpath = args.hgrid
-    fpath_out = args.outfile
-    slr = args.slr
-    stime = args.stime
-    etime = args.etime
+@click.command(context_settings=dict(help_option_names=["-h", "--help"]))
+@click.option(
+    "--stime",
+    default=None,
+    required=False,
+    help="Start time in ISO-like format 2009-03-12T00:00:00. Time part and 'T' are optional.",
+)
+@click.option("--etime", default=None, required=False, help="End time.")
+@click.option(
+    "--hgrid",
+    default="hgrid.gr3",
+    required=False,
+    help="Name of hgrid file if not hgrid.gr3",
+)
+@click.option(
+    "--outfile",
+    default="elev2D.th.nc",
+    help="Name of output file: either elev2D.th or elev2D.th.nc",
+)
+@click.option(
+    "--slr",
+    default=0.0,
+    type=float,
+    required=False,
+    help="Scalar sea level rise increment",
+)
+@click.argument("pt_reyes", type=click.Path(exists=True))
+@click.argument("monterey", type=click.Path(exists=True))
+def gen_elev2d_cli(stime, etime, hgrid, outfile, slr, pt_reyes, monterey):
+    """
+    Script to create elev2D.th.nc boundary condition from Point Reyes and Monterey NOAA file
 
-    return gen_elev2D(
-        hgrid_fpath, fpath_out, pt_reyes_fpath, monterey_fpath, stime, etime, slr
-    )
+    ============== Example ==================
+    > gen_elev2D.py --outfile elev2D.th.nc --stime=2009-03-12 --etime=2010-01-01 9415020_gageheight.csv 9413450_gageheight.csv
+    """
+    return gen_elev2D(hgrid, outfile, pt_reyes, monterey, stime, etime, slr)
 
 
 def gen_elev2D(hgrid_fpath, outfile, pt_reyes_fpath, monterey_fpath, start, end, slr):
@@ -232,22 +256,52 @@ def gen_elev2D(hgrid_fpath, outfile, pt_reyes_fpath, monterey_fpath, start, end,
     pt_reyes = read_noaa(
         pt_reyes_fpath, start=sdate - tbuf, end=bufend, force_regular=True
     )
+
+    # --- Add this check for coverage ---
+    pt_start = pt_reyes.index.min()
+    pt_end = pt_reyes.index.max()
+    expected_start = sdate - tbuf
+    expected_end = bufend
+    if pt_start > expected_start or pt_end < expected_end:
+        warnings.warn(
+            f"Point Reyes data does not fully span required range: {expected_start} to {expected_end}. "
+            f"Actual range: {pt_start} to {pt_end}"
+        )
+    # --- End check ---
+
     pt_reyes.interpolate(limit=max_gap, inplace=True)
     if pt_reyes.isna().any(axis=None):
         raise ValueError("pt_reyes has gaps larger than fill limit")
+    if pt_reyes.empty:
+        raise ValueError(
+            "No data loaded for Point Reyes. Check file path and date range."
+        )
+
     ts_pr_subtidal, ts_pr_diurnal, ts_pr_semi, noise = separate_species(
         pt_reyes, noise_thresh_min=150
     )
-
     del noise
 
     print("Reading Monterey...")
     monterey = read_noaa(
         monterey_fpath, start=sdate - tbuf, end=bufend, force_regular=True
     )
+
+    # --- Add this check for coverage ---
+    mt_start = monterey.index.min()
+    mt_end = monterey.index.max()
+    if mt_start > expected_start or mt_end < expected_end:
+        warnings.warn(
+            f"Monterey data does not fully span required range: {expected_start} to {expected_end}. "
+            f"Actual range: {mt_start} to {mt_end}"
+        )
+    # --- End check ---
+
     monterey.interpolate(limit=max_gap, inplace=True)
     if monterey.isna().any(axis=None):
         raise ValueError("monterey has gaps larger than fill limit")
+    if monterey.empty:
+        raise ValueError("No data loaded for Monterey. Check file path and date range.")
 
     if pt_reyes.index.freq != monterey.index.freq:
         raise ValueError(
