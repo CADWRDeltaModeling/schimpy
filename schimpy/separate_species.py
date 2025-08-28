@@ -148,13 +148,13 @@ def main():
     args = parser.parse_args()
     if args.stime:
         sdate = dtm.datetime(
-            *list(map(int, re.split("[^\d]", args.stime)))
+            *list(map(int, re.split(r"[^\d]", args.stime)))
         )  # convert start time string input to datetime
     else:
         sdate = None
     if args.etime:
         edate = dtm.datetime(
-            *list(map(int, re.split("[^\d]", args.etime)))
+            *list(map(int, re.split(r"[^\d]", args.etime)))
         )  # convert start time string input to datetime
     else:
         edate = None
