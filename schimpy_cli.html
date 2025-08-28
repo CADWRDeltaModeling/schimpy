@@ -70,6 +70,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#sch-convert-mesh-cli">convert-mesh-cli</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#sch-convert-points-cli">convert-points-cli</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#sch-convert-polygons-cli">convert-polygons-cli</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sch-gen-elev2d-cli">gen-elev2d-cli</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#sch-model-time-cli">model-time-cli</a></li>
 </ul>
 </li>
@@ -548,6 +549,59 @@ $ contour_smooth.py subcommand –help</p>
 <dt class="sig sig-object std" id="cmdoption-sch-convert-polygons-cli-h">
 <span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-sch-convert-polygons-cli-h" title="Link to this definition"></a></dt>
 <dd><p>Show this message and exit.</p>
+</dd></dl>
+
+</section>
+<section id="sch-gen-elev2d-cli">
+<h3>gen-elev2d-cli<a class="headerlink" href="#sch-gen-elev2d-cli" title="Link to this heading"></a></h3>
+<p>Script to create elev2D.th.nc boundary condition from Point Reyes and Monterey NOAA file</p>
+<p>============== Example ==================
+&gt; gen_elev2D.py –outfile elev2D.th.nc –stime=2009-03-12 –etime=2010-01-01 9415020_gageheight.csv 9413450_gageheight.csv</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sch<span class="w"> </span>gen-elev2d-cli<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>PT_REYES<span class="w"> </span>MONTEREY
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-sch-gen-elev2d-cli-stime">
+<span class="sig-name descname"><span class="pre">--stime</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;stime&gt;</span></span><a class="headerlink" href="#cmdoption-sch-gen-elev2d-cli-stime" title="Link to this definition"></a></dt>
+<dd><p>Start time in ISO-like format 2009-03-12T00:00:00. Time part and ‘T’ are optional.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-sch-gen-elev2d-cli-etime">
+<span class="sig-name descname"><span class="pre">--etime</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;etime&gt;</span></span><a class="headerlink" href="#cmdoption-sch-gen-elev2d-cli-etime" title="Link to this definition"></a></dt>
+<dd><p>End time.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-sch-gen-elev2d-cli-hgrid">
+<span class="sig-name descname"><span class="pre">--hgrid</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;hgrid&gt;</span></span><a class="headerlink" href="#cmdoption-sch-gen-elev2d-cli-hgrid" title="Link to this definition"></a></dt>
+<dd><p>Name of hgrid file if not hgrid.gr3</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-sch-gen-elev2d-cli-outfile">
+<span class="sig-name descname"><span class="pre">--outfile</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;outfile&gt;</span></span><a class="headerlink" href="#cmdoption-sch-gen-elev2d-cli-outfile" title="Link to this definition"></a></dt>
+<dd><p>Name of output file: either elev2D.th or elev2D.th.nc</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-sch-gen-elev2d-cli-slr">
+<span class="sig-name descname"><span class="pre">--slr</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;slr&gt;</span></span><a class="headerlink" href="#cmdoption-sch-gen-elev2d-cli-slr" title="Link to this definition"></a></dt>
+<dd><p>Scalar sea level rise increment</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-sch-gen-elev2d-cli-arg-PT_REYES">
+<span class="sig-name descname"><span class="pre">PT_REYES</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-sch-gen-elev2d-cli-arg-PT_REYES" title="Link to this definition"></a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-sch-gen-elev2d-cli-arg-MONTEREY">
+<span class="sig-name descname"><span class="pre">MONTEREY</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-sch-gen-elev2d-cli-arg-MONTEREY" title="Link to this definition"></a></dt>
+<dd><p>Required argument</p>
 </dd></dl>
 
 </section>
