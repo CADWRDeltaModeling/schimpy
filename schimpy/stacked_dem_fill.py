@@ -10,48 +10,28 @@ except ImportError:
     import gdal
     from gdalconst import *
 
+import yaml
+import hashlib
+from xml.etree.ElementInclude import include
 from schimpy.schism_setup import ensure_outdir
-
+from typing import Callable, Dict, List, Optional, Tuple, Union
+from datetime import datetime
 import numpy as np
 import sys
 import os
-import geopandas as gpd
-from shapely.geometry import Point
+import diskcache as dc
+import json
+
+
 
 DEFAULT_NA_FILL = 2.0
+_MAX_CACHE_KEYS = 5  # hard cap on total keys in this cache namespace
 
-
-def stacked_dem_fill(
+def _stacked_dem_fill(
     files, points, out_dir, values=None, negate=False, require_all=True, na_fill=None
 ):
-    """Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
-    This routine controls prioritization of the dems, gradually filling points
-    that are still marked `nan`
-
-    Parameters
-    ----------
-    files:  list[str]
-        list of files. Existence is checked and ValueError for bad file
-    points: np.ndarray
-        this is a numpy array of points, nrow = num of points and ncol = 2 (x,y).
-    out_dir: Path
-        directory to write the output files
-    values: np.ndarray
-        values at each point -- this is an output, but this gives an opportunity to use an existing data structure to receive
-    negate: bool
-        if True, values will be inverted (from elevation to depth)
-    require_all: bool
-        if True, a ValueError is raised if the list of DEMs does not cover all the points. In either case (True/False)
-        a file is created or overwritten (`dem_misses.txt`) that will show all the misses.
-    na_fill: float
-        value to substitute at the end for values that are NA after all DEMs are processed.
-        If require_all = True na_fill must be None
-
-    Returns
-    -------
-    values : np.ndarray
-        Values at the nodes
-
+    """
+    Implementational core for stacked_dem_fill. See that function for details
     """
     if values is None:
         values = np.full(points.shape[0], np.nan)
@@ -105,13 +85,184 @@ def stacked_dem_fill(
     return values
 
 
-# =============================================================================
-def Usage():
-    print("Usage: stacked_dem_fill.py demfilelist pointlist")
-    sys.exit(1)
+
+def _cache_dir_for(out_dir: str) -> str:
+    # Keep cache colocated with outputs unless you decide otherwise
+    cdir = os.path.join(out_dir, ".dem_cache")
+    os.makedirs(cdir, exist_ok=True)
+    return cdir
+
+def _make_cache_key(
+    files, points, values, require_all, na_fill
+) -> str:
+    """
+    Build a stable key that:
+      - Includes the DEM file list (absolute paths, ordered)
+      - Includes the *content* of points
+      - Includes values mask & non-NaN values (to honor prefilled inputs)
+      - Includes options that affect the numeric result (require_all, na_fill)
+    NOTE: 'negate' is intentionally excluded per requirement.
+    """
+    files_abs = tuple(os.path.abspath(f) for f in files)
+    pts = np.asarray(points, dtype=np.float64)
+    if values is None:
+        vals = np.full(pts.shape[0], np.nan, dtype=np.float64)
+    else:
+        vals = np.asarray(values, dtype=np.float64)
+
+    mask = np.isnan(vals)
+    packed = {
+        "files": files_abs,
+        "require_all": bool(require_all),
+        "na_fill": None if na_fill is None else float(na_fill),
+        # Hash large arrays by content to avoid JSON bloat
+        "points_hash": hashlib.blake2b(pts.tobytes(), digest_size=16).hexdigest(),
+        "mask_hash": hashlib.blake2b(mask.tobytes(), digest_size=16).hexdigest(),
+        "vals_non_nan_hash": hashlib.blake2b(vals[~mask].tobytes(), digest_size=16).hexdigest(),
+        "n_points": int(pts.shape[0]),
+    }
+    key_src = json.dumps(packed, sort_keys=True).encode("utf-8")
+    return hashlib.blake2b(key_src, digest_size=16).hexdigest()
+
+def _touch_lru(cache: dc.Cache, key: str):
+    """
+    Maintain a simple LRU list inside the cache under a reserved meta-key.
+    Ensures at most _MAX_CACHE_KEYS items exist in the cache namespace.
+    """
+    META = "__order__"
+    order = cache.get(META, [])
+    if key in order:
+        order.remove(key)
+    order.append(key)
+    # Cull least-recently-used beyond cap
+    while len(order) > _MAX_CACHE_KEYS:
+        old = order.pop(0)
+        try:
+            del cache[old]
+        except KeyError:
+            pass
+    cache[META] = order
+
+def stacked_dem_fill(
+    files, points, out_dir, values=None, negate=False, require_all=True, na_fill=None
+):
+    """
+    Fill values at an array of points using bilinear interpolation from a prioritized stack of DEMs.
+    This function manages prioritization of the DEMs, gradually filling points
+    that are still marked as `nan`. Uses a cache to speed up repeated queries.
+
+    Parameters
+    ----------
+    files : list of str
+        List of DEM file paths. Existence is checked; raises ValueError if any file is missing.
+    points : np.ndarray
+        Numpy array of shape (n_points, 2) containing (x, y) coordinates for interpolation.
+    out_dir : str or Path
+        Directory to write output files and cache.
+    values : np.ndarray or None, optional
+        Optional array of initial values at each point. If provided, must be same length as points.
+        Points with NaN values will be filled.
+    negate : bool, optional
+        If True, output values will be negated (e.g., convert elevation to depth).
+    require_all : bool, optional
+        If True, raises ValueError if the DEMs do not cover all points. In either case,
+        a file `dem_misses.txt` is created or overwritten with locations of uncovered points.
+    na_fill : float or None, optional
+        Value to substitute for points that remain NaN after all DEMs are processed.
+        If `require_all` is True, `na_fill` must be None.
+
+    Returns
+    -------
+    np.ndarray
+        Array of values at the input points, filled from the DEMs.
+
+    Raises
+    ------
+    ValueError
+        If any DEM file does not exist, or if `require_all` is True and not all points are covered.
+    """
+    cache = dc.Cache(_cache_dir_for(out_dir))
+    key = _make_cache_key(files, points, values, require_all, na_fill)
+
+    if key in cache:
+        result = np.asarray(cache[key], dtype=np.float64)
+        _touch_lru(cache, key)
+    else:
+        # IMPORTANT: negate=False here so cache stores the canonical (non-negated) result
+        result = _stacked_dem_fill(
+            files=files,
+            points=np.asarray(points, dtype=np.float64),
+            out_dir=out_dir,
+            values=values,
+            negate=False,
+            require_all=require_all,
+            na_fill=na_fill,
+        )
+        cache[key] = np.asarray(result, dtype=np.float64)
+        _touch_lru(cache, key)
+
+    if negate:
+        result = np.negative(result)
+    return result
 
 
+
 # =============================================================================
+
+def create_dem_sampler(
+    dem_list,
+    # 'cache_dir' and 'q' kept only for backward compatibility; no longer used here
+    cache_dir: str = None,
+    q: float = None,
+    *,
+    out_dir: str = "logs",
+    require_all: bool = False,
+    na_fill: float = DEFAULT_NA_FILL,
+    negate: bool = True,
+):
+    """
+    Return a callable dem_sampler(points_xy) that uses stacked_dem_fill.
+    Caching now lives inside stacked_dem_fill; this factory is intentionally thin.
+
+    Parameters
+    ----------
+    dem_list : str | list[str]
+        YAML path (list of DEM files) or a list of DEM file paths.
+    cache_dir, q : deprecated
+        Ignored; retained to avoid breaking older call sites.
+    out_dir : str
+        Output/log directory passed through to stacked_dem_fill (also hosts the cache).
+    require_all : bool
+        See stacked_dem_fill.
+    na_fill : float | None
+        See stacked_dem_fill.
+    negate : bool
+        If True, return depth (+down). Negation happens *outside* the cache in stacked_dem_fill.
+
+    Returns
+    -------
+    callable
+        dem_sampler(points_xy[, values=None]) -> np.ndarray
+    """
+    if isinstance(dem_list, str):
+        with open(dem_list, "r") as f:
+            dem_files = yaml.safe_load(f)
+    else:
+        dem_files = list(dem_list)
+
+    def dem_sampler(points_xy, values=None):
+        return stacked_dem_fill(
+            files=dem_files,
+            points=np.asarray(points_xy, dtype=float),
+            out_dir=out_dir,
+            values=values,
+            negate=negate,
+            require_all=require_all,
+            na_fill=na_fill,
+        )
+
+    return dem_sampler
+
 
 # =============================================================================
 
@@ -190,6 +341,89 @@ def bilinear(points, gt, raster):
     iy2 = None
 
     return res
+
+# ----------------------------- DEM sampler & cache ----------------------------
+
+
+def create_dem_sampler(
+    dem_list: Union[str, List[str]], cache_dir: str = "./dem_cache", q: float = 1e-6
+):
+    """Create a DEM sampler ``dem_sampler(xy)`` with disk caching.
+
+    The cache key includes:
+    - The list of DEM source names (from the YAML or the provided list).
+    - A daily stamp (YYYYMMDD) to force refresh at least daily.
+    - A compact signature of the request batch: length, quantized centroid, and
+      quantized bounding box (min/max) of XY.
+
+    Parameters
+    ----------
+    dem_list : str or list of str
+        Either a YAML file path consumable by :func:`stacked_dem_fill` or a list
+        of DEM file paths.
+    cache_dir : str, optional
+        Directory for :mod:`diskcache` storage, by default ``"./dem_cache"``.
+    q : float, optional
+        Quantization (meters) for the request signature, by default 1e-6.
+
+    Returns
+    -------
+    callable
+        ``dem_sampler(points_xy)`` mapping ``(k,2)`` XY→depth(+down) array.
+    """
+    if isinstance(dem_list, str):
+        with open(dem_list, "r") as f:
+            dem_files = yaml.safe_load(f)
+    else:
+        dem_files = list(dem_list)
+
+    dem_names = tuple(map(str, dem_files))  # stable order if YAML preserves it
+    dem_hash = hashlib.blake2b(
+        "|".join(dem_names).encode("utf-8"), digest_size=12
+    ).hexdigest()
+
+    # Ensure cache_dir exists
+    os.makedirs(cache_dir, exist_ok=True)
+    # Ensure ./logs exists at the present level
+    os.makedirs("logs", exist_ok=True)
+    cache = dc.Cache(cache_dir)
+
+    def _batch_signature(points_xy: np.ndarray, q=q) -> str:
+        pts = np.asarray(points_xy, dtype=np.float64)
+        n = pts.shape[0]
+        if n == 0:
+            return f"{dem_hash}|empty"
+        # quantize
+        pts_q = np.round(pts / q) * q
+        cen = np.mean(pts_q, axis=0)
+        mn = np.min(pts_q, axis=0)
+        mx = np.max(pts_q, axis=0)
+        sig_bytes = f"{n}|{cen[0]:.6f},{cen[1]:.6f}|{mn[0]:.6f},{mn[1]:.6f}|{mx[0]:.6f},{mx[1]:.6f}".encode(
+            "utf-8"
+        )
+        sig_hash = hashlib.blake2b(sig_bytes, digest_size=12).hexdigest()
+        # daily stamp ensures at least daily refresh
+        day = datetime.utcnow().strftime("%Y%m%d")
+        return f"{dem_hash}|{day}|{sig_hash}"
+
+    def dem_sampler(points_xy: np.ndarray) -> np.ndarray:
+        key = _batch_signature(points_xy)
+        if key in cache:
+            z = cache[key]
+            return np.asarray(z, dtype=float)
+
+        z = stacked_dem_fill(
+            files=dem_files,
+            points=np.asarray(points_xy, dtype=float),
+            out_dir="logs",
+            require_all=False,
+            na_fill=2.0,
+            negate=True,  # depth +down as used in the workflow
+        )
+        cache[key] = np.asarray(z, dtype=float)
+        return np.asarray(z, dtype=float)
+
+    return dem_sampler
 
 
 # =================================================================

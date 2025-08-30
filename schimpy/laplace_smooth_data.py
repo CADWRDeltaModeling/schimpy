@@ -1,9 +1,11 @@
 import numpy as np
+import numba
 
-
-def laplace_smooth_data2(mesh,data,kappa=0.05,dt=1.0,iter_total=150):
+def laplace_smooth_data2_slow(mesh,data,kappa=0.05,dt=1.0,iter_total=150):
     """
     Apply Laplacian smoothing to a scalar field on a mesh using explicit diffusion.
+    
+    DEPRECATED. Use the version without _slow in the name
 
     This function performs iterative smoothing by updating each node's value
     toward the average of its neighbors. It corresponds to forward Euler
@@ -48,6 +50,38 @@ def laplace_smooth_data2(mesh,data,kappa=0.05,dt=1.0,iter_total=150):
     return smooth_data
 
 
+
+def laplace_smooth_data2(mesh,data,kappa=0.05,dt=1.0,iter_total=150):
+    """
+    Apply Laplacian smoothing to a scalar field on a mesh using explicit diffusion.
+
+    This function performs iterative smoothing by updating each node's value
+    toward the average of its neighbors. It corresponds to forward Euler
+    integration of the diffusion equation.
+
+    Parameters
+    ----------
+    mesh : object
+        A mesh object with a `nodes` array and a method `get_neighbor_nodes(ndx)`
+        returning neighbor node indices for a given node.
+    data : ndarray of shape (N,)
+        Initial scalar field values at each mesh node.
+    kappa : float, optional
+        Diffusivity coefficient. Controls the rate of smoothing. Default is 0.05.
+    dt : float, optional
+        Timestep used for each smoothing iteration. Default is 1.0.
+    iter_total : int, optional
+        Number of smoothing iterations to perform. Default is 150.
+
+    Returns
+    -------
+    smooth_data : ndarray of shape (N,)
+        The smoothed scalar field after `iter_total` iterations.
+    """    
+    n_nodes = mesh.nodes.shape[0]
+    neighbors = [np.array(mesh.get_neighbor_nodes(i), dtype=np.int32) for i in range(n_nodes)]
+
+    return smooth_kernel_numba(data.astype(np.float64), neighbors, kappa, dt, iter_total)
  
 
 def laplace_smooth_with_vel2(mesh,data,vel,kappa=0.05,dt=1.,iter_total=1):
@@ -152,3 +186,32 @@ def laplace_smooth_with_vel3(mesh,nlayer,data,vel,kappa=0.05,dt=1.,iter_total=1)
         iter += 1
         smooth_data = zz
     return smooth_data
+
+
+
+
+@numba.njit
+def smooth_kernel_numba(data, neighbors, kappa, dt, iter_total):
+    n_nodes = len(data)
+    result = data.copy()
+    for _ in range(iter_total):
+        tmp = result.copy()
+        for i in range(n_nodes):
+            nbs = neighbors[i]
+            if len(nbs) == 0:
+                continue
+            v_ave = 0.0
+            for j in nbs:
+                v_ave += result[j]
+            v_ave /= len(nbs)
+            tmp[i] = result[i] + dt * kappa * (v_ave - result[i])
+        result = tmp
+    return result
+
+
+
+
+
+
+
+
