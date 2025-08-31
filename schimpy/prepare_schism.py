@@ -10,6 +10,14 @@ from schimpy.small_areas import small_areas
 from schimpy.split_quad import split_quad
 from schimpy import schism_yaml
 from schimpy.create_vgrid_lsc2 import vgrid_gen
+from schimpy.mesh_volume_tvd import (
+    refine_volume_tvd,
+    ShorelineOptions,
+    FloorOptions,
+    TVDOptions,
+)
+
+
 import numpy as np
 import subprocess
 import os
@@ -65,23 +73,97 @@ def create_hgrid(s, inputs, logger):
         opt_params = section.get(option_name)
         default_depth_for_missing_dem = 2.0
         if opt_params is not None:
-            dem_list = section.get("dem_list")
-            if dem_list is None:
-                raise ValueError("dem_list must be provided for the mesh optimization")
-            expected_items = ("damp", "damp_shoreline", "face_coeff", "volume_coeff")
-            check_and_suggest(opt_params, expected_items)
-            logger.info("Start optimizing the mesh...")
-            optimizer = GridOptimizer(
-                mesh=s.mesh,
-                demfiles=dem_list,
-                na_fill=default_depth_for_missing_dem,
-                logger=logger,
-                out_dir=inputs["prepro_output_dir"],
-            )
-            optimized_elevation = optimizer.optimize(opt_params)
-            s.mesh.nodes[:, 2] = np.negative(optimized_elevation)
+            method = opt_params.get("method")
+            if method is None:
+                raise ValueError(
+                    "Depth optimization parameters must include method = [volume | volume_tvd]. "
+                    "The former is the traditional method which is now deprecated. "
+                    "volume_tvd is the new method which requires different parameters which you can "
+                    "find listed in a more current template"
+                )
+
+            if method == "volume":
+                # Legacy GridOptimizer path (deprecated)
+                dem_list = section.get("dem_list")
+                if dem_list is None:
+                    raise ValueError("dem_list must be provided for the mesh optimization")
+                expected_items = ("damp", "damp_shoreline", "face_coeff", "volume_coeff")
+                check_and_suggest(opt_params, expected_items)
+                logger.info("Start optimizing the mesh (legacy 'volume').")
+                optimizer = GridOptimizer(
+                    mesh=s.mesh,
+                    demfiles=dem_list,
+                    na_fill=default_depth_for_missing_dem,
+                    logger=logger,
+                    out_dir=inputs["prepro_output_dir"],
+                )
+                optimized_elevation = optimizer.optimize(opt_params)
+                s.mesh.nodes[:, 2] = np.negative(optimized_elevation)
+            elif method=="volume_tvd":
+                dem_spec = section.get("dem_list")
+                if dem_spec is None:
+                    raise ValueError("For method=volume_tvd, provide dem_list")
+
+                sl = opt_params.get("shoreline")
+                shoreline = None
+                if sl is not None:
+                    shoreline = ShorelineOptions(
+                        href=sl.get("href", 0.0),
+                        deep_delta=float(sl.get("deep_delta", 1.0)),
+                        shore_delta=float(sl.get("shore_delta", 3.0)),
+                        seeds=sl.get("seeds"),
+                        use_default_seeds=bool(sl.get("use_default_seeds", True)),
+                        smooth_relax_factor=float(sl.get("smooth_relax_factor", 0.4)),
+                        smooth_strip_max=int(sl.get("smooth_strip_max", 24)),
+                        smooth_eps_deg=float(sl.get("smooth_eps_deg", 55.0)),
+                        filter_deep=bool(sl.get("filter_deep", True)),
+                        epsg=int(sl.get("epsg", 26910)),
+                        out_csv=sl.get("out_csv"),
+                        out_shp=sl.get("out_shp"),
+                    )
+
+                fl = opt_params.get("floor")
+                floor = None
+                if fl is not None:
+                    floor = FloorOptions(
+                        filter=str(fl.get("filter", "max")).lower(),
+                        window=int(fl.get("window", 5)),
+                        enforce_floor=bool(fl.get("enforce_floor", False)),
+                        reg_weight=float(fl.get("reg_weight", 0.0)),
+                    )
+
+                tv = opt_params.get("tvd")
+                tvd = None
+                if tv is not None:
+                    tvd = TVDOptions(
+                        steps=int(tv.get("steps", 32)),
+                        dt=float(tv.get("dt", 1.0)),
+                        mu=float(tv.get("mu", 1.0)),
+                        lambda_l2=float(tv.get("lambda_l2", 500.0)),
+                        tv_weight=float(tv.get("tv_weight", 1.0)),
+                        l2_weight=float(tv.get("l2_weight", 5e-5)),
+                        cfl_target=float(tv.get("cfl_target", 1.0)),
+                        clip_eps=tv.get("clip_eps", None),
+                        rel_eta=float(tv.get("rel_eta", 2e-3)),
+                        max_backtracks=int(tv.get("max_backtracks", 4)),
+                    )
+
+                logger.info("Start optimizing the mesh ('volume_tvd').")
+                _ = refine_volume_tvd(
+                    s.mesh,
+                    dem_spec=dem_spec,
+                    out_dir=inputs["prepro_output_dir"],
+                    shoreline=shoreline,
+                    floor=floor,
+                    tvd=tvd,
+                    cache_dir=os.path.join(inputs["prepro_output_dir"], "dem_cache"),
+                    logger=logger
+                )
+            else:
+                raise ValueError(f"Unknown depth_optimization.method: {method!r}")
         else:
             dem_list = section.get("dem_list")
+            s.dem_list = dem_list
             if dem_list is not None:
                 s.mesh.nodes[:, 2] = np.negative(
                     stacked_dem_fill(
