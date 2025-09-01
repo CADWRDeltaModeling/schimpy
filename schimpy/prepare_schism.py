@@ -107,8 +107,23 @@ def create_hgrid(s, inputs, logger):
                 sl = opt_params.get("shoreline")
                 shoreline = None
                 if sl is not None:
+                    href_spec = sl.get("href", 0.0)
+                    # NEW: support dict form to build an href.gr3 via polygons
+                    if isinstance(href_spec, dict):
+                        href_name = href_spec.get("gr3_name", "href.gr3")   # default name
+                        href_path = ensure_outdir(inputs["prepro_output_dir"], href_name)
+                        polygons = href_spec.get("polygons", [])
+                        default  = href_spec.get("default", None)
+                        smooth   = href_spec.get("smooth", None)
+                        # reuse the exact machinery used by the 'gr3' section:
+                        s.create_node_partitioning(href_path, polygons, default, smooth)  # writes GR3
+                        href_arg = href_path
+                    else:
+                        href_arg = href_spec  # float or string — existing behavior                    
+                    
+                    logger.debug(f"Using {href_arg} as reference for shoreline discovery")
                     shoreline = ShorelineOptions(
-                        href=sl.get("href", 0.0),
+                        href=href_arg,
                         deep_delta=float(sl.get("deep_delta", 1.0)),
                         shore_delta=float(sl.get("shore_delta", 3.0)),
                         seeds=sl.get("seeds"),
@@ -118,8 +133,8 @@ def create_hgrid(s, inputs, logger):
                         smooth_eps_deg=float(sl.get("smooth_eps_deg", 55.0)),
                         filter_deep=bool(sl.get("filter_deep", True)),
                         epsg=int(sl.get("epsg", 26910)),
-                        out_csv=sl.get("out_csv"),
-                        out_shp=sl.get("out_shp"),
+                        shore_csv=sl.get("shore_csv"),
+                        shore_shp=sl.get("shore_shp"),
                     )
 
                 fl = opt_params.get("floor")

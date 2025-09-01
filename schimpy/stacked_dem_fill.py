@@ -225,6 +225,7 @@ def create_dem_sampler(
     """
     Return a callable dem_sampler(points_xy) that uses stacked_dem_fill.
     Caching now lives inside stacked_dem_fill; this factory is intentionally thin.
+    Default is depth based (negated)
 
     Parameters
     ----------
@@ -239,7 +240,7 @@ def create_dem_sampler(
     na_fill : float | None
         See stacked_dem_fill.
     negate : bool
-        If True, return depth (+down). Negation happens *outside* the cache in stacked_dem_fill.
+        If True, return depth (+down). Default is true
 
     Returns
     -------
@@ -249,6 +250,9 @@ def create_dem_sampler(
     if isinstance(dem_list, str):
         with open(dem_list, "r") as f:
             dem_files = yaml.safe_load(f)
+            if "dem_list" in dem_files:
+                dem_files = dem_files["dem_files"]
+                print(dem_files)
     else:
         dem_files = list(dem_list)
 
@@ -373,9 +377,12 @@ def create_dem_sampler(
     callable
         ``dem_sampler(points_xy)`` mapping ``(k,2)`` XY→depth(+down) array.
     """
+    
     if isinstance(dem_list, str):
         with open(dem_list, "r") as f:
             dem_files = yaml.safe_load(f)
+            if "dem_list" in dem_files: 
+                dem_files = dem_files["dem_list"]
     else:
         dem_files = list(dem_list)
 

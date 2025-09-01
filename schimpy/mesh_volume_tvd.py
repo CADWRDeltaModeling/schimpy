@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import annotations
-from venv import logger
 import logging
+
 
 """
 mesh_volume_tvd
@@ -37,7 +37,7 @@ from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional,
 
 import os
 import numpy as np
-
+import pandas as pd
 from schimpy.stacked_dem_fill import create_dem_sampler
 from schimpy.schism_mesh import read_mesh, write_mesh
 
@@ -1433,6 +1433,7 @@ def run_tvd_variational(
     floor_mask: np.ndarray = None,
     reg_weight: float = 0.0,
     enforce_floor: bool = False,
+    logger: logging.Logger = None
 ) -> Dict[str, np.ndarray]:
     """TV-prox + variational L2 descent with backtracking.
 
@@ -1624,38 +1625,41 @@ def run_tvd_variational(
 
 
 # ------------------------------ Floor utilities ------------------------------
-
-def build_shore_floor_from_csv(
-    csv_path: str,
+def build_shore_floor_from_df(
+    df: pd.DataFrame,
     n_nodes: int,
-    filter_kind: str = "max",
-    window: int = 7,
+    *,
+    filter_kind: str = "max",   # or "median"
+    window: int = 5,
     trim_endpoints: bool = True,
-) -> Tuple[np.ndarray, np.ndarray]:
+):
     """
-    Construct a nodewise shoreline floor (z_floor, mask) from a shore_edge CSV.
+    Construct a nodewise shoreline floor from an in-memory DataFrame.
+
+    This mirrors the CSV-based implementation but avoids any file I/O.
 
     Parameters
     ----------
-    csv_path : str
-        CSV produced by shore_edge (columns include: node,x,y,z,poly_id,label).
+    df : pandas.DataFrame
+        Columns: ``node, x, y, z, poly_id, label`` (``node`` is 1-based).
     n_nodes : int
-        Total node count in the target mesh.
-    filter_kind : {"max","median"}, optional
-        Aggregation along each polyline; default "max".
+        Total number of mesh nodes.
+    filter_kind : {'max','median'}, optional
+        Rolling aggregation applied along each polyline, by default ``'max'``.
     window : int, optional
-        Odd window size for rolling aggregation; default 7.
+        Odd window size for the rolling aggregation, by default ``7``.
     trim_endpoints : bool, optional
-        Drop endpoints that touch "deep" to avoid contaminating floors.
+        Drop endpoints that touch any ``'deep'`` edge, by default ``True``.
 
     Returns
     -------
-    (z_floor, mask) : (ndarray, ndarray[bool])
-        Floor elevations per node and the mask of nodes where a floor is defined.
-    """
-    import pandas as pd
-
-    df = pd.read_csv(csv_path, comment="#")
+    z_floor : numpy.ndarray
+        Floor elevation per node (length = ``n_nodes``), ``-inf`` where unset.
+    mask : numpy.ndarray of bool
+        True where a floor value is defined.
+    """    
+    import numpy as np
+    df = df.copy()
     df["node0"] = df["node"].astype(int) - 1
     deep_nodes = set(df.loc[df["label"] == "deep", "node0"].tolist())
     df_ss = df[df["label"] == "shore"]
@@ -1667,14 +1671,11 @@ def build_shore_floor_from_csv(
     for _, g in df_ss.groupby("poly_id"):
         nodes = g["node0"].to_numpy()
         zc = g["z"].to_numpy()
-        # Trim endpoints touching deep
         if trim_endpoints:
-            while len(nodes) >= 2 and len(nodes) > 0 and nodes[0] in deep_nodes:
-                nodes = nodes[1:]
-                zc = zc[1:]
-            while len(nodes) >= 2 and len(nodes) > 0 and nodes[-1] in deep_nodes:
-                nodes = nodes[:-1]
-                zc = zc[:-1]
+            while len(nodes) >= 2 and nodes[0] in deep_nodes:
+                nodes, zc = nodes[1:], zc[1:]
+            while len(nodes) >= 2 and nodes[-1] in deep_nodes:
+                nodes, zc = nodes[:-1], zc[:-1]
         if len(nodes) == 0:
             continue
         if len(nodes) == 1:
@@ -1682,8 +1683,7 @@ def build_shore_floor_from_csv(
         else:
             zf = np.empty_like(zc)
             for i in range(len(zc)):
-                a = max(0, i - half)
-                b = min(len(zc), i + half + 1)
+                a, b = max(0, i - half), min(len(zc), i + half + 1)
                 win = zc[a:b]
                 zf[i] = np.median(win) if filter_kind == "median" else np.max(win)
         for n, v in zip(nodes, zf):
@@ -1711,8 +1711,9 @@ class ShorelineOptions:
     # Output / filtering
     filter_deep: bool = True
     epsg: int = 26910  # default UTM10N NAD83
-    out_csv: Optional[str] = None
-    out_shp: Optional[str] = None
+    shore_csv: Optional[str] = None
+    shore_shp: Optional[str] = None
+
 
 
 def _load_href_to_nodes(mesh: "SCHISM_mesh", href_opt: Union[float, str]) -> np.ndarray:
@@ -1726,68 +1727,85 @@ def _load_href_to_nodes(mesh: "SCHISM_mesh", href_opt: Union[float, str]) -> np.
         if h.shape[0] != mesh.n_nodes():
             raise ValueError("Href mesh node count != target mesh node count")
         return h
+@dataclass
+class ShorelineData:
+    """
+    Container for shoreline detection outputs (pure data; no filenames).
 
+    Attributes
+    ----------
+    polylines : list of dict
+        One dict per merged polyline with keys:
+        ``{'poly_id','label','nodes','coords'}``.
+    df : pandas.DataFrame
+        Per-node table equivalent to the shoreline CSV with columns
+        ``['node','x','y','z','poly_id','label']`` (``node`` is 1-based).
+    labels_perimeter : dict[int, str]
+        Perimeter edge labels (``'shore'`` or ``'deep'``) keyed by edge id.
+    wet_mask : numpy.ndarray (bool)
+        Mask of elements in the final always-wet region after stage 2/3.
+    """
+    polylines: List[dict]
+    df: pd.DataFrame
+    labels_perimeter: Dict[int, str]
+    wet_mask: np.ndarray
 
 def detect_shorelines(
-    mesh: "SCHISM_mesh",
-    href: Union[float, str],
+    mesh,
+    *,
+    href: float,
     deep_delta: float,
     shore_delta: float,
-    seeds: Optional[Sequence[Tuple[float, float]]] = None,
+    seeds=None,
     use_default_seeds: bool = True,
     smooth_relax_factor: float = 1.25,
     smooth_strip_max: int = 12,
     smooth_eps_deg: float = 5.0,
     filter_deep: bool = True,
     epsg: int = 26910,
-    out_csv: Optional[str] = None,
-    out_shp: Optional[str] = None,
-) -> Tuple[str, Optional[str]]:
+    shore_csv: Optional[str] = None,
+    shore_shp: Optional[str] = None,
+    logger=None,
+) -> ShorelineData:
     """
-    Identify shoreline and deep perimeter strings around 'always wet' areas.
+    Detect perimeter shore/deep edges (stages 1–3) and return **data only**.
+
+    Optionally writes diagnostic artifacts if ``shore_csv`` / ``shore_shp`` are
+    provided. No filenames are returned.
 
     Parameters
     ----------
-    mesh : SCHISM_mesh
-        The mesh object to analyze. Must be a loaded SCHISM_mesh instance, not a file path.
-    href : float or str
-        Reference depth for shoreline detection. Can be a float or a path to a .gr3 file.
-    deep_delta : float
-        Depth threshold (meters) above href to classify as 'deep'.
-    shore_delta : float
-        Depth threshold (meters) above href to classify as 'shore'.
-    seeds : sequence of tuple of float, optional
-        List of (x, y) coordinates to use as seed points for flood fill. If None, uses default seeds.
+    mesh : schimpy.schism_mesh.SchismMesh
+        Target mesh (``nodes`` depths are read but not mutated here).
+    href : float
+        Reference depth for nodewise tests (positive downward).
+    deep_delta, shore_delta : float
+        Threshold deltas (m) for deep vs. shore classification.
+    seeds : sequence of (x, y), optional
+        Seed points for the always-wet floodfill.
     use_default_seeds : bool, optional
-        If True and seeds is None, uses built-in default seed coordinates (default True).
+        If True, augment with built-in seeds.
     smooth_relax_factor : float, optional
-        Relaxation factor for stage 3 smoothing (default 1.25).
+        Stage-3 relaxed edge criterion factor.
     smooth_strip_max : int, optional
-        Maximum number of elements in a smoothing strip (default 12).
+        Maximum length of accepted stage-3 strips.
     smooth_eps_deg : float, optional
-        Minimum angle improvement (degrees) required for smoothing (default 5.0).
+        Corner improvement tolerance in degrees.
     filter_deep : bool, optional
-        If True, deep nodes are excluded from the output CSV (default True).
+        Exclude rows labeled ``'deep'`` from CSV export.
     epsg : int, optional
-        EPSG code for coordinate reference system (default 26910).
-    out_csv : str, optional
-        Path to write the output CSV file. If None, defaults to "shores.csv".
-    out_shp : str, optional
-        Path to write the output shapefile. If None, shapefile is not written.
+        EPSG code for shapefile/CSV header.
+    shore_csv, shore_shp : str or None, optional
+        Optional paths to write diagnostics. If None, nothing is written.
+    logger : logging.Logger, optional
+        Logger for INFO/DEBUG emissions.
 
     Returns
     -------
-    out_csv : str
-        Path to the written CSV file containing shoreline node information.
-    out_shp : str or None
-        Path to the written shapefile if requested, otherwise None.
-
-    Notes
-    -----
-    - The `mesh` parameter must be a SCHISM_mesh object, not a file path.
-    - The output CSV contains columns: node, x, y, z, poly_id, label.
-    - The output shapefile (if requested) contains merged polylines for shore and deep perimeters.
+    ShorelineData
+        Polylines, per-node DataFrame, perimeter labels, and wet mask.
     """
+
     h0_node = _load_href_to_nodes(mesh, href)
     h0_edge = _edge_field_from_nodes(mesh, h0_node)
 
@@ -1826,30 +1844,28 @@ def detect_shorelines(
     perim_final = set(_perimeter_edges_of_region(mesh, in_after))
 
     # Final labels + 'smoothed' where removed
-    labels_all: Dict[int, str] = {}
-    for eidx in perim_final:
-        labels_all[int(eidx)] = labels_final[int(eidx)]
-    for eidx in perim_before:
-        if eidx not in perim_final:
-            labels_all[int(eidx)] = "smoothed"
-
-    # Merge polylines & node rows
+    labels_all = labels_final  # from stage 3 (or 2), as you do today
     polylines, node_rows = _merged_polylines_and_node_rows(mesh, labels_all)
 
-    # Outputs
-    if out_shp:
-        _write_merged_shapefile(polylines, out_shp, epsg=int(epsg))
+    # Build DataFrame for downstream use
 
-    if filter_deep:
-        rows_for_csv = [r for r in node_rows if str(r.get("label")) != "deep"]
-    else:
-        rows_for_csv = list(node_rows)
+    polylines, node_rows = _merged_polylines_and_node_rows(mesh, labels_all)
+    if shore_csv:
+        rows_for_csv = node_rows if not filter_deep else [r for r in node_rows if str(r.get("label")) != "deep"]
+        _write_nodes_csv(rows_for_csv, shore_csv, epsg=epsg)
 
-    if out_csv is None:
-        out_csv = "shores.csv"
-    _write_nodes_csv(rows_for_csv, out_csv, epsg=int(epsg))
+    if shore_csv:
+        _write_nodes_csv(rows_for_csv, shore_csv, epsg=int(epsg))
 
-    return out_csv, out_shp
+    if shore_shp:
+        _write_merged_shapefile(polylines, shore_shp, epsg=epsg)
+
+    return ShorelineData(
+        polylines=polylines,
+        df=pd.DataFrame(node_rows),
+        labels_perimeter=labels_all,
+        wet_mask=in_after,
+    )
 
 
 # ----------------------------- Main driver (API) -----------------------------
@@ -1912,6 +1928,8 @@ def refine_volume_tvd(
         poly_id list for which to dump triple profiles.
     profiles_dir : str, optional
         Directory where profile PNGs go (defaults to ``out_dir``).
+    logger : logging.Logger, optional
+        Logger instance for logging progress and messages.
 
     Returns
     -------
@@ -1942,12 +1960,11 @@ def refine_volume_tvd(
     shore_csv = None
     z_floor = None
     floor_mask = None
+    shore = None
+    shore = None
     if shoreline is not None:
-        logger.info("Detecting shorelines...")
-        csv_path = shoreline.out_csv or os.path.join(out_dir, "shores.csv")
-        shp_path = shoreline.out_shp or os.path.join(out_dir, "shores.shp")
-        csv_path, _ = detect_shorelines(
-            mesh=mesh,
+        shore = detect_shorelines(
+            mesh,
             href=shoreline.href,
             deep_delta=float(shoreline.deep_delta),
             shore_delta=float(shoreline.shore_delta),
@@ -1958,15 +1975,36 @@ def refine_volume_tvd(
             smooth_eps_deg=float(shoreline.smooth_eps_deg),
             filter_deep=bool(shoreline.filter_deep),
             epsg=int(shoreline.epsg),
-            out_csv=csv_path,
-            out_shp=shp_path,
+            # Only if you want diagnostics written by the shoreline stage:
+            shore_csv=shoreline.shore_csv,          # may be None
+            shore_shp=shoreline.shore_shp,          # may be None
+            logger=logger,
         )
-        shore_csv = csv_path
 
-    if (shoreline is not None):
+        # Floor straight from memory (df), no CSV round-trip
         fopts = floor or FloorOptions()
-        z_floor, floor_mask = build_shore_floor_from_csv(
-            shore_csv, mesh.n_nodes(), filter_kind=fopts.filter, window=int(fopts.window), trim_endpoints=True
+        z_floor, floor_mask = build_shore_floor_from_df(
+            shore.df, mesh.n_nodes(),
+            filter_kind=fopts.filter, window=int(fopts.window), trim_endpoints=True
+        )
+
+    # Optional profiles: plot from in-memory data (no CSV read)
+    if (shore is not None) and profiles:
+        out_dir_profiles = profiles_dir or out_dir
+        os.makedirs(out_dir_profiles, exist_ok=True)
+        _plot_profiles(shore.polylines, shore.df.to_dict("records"),
+                    set(int(p) for p in profiles), out_dir_profiles,
+                    filt=(floor.filter if floor else "none"),
+                    window=(floor.window if floor else 5))
+
+
+    # Build shoreline “floor” directly from in-memory data
+    if shore is not None and floor is not None:
+        z_floor, floor_mask = build_shore_floor_from_df(
+            shore.df, mesh.n_nodes(),
+            filter_kind=fopts.filter,
+            window=int(fopts.window),
+            trim_endpoints=True,
         )
 
     # 3) Build options and run TVD
@@ -2000,6 +2038,7 @@ def refine_volume_tvd(
         floor_mask=floor_mask,
         reg_weight=float(reg_weight),
         enforce_floor=bool(enforce_floor),
+        logger=logger
     )
 
     z = np.asarray(res["z"], dtype=float)
@@ -2052,8 +2091,9 @@ def refine_volume_tvd(
                 plt.close(fig)
         except Exception:
             pass
+    logger.info("Mesh optimization complete")
+    return res
 
-    return {"z": z, "shore_csv": shore_csv, "z0": z0}
 
 
 # ------------------------------------ CLI ------------------------------------
@@ -2089,6 +2129,8 @@ def _cli():
     ap.add_argument("--smooth_eps_deg", type=float, default=55.0)
     ap.add_argument("--filter_deep", action="store_true")   # todo: necessary?
     ap.add_argument("--epsg", type=int, default=26910)      # todo: shouldn't be unique to this process
+    ap.add_argument("--shore_csv", default=None, help="Output CSV file for node diagnostics")
+    ap.add_argument("--shore_shp", default=None, help="Output Shapefile for shoreline diagnostics")
 
     # Floor regularization
     ap.add_argument("--shore_floor_filter", choices=["max","median"], default="median")
@@ -2108,8 +2150,8 @@ def _cli():
     h = logging.StreamHandler()
     h.setFormatter(logging.Formatter("%(message)s"))
     logger.addHandler(h)
-    logger.setLevel(getattr(logging, args.log_level.upper(), logging.INFO))    
 
+    logger.setLevel(getattr(logging, args.log_level.upper(), logging.INFO))    
     mesh = read_mesh(args.mesh, nodestring_option="land")
 
     # Prepopulate the mesh based on point samples at nodes
@@ -2138,8 +2180,8 @@ def _cli():
         smooth_eps_deg=args.smooth_eps_deg,
         filter_deep=bool(args.filter_deep),
         epsg=int(args.epsg),
-        out_csv=os.path.join(os.path.dirname(args.out) or ".", "shores.csv"),
-        out_shp=os.path.join(os.path.dirname(args.out) or ".", "shores.shp"),
+        shore_csv=args.shore_csv or None,
+        shore_shp=args.shore_shp or None,
     )
     floor = FloorOptions(
         filter=args.shore_floor_filter,
@@ -2147,7 +2189,7 @@ def _cli():
         enforce_floor=bool(args.enforce_floor),
         reg_weight=float(args.reg_weight),
     )
-    refine_volume_tvd(
+    res = refine_volume_tvd(
         mesh,
         dem_spec=args.dem,
         out_dir=os.path.dirname(args.out) or ".",
@@ -2160,7 +2202,7 @@ def _cli():
         logger=logger,
     )
 
-
+    mesh.nodes[:, 2] = res["z"]
     
     write_mesh(mesh, args.out)
     logger.info(f"Wrote {args.out}")
