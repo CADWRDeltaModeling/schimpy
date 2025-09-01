@@ -270,7 +270,6 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
         prev_use = False
         prev_outline = None
         no_record = True
-<<<<<<< HEAD
         for iline, line in enumerate(thfile):
             if (
                 line
@@ -281,12 +280,6 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
                     or line.startswith("time")
                 )
             ):
-=======
-        
-        
-        for iline,line in enumerate(thfile):
-            if line and len(line) > 1 and not (line.startswith("#") or line.startswith("date") or line.startswith("time")):
->>>>>>> ad36b55 (caching for stacked_dem_fill.py , bug fix on date formats for model_time.py, accelerate laplace_smooth_data.py, optimized raster_to_nodes.py)
                 splitline = line.split()
                 if skip_nan and splitline[-1] == "nan":
                     continue
