@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SCHIMPY Toolset &mdash; schimpy 0.0.0 documentation</title>
+  <title>SCHIMPY Toolset &mdash; schimpy 1.12.2.dev37+g5a1751d documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=7026087e"></script>
+      <script src="_static/documentation_options.js?v=b86fd389"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -582,11 +582,11 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.laplace_smooth_data">schimpy.laplace_smooth_data module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_data"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_data2"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data2()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_with_vel"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_with_vel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_data2_slow"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data2_slow()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_with_vel2"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_with_vel2()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.laplace_smooth_with_vel3"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_with_vel3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.laplace_smooth_data.smooth_kernel_numba"><code class="docutils literal notranslate"><span class="pre">smooth_kernel_numba()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.lsc2">schimpy.lsc2 module</a><ul>
@@ -633,6 +633,97 @@ can greatly simplify the work involved when the mesh is revised.</p>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.merge_th.read_locations_from_input"><code class="docutils literal notranslate"><span class="pre">read_locations_from_input()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.merge_th.read_th_spec"><code class="docutils literal notranslate"><span class="pre">read_th_spec()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.merge_th.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.mesh_volume_tvd">schimpy.mesh_volume_tvd module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.AdaptiveElementQuadrature"><code class="docutils literal notranslate"><span class="pre">AdaptiveElementQuadrature</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.AdaptiveElementQuadrature.quad_points"><code class="docutils literal notranslate"><span class="pre">AdaptiveElementQuadrature.quad_points()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloodFillResult"><code class="docutils literal notranslate"><span class="pre">FloodFillResult</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloodFillResult.edge_labels_stage1"><code class="docutils literal notranslate"><span class="pre">FloodFillResult.edge_labels_stage1</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloodFillResult.edge_labels_stage2"><code class="docutils literal notranslate"><span class="pre">FloodFillResult.edge_labels_stage2</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloodFillResult.wet_elems_stage1"><code class="docutils literal notranslate"><span class="pre">FloodFillResult.wet_elems_stage1</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloodFillResult.wet_elems_stage2"><code class="docutils literal notranslate"><span class="pre">FloodFillResult.wet_elems_stage2</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloorOptions"><code class="docutils literal notranslate"><span class="pre">FloorOptions</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloorOptions.enforce_floor"><code class="docutils literal notranslate"><span class="pre">FloorOptions.enforce_floor</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloorOptions.filter"><code class="docutils literal notranslate"><span class="pre">FloorOptions.filter</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloorOptions.reg_weight"><code class="docutils literal notranslate"><span class="pre">FloorOptions.reg_weight</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FloorOptions.window"><code class="docutils literal notranslate"><span class="pre">FloorOptions.window</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions"><code class="docutils literal notranslate"><span class="pre">FlowOptions</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.cfl"><code class="docutils literal notranslate"><span class="pre">FlowOptions.cfl</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.cfl_target"><code class="docutils literal notranslate"><span class="pre">FlowOptions.cfl_target</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.clipping_eps"><code class="docutils literal notranslate"><span class="pre">FlowOptions.clipping_eps</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.dt"><code class="docutils literal notranslate"><span class="pre">FlowOptions.dt</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.l2_weight"><code class="docutils literal notranslate"><span class="pre">FlowOptions.l2_weight</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.lambda_l2"><code class="docutils literal notranslate"><span class="pre">FlowOptions.lambda_l2</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.max_backtracks"><code class="docutils literal notranslate"><span class="pre">FlowOptions.max_backtracks</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.mu"><code class="docutils literal notranslate"><span class="pre">FlowOptions.mu</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.n_steps"><code class="docutils literal notranslate"><span class="pre">FlowOptions.n_steps</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.rel_eta"><code class="docutils literal notranslate"><span class="pre">FlowOptions.rel_eta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.FlowOptions.tv_weight"><code class="docutils literal notranslate"><span class="pre">FlowOptions.tv_weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineData"><code class="docutils literal notranslate"><span class="pre">ShorelineData</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineData.df"><code class="docutils literal notranslate"><span class="pre">ShorelineData.df</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineData.labels_perimeter"><code class="docutils literal notranslate"><span class="pre">ShorelineData.labels_perimeter</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineData.polylines"><code class="docutils literal notranslate"><span class="pre">ShorelineData.polylines</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineData.wet_mask"><code class="docutils literal notranslate"><span class="pre">ShorelineData.wet_mask</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.deep_delta"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.deep_delta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.epsg"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.epsg</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.filter_deep"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.filter_deep</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.href"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.href</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.seeds"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.seeds</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.shore_csv"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.shore_csv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.shore_delta"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.shore_delta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.shore_shp"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.shore_shp</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.smooth_eps_deg"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.smooth_eps_deg</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.smooth_relax_factor"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.smooth_relax_factor</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.smooth_strip_max"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.smooth_strip_max</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.ShorelineOptions.use_default_seeds"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions.use_default_seeds</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions"><code class="docutils literal notranslate"><span class="pre">TVDOptions</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.cfl_target"><code class="docutils literal notranslate"><span class="pre">TVDOptions.cfl_target</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.clip_eps"><code class="docutils literal notranslate"><span class="pre">TVDOptions.clip_eps</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.dt"><code class="docutils literal notranslate"><span class="pre">TVDOptions.dt</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.l2_weight"><code class="docutils literal notranslate"><span class="pre">TVDOptions.l2_weight</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.lambda_l2"><code class="docutils literal notranslate"><span class="pre">TVDOptions.lambda_l2</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.max_backtracks"><code class="docutils literal notranslate"><span class="pre">TVDOptions.max_backtracks</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.mu"><code class="docutils literal notranslate"><span class="pre">TVDOptions.mu</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.rel_eta"><code class="docutils literal notranslate"><span class="pre">TVDOptions.rel_eta</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.steps"><code class="docutils literal notranslate"><span class="pre">TVDOptions.steps</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVDOptions.tv_weight"><code class="docutils literal notranslate"><span class="pre">TVDOptions.tv_weight</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator"><code class="docutils literal notranslate"><span class="pre">TVL2VolumeEvaluator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.global_volume"><code class="docutils literal notranslate"><span class="pre">TVL2VolumeEvaluator.global_volume()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.l2_dem"><code class="docutils literal notranslate"><span class="pre">TVL2VolumeEvaluator.l2_dem()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.tv_energy"><code class="docutils literal notranslate"><span class="pre">TVL2VolumeEvaluator.tv_energy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVSubgradientOperator"><code class="docutils literal notranslate"><span class="pre">TVSubgradientOperator</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.TVSubgradientOperator.step"><code class="docutils literal notranslate"><span class="pre">TVSubgradientOperator.step()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.VolumeL2Variational"><code class="docutils literal notranslate"><span class="pre">VolumeL2Variational</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.VolumeL2Variational.gradient"><code class="docutils literal notranslate"><span class="pre">VolumeL2Variational.gradient()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.VolumeL2Variational.residuals_and_energy"><code class="docutils literal notranslate"><span class="pre">VolumeL2Variational.residuals_and_energy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.build_shore_floor_from_df"><code class="docutils literal notranslate"><span class="pre">build_shore_floor_from_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.detect_shorelines"><code class="docutils literal notranslate"><span class="pre">detect_shorelines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.floodfill_always_wet"><code class="docutils literal notranslate"><span class="pre">floodfill_always_wet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.refine_volume_tvd"><code class="docutils literal notranslate"><span class="pre">refine_volume_tvd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.run_tvd_variational"><code class="docutils literal notranslate"><span class="pre">run_tvd_variational()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.mesh_volume_tvd.stage3_single_pass_entry_exit"><code class="docutils literal notranslate"><span class="pre">stage3_single_pass_entry_exit()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.metricsplot">schimpy.metricsplot module</a><ul>
@@ -1388,9 +1479,9 @@ can greatly simplify the work involved when the mesh is revised.</p>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="schimpy.html#module-schimpy.stacked_dem_fill">schimpy.stacked_dem_fill module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.ParseType"><code class="docutils literal notranslate"><span class="pre">ParseType()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.Usage"><code class="docutils literal notranslate"><span class="pre">Usage()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.bilinear"><code class="docutils literal notranslate"><span class="pre">bilinear()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.create_dem_sampler"><code class="docutils literal notranslate"><span class="pre">create_dem_sampler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.filelist_main"><code class="docutils literal notranslate"><span class="pre">filelist_main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.fill_2dm"><code class="docutils literal notranslate"><span class="pre">fill_2dm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="schimpy.html#schimpy.stacked_dem_fill.fill_gr3"><code class="docutils literal notranslate"><span class="pre">fill_gr3()</span></code></a></li>

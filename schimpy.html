@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subpackages &mdash; schimpy 0.0.0 documentation</title>
+  <title>Subpackages &mdash; schimpy 1.12.2.dev37+g5a1751d documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=7026087e"></script>
+      <script src="_static/documentation_options.js?v=b86fd389"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -277,11 +277,11 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.laplace_smooth_data">schimpy.laplace_smooth_data module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.laplace_smooth_data.laplace_smooth_data"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.laplace_smooth_data.laplace_smooth_data2"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data2()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.laplace_smooth_data.laplace_smooth_with_vel"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_with_vel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.laplace_smooth_data.laplace_smooth_data2_slow"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_data2_slow()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.laplace_smooth_data.laplace_smooth_with_vel2"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_with_vel2()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.laplace_smooth_data.laplace_smooth_with_vel3"><code class="docutils literal notranslate"><span class="pre">laplace_smooth_with_vel3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.laplace_smooth_data.smooth_kernel_numba"><code class="docutils literal notranslate"><span class="pre">smooth_kernel_numba()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.lsc2">schimpy.lsc2 module</a><ul>
@@ -320,6 +320,25 @@
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.read_locations_from_input"><code class="docutils literal notranslate"><span class="pre">read_locations_from_input()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.read_th_spec"><code class="docutils literal notranslate"><span class="pre">read_th_spec()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.merge_th.write_th"><code class="docutils literal notranslate"><span class="pre">write_th()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-schimpy.mesh_volume_tvd">schimpy.mesh_volume_tvd module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.AdaptiveElementQuadrature"><code class="docutils literal notranslate"><span class="pre">AdaptiveElementQuadrature</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.FloodFillResult"><code class="docutils literal notranslate"><span class="pre">FloodFillResult</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.FloorOptions"><code class="docutils literal notranslate"><span class="pre">FloorOptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.FlowOptions"><code class="docutils literal notranslate"><span class="pre">FlowOptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.ShorelineData"><code class="docutils literal notranslate"><span class="pre">ShorelineData</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.ShorelineOptions"><code class="docutils literal notranslate"><span class="pre">ShorelineOptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.TVDOptions"><code class="docutils literal notranslate"><span class="pre">TVDOptions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator"><code class="docutils literal notranslate"><span class="pre">TVL2VolumeEvaluator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.TVSubgradientOperator"><code class="docutils literal notranslate"><span class="pre">TVSubgradientOperator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.VolumeL2Variational"><code class="docutils literal notranslate"><span class="pre">VolumeL2Variational</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.build_shore_floor_from_df"><code class="docutils literal notranslate"><span class="pre">build_shore_floor_from_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.detect_shorelines"><code class="docutils literal notranslate"><span class="pre">detect_shorelines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.floodfill_always_wet"><code class="docutils literal notranslate"><span class="pre">floodfill_always_wet()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.refine_volume_tvd"><code class="docutils literal notranslate"><span class="pre">refine_volume_tvd()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.run_tvd_variational"><code class="docutils literal notranslate"><span class="pre">run_tvd_variational()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.mesh_volume_tvd.stage3_single_pass_entry_exit"><code class="docutils literal notranslate"><span class="pre">stage3_single_pass_entry_exit()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.metricsplot">schimpy.metricsplot module</a><ul>
@@ -542,9 +561,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-schimpy.stacked_dem_fill">schimpy.stacked_dem_fill module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.ParseType"><code class="docutils literal notranslate"><span class="pre">ParseType()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.Usage"><code class="docutils literal notranslate"><span class="pre">Usage()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.bilinear"><code class="docutils literal notranslate"><span class="pre">bilinear()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.create_arg_parser"><code class="docutils literal notranslate"><span class="pre">create_arg_parser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.create_dem_sampler"><code class="docutils literal notranslate"><span class="pre">create_dem_sampler()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.filelist_main"><code class="docutils literal notranslate"><span class="pre">filelist_main()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.fill_2dm"><code class="docutils literal notranslate"><span class="pre">fill_2dm()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#schimpy.stacked_dem_fill.fill_gr3"><code class="docutils literal notranslate"><span class="pre">fill_gr3()</span></code></a></li>
@@ -3227,28 +3246,146 @@ with respect to dt. This is checked.</p>
 <section id="module-schimpy.laplace_smooth_data">
 <span id="schimpy-laplace-smooth-data-module"></span><h2>schimpy.laplace_smooth_data module<a class="headerlink" href="#module-schimpy.laplace_smooth_data" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.laplace_smooth_data.laplace_smooth_data">
-<span class="sig-prename descclassname"><span class="pre">schimpy.laplace_smooth_data.</span></span><span class="sig-name descname"><span class="pre">laplace_smooth_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.laplace_smooth_data.laplace_smooth_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.laplace_smooth_data.laplace_smooth_data2">
 <span class="sig-prename descclassname"><span class="pre">schimpy.laplace_smooth_data.</span></span><span class="sig-name descname"><span class="pre">laplace_smooth_data2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.laplace_smooth_data.laplace_smooth_data2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Apply Laplacian smoothing to a scalar field on a mesh using explicit diffusion.</p>
+<p>This function performs iterative smoothing by updating each node’s value
+toward the average of its neighbors. It corresponds to forward Euler
+integration of the diffusion equation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">object</span></dt><dd><p>A mesh object with a <cite>nodes</cite> array and a method <cite>get_neighbor_nodes(ndx)</cite>
+returning neighbor node indices for a given node.</p>
+</dd>
+<dt><strong>data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>Initial scalar field values at each mesh node.</p>
+</dd>
+<dt><strong>kappa</strong><span class="classifier">float, optional</span></dt><dd><p>Diffusivity coefficient. Controls the rate of smoothing. Default is 0.05.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float, optional</span></dt><dd><p>Timestep used for each smoothing iteration. Default is 1.0.</p>
+</dd>
+<dt><strong>iter_total</strong><span class="classifier">int, optional</span></dt><dd><p>Number of smoothing iterations to perform. Default is 150.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>smooth_data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>The smoothed scalar field after <cite>iter_total</cite> iterations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.laplace_smooth_data.laplace_smooth_with_vel">
-<span class="sig-prename descclassname"><span class="pre">schimpy.laplace_smooth_data.</span></span><span class="sig-name descname"><span class="pre">laplace_smooth_with_vel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.laplace_smooth_data.laplace_smooth_with_vel" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="schimpy.laplace_smooth_data.laplace_smooth_data2_slow">
+<span class="sig-prename descclassname"><span class="pre">schimpy.laplace_smooth_data.</span></span><span class="sig-name descname"><span class="pre">laplace_smooth_data2_slow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.laplace_smooth_data.laplace_smooth_data2_slow" title="Link to this definition"></a></dt>
+<dd><p>Apply Laplacian smoothing to a scalar field on a mesh using explicit diffusion.</p>
+<p>DEPRECATED. Use the version without _slow in the name</p>
+<p>This function performs iterative smoothing by updating each node’s value
+toward the average of its neighbors. It corresponds to forward Euler
+integration of the diffusion equation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">object</span></dt><dd><p>A mesh object with a <cite>nodes</cite> array and a method <cite>get_neighbor_nodes(ndx)</cite>
+returning neighbor node indices for a given node.</p>
+</dd>
+<dt><strong>data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>Initial scalar field values at each mesh node.</p>
+</dd>
+<dt><strong>kappa</strong><span class="classifier">float, optional</span></dt><dd><p>Diffusivity coefficient. Controls the rate of smoothing. Default is 0.05.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float, optional</span></dt><dd><p>Timestep used for each smoothing iteration. Default is 1.0.</p>
+</dd>
+<dt><strong>iter_total</strong><span class="classifier">int, optional</span></dt><dd><p>Number of smoothing iterations to perform. Default is 150.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>smooth_data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>The smoothed scalar field after <cite>iter_total</cite> iterations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.laplace_smooth_data.laplace_smooth_with_vel2">
 <span class="sig-prename descclassname"><span class="pre">schimpy.laplace_smooth_data.</span></span><span class="sig-name descname"><span class="pre">laplace_smooth_with_vel2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.laplace_smooth_data.laplace_smooth_with_vel2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Apply Laplacian smoothing with additive forcing to a scalar field on a mesh.</p>
+<p>This function performs iterative diffusion of <cite>data</cite> while incorporating
+a source or forcing term <cite>vel</cite> at each node. It evolves the field
+using explicit Euler integration of the PDE:</p>
+<blockquote>
+<div><p>∂u/∂t = κ ∇²u + vel</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">object</span></dt><dd><p>A mesh object with a <cite>nodes</cite> array and a method <cite>get_neighbor_nodes(ndx)</cite>
+returning neighbor node indices for a given node.</p>
+</dd>
+<dt><strong>data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>Initial scalar field values at each mesh node.</p>
+</dd>
+<dt><strong>vel</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>Additive source or forcing term to apply at each node.</p>
+</dd>
+<dt><strong>kappa</strong><span class="classifier">float, optional</span></dt><dd><p>Diffusivity coefficient. Default is 0.05.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float, optional</span></dt><dd><p>Timestep used for each smoothing iteration. Default is 1.0.</p>
+</dd>
+<dt><strong>iter_total</strong><span class="classifier">int, optional</span></dt><dd><p>Number of smoothing iterations to perform. Default is 1.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>smooth_data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>The smoothed and forced scalar field after <cite>iter_total</cite> iterations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.laplace_smooth_data.laplace_smooth_with_vel3">
 <span class="sig-prename descclassname"><span class="pre">schimpy.laplace_smooth_data.</span></span><span class="sig-name descname"><span class="pre">laplace_smooth_with_vel3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nlayer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_total</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.laplace_smooth_data.laplace_smooth_with_vel3" title="Link to this definition"></a></dt>
+<dd><p>Apply layer-aware Laplacian smoothing with forcing to a scalar field on a mesh.</p>
+<p>This function diffuses values across mesh nodes but restricts neighbor contributions
+to those from the same or deeper layers. Shallower neighbors are excluded from
+smoothing influence, preserving stratification or flow directionality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">object</span></dt><dd><p>A mesh object with a <cite>nodes</cite> array and a method <cite>get_neighbor_nodes(ndx)</cite>
+returning neighbor node indices for a given node.</p>
+</dd>
+<dt><strong>nlayer</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>Integer layer index for each node. Smoothing ignores neighbors with shallower layer values.</p>
+</dd>
+<dt><strong>data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>Initial scalar field values at each mesh node (used as fallback for excluded neighbors).</p>
+</dd>
+<dt><strong>vel</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>Additive source or forcing term applied at each node.</p>
+</dd>
+<dt><strong>kappa</strong><span class="classifier">float, optional</span></dt><dd><p>Diffusivity coefficient. Default is 0.05.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float, optional</span></dt><dd><p>Timestep used for each smoothing iteration. Default is 1.0.</p>
+</dd>
+<dt><strong>iter_total</strong><span class="classifier">int, optional</span></dt><dd><p>Number of smoothing iterations to perform. Default is 1.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>smooth_data</strong><span class="classifier">ndarray of shape (N,)</span></dt><dd><p>The smoothed scalar field after <cite>iter_total</cite> iterations with layer-aware filtering and forcing.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.laplace_smooth_data.smooth_kernel_numba">
+<span class="sig-prename descclassname"><span class="pre">schimpy.laplace_smooth_data.</span></span><span class="sig-name descname"><span class="pre">smooth_kernel_numba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iter_total</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.laplace_smooth_data.smooth_kernel_numba" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -3508,6 +3645,644 @@ as a standard S grid theta although it will be varied according to depth</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.merge_th.write_th">
 <span class="sig-prename descclassname"><span class="pre">schimpy.merge_th.</span></span><span class="sig-name descname"><span class="pre">write_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.merge_th.write_th" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-schimpy.mesh_volume_tvd">
+<span id="schimpy-mesh-volume-tvd-module"></span><h2>schimpy.mesh_volume_tvd module<a class="headerlink" href="#module-schimpy.mesh_volume_tvd" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.AdaptiveElementQuadrature">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">AdaptiveElementQuadrature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A9</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A16</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.AdaptiveElementQuadrature" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Adaptive quadrature for tri/quad elements.</p>
+<p>Triangles use a fixed symmetric 6-point rule. Quads use tensor
+Gauss–Legendre nodes (3×3, 4×4, or 5×5) chosen by polygon area.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>A9</strong><span class="classifier">float, optional</span></dt><dd><p>Area threshold (m^2) below which quads use 3×3 rule, by default 60.0.</p>
+</dd>
+<dt><strong>A16</strong><span class="classifier">float, optional</span></dt><dd><p>Area threshold for 4×4 rule (5×5 above), by default 200.0.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>quad_points</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.AdaptiveElementQuadrature.quad_points">
+<span class="sig-name descname"><span class="pre">quad_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.AdaptiveElementQuadrature.quad_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloodFillResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">FloodFillResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wet_elems_stage1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'np.ndarray'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_labels_stage1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Dict[int,</span> <span class="pre">str]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wet_elems_stage2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'np.ndarray'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_labels_stage2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Dict[int,</span> <span class="pre">str]'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloodFillResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloodFillResult.edge_labels_stage1">
+<span class="sig-name descname"><span class="pre">edge_labels_stage1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloodFillResult.edge_labels_stage1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloodFillResult.edge_labels_stage2">
+<span class="sig-name descname"><span class="pre">edge_labels_stage2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloodFillResult.edge_labels_stage2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloodFillResult.wet_elems_stage1">
+<span class="sig-name descname"><span class="pre">wet_elems_stage1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloodFillResult.wet_elems_stage1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloodFillResult.wet_elems_stage2">
+<span class="sig-name descname"><span class="pre">wet_elems_stage2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloodFillResult.wet_elems_stage2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloorOptions">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">FloorOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloorOptions" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloorOptions.enforce_floor">
+<span class="sig-name descname"><span class="pre">enforce_floor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloorOptions.enforce_floor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloorOptions.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'max'</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloorOptions.filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloorOptions.reg_weight">
+<span class="sig-name descname"><span class="pre">reg_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloorOptions.reg_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FloorOptions.window">
+<span class="sig-name descname"><span class="pre">window</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FloorOptions.window" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">FlowOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_l2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfl_target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipping_eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_eta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_backtracks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tv_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Options for <a class="reference internal" href="#schimpy.mesh_volume_tvd.run_tvd_variational" title="schimpy.mesh_volume_tvd.run_tvd_variational"><code class="xref py py-func docutils literal notranslate"><span class="pre">run_tvd_variational()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_steps</strong><span class="classifier">int</span></dt><dd><p>Max number of iterations.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">Optional[float]</span></dt><dd><p>Base time step (meters). If None, a CFL-derived dt is used.</p>
+</dd>
+<dt><strong>cfl</strong><span class="classifier">float</span></dt><dd><p>CFL-like factor if <code class="docutils literal notranslate"><span class="pre">dt</span></code> is None.</p>
+</dd>
+<dt><strong>mu</strong><span class="classifier">float</span></dt><dd><p>TV step strength (prox gain). Default 1.0.</p>
+</dd>
+<dt><strong>lambda_l2</strong><span class="classifier">float</span></dt><dd><p>Scale on the L2 descent increment (separate from <code class="docutils literal notranslate"><span class="pre">l2_weight</span></code> in the
+objective). Default 1.0.</p>
+</dd>
+<dt><strong>cfl_target</strong><span class="classifier">float</span></dt><dd><p>Target explicit rate cap for TV step. Default 1.0.</p>
+</dd>
+<dt><strong>clipping_eps</strong><span class="classifier">Optional[float]</span></dt><dd><p>If not None, clip neighbor-wise with ± <code class="docutils literal notranslate"><span class="pre">clipping_eps</span></code> (meters).</p>
+</dd>
+<dt><strong>rel_eta</strong><span class="classifier">float</span></dt><dd><p>Required relative drop in the weighted objective per accept.</p>
+</dd>
+<dt><strong>max_backtracks</strong><span class="classifier">int</span></dt><dd><p>Maximum backtracks per iteration.</p>
+</dd>
+<dt><strong>tv_weight</strong><span class="classifier">float</span></dt><dd><p>Weight on TV in the objective.</p>
+</dd>
+<dt><strong>l2_weight</strong><span class="classifier">float</span></dt><dd><p>Weight on L2(volume) in the objective.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.cfl">
+<span class="sig-name descname"><span class="pre">cfl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.25</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.cfl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.cfl_target">
+<span class="sig-name descname"><span class="pre">cfl_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.cfl_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.clipping_eps">
+<span class="sig-name descname"><span class="pre">clipping_eps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.clipping_eps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.dt">
+<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.dt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.l2_weight">
+<span class="sig-name descname"><span class="pre">l2_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.2</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.l2_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.lambda_l2">
+<span class="sig-name descname"><span class="pre">lambda_l2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.lambda_l2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.max_backtracks">
+<span class="sig-name descname"><span class="pre">max_backtracks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.max_backtracks" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.mu">
+<span class="sig-name descname"><span class="pre">mu</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.mu" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.n_steps">
+<span class="sig-name descname"><span class="pre">n_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">25</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.n_steps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.rel_eta">
+<span class="sig-name descname"><span class="pre">rel_eta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.001</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.rel_eta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.FlowOptions.tv_weight">
+<span class="sig-name descname"><span class="pre">tv_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.FlowOptions.tv_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineData">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">ShorelineData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polylines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.2)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels_perimeter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wet_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineData" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Container for shoreline detection outputs (pure data; no filenames).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>polylines</strong><span class="classifier">list of dict</span></dt><dd><p>One dict per merged polyline with keys:
+<code class="docutils literal notranslate"><span class="pre">{'poly_id','label','nodes','coords'}</span></code>.</p>
+</dd>
+<dt><strong>df</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>Per-node table equivalent to the shoreline CSV with columns
+<code class="docutils literal notranslate"><span class="pre">['node','x','y','z','poly_id','label']</span></code> (<code class="docutils literal notranslate"><span class="pre">node</span></code> is 1-based).</p>
+</dd>
+<dt><strong>labels_perimeter</strong><span class="classifier">dict[int, str]</span></dt><dd><p>Perimeter edge labels (<code class="docutils literal notranslate"><span class="pre">'shore'</span></code> or <code class="docutils literal notranslate"><span class="pre">'deep'</span></code>) keyed by edge id.</p>
+</dd>
+<dt><strong>wet_mask</strong><span class="classifier">numpy.ndarray (bool)</span></dt><dd><p>Mask of elements in the final always-wet region after stage 2/3.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineData.df">
+<span class="sig-name descname"><span class="pre">df</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.2)"><span class="pre">DataFrame</span></a></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineData.df" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineData.labels_perimeter">
+<span class="sig-name descname"><span class="pre">labels_perimeter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineData.labels_perimeter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineData.polylines">
+<span class="sig-name descname"><span class="pre">polylines</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineData.polylines" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineData.wet_mask">
+<span class="sig-name descname"><span class="pre">wet_mask</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ndarray</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineData.wet_mask" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">ShorelineOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">href</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Union[float,</span> <span class="pre">str]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shore_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Optional[List[Tuple[float,</span> <span class="pre">float]]]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_default_seeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_relax_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_strip_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_eps_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">55.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_deep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">26910</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shore_csv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Optional[str]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shore_shp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Optional[str]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>seeds</strong></dt><dd></dd>
+<dt><strong>shore_csv</strong></dt><dd></dd>
+<dt><strong>shore_shp</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.deep_delta">
+<span class="sig-name descname"><span class="pre">deep_delta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.deep_delta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.epsg">
+<span class="sig-name descname"><span class="pre">epsg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">26910</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.epsg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.filter_deep">
+<span class="sig-name descname"><span class="pre">filter_deep</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.filter_deep" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.href">
+<span class="sig-name descname"><span class="pre">href</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.href" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.seeds">
+<span class="sig-name descname"><span class="pre">seeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.seeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.shore_csv">
+<span class="sig-name descname"><span class="pre">shore_csv</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.shore_csv" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.shore_delta">
+<span class="sig-name descname"><span class="pre">shore_delta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.shore_delta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.shore_shp">
+<span class="sig-name descname"><span class="pre">shore_shp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.shore_shp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.smooth_eps_deg">
+<span class="sig-name descname"><span class="pre">smooth_eps_deg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">55.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.smooth_eps_deg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.smooth_relax_factor">
+<span class="sig-name descname"><span class="pre">smooth_relax_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.4</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.smooth_relax_factor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.smooth_strip_max">
+<span class="sig-name descname"><span class="pre">smooth_strip_max</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">24</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.smooth_strip_max" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.ShorelineOptions.use_default_seeds">
+<span class="sig-name descname"><span class="pre">use_default_seeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.ShorelineOptions.use_default_seeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">TVDOptions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_l2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tv_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfl_target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Optional[float]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_eta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_backtracks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>clip_eps</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.cfl_target">
+<span class="sig-name descname"><span class="pre">cfl_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.cfl_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.clip_eps">
+<span class="sig-name descname"><span class="pre">clip_eps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.clip_eps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.dt">
+<span class="sig-name descname"><span class="pre">dt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.dt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.l2_weight">
+<span class="sig-name descname"><span class="pre">l2_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5e-05</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.l2_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.lambda_l2">
+<span class="sig-name descname"><span class="pre">lambda_l2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.lambda_l2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.max_backtracks">
+<span class="sig-name descname"><span class="pre">max_backtracks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.max_backtracks" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.mu">
+<span class="sig-name descname"><span class="pre">mu</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.mu" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.rel_eta">
+<span class="sig-name descname"><span class="pre">rel_eta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.002</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.rel_eta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.steps">
+<span class="sig-name descname"><span class="pre">steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.steps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVDOptions.tv_weight">
+<span class="sig-name descname"><span class="pre">tv_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVDOptions.tv_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVL2VolumeEvaluator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">TVL2VolumeEvaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SCHISM_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dem_sampler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quadrature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#schimpy.mesh_volume_tvd.AdaptiveElementQuadrature" title="schimpy.mesh_volume_tvd.AdaptiveElementQuadrature"><span class="pre">AdaptiveElementQuadrature</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Evaluator for TV energy and DEM-integrated L2 energy with cached quadrature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">SCHISM_mesh</span></dt><dd><p>Mesh with <code class="docutils literal notranslate"><span class="pre">nodes</span></code> (n,3), <code class="docutils literal notranslate"><span class="pre">edges</span></code> (m,2), and <code class="docutils literal notranslate"><span class="pre">elems</span></code> (list of 3/4-tuples).</p>
+</dd>
+<dt><strong>dem_sampler</strong><span class="classifier">callable, optional</span></dt><dd><p>Function mapping <code class="docutils literal notranslate"><span class="pre">(k,2)</span></code> XY points → DEM depth (+down) array.</p>
+</dd>
+<dt><strong>quadrature</strong><span class="classifier">AdaptiveElementQuadrature, optional</span></dt><dd><p>Quadrature rule provider.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>global_volume</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>l2_dem</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>tv_energy</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.global_volume">
+<span class="sig-name descname"><span class="pre">global_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.global_volume" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.l2_dem">
+<span class="sig-name descname"><span class="pre">l2_dem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.l2_dem" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.tv_energy">
+<span class="sig-name descname"><span class="pre">tv_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator.tv_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVSubgradientOperator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">TVSubgradientOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes_xy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lump_mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_cfl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfl_target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipping_eps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVSubgradientOperator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Edge-TV subgradient step on an unstructured mesh.</p>
+<p>TV(z) = sum_{(i,j)} w_ij * <a href="#id15"><span class="problematic" id="id16">|z_i - z_j|</span></a>, with w_ij = <a href="#id17"><span class="problematic" id="id18">|edge|</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nodes_xy</strong><span class="classifier">ndarray, shape (n,2)</span></dt><dd><p>Node x,y coordinates.</p>
+</dd>
+<dt><strong>elems</strong><span class="classifier">list of array_like</span></dt><dd><p>Element connectivities (3 or 4 node indices).</p>
+</dd>
+<dt><strong>lump_mass</strong><span class="classifier">ndarray, shape (n,)</span></dt><dd><p>Lumped node areas (for explicit scaling).</p>
+</dd>
+<dt><strong>eps</strong><span class="classifier">float, optional</span></dt><dd><p>Smoothing parameter in the <a href="#id19"><span class="problematic" id="id20">|·|</span></a> derivative, by default 1e-8.</p>
+</dd>
+<dt><strong>enforce_cfl</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, scales the step to keep dt*max_rate &lt;= cfl_target.</p>
+</dd>
+<dt><strong>cfl_target</strong><span class="classifier">float, optional</span></dt><dd><p>Target explicit rate cap used when <code class="docutils literal notranslate"><span class="pre">enforce_cfl</span></code> is True.</p>
+</dd>
+<dt><strong>clipping_eps</strong><span class="classifier">Optional[float], optional</span></dt><dd><p>If not None, clip the updated node values to each node’s neighbor
+range ± <code class="docutils literal notranslate"><span class="pre">clipping_eps</span></code>. Use None to disable clipping entirely.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>step</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.TVSubgradientOperator.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.TVSubgradientOperator.step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.VolumeL2Variational">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">VolumeL2Variational</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#schimpy.mesh_volume_tvd.TVL2VolumeEvaluator" title="schimpy.mesh_volume_tvd.TVL2VolumeEvaluator"><span class="pre">TVL2VolumeEvaluator</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.VolumeL2Variational" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Element-mean variational L2 penalty to DEM.</p>
+<p>J_vol(z) = 0.5 * sum_e A_e * ( z̄_e - d̄_e )^2,   r_e = z̄_e - d̄_e</p>
+<p>Gradient w.r.t. node i:
+dJ/dz_i = sum_{e∋i} r_e * ∫_e N_i dA</p>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>gradient</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>residuals_and_energy</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.VolumeL2Variational.gradient">
+<span class="sig-name descname"><span class="pre">gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.VolumeL2Variational.gradient" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.VolumeL2Variational.residuals_and_energy">
+<span class="sig-name descname"><span class="pre">residuals_and_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.VolumeL2Variational.residuals_and_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.build_shore_floor_from_df">
+<span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">build_shore_floor_from_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.2)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'max'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim_endpoints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.build_shore_floor_from_df" title="Link to this definition"></a></dt>
+<dd><p>Construct a nodewise shoreline floor from an in-memory DataFrame.</p>
+<p>This mirrors the CSV-based implementation but avoids any file I/O.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>df</strong><span class="classifier">pandas.DataFrame</span></dt><dd><p>Columns: <code class="docutils literal notranslate"><span class="pre">node,</span> <span class="pre">x,</span> <span class="pre">y,</span> <span class="pre">z,</span> <span class="pre">poly_id,</span> <span class="pre">label</span></code> (<code class="docutils literal notranslate"><span class="pre">node</span></code> is 1-based).</p>
+</dd>
+<dt><strong>n_nodes</strong><span class="classifier">int</span></dt><dd><p>Total number of mesh nodes.</p>
+</dd>
+<dt><strong>filter_kind</strong><span class="classifier">{‘max’,’median’}, optional</span></dt><dd><p>Rolling aggregation applied along each polyline, by default <code class="docutils literal notranslate"><span class="pre">'max'</span></code>.</p>
+</dd>
+<dt><strong>window</strong><span class="classifier">int, optional</span></dt><dd><p>Odd window size for the rolling aggregation, by default <code class="docutils literal notranslate"><span class="pre">7</span></code>.</p>
+</dd>
+<dt><strong>trim_endpoints</strong><span class="classifier">bool, optional</span></dt><dd><p>Drop endpoints that touch any <code class="docutils literal notranslate"><span class="pre">'deep'</span></code> edge, by default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>z_floor</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Floor elevation per node (length = <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code>), <code class="docutils literal notranslate"><span class="pre">-inf</span></code> where unset.</p>
+</dd>
+<dt><strong>mask</strong><span class="classifier">numpy.ndarray of bool</span></dt><dd><p>True where a floor value is defined.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.detect_shorelines">
+<span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">detect_shorelines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">href</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">deep_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shore_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_default_seeds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_relax_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_strip_max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_eps_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_deep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">26910</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shore_csv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shore_shp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#schimpy.mesh_volume_tvd.ShorelineData" title="schimpy.mesh_volume_tvd.ShorelineData"><span class="pre">ShorelineData</span></a></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.detect_shorelines" title="Link to this definition"></a></dt>
+<dd><p>Detect perimeter shore/deep edges (stages 1–3) and return <strong>data only</strong>.</p>
+<p>Optionally writes diagnostic artifacts if <code class="docutils literal notranslate"><span class="pre">shore_csv</span></code> / <code class="docutils literal notranslate"><span class="pre">shore_shp</span></code> are
+provided. No filenames are returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">schimpy.schism_mesh.SchismMesh</span></dt><dd><p>Target mesh (<code class="docutils literal notranslate"><span class="pre">nodes</span></code> depths are read but not mutated here).</p>
+</dd>
+<dt><strong>href</strong><span class="classifier">float</span></dt><dd><p>Reference depth for nodewise tests (positive downward).</p>
+</dd>
+<dt><strong>deep_delta, shore_delta</strong><span class="classifier">float</span></dt><dd><p>Threshold deltas (m) for deep vs. shore classification.</p>
+</dd>
+<dt><strong>seeds</strong><span class="classifier">sequence of (x, y), optional</span></dt><dd><p>Seed points for the always-wet floodfill.</p>
+</dd>
+<dt><strong>use_default_seeds</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, augment with built-in seeds.</p>
+</dd>
+<dt><strong>smooth_relax_factor</strong><span class="classifier">float, optional</span></dt><dd><p>Stage-3 relaxed edge criterion factor.</p>
+</dd>
+<dt><strong>smooth_strip_max</strong><span class="classifier">int, optional</span></dt><dd><p>Maximum length of accepted stage-3 strips.</p>
+</dd>
+<dt><strong>smooth_eps_deg</strong><span class="classifier">float, optional</span></dt><dd><p>Corner improvement tolerance in degrees.</p>
+</dd>
+<dt><strong>filter_deep</strong><span class="classifier">bool, optional</span></dt><dd><p>Exclude rows labeled <code class="docutils literal notranslate"><span class="pre">'deep'</span></code> from CSV export.</p>
+</dd>
+<dt><strong>epsg</strong><span class="classifier">int, optional</span></dt><dd><p>EPSG code for shapefile/CSV header.</p>
+</dd>
+<dt><strong>shore_csv, shore_shp</strong><span class="classifier">str or None, optional</span></dt><dd><p>Optional paths to write diagnostics. If None, nothing is written.</p>
+</dd>
+<dt><strong>logger</strong><span class="classifier">logging.Logger, optional</span></dt><dd><p>Logger for INFO/DEBUG emissions.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ShorelineData</dt><dd><p>Polylines, per-node DataFrame, perimeter labels, and wet mask.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.floodfill_always_wet">
+<span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">floodfill_always_wet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seeds_xy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.13)"><span class="pre">Iterable</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0_edge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#schimpy.mesh_volume_tvd.FloodFillResult" title="schimpy.mesh_volume_tvd.FloodFillResult"><span class="pre">FloodFillResult</span></a></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.floodfill_always_wet" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.refine_volume_tvd">
+<span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">refine_volume_tvd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SCHISM_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dem_spec</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shoreline</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#schimpy.mesh_volume_tvd.ShorelineOptions" title="schimpy.mesh_volume_tvd.ShorelineOptions"><span class="pre">ShorelineOptions</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#schimpy.mesh_volume_tvd.FloorOptions" title="schimpy.mesh_volume_tvd.FloorOptions"><span class="pre">FloorOptions</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tvd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#schimpy.mesh_volume_tvd.TVDOptions" title="schimpy.mesh_volume_tvd.TVDOptions"><span class="pre">TVDOptions</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'./dem_cache'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profiles_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.refine_volume_tvd" title="Link to this definition"></a></dt>
+<dd><p>Execute the end-to-end shoreline+TVD workflow on an already loaded mesh.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">SCHISM_mesh</span></dt><dd><p>Mesh to refine. Boundary info is preserved.</p>
+</dd>
+<dt><strong>dem_spec</strong><span class="classifier">str | sequence | mapping</span></dt><dd><p>DEM YAML path or object (anything <code class="xref py py-func docutils literal notranslate"><span class="pre">create_dem_sampler()</span></code> accepts).</p>
+</dd>
+<dt><strong>out_dir</strong><span class="classifier">str</span></dt><dd><p>Where to write diagnostics (shore CSV/shape, profiles).</p>
+</dd>
+<dt><strong>shoreline</strong><span class="classifier">ShorelineOptions, optional</span></dt><dd><p>If provided, shorelines are detected and used to build a floor.</p>
+</dd>
+<dt><strong>floor</strong><span class="classifier">FloorOptions, optional</span></dt><dd><p>Controls floor regularization and enforcement.</p>
+</dd>
+<dt><strong>tvd</strong><span class="classifier">TVDOptions, optional</span></dt><dd><p>Algorithm controls; sensible defaults used if None.</p>
+</dd>
+<dt><strong>cache_dir</strong><span class="classifier">str</span></dt><dd><p>Disk cache for DEM sampler.</p>
+</dd>
+<dt><strong>profiles</strong><span class="classifier">sequence of int, optional</span></dt><dd><p>poly_id list for which to dump triple profiles.</p>
+</dd>
+<dt><strong>profiles_dir</strong><span class="classifier">str, optional</span></dt><dd><p>Directory where profile PNGs go (defaults to <code class="docutils literal notranslate"><span class="pre">out_dir</span></code>).</p>
+</dd>
+<dt><strong>logger</strong><span class="classifier">logging.Logger, optional</span></dt><dd><p>Logger instance for logging progress and messages.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Keys include:
+- “z”: final node elevations
+- “shore_csv”: CSV path if shorelines detected
+- “z0”: initial DEM point samples</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.run_tvd_variational">
+<span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">run_tvd_variational</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SCHISM_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dem_sampler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#schimpy.mesh_volume_tvd.FlowOptions" title="schimpy.mesh_volume_tvd.FlowOptions"><span class="pre">FlowOptions</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">FlowOptions(n_steps=25,</span> <span class="pre">dt=None,</span> <span class="pre">cfl=0.25,</span> <span class="pre">mu=1.0,</span> <span class="pre">lambda_l2=1.0,</span> <span class="pre">cfl_target=1.0,</span> <span class="pre">clipping_eps=None,</span> <span class="pre">rel_eta=0.001,</span> <span class="pre">max_backtracks=4,</span> <span class="pre">tv_weight=1.0,</span> <span class="pre">l2_weight=0.2)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">floor_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">np.ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reg_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enforce_floor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.13)"><span class="pre">logging.Logger</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">np.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#schimpy.mesh_volume_tvd.run_tvd_variational" title="Link to this definition"></a></dt>
+<dd><p>TV-prox + variational L2 descent with backtracking.</p>
+<p>The iteration performs an explicit L2 descent step followed by a TV
+subgradient “prox” step. Acceptance is based on a relative drop in the
+weighted objective <span class="math notranslate nohighlight">\(w_{tv} TV + w_{l2} J_{vol}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mesh</strong><span class="classifier">SCHISM_mesh</span></dt><dd><p>Mesh object providing <code class="docutils literal notranslate"><span class="pre">nodes</span></code>, <code class="docutils literal notranslate"><span class="pre">edges</span></code>, and <code class="docutils literal notranslate"><span class="pre">elems</span></code>.</p>
+</dd>
+<dt><strong>z0</strong><span class="classifier">ndarray, shape (n_nodes,)</span></dt><dd><p>Initial node elevations (meters). Use DEM samples if your incoming mesh
+has been manipulated away from the DEM and you want a safer start.</p>
+</dd>
+<dt><strong>dem_sampler</strong><span class="classifier">callable</span></dt><dd><p>Function mapping XY→depth(+down). See <code class="xref py py-func docutils literal notranslate"><span class="pre">create_dem_sampler()</span></code>.</p>
+</dd>
+<dt><strong>options</strong><span class="classifier">FlowOptions, optional</span></dt><dd><p>Algorithm options (see <a class="reference internal" href="#schimpy.mesh_volume_tvd.FlowOptions" title="schimpy.mesh_volume_tvd.FlowOptions"><code class="xref py py-class docutils literal notranslate"><span class="pre">FlowOptions</span></code></a>).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dict</dt><dd><p>Keys:
+- <code class="docutils literal notranslate"><span class="pre">&quot;z&quot;</span></code>: final node elevations.
+- <code class="docutils literal notranslate"><span class="pre">&quot;history&quot;</span></code>: (k+1, n_nodes) stack of accepted iterates.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.mesh_volume_tvd.stage3_single_pass_entry_exit">
+<span class="sig-prename descclassname"><span class="pre">schimpy.mesh_volume_tvd.</span></span><span class="sig-name descname"><span class="pre">stage3_single_pass_entry_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_region_before</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elem_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_mean_d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0_node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h0_edge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">relax_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_nmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_eps_deg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.mesh_volume_tvd.stage3_single_pass_entry_exit" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>
@@ -8947,11 +9722,6 @@ It does not contain any extra information, e.g. boundary information.</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="schimpy.stacked_dem_fill.Usage">
-<span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">Usage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.Usage" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="schimpy.stacked_dem_fill.bilinear">
 <span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">bilinear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raster</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.bilinear" title="Link to this definition"></a></dt>
 <dd><p>Bilinear interpolated point  using data on raster
@@ -8964,6 +9734,38 @@ raster: the data</p>
 <dt class="sig sig-object py" id="schimpy.stacked_dem_fill.create_arg_parser">
 <span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">create_arg_parser</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.create_arg_parser" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schimpy.stacked_dem_fill.create_dem_sampler">
+<span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">create_dem_sampler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dem_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'./dem_cache'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.create_dem_sampler" title="Link to this definition"></a></dt>
+<dd><p>Create a DEM sampler <code class="docutils literal notranslate"><span class="pre">dem_sampler(xy)</span></code> with disk caching.</p>
+<p>The cache key includes:
+- The list of DEM source names (from the YAML or the provided list).
+- A daily stamp (YYYYMMDD) to force refresh at least daily.
+- A compact signature of the request batch: length, quantized centroid, and</p>
+<blockquote>
+<div><p>quantized bounding box (min/max) of XY.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dem_list</strong><span class="classifier">str or list of str</span></dt><dd><p>Either a YAML file path consumable by <a class="reference internal" href="#schimpy.stacked_dem_fill.stacked_dem_fill" title="schimpy.stacked_dem_fill.stacked_dem_fill"><code class="xref py py-func docutils literal notranslate"><span class="pre">stacked_dem_fill()</span></code></a> or a list
+of DEM file paths.</p>
+</dd>
+<dt><strong>cache_dir</strong><span class="classifier">str, optional</span></dt><dd><p>Directory for <code class="xref py py-mod docutils literal notranslate"><span class="pre">diskcache</span></code> storage, by default <code class="docutils literal notranslate"><span class="pre">&quot;./dem_cache&quot;</span></code>.</p>
+</dd>
+<dt><strong>q</strong><span class="classifier">float, optional</span></dt><dd><p>Quantization (meters) for the request signature, by default 1e-6.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>callable</dt><dd><p><code class="docutils literal notranslate"><span class="pre">dem_sampler(points_xy)</span></code> mapping <code class="docutils literal notranslate"><span class="pre">(k,2)</span></code> XY→depth(+down) array.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.stacked_dem_fill.filelist_main">
@@ -8990,33 +9792,40 @@ points ( x,y or x,y,z ) from pointlistfile</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="schimpy.stacked_dem_fill.stacked_dem_fill">
 <span class="sig-prename descclassname"><span class="pre">schimpy.stacked_dem_fill.</span></span><span class="sig-name descname"><span class="pre">stacked_dem_fill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">na_fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schimpy.stacked_dem_fill.stacked_dem_fill" title="Link to this definition"></a></dt>
-<dd><p>Fill values at an array of points using bilinear interpolation from a prioritized stack of dems.
-This routine controls prioritization of the dems, gradually filling points
-that are still marked <cite>nan</cite></p>
+<dd><p>Fill values at an array of points using bilinear interpolation from a prioritized stack of DEMs.
+This function manages prioritization of the DEMs, gradually filling points
+that are still marked as <cite>nan</cite>. Uses a cache to speed up repeated queries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>files:  list[str]</strong></dt><dd><p>list of files. Existence is checked and ValueError for bad file</p>
+<dt><strong>files</strong><span class="classifier">list of str</span></dt><dd><p>List of DEM file paths. Existence is checked; raises ValueError if any file is missing.</p>
 </dd>
-<dt><strong>points: np.ndarray</strong></dt><dd><p>this is a numpy array of points, nrow = num of points and ncol = 2 (x,y).</p>
+<dt><strong>points</strong><span class="classifier">np.ndarray</span></dt><dd><p>Numpy array of shape (n_points, 2) containing (x, y) coordinates for interpolation.</p>
 </dd>
-<dt><strong>out_dir: Path</strong></dt><dd><p>directory to write the output files</p>
+<dt><strong>out_dir</strong><span class="classifier">str or Path</span></dt><dd><p>Directory to write output files and cache.</p>
 </dd>
-<dt><strong>values: np.ndarray</strong></dt><dd><p>values at each point – this is an output, but this gives an opportunity to use an existing data structure to receive</p>
+<dt><strong>values</strong><span class="classifier">np.ndarray or None, optional</span></dt><dd><p>Optional array of initial values at each point. If provided, must be same length as points.
+Points with NaN values will be filled.</p>
 </dd>
-<dt><strong>negate: bool</strong></dt><dd><p>if True, values will be inverted (from elevation to depth)</p>
+<dt><strong>negate</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, output values will be negated (e.g., convert elevation to depth).</p>
 </dd>
-<dt><strong>require_all: bool</strong></dt><dd><p>if True, a ValueError is raised if the list of DEMs does not cover all the points. In either case (True/False)
-a file is created or overwritten (<cite>dem_misses.txt</cite>) that will show all the misses.</p>
+<dt><strong>require_all</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, raises ValueError if the DEMs do not cover all points. In either case,
+a file <cite>dem_misses.txt</cite> is created or overwritten with locations of uncovered points.</p>
 </dd>
-<dt><strong>na_fill: float</strong></dt><dd><p>value to substitute at the end for values that are NA after all DEMs are processed.
-If require_all = True na_fill must be None</p>
+<dt><strong>na_fill</strong><span class="classifier">float or None, optional</span></dt><dd><p>Value to substitute for points that remain NaN after all DEMs are processed.
+If <cite>require_all</cite> is True, <cite>na_fill</cite> must be None.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>values</strong><span class="classifier">np.ndarray</span></dt><dd><p>Values at the nodes</p>
+<dt>np.ndarray</dt><dd><p>Array of values at the input points, filled from the DEMs.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>If any DEM file does not exist, or if <cite>require_all</cite> is True and not all points are covered.</p>
 </dd>
 </dl>
 </dd>
