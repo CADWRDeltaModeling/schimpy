@@ -43,7 +43,6 @@ dependencies = [
     "pyproj",
     "nodepy",
     "shapely>=2.0",
-    "rasterstats",
     "param",
     "rtree",
     "click",
