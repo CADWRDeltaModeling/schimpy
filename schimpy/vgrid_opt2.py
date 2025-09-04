@@ -49,8 +49,6 @@ def meshobj(
     grad_hess,
     laplace_hess,
 ):
-    import pdb
-
     obj = 0.0
 
     # print "objective"

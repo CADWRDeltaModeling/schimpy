@@ -6,7 +6,7 @@ from schimpy.schism_mesh import read_mesh
 from schimpy.schism_linestring import read_linestrings, write_linestrings
 from schimpy.schism_polygon import read_polygons, write_polygons
 import yaml
-from shapely.geometry import Point, LineString
+from shapely.geometry import LineString
 from shapely.geometry.polygon import Polygon
 import geopandas as gpd
 

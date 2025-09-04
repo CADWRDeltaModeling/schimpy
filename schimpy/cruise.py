@@ -2,7 +2,6 @@ import datetime as dtm
 from schimpy.profile_plot import profile_plot
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import fontManager, FontProperties
-from matplotlib import ticker, cm
 import sys
 import pandas as pd
 import numpy as np

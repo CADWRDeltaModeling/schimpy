@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 """Command line tool to convert SCHISM points (source and sink) in YAML to Shapefile"""
 import click
-import pandas as pd
 import fiona
-from schimpy.schism_sources_sinks import yaml2df
 
 
 def df_to_shp(fpath, df):

@@ -33,7 +33,7 @@ Notes
 
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple, Union, Callable
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union, Callable
 
 import os
 import numpy as np
@@ -43,7 +43,6 @@ from schimpy.schism_mesh import read_mesh, write_mesh
 
 # Shoreline helper functions
 
-import argparse
 from dataclasses import dataclass
 from typing import Iterable, Tuple, Dict, Set, List, Optional
 import numpy as np
@@ -51,6 +50,8 @@ import os
 
 # requested import
 from schimpy.schism_mesh import read_mesh
+import matplotlib.pyplot as plt
+
 
 try:
     from shapely.geometry import Point
@@ -814,9 +815,7 @@ def _plot_profiles(
     filt: str = "none",
     window: int = 5,
 ):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from collections import defaultdict
+
 
     rows_by_node = {int(r["node"]): r for r in node_rows}
     for p in polylines:
@@ -883,7 +882,6 @@ def _plot_profiles(
 
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Tuple, Union
-import hashlib
 import os
 
 

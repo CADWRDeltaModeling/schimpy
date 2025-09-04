@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from schimpy.prepare_schism import prepare_schism
 import unittest
-import os, sys, argparse
+import os, argparse
 
 class TestPrepareSchism(unittest.TestCase):
     def setUp(self):

@@ -4,10 +4,8 @@ Main function is called embed_fine
 """
 
 import numpy as np
-import numpy.ma as ma
 import matplotlib.pyplot as plt
 import scipy.ndimage as cv
-from scipy.integrate import odeint
 from nodepy import *
 import sys
 import os.path
@@ -47,8 +45,6 @@ def embed_raster(
 
     The smoothing is done with contour_smooth2d
     """
-    from nodepy import runge_kutta_method as rk
-    from nodepy import ivp
 
     ds_fine = RasterWrapper(input_fg)
     cols = ds_fine.nx

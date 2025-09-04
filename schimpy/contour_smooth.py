@@ -17,7 +17,6 @@ import numpy.ma as ma
 import matplotlib.pyplot as plt
 import scipy.ndimage as cv
 from scipy.integrate import odeint
-import sys
 import os.path
 
 try:
@@ -241,7 +240,6 @@ def contour_smooth2d(dem, scales, max_time, nstep, report_interval):
 
 def view_smooth(file0, file1, levels, vmin, vmax, **kwargs):
     """View the dumped files to graphically explore smoothing progress"""
-    import sys
     import numpy as np
     import matplotlib.pyplot as plt
 

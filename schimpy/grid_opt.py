@@ -35,7 +35,6 @@ from scipy.sparse import lil_matrix, eye, vstack
 import numpy as np
 from . import schism_yaml
 import argparse
-import os
 import logging
 
 

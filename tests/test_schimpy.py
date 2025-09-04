@@ -6,8 +6,6 @@ import pytest
 
 from click.testing import CliRunner
 
-import schimpy
-# import cli
 
 
 @pytest.fixture

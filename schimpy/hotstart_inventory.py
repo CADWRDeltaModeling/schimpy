@@ -3,8 +3,6 @@
 
 import argparse
 import glob
-import re
-import datetime as dtm
 import os
 import pandas as pd
 from schimpy.param import *

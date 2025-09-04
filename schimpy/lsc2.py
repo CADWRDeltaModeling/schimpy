@@ -27,7 +27,6 @@ given as arrays) or globally (if provided as scalars).
 import numpy as np
 from schimpy.laplace_smooth_data import *
 from schimpy.schism_setup import ensure_outdir
-from pathlib import Path
 
 showlist = [0, 1, 2]  # ,419,28778,28923,237892,237893,232311]
 showlist = [7942, 7967, 7968, 7969, 7972]

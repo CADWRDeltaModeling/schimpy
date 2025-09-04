@@ -3,7 +3,6 @@
 
 import numpy as np
 from scipy.spatial import cKDTree as KDTree
-from shapely.geometry import LineString
 
 
 class Invdisttree:

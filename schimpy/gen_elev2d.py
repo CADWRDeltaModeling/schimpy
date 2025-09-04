@@ -7,19 +7,17 @@ Point Reyes and Monterey.
 2015-06-16: Customized
 """
 
-import sys
 import pandas as pd
 
 from netCDF4 import Dataset
 from schimpy.separate_species import separate_species
 from schimpy.schism_mesh import read_mesh
-from vtools import hours, days, seconds
+from vtools import days, seconds
 from vtools.data.gap import describe_null
 from dms_datastore.read_ts import read_noaa, read_ts
 import numpy as np
 from datetime import datetime
-import struct, argparse, re
-import time
+import struct, argparse
 import click
 import warnings
 

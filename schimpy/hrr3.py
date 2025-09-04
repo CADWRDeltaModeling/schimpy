@@ -8,11 +8,7 @@ from datetime import datetime, timedelta
 import pathlib
 import tempfile
 import logging
-from time import time
-from typing import Union
-import os
 import glob
-import multiprocessing as mp
 
 # from appdirs import user_data_dir
 import boto3
