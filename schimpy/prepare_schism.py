@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Driver module to prepares input files for a SCHISM run."""
-
+from schimpy import __version__ as schimpy_version
 from schimpy.schism_setup import create_schism_setup, check_and_suggest, ensure_outdir
 from schimpy.grid_opt import GridOptimizer
 from schimpy.stacked_dem_fill import stacked_dem_fill
@@ -16,8 +16,9 @@ from schimpy.mesh_volume_tvd import (
     FloorOptions,
     TVDOptions,
 )
-
-
+from packaging.version import Version, InvalidVersion
+import datetime
+import importlib
 import numpy as np
 import subprocess
 import os
@@ -37,6 +38,39 @@ def create_arg_parser():
         dest="main_inputfile", default=None, help="main input file name"
     )
     return parser
+
+
+def check_min_schimpy_version(inputs) -> None:
+    """
+    Check the optional 'min_schimpy_version' key in a configuration dict
+    against the installed schimpy version.
+
+    Parameters
+    ----------
+    inputs : dict
+        Parsed YAML configuration (top-level dict). If it contains the
+        key 'min_schimpy_version', this function validates that the
+        installed schimpy version is greater or equal.
+
+    Raises
+    ------
+    ValueError
+        If the installed version is older than the required minimum.
+    """
+    required = inputs.get("min_schimpy_version")
+    if not required:
+        return  # nothing to check
+
+    try:
+        current = Version(schimpy_version)
+        required_v = Version(str(required))
+    except InvalidVersion as e:
+        raise ValueError(f"Invalid version string in check: {e}") from None
+
+    if current < required_v:
+        raise ValueError(
+            f"schimpy {required_v} or newer required, but found {current}."
+        )
 
 
 def create_hgrid(s, inputs, logger):
@@ -517,6 +551,31 @@ def process_output_dir(inputs):
             raise ValueError("Output directory (output_dir) does not exist")
     return outdir
 
+echo_header = None
+def echo_file_header():
+    """Return a string with processing timestamp and software versions."""
+    global echo_header
+    if echo_header is not None: 
+        return echo_header
+    header_lines = []
+    # Timestamp
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    header_lines.append(f"# Processed {now}")
+
+    # Version info
+    header_lines.append("# Software versions:")
+
+    for pkg in ["bdschism", "schimpy", "vtools"]:
+        try:
+            mod = importlib.import_module(pkg)
+            version = getattr(mod, "__version__", "Not Available")
+        except Exception:
+            version = "Not Available"
+        header_lines.append(f"# {pkg}: {version}")
+
+    echo_header = "\n".join(header_lines) + "\n"
+    return echo_header
+
 
 def process_prepare_yaml(in_fname, use_logging=True):
     """Process the main input YAML file and return the inputs dict without processing any SCHISM inputs."""
@@ -537,6 +596,7 @@ def process_prepare_yaml(in_fname, use_logging=True):
     keys_top_level = [
         "config",
         "env",
+        "min_schimpy_version",
         "prepro_output_dir",
         "mesh",
         "gr3",
@@ -557,6 +617,7 @@ def process_prepare_yaml(in_fname, use_logging=True):
 
     out_fname = os.path.join(inputs["prepro_output_dir"], out_fname)
     with open(out_fname, "w") as f:
+        f.write(echo_file_header())
         f.write(schism_yaml.safe_dump(inputs))
 
     return inputs, logger
@@ -581,6 +642,7 @@ def prepare_schism(args, use_logging=True):
             "ll_outputfile",
         ] + schism_yaml.include_keywords
         check_and_suggest(list(mesh_items.keys()), keys_mesh_section)
+        check_min_schimpy_version(inputs)
         if item_exist(inputs["mesh"], "mesh_inputfile"):
             # Read the grid file to be processed
             mesh_input_fpath = os.path.expanduser(mesh_items["mesh_inputfile"])
@@ -601,6 +663,7 @@ def prepare_schism(args, use_logging=True):
             logger.info(f"copy_resources: copying {key} to {outpath}")
             shutil.copyfile(key, outpath)
 
+    logger.info(echo_file_header())
     logger.info("Done.")
 
 
