@@ -38,7 +38,10 @@ def open_demlist(demlist):
         raise ValueError("demlist file %s not found" % demlist)
     try:
         inputs = yaml_from_file(demlist)
-        filelist = inputs.get("dem_list")
+        if "mesh" in inputs:
+            filelist = inputs["mesh"]["dem_list"]
+        else:
+            filelist = inputs.get("dem_list")
 
     except:
         with open(demlist, "r") as f:
