@@ -36,6 +36,7 @@ dependencies = [
     "netcdf4",
     "scipy>=1.8",
     "matplotlib",
+	"numba",
     "statsmodels",
     "palettable",
     "boto3",
