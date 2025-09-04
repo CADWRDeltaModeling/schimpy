@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import math
 import click
-from schimpy.util.yaml_load import yaml_from_file
+from schimpy.prepare_schism import process_prepare_yaml
 
 try:
     from osgeo import gdal
@@ -37,7 +37,7 @@ def open_demlist(demlist):
     if not os.path.isfile(demlist):
         raise ValueError("demlist file %s not found" % demlist)
     try:
-        inputs = yaml_from_file(demlist)
+        inputs, out_dir, logger = process_prepare_yaml(demlist, use_logging=False)
         if "mesh" in inputs:
             filelist = inputs["mesh"]["dem_list"]
         else:
