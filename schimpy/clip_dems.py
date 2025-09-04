@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import math
 import click
+from schimpy.util.yaml_load import yaml_from_file
 
 try:
     from osgeo import gdal
@@ -32,6 +33,26 @@ def bounding_coords(image):
     return xlo, xhi
 
 
+def open_demlist(demlist):
+    if not os.path.isfile(demlist):
+        raise ValueError("demlist file %s not found" % demlist)
+    try:
+        inputs = yaml_from_file(demlist)
+        filelist = inputs.get("dem_list")
+
+    except:
+        with open(demlist, "r") as f:
+            filelist = f.readlines()
+        filelist = [
+            f.strip() for f in filelist if (not f.startswith("#")) and (f.strip())
+        ]
+
+    if len(filelist) == 0:
+        raise ValueError("demlist file %s is empty" % demlist)
+
+    return filelist
+
+
 def clip_dem(
     xlo,
     xhi,
@@ -41,11 +62,8 @@ def clip_dem(
     prefix="clipped",
     verbose=False,
 ):
-    filelist = [
-        x.strip()
-        for x in open(demlist, "r").readlines()
-        if x and len(x) > 1 and not x.startswith("#")
-    ]
+    filelist = open_demlist(demlist)
+
     iout = 0
     if outformat == "AAIGrid":
         extension = "asc"

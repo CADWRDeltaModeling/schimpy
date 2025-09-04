@@ -11,6 +11,7 @@ from schimpy.split_quad import split_quad
 from schimpy import schism_yaml
 from schimpy import station as station_mod
 from schimpy.create_vgrid_lsc2 import vgrid_gen
+from schimpy.util.yaml_load import yaml_from_file
 from schimpy.mesh_volume_tvd import (
     refine_volume_tvd,
     ShorelineOptions,
@@ -122,8 +123,15 @@ def create_hgrid(s, inputs, logger):
                 # Legacy GridOptimizer path (deprecated)
                 dem_list = section.get("dem_list")
                 if dem_list is None:
-                    raise ValueError("dem_list must be provided for the mesh optimization")
-                expected_items = ("damp", "damp_shoreline", "face_coeff", "volume_coeff")
+                    raise ValueError(
+                        "dem_list must be provided for the mesh optimization"
+                    )
+                expected_items = (
+                    "damp",
+                    "damp_shoreline",
+                    "face_coeff",
+                    "volume_coeff",
+                )
                 check_and_suggest(opt_params, expected_items)
                 logger.info("Start optimizing the mesh (legacy 'volume').")
                 optimizer = GridOptimizer(
@@ -135,38 +143,48 @@ def create_hgrid(s, inputs, logger):
                 )
                 optimized_elevation = optimizer.optimize(opt_params)
                 s.mesh.nodes[:, 2] = np.negative(optimized_elevation)
-            elif method=="volume_tvd":
+            elif method == "volume_tvd":
                 dem_list = section.get("dem_list")
                 if dem_list is None:
                     raise ValueError("For method=volume_tvd, provide dem_list")
                 s.dem_list = dem_list
-                logger.info(f"Using stacked DEM fill for depth initialization. Length of DEM list: {len(dem_list)}")
+                logger.info(
+                    f"Using stacked DEM fill for depth initialization. Length of DEM list: {len(dem_list)}"
+                )
                 s.mesh.nodes[:, 2] = stacked_dem_fill(
-                            dem_list,
-                            s.mesh.nodes[:, :2],
-                            inputs["prepro_output_dir"],
-                            require_all=False,
-                            na_fill=default_depth_for_missing_dem,
-                            negate=True
-                        )
+                    dem_list,
+                    s.mesh.nodes[:, :2],
+                    inputs["prepro_output_dir"],
+                    require_all=False,
+                    na_fill=default_depth_for_missing_dem,
+                    negate=True,
+                )
                 sl = opt_params.get("shoreline")
                 shoreline = None
                 if sl is not None:
                     href_spec = sl.get("href", 0.0)
                     # NEW: support dict form to build an href.gr3 via polygons
                     if isinstance(href_spec, dict):
-                        href_name = href_spec.get("gr3_name", "href.gr3")   # default name
-                        href_path = ensure_outdir(inputs["prepro_output_dir"], href_name)
+                        href_name = href_spec.get(
+                            "gr3_name", "href.gr3"
+                        )  # default name
+                        href_path = ensure_outdir(
+                            inputs["prepro_output_dir"], href_name
+                        )
                         polygons = href_spec.get("polygons", [])
-                        default  = href_spec.get("default", None)
-                        smooth   = href_spec.get("smooth", None)
+                        default = href_spec.get("default", None)
+                        smooth = href_spec.get("smooth", None)
                         # reuse the exact machinery used by the 'gr3' section:
-                        s.create_node_partitioning(href_path, polygons, default, smooth)  # writes GR3
+                        s.create_node_partitioning(
+                            href_path, polygons, default, smooth
+                        )  # writes GR3
                         href_arg = href_path
                     else:
-                        href_arg = href_spec  # float or string — existing behavior                    
-                    
-                    logger.debug(f"Using {href_arg} as reference for shoreline discovery")
+                        href_arg = href_spec  # float or string — existing behavior
+
+                    logger.debug(
+                        f"Using {href_arg} as reference for shoreline discovery"
+                    )
                     shoreline = ShorelineOptions(
                         href=href_arg,
                         deep_delta=float(sl.get("deep_delta", 1.0)),
@@ -217,7 +235,7 @@ def create_hgrid(s, inputs, logger):
                     floor=floor,
                     tvd=tvd,
                     cache_dir=os.path.join(inputs["prepro_output_dir"], ".dem_cache"),
-                    logger=logger
+                    logger=logger,
                 )
             else:
                 raise ValueError(f"Unknown depth_optimization.method: {method!r}")
@@ -458,6 +476,7 @@ def create_fluxflag(s, inputs, logger):
             buf = "{}\n".format(line["name"])
             f.write(buf)
 
+
 def _validate_station_request(request, logger):
     """Return a normalized request list validated against station_mod.station_variables."""
     allowed = set(station_mod.station_variables)  # elev, salt, etc.
@@ -472,9 +491,12 @@ def _validate_station_request(request, logger):
         return "all"
     bad = [x for x in request_list if x not in allowed]
     if bad:
-        logger.error(f"station_output.request contains unknown variables: {bad}. Allowed: {sorted(allowed)}")
+        logger.error(
+            f"station_output.request contains unknown variables: {bad}. Allowed: {sorted(allowed)}"
+        )
         raise ValueError("Invalid station_output.request")
     return request_list
+
 
 def create_station_output(inputs, logger):
     """Create/aggregate station.in from the new top-level 'station_output' section."""
@@ -491,17 +513,23 @@ def create_station_output(inputs, logger):
     # If ANY entry is 'GENERATE' (case-insensitive), create a temp file from DBs,
     # then (optionally) concatenate with any additional provided files.
     generated_tmp = None
-    if station_in_list is not None and any(str(x).strip().upper() == "GENERATE" for x in station_in_list):
-        logger.info("station_output: GENERATE requested (will merge with other files if provided)")
+    if station_in_list is not None and any(
+        str(x).strip().upper() == "GENERATE" for x in station_in_list
+    ):
+        logger.info(
+            "station_output: GENERATE requested (will merge with other files if provided)"
+        )
         station_db = configs.config_file("station_dbase")
-        subloc_db  = configs.config_file("sublocations")
+        subloc_db = configs.config_file("sublocations")
         if station_db is None or subloc_db is None:
             raise ValueError(
                 "station_output: Could not resolve default station databases. "
                 "Check dms_datastore config for 'station_dbase' and 'sublocations'."
             )
         # Write to a temp file inside prepro_output_dir so we can include it in the concat
-        generated_tmp = ensure_outdir(inputs["prepro_output_dir"], "__station_generated.in")
+        generated_tmp = ensure_outdir(
+            inputs["prepro_output_dir"], "__station_generated.in"
+        )
         logger.info(f"station_output: GENERATE -> writing temp {generated_tmp}")
         station_mod.convert_db_station_in(
             outfile=generated_tmp,
@@ -513,14 +541,19 @@ def create_station_output(inputs, logger):
 
     # Mode 2: concatenate listed station.in files
     import pandas as pd
+
     dfs = []
     if not station_in_list:
-        raise ValueError("station_output.station_in_files must be provided (or include 'GENERATE').")
+        raise ValueError(
+            "station_output.station_in_files must be provided (or include 'GENERATE')."
+        )
     # Build the effective list: generated tmp (if any) + all explicit files except the 'GENERATE' token
     files_to_read = []
     if generated_tmp is not None:
         files_to_read.append(generated_tmp)
-    files_to_read.extend([f for f in station_in_list if str(f).strip().upper() != "GENERATE"])
+    files_to_read.extend(
+        [f for f in station_in_list if str(f).strip().upper() != "GENERATE"]
+    )
 
     for f in files_to_read:
         f = os.path.expanduser(str(f))
@@ -560,7 +593,10 @@ def create_station_output(inputs, logger):
         try:
             os.remove(generated_tmp)
         except Exception:
-            logger.warning(f"station_output: could not remove temp file {generated_tmp}")    
+            logger.warning(
+                f"station_output: could not remove temp file {generated_tmp}"
+            )
+
 
 def update_spatial_inputs(s, inputs, logger):
     """Create SCHISM grid inputs.
@@ -650,7 +686,9 @@ def process_output_dir(inputs):
         outdir = inputs["prepro_output_dir"]
         force = True
     else:
-        raise ValueError("Inplace preprocessing not allowed. prepro_output_dir must be specified in launch yaml file. \nConvention is 'prepro_out'")
+        raise ValueError(
+            "Inplace preprocessing not allowed. prepro_output_dir must be specified in launch yaml file. \nConvention is 'prepro_out'"
+        )
     if os.path.exists(outdir):
         created = False
     else:
@@ -660,11 +698,14 @@ def process_output_dir(inputs):
             raise ValueError("Output directory (output_dir) does not exist")
     return outdir
 
+
 echo_header = None
+
+
 def echo_file_header():
     """Return a string with processing timestamp and software versions."""
     global echo_header
-    if echo_header is not None: 
+    if echo_header is not None:
         return echo_header
     header_lines = []
     # Timestamp
@@ -691,9 +732,9 @@ def process_prepare_yaml(in_fname, use_logging=True):
 
     if not os.path.exists(in_fname):
         raise ValueError("Main input file not found")
-    with open(in_fname, "r") as f:
-        inputs = schism_yaml.load(f)
-        outdir = process_output_dir(inputs)
+
+    inputs = yaml_from_file(in_fname)
+    outdir = process_output_dir(inputs)
 
     if use_logging is True:
         setup_logger(outdir)
