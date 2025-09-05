@@ -20,12 +20,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Export paths based on RUNNER_TEMP (works everywhere)
+      # Export a temp build dir and pip hardening
       - name: Set temp-based paths
         run: |
           echo "MAMBA_ROOT_PREFIX=${RUNNER_TEMP}/mamba" >> "$GITHUB_ENV"
@@ -34,28 +33,28 @@ jobs:
           echo "PIP_NO_INDEX=1" >> "$GITHUB_ENV"
           echo "PIP_NO_DEPS=1" >> "$GITHUB_ENV"
 
-      - name: Set up micromamba (with cache)
+      - name: Set up micromamba (create + cache env)
         uses: mamba-org/setup-micromamba@v2
         with:
           micromamba-version: "latest"
-          cache-environment: true
-          cache-downloads: true
           init-shell: bash
+          cache-environment: true          # ✅ now valid
+          cache-downloads: true
+          environment-name: tools
+          create-args: >-
+            python>=3.10
+            conda-build
+            boa
+            anaconda-client
           condarc: |
             channel_priority: strict
             channels:
               - conda-forge
-              # add your org channel if your recipe/tests need it:
-              # - cadwr-dms
+              # - cadwr-dms   # uncomment if your recipe/tests need it
 
-      - name: Create tooling env (cached)
+      - name: Show env
         shell: bash -l {0}
         run: |
-          micromamba create -y -n tools \
-            python>=3.10 \
-            conda-build \
-            boa \
-            anaconda-client
           micromamba activate tools
           python -V
           conda info
