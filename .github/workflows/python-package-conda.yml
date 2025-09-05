@@ -59,7 +59,6 @@ jobs:
             setuptools>68
             conda-build
             boa
-            #conda-verify     # didn't work with py 3.12
             anaconda-client
             setuptools-scm
           condarc: |
