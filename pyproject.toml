@@ -15,7 +15,7 @@ authors = [
     {name = "California Department of Water Resources", email = "Eli.Ateljevich@water.ca.gov"},
     {name = "California Department of Water Resources", email = "Kijin.Nam@water.ca.gov"}
 ]
-requires-python = ">=3.10,<=3.12"
+requires-python = ">=3.10,<3.13"
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
