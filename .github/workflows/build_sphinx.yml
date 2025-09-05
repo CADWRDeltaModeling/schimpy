@@ -35,6 +35,7 @@ jobs:
           environment-name: docs
           create-args: >-
             python=3.12
+            setuptools>=68
             sphinx
             sphinx-rtd-theme
             numpydoc
@@ -57,7 +58,7 @@ jobs:
           PIP_NO_BUILD_ISOLATION: "1"
         run: |
           micromamba run -n docs python -m pip install --upgrade pip
-          micromamba run -n docs python -m pip install -e . --no-deps -v
+          micromamba run -n docs python -m pip install -e . --no-deps --no-build-isolation -v
 
       - name: Install docs extras from pyproject via conda
         run: |
