@@ -6,6 +6,9 @@ on:
       - "conda.recipe/**"
       - ".github/workflows/python-package-conda.yml"
       - "pyproject.toml"
+      - "schimpy/**"
+      - "scripts/**"
+      - "tests/**"
   pull_request:
     paths:
       - "conda.recipe/**"
