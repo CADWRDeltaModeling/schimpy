@@ -39,11 +39,11 @@ jobs:
           # Now install ONLY the extras, *but not via `.[doc]`* to avoid reinstalling the base.
           # Parse pyproject and install the doc list directly:
           python - <<'PY'
-      import tomllib, subprocess, sys
-      data = tomllib.loads(open("pyproject.toml","rb").read())
-      pkgs = data["project"]["optional-dependencies"]["doc"]
-      subprocess.check_call([sys.executable, "-m", "pip", "install", *pkgs])
-      PY
+          import tomllib, subprocess, sys
+          data = tomllib.loads(open("pyproject.toml","rb").read())
+          pkgs = data["project"]["optional-dependencies"]["doc"]
+          subprocess.check_call([sys.executable, "-m", "pip", "install", *pkgs])
+          PY
       
       - name: Build API stubs
         working-directory: docsrc
