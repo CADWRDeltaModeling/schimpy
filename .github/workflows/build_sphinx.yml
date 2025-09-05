@@ -59,7 +59,8 @@ jobs:
         run: |
           micromamba activate docs
           # For [project.optional-dependencies].docs:
-          python -m pip install -e .[doc]
+          pip install -e . --no-deps
+          pip install .[docs] 
 
       - name: Build Sphinx
         shell: bash -l {0}
