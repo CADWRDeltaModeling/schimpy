@@ -34,7 +34,7 @@ jobs:
           cache-downloads: true
           environment-name: docs
           create-args: >-
-            python>=3.11
+            python>3.10,<3.13
             sphinx
             sphinx-rtd-theme
             numpydoc
