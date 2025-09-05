@@ -66,10 +66,15 @@ doc = [
     "numpydoc",
     "pillow>=4.0.0",
     "nbsphinx",
+	"nbconvert",
+	"ipykernel",
     "docutils",
+	"pandoc",
 	"matplotlib",
 	"ipython"
 ]
+
+
 test = [
     "pytest>=3",
     "pytest-cov",
