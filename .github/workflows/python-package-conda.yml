@@ -2,6 +2,9 @@ name: conda-build
 
 on:
   push:
+    tags:
+      - 'v*'      # v1, v1.2, v1.2.3, v2025.09.04, etc.
+      - '[0-9]*'  # 1, 1.2, 1.2.3, 2025.09.04, etc.  
     paths:
       - "conda.recipe/**"
       - ".github/workflows/python-package-conda.yml"
@@ -14,6 +17,9 @@ on:
       - "conda.recipe/**"
       - ".github/workflows/python-package-conda.yml"
       - "pyproject.toml"
+      - "schimpy/**"
+      - "scripts/**"
+      - "tests/**"      
   workflow_dispatch:
 
 concurrency:
@@ -26,6 +32,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # full history
+          fetch-tags: true        
 
       # Export a temp build dir and pip hardening
       - name: Set temp-based paths
