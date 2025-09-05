@@ -48,52 +48,8 @@ jobs:
         shell: bash -l {0}
         run: |
           micromamba activate docs
+          python scripts/install_extras.py
           micromamba install -y -c conda-forge -c cadwr-dms schimpy
-
-      - name: Install docs extras from pyproject.toml (resolved by conda)
-        shell: bash -l {0}
-        run: |
-          micromamba activate docs
-          python - <<'PY'
-          import sys, subprocess
-          try:
-              import tomllib   # py>=3.11
-              with open("pyproject.toml", "rb") as f:  # NOTE: use load() with binary file
-                  data = tomllib.load(f)
-          except ModuleNotFoundError:
-              subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
-              import tomli as tomllib
-              with open("pyproject.toml", "rb") as f:
-                  data = tomllib.load(f)
-    
-          NAME_MAP = {
-          "Pillow": "pillow",
-          "netCDF4": "netcdf4",
-          # extend if any PyPI vs conda names differ
-          }
-
-          proj = data.get("project", {})
-          extras = proj.get("optional-dependencies", {})
-          docs = extras.get("docs", [])
-          if isinstance(docs, str):
-          docs = [docs]
-
-          pkgs = set()
-          for s in docs:
-          if s:
-          name = s.split()[0]
-          name = name.split(";")[0]
-          name = name.split(">=")[0].split("==")[0].split("~=")[0].split("<")[0]
-          name = name.strip()
-          name = NAME_MAP.get(name, name).lower()
-          pkgs.add(name)
-          pkgs = sorted(pkgs)
-          if pkgs:
-          print("Installing docs extras via conda:", pkgs, flush=True)
-          subprocess.check_call(["micromamba","install","-y","-c","conda-forge",*pkgs])
-          else:
-          print("No [project.optional-dependencies].docs group found; skipping.", flush=True)
-          PY
 
       - name: Build Sphinx
         shell: bash -l {0}
