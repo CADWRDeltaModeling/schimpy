@@ -1,4 +1,4 @@
-import schimpy.param as param
+import param
 
 from collections import namedtuple
 

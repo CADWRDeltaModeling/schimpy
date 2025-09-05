@@ -48,7 +48,8 @@ dependencies = [
     "click",
     "dask>=2022.11",
     "numpy>=2.0",
-	"diskcache"
+	"diskcache",
+	"param"
 ]
 
 [project.optional-dependencies]
