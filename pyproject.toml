@@ -28,7 +28,7 @@ keywords = ["schimpy", "SCHISM", "hydrodynamics", "mesh", "geometry", "GIS", "ge
 
 dependencies = [
     "geopandas",
-    "vtools3>=3.8",
+    "vtools3>=3.7",
     "dms-datastore",
     "gdal",
     "pyogrio",
