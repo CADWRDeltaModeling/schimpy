@@ -70,20 +70,21 @@ jobs:
           subprocess.check_call(cmd)
           PY
       
-      - name: Build API stubs
-        working-directory: docsrc
-        run: sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
-
-      - name: Clean & Build HTML
-        working-directory: docsrc
+      - name: Build docs
         run: |
-          make clean
-          make html
+          sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
+          make -C docsrc clean
+          make -C docsrc html
 
-      - name: Install ghp-import
-        shell: bash -l {0}
-        run: python -m pip install --upgrade ghp-import
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docsrc/_build/html
 
-      - name: Publish docs with ghp-import
-        run: ghp-import -n -p -f ./docsrc/_build/html
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+        
+          
 
