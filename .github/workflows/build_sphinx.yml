@@ -80,6 +80,10 @@ jobs:
           make clean
           make html
 
+      - name: Install ghp-import
+        shell: bash -l {0}
+        run: python -m pip install --upgrade ghp-import
+
       - name: Publish docs with ghp-import
         run: ghp-import -n -p -f ./docsrc/_build/html
 
