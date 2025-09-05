@@ -5,19 +5,24 @@
 # in pyproject.toml
 import sys, subprocess, pathlib
 
+# Mappings between PYPI and conda
+NAME_MAP = {
+    "Pillow": "pillow",
+    "netCDF4": "netcdf4",
+}
+
 try:
     import tomllib  # Py>=3.11
 except ModuleNotFoundError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
     import tomli as tomllib
 
-NAME_MAP = {
-    "Pillow": "pillow",
-    "netCDF4": "netcdf4",
-}
-
+# Load the pyproj.toml to get the list of extra dependencies for documentation
+# Form of this assumes py>=3.11
 pp = pathlib.Path("pyproject.toml")
-data = tomllib.loads(pp.read_bytes())
+with pp.open("rb") as f:
+    data = tomllib.load(f)  # works for tomllib and tomli
+
 proj = data.get("project", {})
 extras = proj.get("optional-dependencies", {})
 docs = extras.get("docs", [])
