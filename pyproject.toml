@@ -64,7 +64,8 @@ doc = [
     "numpydoc",
     "pillow>=4.0.0",
     "nbsphinx",
-    "docutils"
+    "docutils",
+	"matplotlib"
 ]
 test = [
     "pytest>=3",
