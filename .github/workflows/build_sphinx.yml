@@ -36,6 +36,7 @@ jobs:
           create-args: >-
             python=3.12
             setuptools>=68
+            setuptools_scm
             sphinx
             sphinx-rtd-theme
             numpydoc
