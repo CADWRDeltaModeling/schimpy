@@ -15,13 +15,13 @@ authors = [
     {name = "California Department of Water Resources", email = "Eli.Ateljevich@water.ca.gov"},
     {name = "California Department of Water Resources", email = "Kijin.Nam@water.ca.gov"}
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<=3.12"
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.9"
+    "Programming Language :: Python :: 3.10"
 ]
 
 keywords = ["schimpy", "SCHISM", "hydrodynamics", "mesh", "geometry", "GIS", "geospatial", "data processing"]
