@@ -59,6 +59,15 @@ jobs:
           python -V
           conda info
 
+      - name: Compute version from setuptools-scm
+        shell: bash -l {0}
+        run: |
+          micromamba activate tools
+          # Ensure setuptools-scm is available to run the CLI
+          python -m pip install -q setuptools-scm
+          export SETUPTOOLS_SCM_PRETEND_VERSION=$(python -m setuptools_scm)
+          echo "SETUPTOOLS_SCM_PRETEND_VERSION=$SETUPTOOLS_SCM_PRETEND_VERSION" >> $GITHUB_ENV
+
       - name: Build conda recipe (no tests first)
         shell: bash -l {0}
         run: |

@@ -1,7 +1,8 @@
 {# raw is for ignoring templating with cookiecutter, leaving it for use with conda-build -#}
 {% set pyproject = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
 {% set project = pyproject['project'] %}
-{% set version = load_setup_py_data().get('version', '0.0.0') %}
+{% set version = environ.get("SETUPTOOLS_SCM_PRETEND_VERSION", "0.0.0") %}
+
 
 package:
   name: schimpy
