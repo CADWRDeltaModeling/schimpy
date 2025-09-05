@@ -25,7 +25,7 @@ with pp.open("rb") as f:
 
 proj = data.get("project", {})
 extras = proj.get("optional-dependencies", {})
-docs = extras.get("docs", [])
+docs = extras.get("doc", [])
 if isinstance(docs, str):
     docs = [docs]
 
