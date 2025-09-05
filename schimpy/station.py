@@ -743,7 +743,7 @@ def station_subset_multidir(
     Parameters
     ----------
 
-    dirs : list(str)
+    dirs : list(str) 
         List of directories. The output dataframe will have a column multindex (dir,station_id) where dir is the directory of the output.
 
 

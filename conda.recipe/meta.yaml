@@ -2,11 +2,12 @@
 {% set pyproject = load_file_data('../pyproject.toml', from_recipe_dir=True) %}
 {% set project = pyproject['project'] %}
 {% set version = environ.get("SETUPTOOLS_SCM_PRETEND_VERSION", "0.0.0") %}
+{% set version = environ.get('PKG_VERSION') or environ.get('SETUPTOOLS_SCM_PRETEND_VERSION') %}
 
 
 package:
   name: schimpy
-  version: {{ environ.get('PKG_VERSION') }}
+  version: {{ version }}
 
 source:
   #git_url: https://github.com/CADWRDeltaModeling/schimpy.git
