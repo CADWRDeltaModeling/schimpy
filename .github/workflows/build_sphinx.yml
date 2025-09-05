@@ -59,7 +59,7 @@ jobs:
           try:
               import tomllib   # py>=3.11
               with open("pyproject.toml", "rb") as f:  # NOTE: use load() with binary file
-              return tomllib.load(f)
+                  return tomllib.load(f)
           except ModuleNotFoundError:
               subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
               import tomli as tomllib
