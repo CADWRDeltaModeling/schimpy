@@ -4,7 +4,6 @@ Manage conversion from SMS 2dm format to gr3.
 Some material borrowed @author: snegusse
 """
 import numpy as np
-import string
 import re
 import math
 import os

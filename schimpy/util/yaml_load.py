@@ -1,5 +1,4 @@
-from schimpy.schism_yaml import load, dump
-from pathlib import Path
+from schimpy.schism_yaml import load
 import pandas as pd
 import string
 import yaml

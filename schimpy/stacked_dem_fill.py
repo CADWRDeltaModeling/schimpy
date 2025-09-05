@@ -12,12 +12,10 @@ except ImportError:
 
 import yaml
 import hashlib
-from xml.etree.ElementInclude import include
 from schimpy.schism_setup import ensure_outdir
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import List, Union
 from datetime import datetime
 import numpy as np
-import sys
 import os
 import diskcache as dc
 import json

@@ -11,7 +11,6 @@ Prerequisite: Numpy, rtree package, and libspatialindex for rtree
 ## Author: Kijin Nam, knam@water.ca.gov
 ##
 
-import schimpy.priority_queue as pq
 import rtree
 import numpy as np
 import types

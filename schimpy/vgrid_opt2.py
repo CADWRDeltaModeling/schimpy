@@ -2,7 +2,6 @@
 """
 Package for optimising vgrid smoothness, shape and completeness
 """
-from scipy.ndimage import gaussian_filter1d
 from schimpy.lsc2 import *
 
 
@@ -193,7 +192,6 @@ def meshessp(
     grad_hess,
     laplace_hess,
 ):
-    import pdb
 
     obj = 0.0
 

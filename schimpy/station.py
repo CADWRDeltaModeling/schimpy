@@ -11,7 +11,7 @@ from dms_datastore.dstore_config import *
 
 if sys.version_info[0] < 3:
     from pandas.compat import u
-    from builtins import open, file, str
+    from builtins import open, str
 else:
     u = lambda x: x
 

@@ -5,7 +5,6 @@
 
 from schimpy import schism_mesh
 from schimpy.schism_setup import ensure_outdir
-import copy
 import numpy as np
 import argparse
 import os

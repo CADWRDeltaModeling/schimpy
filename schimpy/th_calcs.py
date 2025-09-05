@@ -1,6 +1,5 @@
 from schimpy.model_time import read_th
 import pandas as pd
-import os
 
 
 def calc_net_source_sink(
