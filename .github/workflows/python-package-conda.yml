@@ -1,4 +1,4 @@
-name: conda-package
+name: conda-build
 
 on:
   push:
@@ -20,16 +20,19 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      MAMBA_ROOT_PREFIX: ${{ runner.temp }}/mamba
-      CONDA_BLD_PATH: ${{ runner.temp }}/conda-bld
-      # Ensure pip doesn't reach to PyPI or resolve runtime deps during recipe builds
-      PIP_NO_BUILD_ISOLATION: "1"
-      PIP_NO_DEPS: "1"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Export paths based on RUNNER_TEMP (works everywhere)
+      - name: Set temp-based paths
+        run: |
+          echo "MAMBA_ROOT_PREFIX=${RUNNER_TEMP}/mamba" >> "$GITHUB_ENV"
+          echo "CONDA_BLD_PATH=${RUNNER_TEMP}/conda-bld" >> "$GITHUB_ENV"
+          echo "PIP_NO_BUILD_ISOLATION=1" >> "$GITHUB_ENV"
+          echo "PIP_NO_INDEX=1" >> "$GITHUB_ENV"
+          echo "PIP_NO_DEPS=1" >> "$GITHUB_ENV"
 
       - name: Set up micromamba (with cache)
         uses: mamba-org/setup-micromamba@v2
@@ -37,23 +40,19 @@ jobs:
           micromamba-version: "latest"
           cache-environment: true
           cache-downloads: true
+          init-shell: bash
+          condarc: |
+            channel_priority: strict
+            channels:
+              - conda-forge
+              # add your org channel if your recipe/tests need it:
+              # - cadwr-dms
 
-      - name: Configure channels (strict conda-forge)
-        shell: bash -l {0}
-        run: |
-          conda config --set channel_priority strict
-          conda config --remove channels defaults || true
-          conda config --add channels conda-forge
-
-      # Minimal tooling env (easy to augment)
       - name: Create tooling env (cached)
         shell: bash -l {0}
         run: |
           micromamba create -y -n tools \
             python>=3.10 \
-            numpy>=2.0 \
-            vtools>4.9.5 \
-            dms-datastore>=0.0.16 \
             conda-build \
             boa \
             anaconda-client
@@ -65,15 +64,14 @@ jobs:
         shell: bash -l {0}
         run: |
           micromamba activate tools
-          conda mambabuild conda.recipe --no-test -c conda-forge
+          conda mambabuild conda.recipe --no-test
 
-      # Optional: run recipe tests if you already rely on them
-      - name: Test conda recipe
+      - name: Test conda recipe (optional)
         if: always()
         shell: bash -l {0}
         run: |
           micromamba activate tools
-          conda mambabuild conda.recipe -c conda-forge
+          conda mambabuild conda.recipe
 
       - name: Upload to Anaconda (if token configured)
         if: env.ANACONDA_CHANNEL_UPLOAD_TOKEN != ''
