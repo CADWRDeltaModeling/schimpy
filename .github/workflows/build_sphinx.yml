@@ -3,6 +3,11 @@ name: "Sphinx: Render docs"
 on: 
   push:
     branches: ["main", "master"]
+    paths:
+      - "docsrc/**"
+      - "schimpy/**"
+      - "pyproject.toml"
+      - ".github/workflows/build_sphinx.yaml"
   workflow_dispatch:
 
 permissions:
@@ -11,48 +16,38 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: docs-${{ github.ref }}   #"pages"
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up Python 3.11
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.11
-      - name: Add conda to system path
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install doc extras from pyproject
         run: |
-          echo $CONDA/bin >> $GITHUB_PATH
-      - name: Conda build env for docs
+          python -m pip install --upgrade pip
+          # Use the extras group you already have in pyproject: [project.optional-dependencies].doc
+          pip install -e ".[doc]"
+
+      - name: Build API stubs
+        working-directory: docsrc
+        run: sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
+
+      - name: Clean & Build HTML
+        working-directory: docsrc
         run: |
-          conda env create -f schimpy_env.yml
-          source $CONDA/etc/profile.d/conda.sh
-          conda activate schimpy
-          pip install --upgrade pip
-          pip install -r docsrc/requirements.txt
-          conda install -c conda-forge gdal geopandas numpy
-          conda list
-      - name: Build HTML
-        run: |
-          source $CONDA/etc/profile.d/conda.sh
-          conda activate schimpy
-          cd docsrc/
-          sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
           make clean
           make html
-      - name: Run ghp-import
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          source $CONDA/etc/profile.d/conda.sh
-          conda activate schimpy
-          git config http.postBuffer 157286400
-          git pull
-          tree -L 2 -a
-          ghp-import -n -p -f ./docs/html
+
+      - name: Publish docs with ghp-import
+        run: ghp-import -n -p -f ./docsrc/_build/html
+

@@ -4,11 +4,11 @@
 name: schimpy         
 channels:
   - conda-forge            # Note: the order listed in yaml is not enforced by conda
-  - defaults               # For predictable behavior, set your conda config
+  - nodefaults             # For predictable behavior, set your conda config
   - cadwr-dms
 dependencies:
   - python>=3.9,<=3.12
-  - schimpy>=1.6.5         # Recommended for compatibility with current code. Please coordinate with schism_env.yml
+  - schimpy>=1.12.0         # Recommended for compatibility with current code. Please coordinate with schism_env.yml
   - vtools3
   - dms-datastore>=0.0.16
   - pandas>=1.3

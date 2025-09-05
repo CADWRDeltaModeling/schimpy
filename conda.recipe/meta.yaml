@@ -32,9 +32,6 @@ requirements:
     - pip
     - setuptools
     - setuptools_scm
-    - pyproj
-    - ruff>=0.4.8
-    # - pytest-runner >=5.0
     - numpy >=2.0
   run:
     - python {{ project['requires-python'] }}

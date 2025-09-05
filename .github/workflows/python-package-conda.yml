@@ -1,34 +1,85 @@
-name: Python Package using Conda
+name: conda-package
 
-on: [push]
+on:
+  push:
+    paths:
+      - "conda.recipe/**"
+      - ".github/workflows/python-package-conda.yml"
+      - "pyproject.toml"
+  pull_request:
+    paths:
+      - "conda.recipe/**"
+      - ".github/workflows/python-package-conda.yml"
+      - "pyproject.toml"
+  workflow_dispatch:
+
+concurrency:
+  group: conda-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-linux:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 5
+    env:
+      MAMBA_ROOT_PREFIX: ${{ runner.temp }}/mamba
+      CONDA_BLD_PATH: ${{ runner.temp }}/conda-bld
+      # Ensure pip doesn't reach to PyPI or resolve runtime deps during recipe builds
+      PIP_NO_BUILD_ISOLATION: "1"
+      PIP_NO_DEPS: "1"
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.12
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Conda build package and upload to anaconda.org
-      env: 
-        ANACONDA_CHANNEL_UPLOAD_TOKEN: ${{ secrets.ANACONDA_CHANNEL_UPLOAD_TOKEN }}
-      run: |
-        conda create -n test_schimpy -y conda-build conda-verify numpy anaconda-client setuptools-scm
-        source $CONDA/etc/profile.d/conda.sh
-        conda activate test_schimpy
-        conda config --set anaconda_upload yes
-        export SETUPTOOLS_SCM_PRETEND_VERSION=$(python -m setuptools_scm)
-        conda build -c cadwr-dms -c conda-forge --user cadwr-dms --token "$ANACONDA_CHANNEL_UPLOAD_TOKEN" conda.recipe
-        conda activate
-        conda remove -n test_schimpy --all
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up micromamba (with cache)
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          micromamba-version: "latest"
+          cache-environment: true
+          cache-downloads: true
+
+      - name: Configure channels (strict conda-forge)
+        shell: bash -l {0}
+        run: |
+          conda config --set channel_priority strict
+          conda config --remove channels defaults || true
+          conda config --add channels conda-forge
+
+      # Minimal tooling env (easy to augment)
+      - name: Create tooling env (cached)
+        shell: bash -l {0}
+        run: |
+          micromamba create -y -n tools \
+            python>=3.10 \
+            numpy>=2.0 \
+            vtools>4.9.5 \
+            dms-datastore>=0.0.16 \
+            conda-build \
+            boa \
+            anaconda-client
+          micromamba activate tools
+          python -V
+          conda info
+
+      - name: Build conda recipe (no tests first)
+        shell: bash -l {0}
+        run: |
+          micromamba activate tools
+          conda mambabuild conda.recipe --no-test -c conda-forge
+
+      # Optional: run recipe tests if you already rely on them
+      - name: Test conda recipe
+        if: always()
+        shell: bash -l {0}
+        run: |
+          micromamba activate tools
+          conda mambabuild conda.recipe -c conda-forge
+
+      - name: Upload to Anaconda (if token configured)
+        if: env.ANACONDA_CHANNEL_UPLOAD_TOKEN != ''
+        shell: bash -l {0}
+        env:
+          ANACONDA_CHANNEL_UPLOAD_TOKEN: ${{ secrets.ANACONDA_CHANNEL_UPLOAD_TOKEN }}
+        run: |
+          micromamba activate tools
+          anaconda -t "$ANACONDA_CHANNEL_UPLOAD_TOKEN" upload --label main "$CONDA_BLD_PATH"/*/*.tar.bz2

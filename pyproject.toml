@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=42", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -15,7 +15,7 @@ authors = [
     {name = "California Department of Water Resources", email = "Eli.Ateljevich@water.ca.gov"},
     {name = "California Department of Water Resources", email = "Kijin.Nam@water.ca.gov"}
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
@@ -51,11 +51,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+
 doc = [
     "sphinx",
     "sphinx-rtd-theme",
+    "sphinx-click",
+    "sphinx-design",
+    "sphinx-argparse",
+    "sphinxcontrib-bibtex",
+    "sphinxcontrib-mermaid",
     "myst-parser",
-    "numpydoc"
+    "numpydoc",
+    "pillow>=4.0.0",
+    "nbsphinx",
+    "docutils"
 ]
 test = [
     "pytest>=3",
