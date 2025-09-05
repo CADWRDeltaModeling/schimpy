@@ -60,6 +60,7 @@ jobs:
             boa
             anaconda-client
             setuptools-scm
+            conda-verify
           condarc: |
             channel_priority: strict
             channels:

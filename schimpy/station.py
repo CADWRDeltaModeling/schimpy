@@ -650,7 +650,7 @@ def station_subset(
         swapped in.
 
     """
-
+    #
     locs.station_id = locs.station_id.str.lower()
     locs = locs.set_index("station_id")
 
