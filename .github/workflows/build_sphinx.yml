@@ -57,15 +57,15 @@ jobs:
           python - <<'PY'
           import sys, subprocess
           try:
-          import tomllib   # py>=3.11
-          with open("pyproject.toml", "rb") as f:  # NOTE: use load() with binary file
-          data = tomllib.load(f)
+              import tomllib   # py>=3.11
+              with open("pyproject.toml", "rb") as f:  # NOTE: use load() with binary file
+                  data = tomllib.load(f)
           except ModuleNotFoundError:
-          subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
-          import tomli as tomllib
-          with open("pyproject.toml", "rb") as f:
-          data = tomllib.load(f)
-
+              subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
+              import tomli as tomllib
+              with open("pyproject.toml", "rb") as f:
+                  data = tomllib.load(f)
+    
           NAME_MAP = {
           "Pillow": "pillow",
           "netCDF4": "netcdf4",
