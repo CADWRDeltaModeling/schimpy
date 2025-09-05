@@ -32,12 +32,19 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install doc extras from pyproject
+      - name: Install schimpy (no deps), then docs extras
         run: |
           python -m pip install --upgrade pip
-          # Use the extras group you already have in pyproject: [project.optional-dependencies].doc
-          pip install -e ".[doc]"
-
+          pip install -e . --no-deps
+          # Now install ONLY the extras, *but not via `.[doc]`* to avoid reinstalling the base.
+          # Parse pyproject and install the doc list directly:
+          python - <<'PY'
+      import tomllib, subprocess, sys
+      data = tomllib.loads(open("pyproject.toml","rb").read())
+      pkgs = data["project"]["optional-dependencies"]["doc"]
+      subprocess.check_call([sys.executable, "-m", "pip", "install", *pkgs])
+      PY
+      
       - name: Build API stubs
         working-directory: docsrc
         run: sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
