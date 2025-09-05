@@ -54,46 +54,46 @@ jobs:
         shell: bash -l {0}
         run: |
           micromamba activate docs
-          python - <<'PY'
-          import sys, subprocess
-          try:
-              import tomllib   # py>=3.11
-              with open("pyproject.toml", "rb") as f:  # NOTE: use load() with binary file
-                  return tomllib.load(f)
-          except ModuleNotFoundError:
-              subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
-              import tomli as tomllib
-              with open("pyproject.toml", "rb") as f:
-                  return tomllib.load(f)
-        
-          NAME_MAP = {
-              "Pillow": "pillow",
-              "netCDF4": "netcdf4",
-              # extend if any PyPI vs conda names differ
-          }
-        
-          data = tomllib.loads(open("pyproject.toml","rb").read())
-          proj = data.get("project", {})
-          extras = proj.get("optional-dependencies", {})
-          docs = extras.get("docs", [])
-          if isinstance(docs, str):
-              docs = [docs]
+            python - <<'PY'
+            import sys, subprocess
+            try:
+                import tomllib   # py>=3.11
+                with open("pyproject.toml", "rb") as f:  # NOTE: use load() with binary file
+                 data = tomllib.load(f)
+            except ModuleNotFoundError:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
+                import tomli as tomllib
+                with open("pyproject.toml", "rb") as f:
+                 data = tomllib.load(f)
 
-          # Convert specifiers like "pkg>=1.2" -> "pkg" for conda
-          def to_conda_name(spec):
-              name = spec.split()[0]           # drop environment markers
-              name = name.split(";")[0]        # drop markers after semicolon
-              name = name.split(">=")[0].split("==")[0].split("~=")[0].split("<")[0]
-              name = name.strip()
-              return NAME_MAP.get(name, name).lower()
+            NAME_MAP = {
+                "Pillow": "pillow",
+                "netCDF4": "netcdf4",
+                # extend if any PyPI vs conda names differ
+            }
 
-          pkgs = sorted({to_conda_name(s) for s in docs if s})
-          if pkgs:
-              print("Installing docs extras via conda:", pkgs, flush=True)
-              subprocess.check_call(["micromamba","install","-y","-c","conda-forge", *pkgs])
-          else:
-              print("No [project.optional-dependencies].docs group found; skipping.", flush=True)
-          PY
+            proj = data.get("project", {})
+            extras = proj.get("optional-dependencies", {})
+            docs = extras.get("docs", [])
+            if isinstance(docs, str):
+                docs = [docs]
+
+            pkgs = set()
+            for s in docs:
+                if s:
+                 name = s.split()[0]
+                 name = name.split(";")[0]
+                 name = name.split(">=")[0].split("==")[0].split("~=")[0].split("<")[0]
+                 name = name.strip()
+                 name = NAME_MAP.get(name, name).lower()
+                 pkgs.add(name)
+            pkgs = sorted(pkgs)
+            if pkgs:
+                print("Installing docs extras via conda:", pkgs, flush=True)
+                subprocess.check_call(["micromamba","install","-y","-c","conda-forge", *pkgs])
+            else:
+                print("No [project.optional-dependencies].docs group found; skipping.", flush=True)
+            PY
 
       - name: Build Sphinx
         shell: bash -l {0}
