@@ -23,54 +23,79 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up micromamba (conda-forge + optional org channel)
+        uses: mamba-org/setup-micromamba@v2
         with:
-          python-version: "3.11"
-          cache: "pip"
+          init-shell: bash
+          cache-downloads: true
+          environment-name: docs
+          create-args: >-
+            python>=3.11
+            sphinx
+            sphinx-rtd-theme
+            numpydoc
+          condarc: |
+            channel_priority: strict
+            channels:
+              - conda-forge
+              - cadwr-dms   # keep if you publish your internal deps here
 
-      - name: Install schimpy (no deps), then docs extras
+      - name: Install schimpy (from conda channels)
         shell: bash -l {0}
         run: |
-          python -m pip install --upgrade pip
-          # install just your package (no runtime deps pulled)
-          python -m pip install -e . --no-deps -v
+          micromamba activate docs
+          micromamba install -y -c conda-forge -c cadwr-dms schimpy
 
-          # install docs extras from pyproject if present
+      - name: Install docs extras from pyproject.toml (resolved by conda)
+        shell: bash -l {0}
+        run: |
+          micromamba activate docs
           python - <<'PY'
-          import sys, subprocess, pathlib
+          import sys, subprocess
           try:
-              import tomllib  # Py>=3.11
+              import tomllib   # py>=3.11
           except ModuleNotFoundError:
               subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
               import tomli as tomllib
-
-          pp = pathlib.Path("pyproject.toml")
-          raw = pp.read_text(encoding="utf-8")
-          data = tomllib.loads(raw)
+        
+          NAME_MAP = {
+              "Pillow": "pillow",
+              "netCDF4": "netcdf4",
+              # extend if any PyPI vs conda names differ
+          }
+        
+          data = tomllib.loads(open("pyproject.toml","rb").read())
           proj = data.get("project", {})
-          opt = proj.get("optional-dependencies", {})
-
-          # prefer 'docs' but accept 'doc' as a fallback
-          pkgs = opt.get("docs") or opt.get("doc")
-          if not pkgs:
-              print("No [project.optional-dependencies].docs (or .doc) group found; skipping docs extras.")
-              sys.exit(0)
-
-          # normalize to list
-          if isinstance(pkgs, str):
-              pkgs = [pkgs]
-
-          # install the extras (with deps)
-          cmd = [sys.executable, "-m", "pip", "install", *pkgs]
-          print("Installing docs extras:", " ".join(pkgs))
-          subprocess.check_call(cmd)
+          extras = proj.get("optional-dependencies", {})
+          docs = extras.get("docs", [])
+          if isinstance(docs, str):
+              docs = [docs]
+        
+          # Convert specifiers like "pkg>=1.2" -> "pkg" for conda
+          def to_conda_name(spec):
+              name = spec.split()[0]           # drop environment markers
+              name = name.split(";")[0]        # drop markers after semicolon
+              name = name.split(">=")[0].split("==")[0].split("~=")[0].split("<")[0]
+              name = name.strip()
+              return NAME_MAP.get(name, name).lower()
+        
+          pkgs = sorted({to_conda_name(s) for s in docs if s})
+          if pkgs:
+              print("Installing docs extras via conda:", pkgs, flush=True)
+              subprocess.check_call(["micromamba","install","-y","-c","conda-forge", *pkgs])
+          else:
+              print("No [project.optional-dependencies].docs group found; skipping.", flush=True)
           PY
-      
-      - name: Build docs
+
+      - name: Build Sphinx
+        shell: bash -l {0}
+        env:
+          # flip to "0" if/when you want a full unmocked build
+          DOCS_USE_MOCKS: "0"
         run: |
           sphinx-apidoc --force -o . ../schimpy -T --templatedir ./_templates
           make -C docsrc clean
