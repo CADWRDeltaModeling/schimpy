@@ -626,7 +626,7 @@ def station_subset(
        column called "alias" and this will become the label used.
 
      extract_freq : str or pd.tseries.TimeOffset
-       Frequency to extract ... this allows some economies if you want, say, 15min data. Use pandas freq string such as '15T' for 15min
+       Frequency to extract. This allows some economies if you want, say, 15min data. Use pandas freq string such as '15T' for 15min
 
      convert: str or function
         A small number of conversions are supported ("ft", "ec" for uS/cm, "cfs" for flow)
