@@ -45,12 +45,6 @@ jobs:
               - conda-forge
               - cadwr-dms   # keep if you publish your internal deps here
 
-      - name: Install schimpy (from conda channels)
-        shell: bash -l {0}
-        run: |
-          micromamba activate docs
-          python scripts/install_extras.py
-          micromamba install -y -c conda-forge -c cadwr-dms schimpy
 
       - name: Overlay current checkout (no pip deps)
         env:
@@ -59,6 +53,14 @@ jobs:
         run: |
           micromamba run -n docs python -m pip install --upgrade pip
           micromamba run -n docs python -m pip install -e . --no-deps --no-build-isolation -v
+
+
+      - name: Install schimpy (from conda channels)
+        shell: bash -l {0}
+        run: |
+          micromamba activate docs
+          python scripts/install_extras.py
+          micromamba install -y -c conda-forge -c cadwr-dms schimpy
 
       - name: Install docs extras from pyproject via conda
         run: |
