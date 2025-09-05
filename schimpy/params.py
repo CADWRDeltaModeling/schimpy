@@ -1,5 +1,4 @@
 import param
-
 from collections import namedtuple
 
 Params = namedtuple("Params", ["core", "opt", "schout"])
