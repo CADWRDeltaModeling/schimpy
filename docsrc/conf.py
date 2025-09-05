@@ -27,10 +27,10 @@ import schimpy
 tls_verify = False
 # using mock to avoid nodepy documentation which is hard to import
 # import mock
-# MOCK_MODULES = ['nodepy']
-# for mod_name in MOCK_MODULES:
-#    sys.modules[mod_name] = mock.Mock()
-
+autodoc_mock_imports = ["nodepy",
+    "gdal","osgeo","rasterio","fiona","pyproj",
+    "geopandas","shapely","netCDF4","xarray","vtools3"
+]
 # -- General configuration ---------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
