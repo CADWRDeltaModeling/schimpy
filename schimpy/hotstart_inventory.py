@@ -12,6 +12,7 @@ from vtools import days, seconds
 def expected_hotstarts(run_start, dt, nday, hot_freq):
     """
     Generate expected hotstarts based on run parameters.
+
     Parameters
     ----------
     run_start : datetime
@@ -22,18 +23,19 @@ def expected_hotstarts(run_start, dt, nday, hot_freq):
         The number of days for the simulation run.
     hot_freq : pandas.tseries.offsets.DateOffset
         The frequency at which hotstarts are generated.
+
     Returns
     -------
     pandas.DataFrame
         A DataFrame with a DatetimeIndex representing the expected hotstart times
         and a column "iteration" indicating the corresponding iteration numbers.
+    
     Notes
     -----
     This function calculates the expected hotstart times and their corresponding
     iteration numbers based on the provided simulation parameters. It does not
     perform any file inventory or check for existing hotstart files.
     """
-    """Generate expected hotstarts based on run parameters."""
 
     end = run_start + days(nday)
     t = run_start
@@ -151,6 +153,7 @@ def hotstart_inventory_exist(start, dt=90, workdir=".", do_print=True):
     """
     Check for the existence of hotstart inventory files and generate a DataFrame
     mapping iterations to corresponding datetime values.
+    
     Parameters
     ----------
     start : str or pandas.Timestamp
@@ -161,10 +164,12 @@ def hotstart_inventory_exist(start, dt=90, workdir=".", do_print=True):
         Directory to search for hotstart files (default is '.').
     do_print : bool, optional
         Whether to print the iterations and corresponding times (default is True).
+    
     Returns
     -------
     pandas.DataFrame
         A DataFrame with datetime as the index and iteration numbers as the column.
+    
     Notes
     -----
     - The function searches for hotstart files in the specified `workdir` directory.

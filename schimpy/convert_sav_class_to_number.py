@@ -5,7 +5,7 @@
 import argparse
 import numpy as np
 from osgeo import gdal
-from schimpy.schism_polygon import read_polygons Point
+from schimpy.schism_polygon import read_polygons, Point
 from scipy.ndimage import gaussian_filter as gfilt
 
 

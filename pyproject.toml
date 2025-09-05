@@ -47,7 +47,8 @@ dependencies = [
     "rtree",
     "click",
     "dask>=2022.11",
-    "numpy>=2.0"
+    "numpy>=2.0",
+	"diskcache"
 ]
 
 [project.optional-dependencies]
