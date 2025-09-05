@@ -78,7 +78,7 @@ jobs:
           docs = extras.get("docs", [])
           if isinstance(docs, str):
               docs = [docs]
-        
+
           # Convert specifiers like "pkg>=1.2" -> "pkg" for conda
           def to_conda_name(spec):
               name = spec.split()[0]           # drop environment markers
@@ -86,7 +86,7 @@ jobs:
               name = name.split(">=")[0].split("==")[0].split("~=")[0].split("<")[0]
               name = name.strip()
               return NAME_MAP.get(name, name).lower()
-        
+
           pkgs = sorted({to_conda_name(s) for s in docs if s})
           if pkgs:
               print("Installing docs extras via conda:", pkgs, flush=True)
