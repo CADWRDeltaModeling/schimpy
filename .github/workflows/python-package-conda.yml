@@ -50,7 +50,7 @@ jobs:
             channel_priority: strict
             channels:
               - conda-forge
-              # - cadwr-dms   # uncomment if your recipe/tests need it
+              - cadwr-dms   # uncomment if your recipe/tests need it
 
       - name: Show env
         shell: bash -l {0}
@@ -79,7 +79,7 @@ jobs:
         shell: bash -l {0}
         run: |
           micromamba activate tools
-          conda mambabuild conda.recipe
+          conda mambabuild conda.recipe -c conda-forge -c cadwr-dms 
 
       - name: Upload to Anaconda (if token configured)
         if: env.ANACONDA_CHANNEL_UPLOAD_TOKEN != ''
