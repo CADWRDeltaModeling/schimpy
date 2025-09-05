@@ -3,7 +3,6 @@ from collections import namedtuple
 
 Params = namedtuple("Params", ["core", "opt", "schout"])
 
-
 class Core(param.Parameterized):
     ipre = param.Integer(
         default=0, bounds=(0, 1), doc="Pre-processing flag (1: on; 0: off)"

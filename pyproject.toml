@@ -93,7 +93,7 @@ exclude = ["docs"]
 select = ["NPY201"]
 
 [tool.setuptools.packages.find]
-include = ["schimpy"]
+include = ["schimpy","schimpy.util"]
 exclude = ["docsrc"]
 
 [tool.setuptools_scm]

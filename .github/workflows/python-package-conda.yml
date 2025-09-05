@@ -59,11 +59,12 @@ jobs:
             conda-build
             boa
             anaconda-client
+            setuptools-scm
           condarc: |
             channel_priority: strict
             channels:
               - conda-forge
-              - cadwr-dms   # uncomment if your recipe/tests need it
+              - cadwr-dms   
 
       - name: Show env
         shell: bash -l {0}
@@ -76,16 +77,17 @@ jobs:
         shell: bash -l {0}
         run: |
           micromamba activate tools
-          V=$(python -m setuptools_scm || true)
-          if [ -z "$V" ]; then
-            # fall back to tag name or short SHA; strip leading 'v' if present
-            if [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
-              V="${GITHUB_REF_NAME#v}"
-            else
-              V="0.0.0+${GITHUB_SHA::7}"
-            fi
+          # 1) tag -> version
+          if [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
+            V="${GITHUB_REF_NAME#v}"
+          else
+            # 2) setuptools-scm (needs fetch-depth: 0)
+            V=$(python -m setuptools_scm 2>/dev/null || true)
           fi
+          # 3) fallback to 0.0.0+SHA
+          [[ -z "$V" ]] && V="0.0.0+${GITHUB_SHA::7}"
           echo "PKG_VERSION=$V" | tee -a "$GITHUB_ENV"
+          echo "SETUPTOOLS_SCM_PRETEND_VERSION=$V" | tee -a "$GITHUB_ENV"
 
 
       - name: Build conda recipe (no tests first)
