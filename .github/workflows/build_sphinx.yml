@@ -6,6 +6,7 @@ on:
     paths:
       - "docsrc/**"
       - "schimpy/**"
+      - "scripts/install_docs_extras.py"
       - "pyproject.toml"
       - ".github/workflows/build_sphinx.yml"
   workflow_dispatch:

@@ -17,7 +17,7 @@ except ModuleNotFoundError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "tomli"])
     import tomli as tomllib
 
-# Load the pyproj.toml to get the list of extra dependencies for documentation
+# Load the pyproj.toml to get the list of extra dependencies for documentation 
 # Form of this assumes py>=3.11
 pp = pathlib.Path("pyproject.toml")
 with pp.open("rb") as f:
