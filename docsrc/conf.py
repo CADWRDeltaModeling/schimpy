@@ -29,7 +29,8 @@ tls_verify = False
 # import mock
 autodoc_mock_imports = ["nodepy",
     "gdal","osgeo","rasterio","fiona","pyproj",
-    "geopandas","shapely","netCDF4","xarray","vtools3","vtools"
+    "geopandas","shapely","netCDF4","xarray","vtools3","vtools",
+    "rtree","scipy","pandas","numba"
 ]
 # -- General configuration ---------------------------------------------
 
