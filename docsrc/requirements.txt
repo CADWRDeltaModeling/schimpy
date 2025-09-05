@@ -1,4 +1,4 @@
-# This file will be deprecated and moved to pyproj.toml to unify dependencies
+# This file will be deprecated and moved to pyproj.toml to unify dependency spec
 # furo==2021.11.16
 sphinx>=8.0
 sphinx-design

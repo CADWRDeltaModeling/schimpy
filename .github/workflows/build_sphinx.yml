@@ -49,7 +49,8 @@ jobs:
               import tomli as tomllib
 
           pp = pathlib.Path("pyproject.toml")
-          data = tomllib.loads(pp.read_bytes())
+          raw = pp.read_text(encoding="utf-8")
+          data = tomllib.loads(raw)
           proj = data.get("project", {})
           opt = proj.get("optional-dependencies", {})
 
