@@ -13,10 +13,4 @@ and elapsed times on flat files. This is a pretty easy task on simple files usin
 just pandas, but this utility preserves formatting and floating precision of the source, 
 copies over comments and can clip the file to a new start date. 
 
-model_time.py
--------------
 
-.. argparse::
-    :module: schimpy.model_time
-    :func: create_arg_parser
-    :prog: model_time
