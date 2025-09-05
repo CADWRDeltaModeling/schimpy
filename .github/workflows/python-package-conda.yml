@@ -57,6 +57,7 @@ jobs:
           create-args: >-
             python=3.12
             setuptools>68
+            numpy>2
             conda-build
             boa
             anaconda-client
