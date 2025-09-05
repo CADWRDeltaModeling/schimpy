@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module is a simple common base for text file IO. 
+This module is a simple common base for text file IO.
 @outhor: Kijin Nam, knam@water.ca.gov
 """
 
