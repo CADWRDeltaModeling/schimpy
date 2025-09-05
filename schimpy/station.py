@@ -738,7 +738,7 @@ def station_subset_multidir(
     isflux="infer",
     miss="raise",
 ):
-    """Extract a subset of stations from an staout file or flux.out file across a list of directories
+    """ Extract a subset of stations from an staout file or flux.out file across a list of directories
 
     Parameters
     ----------
