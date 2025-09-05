@@ -650,7 +650,7 @@ def station_subset(
         swapped in.
 
     """
-    #
+    
     locs.station_id = locs.station_id.str.lower()
     locs = locs.set_index("station_id")
 
@@ -660,7 +660,7 @@ def station_subset(
         elif "flux" in fpath:
             isflux = True
         else:
-            raise ValueError("Station output type (flux,staout) could not be inferred")
+            raise ValueError("Station output type (flux,staout) could not be inferred") 
 
     if isflux:
         if not os.path.exists(stationfile):
