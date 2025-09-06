@@ -81,7 +81,7 @@ doc = [
 	"ipython"
 ]
 
-These are the tools needed to perform testing. 
+#These are the tools needed to perform testing. 
 test = [
     "pytest>=3",
     "pytest-cov",
