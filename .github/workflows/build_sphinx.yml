@@ -4,12 +4,9 @@ name: "Sphinx: Render docs"
 on: 
   push:
     branches: ["main", "master"]
-    paths:
-      - "docsrc/**"
-      - "schimpy/**"
-      - "scripts/install_docs_extras.py"
-      - "pyproject.toml"
-      - ".github/workflows/build_sphinx.yml"
+    tags:
+      - 'v*'      # v1, v1.2, v1.2.3, v2025.09.04, etc.
+      - '[0-9]*'  # 1, 1.2, 1.2.3, 2025.09.04, etc.  
   workflow_dispatch:
 
 permissions:

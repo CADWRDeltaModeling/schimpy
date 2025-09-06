@@ -6,22 +6,7 @@ on:
     branches: ["main", "master"]
     tags:
       - 'v*'      # v1, v1.2, v1.2.3, v2025.09.04, etc.
-      - '[0-9]*'  # 1, 1.2, 1.2.3, 2025.09.04, etc.  
-    paths:
-      - "conda.recipe/**"
-      - ".github/workflows/python-package-conda.yml"
-      - "pyproject.toml"
-      - "schimpy/**"
-      - "scripts/**"
-      - "tests/**"
-  pull_request:
-    paths:
-      - "conda.recipe/**"
-      - ".github/workflows/python-package-conda.yml"
-      - "pyproject.toml"
-      - "schimpy/**"
-      - "scripts/**"
-      - "tests/**"      
+      - '[0-9]*'  # 1, 1.2, 1.2.3, 2025.09.04, etc.    
   workflow_dispatch:
 
 concurrency:
