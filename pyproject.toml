@@ -15,6 +15,8 @@ authors = [
     {name = "California Department of Water Resources", email = "Eli.Ateljevich@water.ca.gov"},
     {name = "California Department of Water Resources", email = "Kijin.Nam@water.ca.gov"}
 ]
+
+# This has to be coordinated with entries in .github/python-package-conda.yml and build_sphinx.yml
 requires-python = ">=3.10,<3.13"
 
 classifiers = [
@@ -26,9 +28,14 @@ classifiers = [
 
 keywords = ["schimpy", "SCHISM", "hydrodynamics", "mesh", "geometry", "GIS", "geospatial", "data processing"]
 
+# These should be the actual dependencies for API use and associated testing (but not the test framework itself)
+# Pinning is very hard to maintain has two uses:
+# 1. making sure we avoid bugs or have a sufficiently new versions
+# 2. pinning > a very low version helps reduce the search space for the conda 'solve' while having no real
+#    influence 
 dependencies = [
     "geopandas",
-    "vtools3>=3.7",
+    "vtools3>=3.9",
     "dms-datastore",
     "gdal",
     "pyogrio",
@@ -47,13 +54,13 @@ dependencies = [
     "rtree",
     "click",
     "dask>=2022.11",
-    "numpy>2.0",
+    "numpy>2.0",     
 	"diskcache",
 	"param"
 ]
 
 [project.optional-dependencies]
-
+# These are the tools needed to perform documentation
 doc = [
     "sphinx",
     "sphinx-rtd-theme",
@@ -74,17 +81,21 @@ doc = [
 	"ipython"
 ]
 
-
+These are the tools needed to perform testing. 
 test = [
     "pytest>=3",
     "pytest-cov",
     "tox",
     "click"
 ]
+
+# If using pip, these would be used for the build
+# similar tools are listed in python-package-conda.yml and if there are minimum versions (e.g. setuptools)
+# this is where they should be spelled out
 build = [
     "build",
     "pip",
-    "setuptools",
+    "setuptools>68",
     "wheel",
     "setuptools-scm"
 ]

@@ -26,11 +26,9 @@ import schimpy
 
 tls_verify = False
 # using mock to avoid nodepy documentation which is hard to import
-# import mock
-autodoc_mock_imports = ["nodepy",
-    "gdal","osgeo","rasterio","fiona","pyproj",
-    "geopandas","shapely","netCDF4","xarray","vtools3","vtools","dms_datastore",
-    "rtree","scipy","pandas","numba","diskcache","boto3","palletable","param"
+# and to reduce time with the spatial stack
+autodoc_mock_imports = ["nodepy","gdal","osgeo","rasterio","fiona","pyproj",
+    "geopandas","shapely","netCDF4","rtree","param"]
 ]
 # -- General configuration ---------------------------------------------
 

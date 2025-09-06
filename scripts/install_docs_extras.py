@@ -1,8 +1,13 @@
 # scripts/install_docs_extras.py
 
-# This script is used by the documentation action on GitHub
-# for installing things in the docs optional dependencies 
-# in pyproject.toml
+""" This script is used by the documentation action on GitHub
+    for installing dependencies (e.g. sphinx extensions) 
+    that are listed in the doc section of optional dependencies 
+    in pyproject.toml. The script uses conda to do the install,
+    which allows the building of a complete environment for 
+    sphinx to use for references and introspection. At the current time,
+    the Cheese shop lacks some items. 
+"""
 import sys, subprocess, pathlib
 
 # Mappings between PYPI and conda

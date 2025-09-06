@@ -1,3 +1,4 @@
+# This is the github action that builds the documentation and posts it to github-pages
 name: "Sphinx: Render docs"
 
 on: 
@@ -34,6 +35,9 @@ jobs:
           init-shell: bash
           cache-downloads: true
           environment-name: docs
+          # The python here should be coordinated with pyproj.toml. 
+          # The others are a minimal set of things needed to bootstrap the build 
+          # versions should be coordinated with pyproj.toml
           create-args: >-
             python=3.12
             setuptools>=68

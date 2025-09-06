@@ -1,3 +1,4 @@
+# This is the github action that builds the conda distribution and uploads it
 name: conda-build
 
 on:
@@ -51,9 +52,12 @@ jobs:
         with:
           micromamba-version: "latest"
           init-shell: bash
-          cache-environment: true          # ✅ now valid
+          cache-environment: true
           cache-downloads: true
           environment-name: tools
+          # The python here should be coordinated with pyproj.toml. 
+          # The others are a minimal set of things needed to bootstrap the build 
+          # and should be coordinated with pyproj.toml as far as things like minimum versions
           create-args: >-
             python=3.12
             setuptools>68
