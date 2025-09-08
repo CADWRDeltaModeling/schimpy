@@ -235,7 +235,6 @@ class SchismSetup(object):
         """List elements along linestring"""
         mesh = self._input.mesh
         line_segment = np.array(coords, dtype="d").flatten()
-        print(line_segment)
         return mesh.find_intersecting_elems_with_line(line_segment)
 
     def create_flux_regions(self, linestrings, out_fname="fluxflag.prop"):
@@ -657,13 +656,7 @@ class SchismSetup(object):
             except:
                 self._logger.error("Polygon failed to evaluate: {}".format(name))
                 raise
-            # if 97346 in nodes_sel:
-            # print(poly.type)
-            # print("Arrived in poly {}".format(name))
-            # for ii,isel in enumerate(nodes_sel):
-            # if isel == 97346:
-            # print(ii,isel,mesh.nodes[isel,:],vals[ii])
-            # #raise ValueError("Arrived. Poly type = {}".format(poly.type))
+
 
             if nodes_sel is None or not len(nodes_sel):
                 msg = "This polygon contains no nodes: %s" % poly.name

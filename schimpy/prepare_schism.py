@@ -9,6 +9,7 @@ from schimpy.stacked_dem_fill import stacked_dem_fill
 from schimpy.small_areas import small_areas
 from schimpy.split_quad import split_quad
 from schimpy import schism_yaml
+from schimpy import station as station_mod
 from schimpy.create_vgrid_lsc2 import vgrid_gen
 from schimpy.mesh_volume_tvd import (
     refine_volume_tvd,
@@ -16,6 +17,7 @@ from schimpy.mesh_volume_tvd import (
     FloorOptions,
     TVDOptions,
 )
+import dms_datastore.dstore_config as configs
 from packaging.version import Version, InvalidVersion
 import datetime
 import importlib
@@ -456,6 +458,109 @@ def create_fluxflag(s, inputs, logger):
             buf = "{}\n".format(line["name"])
             f.write(buf)
 
+def _validate_station_request(request, logger):
+    """Return a normalized request list validated against station_mod.station_variables."""
+    allowed = set(station_mod.station_variables)  # elev, salt, etc.
+    if isinstance(request, str):
+        if request.lower() == "all":
+            return "all"
+        request_list = [request]
+    else:
+        request_list = list(request)
+    # allow 'all' anywhere
+    if any(str(x).lower() == "all" for x in request_list):
+        return "all"
+    bad = [x for x in request_list if x not in allowed]
+    if bad:
+        logger.error(f"station_output.request contains unknown variables: {bad}. Allowed: {sorted(allowed)}")
+        raise ValueError("Invalid station_output.request")
+    return request_list
+
+def create_station_output(inputs, logger):
+    """Create/aggregate station.in from the new top-level 'station_output' section."""
+    section = inputs.get("station_output")
+    if section is None:
+        return
+    # Accept either key (common misspelling safeguard)
+    station_in_list = section.get("station_in_files")
+
+    name = section.get("name", "station.in")
+    request = _validate_station_request(section.get("request", "all"), logger)
+    out_fpath = ensure_outdir(inputs["prepro_output_dir"], name)
+
+    # If ANY entry is 'GENERATE' (case-insensitive), create a temp file from DBs,
+    # then (optionally) concatenate with any additional provided files.
+    generated_tmp = None
+    if station_in_list is not None and any(str(x).strip().upper() == "GENERATE" for x in station_in_list):
+        logger.info("station_output: GENERATE requested (will merge with other files if provided)")
+        station_db = configs.config_file("station_dbase")
+        subloc_db  = configs.config_file("sublocations")
+        if station_db is None or subloc_db is None:
+            raise ValueError(
+                "station_output: Could not resolve default station databases. "
+                "Check dms_datastore config for 'station_dbase' and 'sublocations'."
+            )
+        # Write to a temp file inside prepro_output_dir so we can include it in the concat
+        generated_tmp = ensure_outdir(inputs["prepro_output_dir"], "__station_generated.in")
+        logger.info(f"station_output: GENERATE -> writing temp {generated_tmp}")
+        station_mod.convert_db_station_in(
+            outfile=generated_tmp,
+            stationdb=station_db,
+            sublocdb=subloc_db,
+            station_request=request,
+            default=-0.5,
+        )
+
+    # Mode 2: concatenate listed station.in files
+    import pandas as pd
+    dfs = []
+    if not station_in_list:
+        raise ValueError("station_output.station_in_files must be provided (or include 'GENERATE').")
+    # Build the effective list: generated tmp (if any) + all explicit files except the 'GENERATE' token
+    files_to_read = []
+    if generated_tmp is not None:
+        files_to_read.append(generated_tmp)
+    files_to_read.extend([f for f in station_in_list if str(f).strip().upper() != "GENERATE"])
+
+    for f in files_to_read:
+        f = os.path.expanduser(str(f))
+        if not os.path.isabs(f):
+            # allow relative to the launch YAML directory or CWD—leave as-is
+            pass
+        if not os.path.exists(f):
+            logger.error(f"station_output: cannot find file '{f}'")
+            raise ValueError(f"station_output file not found: {f}")
+        logger.info(f"station_output: reading {f}")
+        dfs.append(station_mod.read_station_in(f))
+
+    if not dfs:
+        raise ValueError("station_output: no station files to merge.")
+
+    merged = pd.concat(dfs)
+    # Strict check: fail if any (id, subloc) appears more than once
+    dup_mask = merged.index.duplicated(keep=False)
+    if dup_mask.any():
+        # Summarize the first few duplicates for a helpful error
+        dup_keys = merged.index[dup_mask]
+        # unique but preserve order
+        seen = set()
+        uniq_dups = [k for k in dup_keys if not (k in seen or seen.add(k))]
+        sample = ", ".join([f"{k[0]}::{k[1]}" for k in uniq_dups[:10]])
+        more = "" if len(uniq_dups) <= 10 else f" (+{len(uniq_dups)-10} more)"
+        raise ValueError(
+            "station_output: duplicate (station, sublocation) entries detected; "
+            f"please remove redundancy. Examples: {sample}{more}"
+        )
+
+    # Write final station.in with the requested variables; write_station_in handles row renumbering
+    logger.info(f"station_output: writing merged file -> {out_fpath}")
+    station_mod.write_station_in(out_fpath, merged, request=request)
+    # Clean up generated temp if we made one
+    if generated_tmp is not None:
+        try:
+            os.remove(generated_tmp)
+        except Exception:
+            logger.warning(f"station_output: could not remove temp file {generated_tmp}")    
 
 def update_spatial_inputs(s, inputs, logger):
     """Create SCHISM grid inputs.
@@ -474,6 +579,7 @@ def update_spatial_inputs(s, inputs, logger):
     create_prop_with_polygons(s, inputs, logger)
     create_structures(s, inputs, logger)
     create_fluxflag(s, inputs, logger)
+    create_station_output(inputs, logger)
 
 
 def update_temporal_inputs(s, inputs):
@@ -608,6 +714,7 @@ def process_prepare_yaml(in_fname, use_logging=True):
         "hydraulics",
         "sources_sinks",
         "flow_outputs",
+        "station_output",
         "copy_resources",
     ] + schism_yaml.include_keywords
     logger.info("Processing the top level...")
@@ -659,8 +766,9 @@ def prepare_schism(args, use_logging=True):
     if item_exist(inputs, "copy_resources"):
         logger.info("Copying resources to output dir")
         copy_spec = inputs["copy_resources"]
+        prepro_outdir = inputs["prepro_output_dir"]
         for key, item in copy_spec.items():
-            outpath = os.path.join(outdir, item)
+            outpath = ensure_outdir(prepro_outdir, item)
             if os.path.normpath(key) == os.path.normpath(outpath):
                 continue
             logger.info(f"copy_resources: copying {key} to {outpath}")
