@@ -773,9 +773,6 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True):
     with open(out_fname, "w") as f:
         f.write(echo_file_header())
         f.write(schism_yaml.safe_dump(inputs))
-        out_fname = os.path.join(inputs["prepro_output_dir"], out_fname)
-        with open(out_fname, "w") as f:
-            f.write(schism_yaml.safe_dump(inputs))
 
     return inputs, outdir, logger
 
