@@ -727,7 +727,7 @@ def echo_file_header():
     return echo_header
 
 
-def process_prepare_yaml(in_fname, use_logging=True):
+def process_prepare_yaml(in_fname, use_logging=True, write_echo=True):
     """Process the main input YAML file and return the inputs dict without processing any SCHISM inputs."""
 
     if not os.path.exists(in_fname):
@@ -764,12 +764,18 @@ def process_prepare_yaml(in_fname, use_logging=True):
     logger.info("Checking for matching nested keys...")
     check_nested_match(inputs)
 
-    out_fname = os.path.splitext(in_fname)[0] + "_echo" + os.path.splitext(in_fname)[1]
+    if write_echo:
+        out_fname = (
+            os.path.splitext(in_fname)[0] + "_echo" + os.path.splitext(in_fname)[1]
+        )
 
     out_fname = os.path.join(inputs["prepro_output_dir"], out_fname)
     with open(out_fname, "w") as f:
         f.write(echo_file_header())
         f.write(schism_yaml.safe_dump(inputs))
+        out_fname = os.path.join(inputs["prepro_output_dir"], out_fname)
+        with open(out_fname, "w") as f:
+            f.write(schism_yaml.safe_dump(inputs))
 
     return inputs, outdir, logger
 
