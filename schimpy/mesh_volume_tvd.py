@@ -263,7 +263,7 @@ def floodfill_always_wet(
     for ei in seeds:
         if not qualifies[ei]:
             raise RuntimeError(
-                f"Seed element {ei} does not qualify (edge test failed)."
+                f"Seed element {ei} does not qualify (edge depth test failed). This can sometimes be caused by insufficient DEM coverage or by a .dem_cache directory being requeried after being populated with bad values )delete directory)"
             )
 
     # Stage 1 BFS
