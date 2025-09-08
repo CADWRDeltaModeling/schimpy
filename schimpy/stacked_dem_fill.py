@@ -64,10 +64,11 @@ def _stacked_dem_fill(
         f_out = ensure_outdir(out_dir, "dem_misses.txt")
         miss_idx = np.isnan(values)
         miss_points = points[miss_idx]
+        nmiss = miss_points.shape[0]
         f = open(f_out, "w")
         for p in miss_points:
             f.write("%s,%s\n" % tuple(p))
-            message = "DEMs provided do not cover all the points. See file dem_misses.txt for locations"
+            message = f"DEMs provided do not cover {nmiss} points. See file dem_misses.txt for locations and to check for significance"
         f.close()
 
         gdf = gpd.GeoDataFrame(

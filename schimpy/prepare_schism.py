@@ -134,10 +134,19 @@ def create_hgrid(s, inputs, logger):
                 optimized_elevation = optimizer.optimize(opt_params)
                 s.mesh.nodes[:, 2] = np.negative(optimized_elevation)
             elif method=="volume_tvd":
-                dem_spec = section.get("dem_list")
-                if dem_spec is None:
+                dem_list = section.get("dem_list")
+                if dem_list is None:
                     raise ValueError("For method=volume_tvd, provide dem_list")
-
+                s.dem_list = dem_list
+                logger.info(f"Using stacked DEM fill for depth initialization. Length of DEM list: {len(dem_list)}")
+                s.mesh.nodes[:, 2] = stacked_dem_fill(
+                            dem_list,
+                            s.mesh.nodes[:, :2],
+                            inputs["prepro_output_dir"],
+                            require_all=False,
+                            na_fill=default_depth_for_missing_dem,
+                            negate=True
+                        )
                 sl = opt_params.get("shoreline")
                 shoreline = None
                 if sl is not None:
@@ -200,12 +209,12 @@ def create_hgrid(s, inputs, logger):
                 logger.info("Start optimizing the mesh ('volume_tvd').")
                 _ = refine_volume_tvd(
                     s.mesh,
-                    dem_spec=dem_spec,
+                    dem_spec=dem_list,
                     out_dir=inputs["prepro_output_dir"],
                     shoreline=shoreline,
                     floor=floor,
                     tvd=tvd,
-                    cache_dir=os.path.join(inputs["prepro_output_dir"], "dem_cache"),
+                    cache_dir=os.path.join(inputs["prepro_output_dir"], ".dem_cache"),
                     logger=logger
                 )
             else:
@@ -535,13 +544,7 @@ def process_output_dir(inputs):
         outdir = inputs["prepro_output_dir"]
         force = True
     else:
-        warnings.warn(
-            "No output_dir specification. This will not be allowed in the future. \n"
-            + "Using '.' but specification of a separate directory recommended. ",
-            FutureWarning,
-        )
-        outdir = "."
-        inputs["prepro_output_dir"] = outdir
+        raise ValueError("Inplace preprocessing not allowed. prepro_output_dir must be specified in launch yaml file. \nConvention is 'prepro_out'")
     if os.path.exists(outdir):
         created = False
     else:
