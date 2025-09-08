@@ -1898,7 +1898,7 @@ def refine_volume_tvd(
     shoreline: Optional[ShorelineOptions] = None,
     floor: Optional[FloorOptions] = None,
     tvd: Optional[TVDOptions] = None,
-    cache_dir: str = "./dem_cache",
+    cache_dir: str = "./.dem_cache",
     profiles: Optional[Sequence[int]] = None,
     profiles_dir: Optional[str] = None,
     logger: Optional[Any] = None
@@ -2103,7 +2103,7 @@ def _cli():
     ap.add_argument("--mesh", required=True, help="Input mesh file (hgrid.gr3)")
     ap.add_argument("--dem", required=True, help="DEM YAML (file or object in YAML)")
     ap.add_argument("--out", required=True, help="Output mesh file")
-    ap.add_argument("--cache", default="./dem_cache", help="Disk cache directory")
+    ap.add_argument("--cache", default="./.dem_cache", help="Disk cache directory")
     ap.add_argument("--log_level", default="INFO", choices=["DEBUG","INFO","WARNING","ERROR"])
 
     # TVD controls
