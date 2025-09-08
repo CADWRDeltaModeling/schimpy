@@ -37,13 +37,16 @@ def open_demlist(demlist):
     if not os.path.isfile(demlist):
         raise ValueError("demlist file %s not found" % demlist)
     try:
-        inputs, out_dir, logger = process_prepare_yaml(demlist, use_logging=False)
+        inputs, out_dir, logger = process_prepare_yaml(
+            demlist, use_logging=False, write_echo=False
+        )
         if "mesh" in inputs:
             filelist = inputs["mesh"]["dem_list"]
         else:
             filelist = inputs.get("dem_list")
 
     except:
+        print(f"Unable to open {demlist} as schimpy yaml")
         with open(demlist, "r") as f:
             filelist = f.readlines()
         filelist = [
