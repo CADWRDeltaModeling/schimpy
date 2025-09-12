@@ -125,7 +125,6 @@ convert_linestrings = "schimpy.convert_linestrings:convert_linestrings_cli"
 convert_points = "schimpy.convert_points:convert_points_cli"
 combine_consume = "schimpy.combine_consume:combine_consume_cli"
 model_time = "schimpy.model_time:model_time_cli"
-gen_elev2d = "schimpy.gen_elev2d:gen_elev2d_cli"
 
 prepare_schism = "schimpy.prepare_schism:main"
 hotstart_inventory = "schimpy.hotstart_inventory:main"
