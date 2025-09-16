@@ -8,7 +8,6 @@ from schimpy.convert_linestrings import convert_linestrings_cli
 from schimpy.convert_points import convert_points_cli
 from schimpy.combine_consume import combine_consume_cli
 from schimpy.model_time import model_time_cli
-from schimpy.gen_elev2d import gen_elev2d_cli
 
 # from schimpy.prepare_schism import prepare_schism
 # from schimpy.hotstart_inventory import hotstart_inventory
@@ -41,7 +40,6 @@ cli.add_command(convert_linestrings_cli, "convert_linestrings")
 cli.add_command(convert_points_cli, "convert_points")
 cli.add_command(combine_consume_cli, "combine_consume")
 cli.add_command(model_time_cli, "model_time")
-cli.add_command(gen_elev2d_cli, "gen_elev2d")
 # cli.add_command(prepare_schism, "prepare_schism")
 # cli.add_command(hotstart_inventory, "hotstart_inventory")
 # cli.add_command(create_vgrid_lsc2, "create_vgrid_lsc2")
