@@ -51,7 +51,7 @@ def safe_window(ts, window):
     unit = ts.unit
 
     if ts.last_valid_index() is None or ts.first_valid_index() is None:
-        print("      Valid index None")
+        print("      No valid time indexes found")
         return None
     if window[0] > window[1]:
         raise ValueError("The left value of the window is larger than the right.")
@@ -299,13 +299,11 @@ def gen_metrics_grid():
 
 def plot_tss(ax, tss, labels, window=None, cell_method="inst"):
     """Simply plot lines from a list of time series"""
-    print(f"Checking time window validity for {cell_method} plot")
     if window is not None:
         tss_plot = []
         if len(tss) > 0:
             for it in range(len(tss)):
                 ts = tss[it]
-                print(f"   {labels[it]}...")
                 tss_plot.append(safe_window(ts, window))
     else:
         tss_plot = tss

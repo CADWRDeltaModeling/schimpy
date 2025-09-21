@@ -400,8 +400,8 @@ class BatchMetrics(object):
         if isinstance(outputs_dir, str):
             outputs_dir = outputs_dir.split()
         if isinstance(params["time_basis"], list):
-            assert len(outputs_dir) == len(params["time_basis"])
-
+            if len(outputs_dir) > len(params["time_basis"]):
+                raise ValueError("time basis provided as list but doesn't have as many entries as output_dir")
             time_basis = [
                 process_time_str(date_str) for date_str in params["time_basis"]
             ]
@@ -463,28 +463,39 @@ class BatchMetrics(object):
             "station, RMSE, lag, bias, NSE, Willmott_skill, Correlation\n"
         )
 
-        if selected_stations is not None:
-            idx = pd.IndexSlice
-            sim_outputs[0] = sim_outputs[0].loc[:, idx[selected_stations, :]]
-            self.logger.info("==================================================")
-            self.logger.info(
-                "'selected_stations' enabled. Only following will be processed."
-            )
-            for station_id in selected_stations:
-                self.logger.info(" {}".format(station_id))
+        if selected_stations:
+            # Subset quietly to stations actually present for this variable.
+            # Preserve the user’s order where possible.
+            order = [s for s in selected_stations if isinstance(s, str)]
+            cols = sim_outputs[0].columns
+            if isinstance(cols, pd.MultiIndex):
+                level0 = cols.get_level_values(0)
+                keep_mask = level0.isin(order)
+                df = sim_outputs[0].loc[:, keep_mask]
+                # Reorder blocks by the user-provided order (within each station keep native order)
+                if not df.empty:
+                    new_cols = []
+                    for s in order:
+                        block = [c for c in df.columns if c[0] == s]
+                        if block:
+                            new_cols.extend(block)
+                    if new_cols:
+                        df = df.loc[:, new_cols]
+                sim_outputs[0] = df
+            else:
+                present = [s for s in order if s in cols]
+                # If none of the requested stations are present, return an empty selection
+                sim_outputs[0] = sim_outputs[0].loc[:, present] if present else sim_outputs[0].iloc[:, 0:0]
 
-        if excluded_stations is not None:
-            sim_outputs[0] = sim_outputs[0].loc[
-                :,
-                idx[
-                    ~sim_outputs[0].columns.get_level_values(0).isin(excluded_stations),
-                    :,
-                ],
-            ]
-            self.logger.info("==================================================")
-            self.logger.info("'excluded_stations' enabled. Following will be skipped.")
-            for station_id in excluded_stations:
-                self.logger.info(" {}".format(station_id))
+ 
+        if excluded_stations:
+            cols = sim_outputs[0].columns
+            if isinstance(cols, pd.MultiIndex):
+                mask = ~cols.get_level_values(0).isin(excluded_stations)
+                sim_outputs[0] = sim_outputs[0].loc[:, mask]
+            else:
+                mask = ~cols.isin(excluded_stations)
+                sim_outputs[0] = sim_outputs[0].loc[:, mask]
 
         # Iterate through the stations in the first simulation outputs
         for stn in sim_outputs[0].columns:
