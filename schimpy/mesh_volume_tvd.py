@@ -627,41 +627,30 @@ def _write_perimeter_shapefile(
     edge_mean_d = _edge_mean_depth(mesh, node_depth)
     if not path.lower().endswith(".shp"):
         path += ".shp"
-    schema = {
-        "geometry": "LineString",
-        "properties": {
-            "edge_id": "int",
-            "n1": "int",
-            "n2": "int",
-            "label": "str",
-            "depth_mean": "float",
-        },
-    }
-    if epsg is not None:
-        try:
-            from pyproj import CRS
 
-            wkt = CRS.from_epsg(int(epsg)).to_wkt()
-        except Exception:
-            wkt = ""
-    with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema, crs=wkt) as shp:
-        for eidx, lab in labels.items():
-            n1, n2 = int(mesh.edges[eidx, 0]), int(mesh.edges[eidx, 1])
-            geom = LineString(
-                [[(float(xs[n1]), float(ys[n1])), (float(xs[n2]), float(ys[n2]))]]
-            )
-            shp.write(
-                {
-                    "geometry": mapping(geom),
-                    "properties": {
-                        "edge_id": int(eidx),
-                        "n1": n1,
-                        "n2": n2,
-                        "label": str(lab),
-                        "depth_mean": float(edge_mean_d[eidx]),
-                    },
-                }
-            )
+    polylines = []
+    for eidx, lab in labels.items():
+        n1, n2 = int(mesh.edges[eidx, 0]), int(mesh.edges[eidx, 1])
+        geom = LineString(
+            [[(float(xs[n1]), float(ys[n1])), (float(xs[n2]), float(ys[n2]))]]
+        )
+        polylines.append(
+            {
+                "edge_id": int(eidx),
+                "n1": n1,
+                "n2": n2,
+                "label": str(label),
+                "geometry": geom,
+                "depth_mean": float(edge_mean_d[eidx]),
+            }
+        )
+
+    gdf = gpd.GeoDataFrame(polylines)
+
+    if epsg is not None:
+        gdf.set_crs(epsg=epsg, inplace=True)
+
+    gdf.to_file(path, driver="ESRI Shapefile")
 
 
 # ------------------------ Merging + Visualization -----------------------------
@@ -779,40 +768,32 @@ def _merged_polylines_and_node_rows(mesh, labels_all: Dict[int, str]):
 
 
 def _write_merged_shapefile(polylines, path: str, epsg: int = None):
+    """
+    Write 2D polyline Shapefile (.shp + .shx + .dbf, and .prj if EPSG given) for perimeter edges.
+    Uses geopandas + shapely only.
+    """
+
     if not path.lower().endswith(".shp"):
         path += ".shp"
 
-    schema = {
-        "geometry": "LineString",
-        "properties": {
-            "edge_id": "int",
-            "n1": "int",
-            "n2": "int",
-            "label": "str",
-            "depth_mean": "float",
-        },
-    }
-    if epsg is not None:
-        try:
-            from pyproj import CRS
+    # Build a GeoDataFrame from your polylines
+    gdf = gpd.GeoDataFrame(
+        [
+            {
+                "poly_id": int(p["poly_id"]),
+                "label": str(p["label"]),
+                "geometry": LineString(p["coords"]),
+            }
+            for p in polylines
+        ]
+    )
 
-            wkt = CRS.from_epsg(int(epsg)).to_wkt()
-        except Exception:
-            wkt = ""
-    with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema, crs=wkt) as shp:
-        w.field("poly_id", "N", 10, 0)
-        w.field("label", "C", 16)
-        for p in polylines:
-            geom = LineString([[(float(x), float(y)) for (x, y) in p["coords"]]])
-            shp.write(
-                {
-                    "geometry": mapping(geom),
-                    "properties": {
-                        "poly_id": int(p["poly_id"]),
-                        "label": str(p["label"]),
-                    },
-                }
-            )
+    # Set CRS if provided
+    if epsg is not None:
+        gdf.set_crs(epsg=epsg, inplace=True)
+
+    # Write to shapefile
+    gdf.to_file(path, driver="ESRI Shapefile")
 
 
 def _write_nodes_csv(node_rows, path: str, epsg: int = None):
