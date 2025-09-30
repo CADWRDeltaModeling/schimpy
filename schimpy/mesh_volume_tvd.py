@@ -33,7 +33,18 @@ Notes
 
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union, Callable
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    Callable,
+)
 
 import os
 import numpy as np
@@ -54,9 +65,12 @@ import matplotlib.pyplot as plt
 
 
 try:
-    from shapely.geometry import Point
+    from shapely.geometry import Point, LineString, mapping
+    import fiona
 except Exception:
-    raise SystemExit("This script requires shapely (pip install shapely).")
+    raise SystemExit(
+        "This script requires shapely and fiona (pip install shapely, pip install fiona)."
+    )
 
 EdgeLabel = str  # 'deep' | 'shore'
 
@@ -896,6 +910,7 @@ def _plot_profiles(
         fig.savefig(out_png, dpi=140)
         plt.close(fig)
 
+
 # ------------------- Variational/TVD refinement -------------------
 
 from dataclasses import dataclass
@@ -910,6 +925,7 @@ from schimpy.stacked_dem_fill import create_dem_sampler
 from schimpy.schism_mesh import *
 
 # ---- Lightweight geometry/quadrature and TV machinery (adapted & trimmed) ----
+
 
 class AdaptiveElementQuadrature:
     """Adaptive quadrature for tri/quad elements.
@@ -1449,7 +1465,7 @@ def run_tvd_variational(
     floor_mask: np.ndarray = None,
     reg_weight: float = 0.0,
     enforce_floor: bool = False,
-    logger: logging.Logger = None
+    logger: logging.Logger = None,
 ) -> Dict[str, np.ndarray]:
     """TV-prox + variational L2 descent with backtracking.
 
@@ -1545,7 +1561,7 @@ def run_tvd_variational(
             if has_floor:
                 act = (floor_mask) & (z < z_floor)
                 g_reg = np.zeros_like(z)
-                g_reg[act] = (z[act] - z_floor[act])
+                g_reg[act] = z[act] - z_floor[act]
             else:
                 g_reg = 0.0
             dz_l2 = -dt_try * (w_l2 * g_vol + w_reg * g_reg) / a_node
@@ -1554,7 +1570,9 @@ def run_tvd_variational(
             # --- TV prox step ---
             z_trial, info = tvd.step(z_lin, mu=float(options.mu), dt=dt_try)
             if enforce_floor and has_floor:
-                z_trial[floor_mask] = np.maximum(z_trial[floor_mask], z_floor[floor_mask])
+                z_trial[floor_mask] = np.maximum(
+                    z_trial[floor_mask], z_floor[floor_mask]
+                )
             cfl_scale = float(info.get("scale", 1.0))
             max_rate = float(info.get("max_rate", 0.0))
             logger.debug(
@@ -1585,7 +1603,7 @@ def run_tvd_variational(
             Jvol = J_trial
             if has_floor:
                 act_t = (floor_mask) & (z_trial < z_floor)
-                R = 0.5 * float(np.sum((z_floor[act_t] - z_trial[act_t])**2))
+                R = 0.5 * float(np.sum((z_floor[act_t] - z_trial[act_t]) ** 2))
             else:
                 R = 0.0
             obj = w_tv * tv + w_l2 * Jvol + w_reg * R
@@ -1626,7 +1644,9 @@ def run_tvd_variational(
                 )
                 continue
             else:
-                logger.info(f"[iter {k:03d}] STOP: no improvement after {bt} backtrack(s)")
+                logger.info(
+                    f"[iter {k:03d}] STOP: no improvement after {bt} backtrack(s)"
+                )
                 break
 
         history.append(z.copy())
@@ -1636,16 +1656,12 @@ def run_tvd_variational(
     return {"z": z, "history": np.stack(history, axis=0)}
 
 
-
-
-
-
 # ------------------------------ Floor utilities ------------------------------
 def build_shore_floor_from_df(
     df: pd.DataFrame,
     n_nodes: int,
     *,
-    filter_kind: str = "max",   # or "median"
+    filter_kind: str = "max",  # or "median"
     window: int = 5,
     trim_endpoints: bool = True,
 ):
@@ -1673,8 +1689,9 @@ def build_shore_floor_from_df(
         Floor elevation per node (length = ``n_nodes``), ``-inf`` where unset.
     mask : numpy.ndarray of bool
         True where a floor value is defined.
-    """    
+    """
     import numpy as np
+
     df = df.copy()
     df["node0"] = df["node"].astype(int) - 1
     deep_nodes = set(df.loc[df["label"] == "deep", "node0"].tolist())
@@ -1711,6 +1728,7 @@ def build_shore_floor_from_df(
 
 # -------------------------- Shoreline detection API --------------------------
 
+
 @dataclass
 class ShorelineOptions:
     # href can be a float or a path to a gr3 with elevations in nodes[:,2]
@@ -1731,7 +1749,6 @@ class ShorelineOptions:
     shore_shp: Optional[str] = None
 
 
-
 def _load_href_to_nodes(mesh: "SCHISM_mesh", href_opt: Union[float, str]) -> np.ndarray:
     """Load href (float or gr3 path) into a nodewise array."""
     try:
@@ -1743,6 +1760,8 @@ def _load_href_to_nodes(mesh: "SCHISM_mesh", href_opt: Union[float, str]) -> np.
         if h.shape[0] != mesh.n_nodes():
             raise ValueError("Href mesh node count != target mesh node count")
         return h
+
+
 @dataclass
 class ShorelineData:
     """
@@ -1761,10 +1780,12 @@ class ShorelineData:
     wet_mask : numpy.ndarray (bool)
         Mask of elements in the final always-wet region after stage 2/3.
     """
+
     polylines: List[dict]
     df: pd.DataFrame
     labels_perimeter: Dict[int, str]
     wet_mask: np.ndarray
+
 
 def detect_shorelines(
     mesh,
@@ -1828,12 +1849,16 @@ def detect_shorelines(
     # Seeds
     if (seeds is None) and (not use_default_seeds):
         raise ValueError("No seed coordinates and use_default_seeds is False.")
-    seeds_xy = list(seeds) if (seeds is not None) else [
-        (548110.0, 4186370.0),
-        (606258.0, 4213690.0),
-        (626358.0, 4213690.0),
-        (634475.0, 4186958.0),
-    ]
+    seeds_xy = (
+        list(seeds)
+        if (seeds is not None)
+        else [
+            (548110.0, 4186370.0),
+            (606258.0, 4213690.0),
+            (626358.0, 4213690.0),
+            (634475.0, 4186958.0),
+        ]
+    )
 
     # Stage 1-2 flood
     res = floodfill_always_wet(
@@ -1867,7 +1892,11 @@ def detect_shorelines(
 
     polylines, node_rows = _merged_polylines_and_node_rows(mesh, labels_all)
     if shore_csv:
-        rows_for_csv = node_rows if not filter_deep else [r for r in node_rows if str(r.get("label")) != "deep"]
+        rows_for_csv = (
+            node_rows
+            if not filter_deep
+            else [r for r in node_rows if str(r.get("label")) != "deep"]
+        )
         _write_nodes_csv(rows_for_csv, shore_csv, epsg=epsg)
 
     if shore_csv:
@@ -1886,12 +1915,13 @@ def detect_shorelines(
 
 # ----------------------------- Main driver (API) -----------------------------
 
+
 @dataclass
 class FloorOptions:
-    filter: str = "max"           # "max" or "median"
-    window: int = 5               # odd integer
-    enforce_floor: bool = False   # project after TV prox
-    reg_weight: float = 0.0       # hinge weight; 0 disables
+    filter: str = "max"  # "max" or "median"
+    window: int = 5  # odd integer
+    enforce_floor: bool = False  # project after TV prox
+    reg_weight: float = 0.0  # hinge weight; 0 disables
 
 
 @dataclass
@@ -1919,7 +1949,7 @@ def refine_volume_tvd(
     cache_dir: str = "./.dem_cache",
     profiles: Optional[Sequence[int]] = None,
     profiles_dir: Optional[str] = None,
-    logger: Optional[Any] = None
+    logger: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
     Execute the end-to-end shoreline+TVD workflow on an already loaded mesh.
@@ -1992,32 +2022,39 @@ def refine_volume_tvd(
             filter_deep=bool(shoreline.filter_deep),
             epsg=int(shoreline.epsg),
             # Only if you want diagnostics written by the shoreline stage:
-            shore_csv=shoreline.shore_csv,          # may be None
-            shore_shp=shoreline.shore_shp,          # may be None
+            shore_csv=shoreline.shore_csv,  # may be None
+            shore_shp=shoreline.shore_shp,  # may be None
             logger=logger,
         )
 
         # Floor straight from memory (df), no CSV round-trip
         fopts = floor or FloorOptions()
         z_floor, floor_mask = build_shore_floor_from_df(
-            shore.df, mesh.n_nodes(),
-            filter_kind=fopts.filter, window=int(fopts.window), trim_endpoints=True
+            shore.df,
+            mesh.n_nodes(),
+            filter_kind=fopts.filter,
+            window=int(fopts.window),
+            trim_endpoints=True,
         )
 
     # Optional profiles: plot from in-memory data (no CSV read)
     if (shore is not None) and profiles:
         out_dir_profiles = profiles_dir or out_dir
         os.makedirs(out_dir_profiles, exist_ok=True)
-        _plot_profiles(shore.polylines, shore.df.to_dict("records"),
-                    set(int(p) for p in profiles), out_dir_profiles,
-                    filt=(floor.filter if floor else "none"),
-                    window=(floor.window if floor else 5))
-
+        _plot_profiles(
+            shore.polylines,
+            shore.df.to_dict("records"),
+            set(int(p) for p in profiles),
+            out_dir_profiles,
+            filt=(floor.filter if floor else "none"),
+            window=(floor.window if floor else 5),
+        )
 
     # Build shoreline “floor” directly from in-memory data
     if shore is not None and floor is not None:
         z_floor, floor_mask = build_shore_floor_from_df(
-            shore.df, mesh.n_nodes(),
+            shore.df,
+            mesh.n_nodes(),
             filter_kind=fopts.filter,
             window=int(fopts.window),
             trim_endpoints=True,
@@ -2044,7 +2081,9 @@ def refine_volume_tvd(
         reg_weight = float(floor.reg_weight)
         enforce_floor = bool(floor.enforce_floor)
 
-    logger.info("Running Volume-TVD variational problem to improve volume fidelity, reduce noise and enforce shoreline constraints")
+    logger.info(
+        "Running Volume-TVD variational problem to improve volume fidelity, reduce noise and enforce shoreline constraints"
+    )
     res = run_tvd_variational(
         mesh,
         z0=mesh.nodes[:, 2],
@@ -2054,7 +2093,7 @@ def refine_volume_tvd(
         floor_mask=floor_mask,
         reg_weight=float(reg_weight),
         enforce_floor=bool(enforce_floor),
-        logger=logger
+        logger=logger,
     )
 
     z = np.asarray(res["z"], dtype=float)
@@ -2065,6 +2104,7 @@ def refine_volume_tvd(
         try:
             import pandas as pd
             import matplotlib.pyplot as plt
+
             # Reuse the function from the example without importing to avoid circularity
             # Compute distances and dump a quick triple for selected ids
             df = pd.read_csv(shore_csv, comment="#")
@@ -2089,12 +2129,19 @@ def refine_volume_tvd(
                 z_orig = z0[nodes]
                 z_fin = z[nodes]
                 # Try to plot a filtered floor if available
-                z_flt = (z_floor[nodes] if (z_floor is not None) else None)
+                z_flt = z_floor[nodes] if (z_floor is not None) else None
                 import matplotlib.pyplot as plt
+
                 fig, ax = plt.subplots(figsize=(8, 3.0))
                 (base_line,) = ax.plot(s, z_orig, label=f"original")
                 if z_flt is not None:
-                    ax.plot(s, z_flt, linestyle="--", label="filtered", color=base_line.get_color())
+                    ax.plot(
+                        s,
+                        z_flt,
+                        linestyle="--",
+                        label="filtered",
+                        color=base_line.get_color(),
+                    )
                 ax.plot(s, z_fin, label="final")
                 ax.set_xlabel("distance (m)")
                 ax.set_ylabel("depth (m, +down)")
@@ -2111,18 +2158,23 @@ def refine_volume_tvd(
     return res
 
 
-
 # ------------------------------------ CLI ------------------------------------
+
 
 def _cli():
     import argparse
     import logging
-    ap = argparse.ArgumentParser(description="TVD-regularized volume tuning (shoreline + floor + TVD).")
+
+    ap = argparse.ArgumentParser(
+        description="TVD-regularized volume tuning (shoreline + floor + TVD)."
+    )
     ap.add_argument("--mesh", required=True, help="Input mesh file (hgrid.gr3)")
     ap.add_argument("--dem", required=True, help="DEM YAML (file or object in YAML)")
     ap.add_argument("--out", required=True, help="Output mesh file")
     ap.add_argument("--cache", default="./.dem_cache", help="Disk cache directory")
-    ap.add_argument("--log_level", default="INFO", choices=["DEBUG","INFO","WARNING","ERROR"])
+    ap.add_argument(
+        "--log_level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"]
+    )
 
     # TVD controls
     ap.add_argument("--steps", type=int, default=16)
@@ -2135,27 +2187,49 @@ def _cli():
     ap.add_argument("--clip_eps", type=float, default=None)
 
     # Shoreline detection
-    ap.add_argument("--href", default=-0.35, help="Reference *depth* (not elev) for determining the 'always wet' contour (float or gr3 path).")
-    ap.add_argument("--deep_delta", type=float, default=0.35, help="Additional depth from href for a shore to be classified 'deep' for purposes of regularization")
-    ap.add_argument("--shore_delta", type=float, default=0.35,help="Additional distance above href for a shore to still be classified 'shallow' for purposes of regularization")
+    ap.add_argument(
+        "--href",
+        default=-0.35,
+        help="Reference *depth* (not elev) for determining the 'always wet' contour (float or gr3 path).",
+    )
+    ap.add_argument(
+        "--deep_delta",
+        type=float,
+        default=0.35,
+        help="Additional depth from href for a shore to be classified 'deep' for purposes of regularization",
+    )
+    ap.add_argument(
+        "--shore_delta",
+        type=float,
+        default=0.35,
+        help="Additional distance above href for a shore to still be classified 'shallow' for purposes of regularization",
+    )
     ap.add_argument("--use_default_seeds", action="store_true")
     ap.add_argument("--seed", nargs=2, type=float, action="append", default=None)
     ap.add_argument("--smooth_relax_factor", type=float, default=1.2)
     ap.add_argument("--smooth_strip_max", type=int, default=24)
     ap.add_argument("--smooth_eps_deg", type=float, default=55.0)
-    ap.add_argument("--filter_deep", action="store_true")   # todo: necessary?
-    ap.add_argument("--epsg", type=int, default=26910)      # todo: shouldn't be unique to this process
-    ap.add_argument("--shore_csv", default=None, help="Output CSV file for node diagnostics")
-    ap.add_argument("--shore_shp", default=None, help="Output Shapefile for shoreline diagnostics")
+    ap.add_argument("--filter_deep", action="store_true")  # todo: necessary?
+    ap.add_argument(
+        "--epsg", type=int, default=26910
+    )  # todo: shouldn't be unique to this process
+    ap.add_argument(
+        "--shore_csv", default=None, help="Output CSV file for node diagnostics"
+    )
+    ap.add_argument(
+        "--shore_shp", default=None, help="Output Shapefile for shoreline diagnostics"
+    )
 
     # Floor regularization
-    ap.add_argument("--shore_floor_filter", choices=["max","median"], default="median")
+    ap.add_argument("--shore_floor_filter", choices=["max", "median"], default="median")
     ap.add_argument("--shore_floor_window", type=int, default=5)
-    ap.add_argument("--reg_weight", type=float, default=8.e-2)
+    ap.add_argument("--reg_weight", type=float, default=8.0e-2)
     ap.add_argument("--enforce_floor", action="store_true")
 
     # Profiles (optional)
-    ap.add_argument("--profiles", nargs="*", type=int, default=None, help="poly_id(s) to plot")
+    ap.add_argument(
+        "--profiles", nargs="*", type=int, default=None, help="poly_id(s) to plot"
+    )
     ap.add_argument("--profiles_dir", default=None, help="Directory for profile PNGs")
 
     args = ap.parse_args()
@@ -2167,7 +2241,7 @@ def _cli():
     h.setFormatter(logging.Formatter("%(message)s"))
     logger.addHandler(h)
 
-    logger.setLevel(getattr(logging, args.log_level.upper(), logging.INFO))    
+    logger.setLevel(getattr(logging, args.log_level.upper(), logging.INFO))
     mesh = read_mesh(args.mesh, nodestring_option="land")
 
     # Prepopulate the mesh based on point samples at nodes
@@ -2219,7 +2293,7 @@ def _cli():
     )
 
     mesh.nodes[:, 2] = res["z"]
-    
+
     write_mesh(mesh, args.out)
     logger.info(f"Wrote {args.out}")
 
