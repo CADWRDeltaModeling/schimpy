@@ -607,28 +607,22 @@ def _write_perimeter_shapefile(
     """
     Write 2D polyline Shapefile (.shp + .shx + .dbf, and .prj if EPSG given) for perimeter edges.
     """
-    try:
-        import shapefile  # pyshp
-    except Exception:
-        raise SystemExit(
-            "Writing shapefile requires pyshp. Install with: pip install pyshp"
-        )
+
     xs, ys = mesh.nodes[:, 0], mesh.nodes[:, 1]
     node_depth = mesh.nodes[:, 2].astype(float)
     edge_mean_d = _edge_mean_depth(mesh, node_depth)
     if not path.lower().endswith(".shp"):
         path += ".shp"
-    w = shapefile.Writer(path, shapeType=shapefile.POLYLINE)
-    w.field("edge_id", "N", 10, 0)
-    w.field("n1", "N", 10, 0)
-    w.field("n2", "N", 10, 0)
-    w.field("label", "C", 16)
-    w.field("depth_mean", "F", 18, 6)
-    for eidx, lab in labels.items():
-        n1, n2 = int(mesh.edges[eidx, 0]), int(mesh.edges[eidx, 1])
-        w.line([[(float(xs[n1]), float(ys[n1])), (float(xs[n2]), float(ys[n2]))]])
-        w.record(int(eidx), n1, n2, str(lab), float(edge_mean_d[eidx]))
-    w.close()
+    schema = {
+        "geometry": "LineString",
+        "properties": {
+            "edge_id": "int",
+            "n1": "int",
+            "n2": "int",
+            "label": "str",
+            "depth_mean": "float",
+        },
+    }
     if epsg is not None:
         try:
             from pyproj import CRS
@@ -636,8 +630,24 @@ def _write_perimeter_shapefile(
             wkt = CRS.from_epsg(int(epsg)).to_wkt()
         except Exception:
             wkt = ""
-        with open(path[:-4] + ".prj", "w") as prj:
-            prj.write(wkt)
+    with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema, crs=wkt) as shp:
+        for eidx, lab in labels.items():
+            n1, n2 = int(mesh.edges[eidx, 0]), int(mesh.edges[eidx, 1])
+            geom = LineString(
+                [[(float(xs[n1]), float(ys[n1])), (float(xs[n2]), float(ys[n2]))]]
+            )
+            shp.write(
+                {
+                    "geometry": mapping(geom),
+                    "properties": {
+                        "edge_id": int(eidx),
+                        "n1": n1,
+                        "n2": n2,
+                        "label": str(lab),
+                        "depth_mean": float(edge_mean_d[eidx]),
+                    },
+                }
+            )
 
 
 # ------------------------ Merging + Visualization -----------------------------
@@ -755,22 +765,19 @@ def _merged_polylines_and_node_rows(mesh, labels_all: Dict[int, str]):
 
 
 def _write_merged_shapefile(polylines, path: str, epsg: int = None):
-    try:
-        import shapefile  # pyshp
-    except Exception:
-        raise SystemExit(
-            "Writing shapefile requires pyshp. Install with: pip install pyshp"
-        )
     if not path.lower().endswith(".shp"):
         path += ".shp"
-    w = shapefile.Writer(path, shapeType=shapefile.POLYLINE)
-    w.field("poly_id", "N", 10, 0)
-    w.field("label", "C", 16)
-    for p in polylines:
-        w.line([[(float(x), float(y)) for (x, y) in p["coords"]]])
-        w.record(int(p["poly_id"]), str(p["label"]))
-    w.close()
-    # .prj
+
+    schema = {
+        "geometry": "LineString",
+        "properties": {
+            "edge_id": "int",
+            "n1": "int",
+            "n2": "int",
+            "label": "str",
+            "depth_mean": "float",
+        },
+    }
     if epsg is not None:
         try:
             from pyproj import CRS
@@ -778,8 +785,20 @@ def _write_merged_shapefile(polylines, path: str, epsg: int = None):
             wkt = CRS.from_epsg(int(epsg)).to_wkt()
         except Exception:
             wkt = ""
-        with open(path[:-4] + ".prj", "w") as prj:
-            prj.write(wkt)
+    with fiona.open(path, "w", driver="ESRI Shapefile", schema=schema, crs=wkt) as shp:
+        w.field("poly_id", "N", 10, 0)
+        w.field("label", "C", 16)
+        for p in polylines:
+            geom = LineString([[(float(x), float(y)) for (x, y) in p["coords"]]])
+            shp.write(
+                {
+                    "geometry": mapping(geom),
+                    "properties": {
+                        "poly_id": int(p["poly_id"]),
+                        "label": str(p["label"]),
+                    },
+                }
+            )
 
 
 def _write_nodes_csv(node_rows, path: str, epsg: int = None):
@@ -815,7 +834,6 @@ def _plot_profiles(
     filt: str = "none",
     window: int = 5,
 ):
-
 
     rows_by_node = {int(r["node"]): r for r in node_rows}
     for p in polylines:
