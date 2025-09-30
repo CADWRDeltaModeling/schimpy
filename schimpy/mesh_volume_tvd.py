@@ -44,25 +44,20 @@ from typing import (
     Tuple,
     Union,
     Callable,
+    Set,
 )
 
 import os
 import numpy as np
 import pandas as pd
+from numpy.polynomial.legendre import leggauss
 from schimpy.stacked_dem_fill import create_dem_sampler
-from schimpy.schism_mesh import read_mesh, write_mesh
-
-# Shoreline helper functions
-
-from dataclasses import dataclass
-from typing import Iterable, Tuple, Dict, Set, List, Optional
-import numpy as np
-import os
-
-# requested import
-from schimpy.schism_mesh import read_mesh
+from schimpy.schism_mesh import *
 import matplotlib.pyplot as plt
-
+from collections import defaultdict, deque
+import csv
+import argparse
+import logging
 
 try:
     from shapely.geometry import Point, LineString, mapping
@@ -152,7 +147,6 @@ def _perimeter_edges_of_region(mesh, in_region: np.ndarray) -> Set[int]:
 
 def _build_perimeter_loops(mesh, perim_edges: Set[int]) -> List[Dict]:
     """Deterministic ordering of loops and edges."""
-    from collections import defaultdict
 
     edges = mesh.edges
     adj = defaultdict(list)
@@ -282,7 +276,6 @@ def floodfill_always_wet(
 
     # Stage 1 BFS
     in1 = np.zeros(nE, dtype=bool)
-    from collections import deque
 
     q = deque()
     for ei in seeds:
@@ -594,7 +587,6 @@ def stage3_single_pass_entry_exit(
 
 
 def _write_perimeter_csv(mesh, labels: Dict[int, str], path: str) -> None:
-    import csv
 
     with open(path, "w", newline="") as f:
         w = csv.writer(f)
@@ -605,7 +597,6 @@ def _write_perimeter_csv(mesh, labels: Dict[int, str], path: str) -> None:
 
 
 def _write_wet_elems_csv(mask: np.ndarray, path: str) -> None:
-    import csv
 
     idxs = np.flatnonzero(mask.astype(bool))
     with open(path, "w", newline="") as f:
@@ -620,6 +611,7 @@ def _write_perimeter_shapefile(
 ) -> None:
     """
     Write 2D polyline Shapefile (.shp + .shx + .dbf, and .prj if EPSG given) for perimeter edges.
+    Uses geopandas + shapely only.
     """
 
     xs, ys = mesh.nodes[:, 0], mesh.nodes[:, 1]
@@ -654,8 +646,6 @@ def _write_perimeter_shapefile(
 
 
 # ------------------------ Merging + Visualization -----------------------------
-from typing import Dict, List, Tuple, Iterable, Optional, Set
-import numpy as np
 
 
 def _edge_pairs(mesh, edge_ids: Iterable[int]) -> List[Tuple[int, int]]:
@@ -671,7 +661,6 @@ def _build_chains_from_edges(pairs: List[Tuple[int, int]]) -> List[List[int]]:
     Given undirected edge (n1,n2) pairs, split into maximal paths or cycles and
     return ordered node lists (one per chain).
     """
-    from collections import defaultdict
 
     adj = defaultdict(list)
     edge_set = set()
@@ -797,7 +786,6 @@ def _write_merged_shapefile(polylines, path: str, epsg: int = None):
 
 
 def _write_nodes_csv(node_rows, path: str, epsg: int = None):
-    import csv
 
     with open(path, "w", newline="") as f:
         if epsg:
@@ -894,17 +882,6 @@ def _plot_profiles(
 
 # ------------------- Variational/TVD refinement -------------------
 
-from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Tuple, Union
-import os
-
-
-import numpy as np
-
-
-from schimpy.stacked_dem_fill import create_dem_sampler
-from schimpy.schism_mesh import *
-
 # ---- Lightweight geometry/quadrature and TV machinery (adapted & trimmed) ----
 
 
@@ -961,7 +938,6 @@ class AdaptiveElementQuadrature:
 
     @staticmethod
     def _gauss_legendre_1d(n: int) -> Tuple[np.ndarray, np.ndarray]:
-        from numpy.polynomial.legendre import leggauss
 
         return leggauss(n)
 
@@ -1231,7 +1207,6 @@ class TVL2VolumeEvaluator:
 
     @staticmethod
     def _build_S_quad(n: int) -> np.ndarray:
-        from numpy.polynomial.legendre import leggauss
 
         xi1d, _ = leggauss(n)
         XI, ETA = np.meshgrid(xi1d, xi1d)
@@ -1671,7 +1646,6 @@ def build_shore_floor_from_df(
     mask : numpy.ndarray of bool
         True where a floor value is defined.
     """
-    import numpy as np
 
     df = df.copy()
     df["node0"] = df["node"].astype(int) - 1
@@ -2083,8 +2057,6 @@ def refine_volume_tvd(
     # Optional triple profiles
     if (shoreline is not None) and (profiles is not None and len(profiles) > 0):
         try:
-            import pandas as pd
-            import matplotlib.pyplot as plt
 
             # Reuse the function from the example without importing to avoid circularity
             # Compute distances and dump a quick triple for selected ids
@@ -2111,7 +2083,6 @@ def refine_volume_tvd(
                 z_fin = z[nodes]
                 # Try to plot a filtered floor if available
                 z_flt = z_floor[nodes] if (z_floor is not None) else None
-                import matplotlib.pyplot as plt
 
                 fig, ax = plt.subplots(figsize=(8, 3.0))
                 (base_line,) = ax.plot(s, z_orig, label=f"original")
@@ -2143,8 +2114,6 @@ def refine_volume_tvd(
 
 
 def _cli():
-    import argparse
-    import logging
 
     ap = argparse.ArgumentParser(
         description="TVD-regularized volume tuning (shoreline + floor + TVD)."
