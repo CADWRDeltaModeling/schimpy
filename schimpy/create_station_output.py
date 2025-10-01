@@ -4,6 +4,7 @@ import os
 import sys
 import pandas as pd
 import schimpy.station as station
+from schimpy.util.yaml_load import yaml_from_file
 import glob
 import numpy as np
 
@@ -98,16 +99,46 @@ def create_station_output(
     # fluxflag.prop
     elif input_type == "fluxflag":
 
-        # fluxflag_loc_old = station.station_names_from_file(old_input)
         fluxflag_loc_new = station.station_names_from_file(new_input)
-
         flux_out_old = station.read_flux_out(target, old_input, reftime=None)
-
-        # Make sure fluxflag_loc_old and flux_out_old have matching columns
         fluxflag_loc_new = [loc.lower() for loc in fluxflag_loc_new]
 
         # Identify missing columns and fill with NaN
         out_columns = fluxflag_loc_new
+        missing_cols = [col for col in out_columns if col not in flux_out_old.columns]
+        for col in missing_cols:
+            flux_out_old[col] = np.nan
+
+        # Reorder to match column order
+        flux_out_new = flux_out_old[out_columns]
+
+        write_station_output(
+            flux_out_new,
+            os.path.join(out_dir, os.path.basename(file)),
+            index_map="{:0.6f}",
+            float_format="%.4e",
+            na_rep="-999",
+        )
+
+    # fluxflag.prop
+    elif input_type == "fluxline":
+
+        fluxline_old = yaml_from_file(old_input)
+        fluxline_new = yaml_from_file(new_input)
+
+        # extract station names
+        fluxline_loc_old = [item["station_id"] for item in fluxline_old["linestrings"]]
+        fluxline_loc_old = [loc.lower() for loc in fluxline_loc_old]
+        fluxline_loc_new = [item["station_id"] for item in fluxline_new["linestrings"]]
+        fluxline_loc_new = [loc.lower() for loc in fluxline_loc_new]
+
+        # Read flux.out
+        flux_out_old = station.read_flux_out(
+            "outputs_sdg/flux.out", fluxline_loc_old, reftime=None
+        )
+
+        # Identify missing columns and fill with NaN
+        out_columns = fluxline_loc_new
         missing_cols = [col for col in out_columns if col not in flux_out_old.columns]
         for col in missing_cols:
             flux_out_old[col] = np.nan
