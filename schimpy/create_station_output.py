@@ -35,14 +35,20 @@ def read_staout_lite(fname, station_infile):
     return staout
 
 
-def write_staout(staout: pd.DataFrame, out_path):
-    staout.index = staout.index.map("{:0.6E}".format)
+def write_station_output(
+    staout: pd.DataFrame,
+    out_path,
+    index_map,
+    float_format,
+    na_rep,
+):
+    staout.index = staout.index.map(index_map.format)
     staout.to_csv(
         out_path,
         sep="\t",
         header=None,
-        na_rep="-999",
-        float_format="%.6e",
+        na_rep=na_rep,
+        float_format=float_format,
     )
 
 
@@ -81,7 +87,41 @@ def create_station_output(
             # Reorder new staout to match the column order of B
             staout_new = staout_old[out_columns]
 
-            write_staout(staout_new, os.path.join(out_dir, os.path.basename(file)))
+            write_station_output(
+                staout_new,
+                os.path.join(out_dir, os.path.basename(file)),
+                index_map="{:0.6E}",
+                float_format="%.6e",
+                na_rep="-999",
+            )
+
+    # fluxflag.prop
+    elif input_type == "fluxflag":
+
+        # fluxflag_loc_old = station.station_names_from_file(old_input)
+        fluxflag_loc_new = station.station_names_from_file(new_input)
+
+        flux_out_old = station.read_flux_out(target, old_input, reftime=None)
+
+        # Make sure fluxflag_loc_old and flux_out_old have matching columns
+        fluxflag_loc_new = [loc.lower() for loc in fluxflag_loc_new]
+
+        # Identify missing columns and fill with NaN
+        out_columns = fluxflag_loc_new
+        missing_cols = [col for col in out_columns if col not in flux_out_old.columns]
+        for col in missing_cols:
+            flux_out_old[col] = np.nan
+
+        # Reorder to match column order
+        flux_out_new = flux_out_old[out_columns]
+
+        write_station_output(
+            flux_out_new,
+            os.path.join(out_dir, os.path.basename(file)),
+            index_map="{:0.6f}",
+            float_format="%.4e",
+            na_rep="-999",
+        )
 
 
 @click.command()
