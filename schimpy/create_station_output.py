@@ -134,7 +134,7 @@ def create_station_output(
 
         # Read flux.out
         flux_out_old = station.read_flux_out(
-            "outputs_sdg/flux.out", fluxline_loc_old, reftime=None
+            target, fluxline_loc_old, reftime=None
         )
 
         # Identify missing columns and fill with NaN
