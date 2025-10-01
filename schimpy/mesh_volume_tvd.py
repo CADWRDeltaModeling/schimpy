@@ -61,11 +61,8 @@ import logging
 
 try:
     from shapely.geometry import Point, LineString, mapping
-    import fiona
 except Exception:
-    raise SystemExit(
-        "This script requires shapely and fiona (pip install shapely, pip install fiona)."
-    )
+    raise SystemExit("This script requires shapely (pip install shapely).")
 
 EdgeLabel = str  # 'deep' | 'shore'
 

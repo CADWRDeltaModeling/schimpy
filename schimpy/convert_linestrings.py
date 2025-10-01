@@ -7,7 +7,6 @@ from schimpy.schism_linestring import read_linestrings, write_linestrings
 from schimpy.prepare_schism import get_structures_from_yaml
 from schimpy.schism_setup import check_and_suggest
 from schimpy.util.yaml_load import yaml_from_file
-import fiona
 from shapely.geometry import LineString, mapping
 import click
 
@@ -23,21 +22,20 @@ def convert_structures_main(input_yaml, output_fn):
         inputs = yaml_from_file(input_yaml)
         structures = inputs.get("structures")
         structures = get_structures_from_yaml(structures)
-        with fiona.open(
-            output_fn, "w", driver="ESRI Shapefile", schema=schema, crs="EPSG:26910"
-        ) as shp:
-            for struct in structures:
-                line = LineString(struct["end_points"])
-                shp.write(
-                    {
-                        "geometry": mapping(line),
-                        "properties": {
-                            "name": struct["name"],
-                            "type": struct["type"],
-                            "configuration": str(struct["configuration"]),
-                        },
-                    }
-                )
+        # Build GeoDataFrame
+        gdf = gpd.GeoDataFrame(
+            [
+                {
+                    "geometry": LineString(struct["end_points"]),
+                    "name": struct["name"],
+                    "type": struct["type"],
+                    "configuration": str(struct["configuration"]),
+                }
+                for struct in structures
+            ],
+            crs="EPSG:26910",
+        )
+        gdf.to_file(output_fn, driver="ESRI Shapefile")
     else:
         raise ValueError(
             "Unsupported input file type. Only YAML (.yaml) supported for structures."

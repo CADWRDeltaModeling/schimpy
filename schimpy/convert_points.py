@@ -2,28 +2,22 @@
 # -*- coding: utf-8 -*-
 """Command line tool to convert SCHISM points (source and sink) in YAML to Shapefile"""
 import click
-import fiona
+import geopandas as gpd
+import pandas as pd
+from shapely.geometry import Point
 
 
 def df_to_shp(fpath, df):
-    """Convert a DataFrame to a Shapefile."""
-    # Open a fiona object
-    pointShp = fiona.open(
-        fpath,
-        mode="w",
-        driver="ESRI Shapefile",
-        schema={"geometry": "Point", "properties": [("site", "str"), ("stype", "str")]},
+    """Convert a DataFrame to a Shapefile using geopandas."""
+    gdf = gpd.GeoDataFrame(
+        df,
+        geometry=[Point(row.x, row.y) for _, row in df.iterrows()],
         crs="EPSG:26910",
     )
-
-    for index, row in df.iterrows():
-        rowDict = {
-            "geometry": {"type": "Point", "coordinates": (row.x, row.y)},
-            "properties": {"site": row.sites, "stype": row.stype},
-        }
-        pointShp.write(rowDict)
-
-    pointShp.close()
+    # Only keep relevant columns
+    gdf = gdf[["geometry", "sites", "stype"]]
+    gdf = gdf.rename(columns={"sites": "site"})
+    gdf.to_file(fpath, driver="ESRI Shapefile")
 
 
 def read_points(fpath):
