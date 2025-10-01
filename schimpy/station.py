@@ -556,7 +556,7 @@ def read_flux_out(fpath, names, reftime):
         names=["time"] + names,
         dtype="d",
     )
-    print("ref",reftime)
+    #print("ref",reftime)
     if reftime is not None:
         dtsec = round((data.index[1] - data.index[0])*86400)
         freqstr = f"{dtsec}s"
