@@ -9,6 +9,7 @@ from schimpy.schism_setup import check_and_suggest
 from schimpy.util.yaml_load import yaml_from_file
 from shapely.geometry import LineString, mapping
 import click
+import geopandas as gpd
 
 schema = {
     "geometry": "LineString",
