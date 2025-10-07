@@ -5,6 +5,7 @@ import click
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import Point
+from schimpy.schism_sources_sinks import yaml2df
 
 
 def df_to_shp(fpath, df):
