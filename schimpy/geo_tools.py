@@ -157,7 +157,7 @@ def partition_check(
             )
     else:
         # otherwise the domain is contiguous.
-        logging.info("The domain divisino is contiguous!")
+        logging.info("The domain division is contiguous!")
     mapping = np.where(ID_df.values)[1] + 1  # change to one-based indices
     # this is only used when the number of orphaned cells exceed half of the original cells
     # regions = np.append(poly_gpd.region.values, 'other')
