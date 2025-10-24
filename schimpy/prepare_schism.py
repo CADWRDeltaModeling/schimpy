@@ -117,6 +117,8 @@ def create_hgrid(s, inputs, logger):
                     "The former is the traditional method which is now deprecated. "
                     "volume_tvd is the new method which requires different parameters which you can "
                     "find listed in a more current template"
+                    "For example, include the following line inside `depth_opt_params.yaml`:"
+                    "   method: volume_tvd"
                 )
 
             if method == "volume":
