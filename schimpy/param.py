@@ -3,14 +3,52 @@
 
 import schimpy.nml as nml
 import pandas as pd
-
+from pathlib import Path
+import os
 
 class Params(object):
 
     def __init__(self, fname, default=None):
-        self._namelist = nml.parse(fname)
-        self.cached_other = {}
+        # ...
+        # OLD (problem): self._namelist = nml.parse(fname)
+        # NEW (robust): read text if a path is given
+        from . import nml  # wherever your nml lives
+
+        # Accept either text or a path-like
+        if isinstance(fname, (str, os.PathLike, Path)):
+            p = Path(fname)
+            if p.exists():
+                text = p.read_text(encoding="utf-8")
+            else:
+                # If it's a path-like string that doesn't exist, treat as text
+                text = str(fname)
+        else:
+            text = fname  # already text
+
+        self._namelist = nml.parse(text)  # feed TEXT to the parser
+
+        if not isinstance(self._namelist, dict) or not self._namelist:
+            raise ValueError(
+                f"Parsed namelist is empty for input {fname!r}. "
+                "Ensure you passed file contents or a valid file path."
+            )
+
         self.default = self.process_default(default)
+
+    def _require_section_keys(self, section: str, keys: tuple[str, ...]) -> dict:
+        """
+        Ensure a named section exists and that all required keys are present.
+        Returns the section dict; raises KeyError with specifics otherwise.
+        """
+        sect = self._namelist.get(section)
+        if not isinstance(sect, dict):
+            raise KeyError(f"Section '{section}' not found in namelist.")
+        missing = [k for k in keys if k not in sect]
+        if missing:
+            raise KeyError(f"Missing required keys in section '{section}': {missing}")
+        return sect
+
+
 
     def process_default(self, default):
         """Process default parameters
@@ -35,12 +73,14 @@ class Params(object):
     # -----------------------------------------------------------------------------
 
     def get_run_start(self):
-        """Get start time as datetime"""
-        syear = self["start_year"]
-        smonth = self["start_month"]
-        sday = self["start_day"]
-        shour = self["start_hour"]
-        return pd.Timestamp(year=syear, month=smonth, day=sday, hour=shour)
+        import pandas as pd
+        opt = self._require_section_keys("OPT", ("start_year", "start_month", "start_day", "start_hour"))
+        y = int(opt["start_year"]["value"])
+        m = int(opt["start_month"]["value"])
+        d = int(opt["start_day"]["value"])
+        h = int(opt["start_hour"]["value"])
+        return pd.Timestamp(y, m, d, h)
+
 
     def get_interval(self, name):
         dt = self["dt"]
@@ -71,27 +111,13 @@ class Params(object):
     # -----------------------------------------------------------------------------
 
     def set_run_start(self, run_start):
-        """Set start time
-
-        Parameters
-        ----------
-            start : datetime
-        Coercible to datetime
-
-        """
-        stime = (
-            run_start if type(run_start) == pd.Timestamp else pd.to_datetime(run_start)
-        )
-        # parse them all before we start setting any
-        syear = stime.year
-        smonth = stime.month
-        sday = stime.day
-        shour = stime.hour
-
-        self["start_year"] = syear
-        self["start_month"] = smonth
-        self["start_day"] = sday
-        self["start_hour"] = shour
+        import pandas as pd
+        ts = pd.to_datetime(run_start)
+        opt = self._require_section_keys("OPT", ("start_year", "start_month", "start_day", "start_hour"))
+        opt["start_year"]["value"]  = int(ts.year)
+        opt["start_month"]["value"] = int(ts.month)
+        opt["start_day"]["value"]   = int(ts.day)
+        opt["start_hour"]["value"]  = int(ts.hour)
 
     run_start = property(get_run_start, set_run_start)
 
@@ -177,7 +203,6 @@ class Params(object):
 
     def to_dataframe(self, defaults=None):
         sections = self.sections(defaults)
-        print(sections)
         indices = []
         values = []
 
@@ -244,48 +269,66 @@ class Params(object):
         raise NotImplementedError("Not sure what is most useful yet")
 
     def searchfor(self, key, section=False):
-        """Search for key in all the sections
-
-        Parameters
-        ----------
-            key : str
-            Key to search for
-
-            section = bool
-            If boolean, returns a tuple of section, value
-
-            default = str
-            Name of default to use for backup
-
-        Returns
-            Value cached under key
-
-        Raises
-            IndexError if key not present
-
         """
-        for k in self._namelist.keys():
-            sect = self._namelist[k]
-            if key in sect.keys():
-                if section:
-                    return (k, sect[key])
-                else:
-                    return sect[key]
+        Search for key.
+        - section == False (default): scan all dict sections; return value
+        - section == True: scan all dict sections; return (section_name, value)
+        - section is a str (e.g., 'OPT'/'CORE'): only search that section;
+        return value when section == False, else (section_name, value)
+        Raises IndexError if not found.
+        """
+        # section-specific search (deterministic; no global scan)
+        if isinstance(section, str):
+            sect = self._namelist.get(section)
+            if isinstance(sect, dict) and key in sect:
+                return (section, sect[key]) if section not in (False, None) else sect[key]
+            raise IndexError(f"Key {key} not found in section '{section}'")
 
-        # if we got here, the Param is not in the current file
-        # search in (possibly cached) Params object named by default
+        # existing behavior: scan all sections
+        for sect_name, sect in self._namelist.items():
+            if isinstance(sect, dict) and key in sect:
+                return (sect_name, sect[key]) if section else sect[key]
+
         if self.default is not None:
             return self.default.searchfor(key, section=section)
 
-        # If we get here, the key is not present in either this ParamSet or default
         raise IndexError(f"Key {key} not found in namespace")
 
+    # 3) Hint map so __getitem__/__setitem__ don’t rely on global scans for known keys
+    _SECTION_HINTS = {
+        # OPT time quartet
+        "start_year": "OPT", "start_month": "OPT", "start_day": "OPT", "start_hour": "OPT",
+        # CORE writer validation fields
+        "nhot_write": "CORE", "ihfskip": "CORE",
+    }
+
+    def __getitem__(self, key):
+        sect_name = self._SECTION_HINTS.get(key)
+        if sect_name:
+            # deterministic, section-specific
+            item = self.searchfor(key, section=sect_name)
+            return item["value"]
+        # fallback (legacy)
+        item = self.searchfor(key)
+        return item["value"]
+
+    def __setitem__(self, key, val):
+        sect_name = self._SECTION_HINTS.get(key)
+        if sect_name:
+            sect_name, _ = self.searchfor(key, section=sect_name)  # raises if absent
+            self._namelist[sect_name][key]["value"] = val
+            return
+        sect_name, _ = self.searchfor(key, section=True)  # legacy path
+        self._namelist[sect_name][key]["value"] = val
+
+    # 5) Validate also reads from the known section (no global scan)
     def validate(self):
-        """Validation tests"""
-        nhotwrite = self["nhot_write"]
-        ihfskip = self["ihfskip"]
+        core = self._require_section_keys("CORE", ("ihfskip",))
+        schout = self._require_section_keys("SCHOUT", ("nhot_write",))
+        nhotwrite = schout["nhot_write"]["value"]
+        ihfskip   = core["ihfskip"]["value"]
         ratio = nhotwrite / ihfskip
-        if abs(ratio - round(ratio)) > 0.001:
+        if abs(ratio - round(ratio)) > 1e-3:
             raise ValueError("nhot_write not divisible by ihfskip")
 
     def __getitem__(self, key):
