@@ -467,8 +467,11 @@ def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s", head=No
     Automatically converts to timestamp if time_basis is supplied unless to_timestamp is False
     """
 
+
     # check if first line contains headers (and thus is elapsed)s
-    if is_elapsed(input):
+    file_is_elapsed = is_elapsed(input)
+
+    if file_is_elapsed:
         # read elapsed file
         if time_basis is None:
             raise ValueError(
@@ -495,13 +498,18 @@ def read_th(input, time_basis=None, to_timestamp=True, elapsed_unit="s", head=No
         out_df.index = pd.to_datetime(out_df.index, format="%Y-%m-%dT%H:%M")
 
     # monotonic increase check, finds any repeat datetimes and/or a mixup of order
-    mon_inc = all(x < y for x, y in zip(out_df.index, out_df.index[1:]))
-    if not mon_inc:
+    if not out_df.index.is_monotonic_increasing:
         # prints the row(s) where monotonicity is broken
-        bad_rows = out_df.loc[
-            out_df.index.to_series().diff() < pd.to_timedelta("0 seconds")
-        ]
-        raise ValueError(f"Non-monotonic datetime index found:\n{bad_rows}")
+        if file_is_elapsed:
+            bad_rows = out_df.loc[
+                out_df.index.to_series().diff() <= 0.
+            ]
+            raise ValueError(f"Non-monotonic elapsed index found:\n{bad_rows}")
+        else:
+            bad_rows = out_df.loc[
+                out_df.index.to_series().diff() <= pd.to_timedelta("0 seconds")
+            ]
+            raise ValueError(f"Non-monotonic datetime index found:\n{bad_rows}")
 
     return out_df
 

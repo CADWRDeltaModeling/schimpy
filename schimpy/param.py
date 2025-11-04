@@ -15,14 +15,15 @@ class Params(object):
         from . import nml  # wherever your nml lives
 
         # Accept either text or a path-like
-        if isinstance(fname, (str, os.PathLike, Path)):
+        # if isinstance(fname, (str, os.PathLike, Path)):
+        try:
             p = Path(fname)
             if p.exists():
                 text = p.read_text(encoding="utf-8")
             else:
                 # If it's a path-like string that doesn't exist, treat as text
                 text = str(fname)
-        else:
+        except:
             text = fname  # already text
 
         self._namelist = nml.parse(text)  # feed TEXT to the parser
