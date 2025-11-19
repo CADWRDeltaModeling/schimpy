@@ -27,14 +27,20 @@ class boundary(object):
 
         with open(yaml_fn, "r") as fn:
             bc_yaml = load(fn)
-            self.date = bc_yaml["bctides"]["date"]
-            if "earth_tidals" in bc_yaml["bctides"].keys():
-                self.earth_tidals = bc_yaml["bctides"]["earth_tidals"]
+
+            main_id = "bctides"
+            self.date = bc_yaml[main_id]["date"]
+            if "earth_tidals" in bc_yaml[main_id].keys():
+                self.earth_tidals = bc_yaml[main_id]["earth_tidals"]
             else:
                 self.earth_tidals = None
-            self.boundary_tidals = bc_yaml["bctides"]["bounary_forcing_tidals"]
-            self.open_boundaries = bc_yaml["bctides"]["open_boundaries"]
-            self.hgrid = bc_yaml["bctides"]["hgrid_input_file"]
+            if "bounary_forcing_tidals" in bc_yaml[main_id].keys():
+                self.boundary_tidals = bc_yaml[main_id]["bounary_forcing_tidals"]
+            else:
+                self.boundary_tidals = None
+            
+            self.open_boundaries = bc_yaml[main_id]["open_boundaries"]
+            self.hgrid = bc_yaml[main_id]["hgrid_input_file"]
 
             self.elev_type = {
                 "elev.th": 1,
@@ -99,22 +105,22 @@ class boundary(object):
 
             ##out earth tidal potential if any
             if self.earth_tidals:
-                num_tidal = len(self.earth_tidals["tidal_constitutes"])
+                num_tidal = len(self.earth_tidals["tidal_constituents"])
                 cutoff_depth = self.earth_tidals["tidal_cutoff_depth"]
                 outf.write(str(num_tidal) + " " + str(cutoff_depth) + "\n")
                 for i in range(num_tidal):
                     outf.write(
-                        self.earth_tidals["tidal_constitutes"][i]["tidal_constitute"]
+                        self.earth_tidals["tidal_constituents"][i]["name"]
                     )
                     outf.write("\n")
-                    amp = self.earth_tidals["tidal_constitutes"][i]["amplitude"]
-                    node_factor = self.earth_tidals["tidal_constitutes"][i][
+                    amp = self.earth_tidals["tidal_constituents"][i]["amplitude"]
+                    node_factor = self.earth_tidals["tidal_constituents"][i][
                         "node_factor"
                     ]
-                    freq = self.earth_tidals["tidal_constitutes"][i][
+                    freq = self.earth_tidals["tidal_constituents"][i][
                         "angular_frequency"
                     ]
-                    eqa = self.earth_tidals["tidal_constitutes"][i][
+                    eqa = self.earth_tidals["tidal_constituents"][i][
                         "earth_equilibrium_argument"
                     ]
                     outf.write(
@@ -134,20 +140,20 @@ class boundary(object):
 
             ## out boundary forcing tidal
             if self.boundary_tidals:
-                num_tidal = len(self.boundary_tidals["tidal_constitutes"])
+                num_tidal = len(self.boundary_tidals["tidal_constituents"])
                 outf.write(str(num_tidal) + "\n")
                 for i in range(num_tidal):
                     outf.write(
-                        self.boundary_tidals["tidal_constitutes"][i]["tidal_constitute"]
+                        self.boundary_tidals["tidal_constituents"][i]["name"]
                     )
                     outf.write("\n")
-                    freq = self.boundary_tidals["tidal_constitutes"][i][
+                    freq = self.boundary_tidals["tidal_constituents"][i][
                         "angular_frequency"
                     ]
-                    node_factor = self.boundary_tidals["tidal_constitutes"][i][
+                    node_factor = self.boundary_tidals["tidal_constituents"][i][
                         "node_factor"
                     ]
-                    eqa = self.boundary_tidals["tidal_constitutes"][i][
+                    eqa = self.boundary_tidals["tidal_constituents"][i][
                         "earth_equilibrium_argument"
                     ]
                     outf.write(str(freq) + " " + str(node_factor) + " " + str(eqa))
@@ -198,7 +204,7 @@ class boundary(object):
                     elev_boundary = None
                     if "elevation_boundary" in self.open_boundaries[i].keys():
                         elev_boundary = self.open_boundaries[i]["elevation_boundary"]
-                        elev_source = elev_boundary["boundary"]
+                        elev_source = elev_boundary["type"]
                         elev_key = elev_source
                         if isinstance(elev_source, numbers.Number):
                             elev_key = "constant"
@@ -216,7 +222,7 @@ class boundary(object):
                     vel_boundary = None
                     if "velocity_boundary" in self.open_boundaries[i].keys():
                         vel_boundary = self.open_boundaries[i]["velocity_boundary"]
-                        vel_source = vel_boundary["boundary"]
+                        vel_source = vel_boundary["type"]
                         vel_key = vel_source
 
                         if isinstance(vel_source, numbers.Number):
@@ -239,7 +245,7 @@ class boundary(object):
                     temp_boundary = None
                     if "temperature_boundary" in self.open_boundaries[i].keys():
                         temp_boundary = self.open_boundaries[i]["temperature_boundary"]
-                        temp_source = temp_boundary["boundary"]
+                        temp_source = temp_boundary["type"]
                         temp_key = temp_source
                         if isinstance(temp_source, numbers.Number):
                             temp_key = "constant"
@@ -254,7 +260,7 @@ class boundary(object):
                     salt_boundary = None
                     if "salinity_boundary" in self.open_boundaries[i].keys():
                         salt_boundary = self.open_boundaries[i]["salinity_boundary"]
-                        salt_source = salt_boundary["boundary"]
+                        salt_source = salt_boundary["type"]
                         salt_key = salt_source
                         if isinstance(salt_source, numbers.Number):
                             salt_key = "constant"
@@ -275,9 +281,7 @@ class boundary(object):
                             self.open_boundaries[i]["tracers"]
                         )
                         for j in range(boundary_tracer_mod_num):
-                            tracer_boundary = self.open_boundaries[i]["tracers"][j][
-                                "boundary"
-                            ]
+                            tracer_boundary = self.open_boundaries[i]["tracers"][j]["type"]
                             tracer_mod = self.open_boundaries[i]["tracers"][j]["tracer"]
                             tracer_boundary_key = tracer_boundary
                             if isinstance(tracer_boundary, numbers.Number):
@@ -321,12 +325,12 @@ class boundary(object):
                         outf.write(str(elev_source))
                     elif (elev_id == 3) or (elev_id == 5):
                         ## tidal forcing
-                        num_tidal_constitutes = elev_boundary["tidal_constitutes"]
-                        for tidal_constitute in elev_boundary["tidal_constitutes"]:
-                            outf.write(tidal_constitute["tidal_constitute"] + "\n")
+                        num_tidal_constituents = elev_boundary["tidal_constituents"]
+                        for tidal_constituent in elev_boundary["tidal_constituents"]:
+                            outf.write(tidal_constituent["name"] + "\n")
                             for kk in range(num_nodes):
-                                amp = tidal_constitute["tidal_amplitude"]
-                                phase = tidal_constitute["tidal_phase"]
+                                amp = tidal_constituent["amplitude"]
+                                phase = tidal_constituent["phase"]
                                 node_id = node_id_lst[kk]
                                 x = hgrid.nodes[node_id, 0]
                                 y = hgrid.nodes[node_id, 1]
@@ -360,17 +364,17 @@ class boundary(object):
                         outf.write(str(vel_source))
                     elif (vel_id == 3) or (vel_id == 5):
                         ## tidal forcing
-                        for tidal_constitute in vel_boundary["tidal_constitutes"]:
-                            outf.write(tidal_constitute["tidal_constitute"] + "\n")
+                        for tidal_constituent in vel_boundary["tidal_constituents"]:
+                            outf.write(tidal_constituent["name"] + "\n")
                             for kk in range(num_nodes):
-                                u_amp = tidal_constitute["u_amplitude"]
-                                u_phase = tidal_constitute["u_phase"]
-                                v_amp = tidal_constitute["v_amplitude"]
-                                v_phase = tidal_constitute["v_phase"]
+                                u_amp = tidal_constituent["u_amplitude"]
+                                u_phase = tidal_constituent["u_phase"]
+                                v_amp = tidal_constituent["v_amplitude"]
+                                v_phase = tidal_constituent["v_phase"]
                                 node_id = node_id_lst[kk]
                                 x = hgrid.nodes[node_id, 0]
                                 y = hgrid.nodes[node_id, 1]
-
+                                
                                 if isinstance(u_amp, numbers.Number):
                                     u_amp_val = u_amp
                                 elif isinstance(
@@ -451,7 +455,7 @@ class boundary(object):
 
                     ## temperature bc parameters
                     if temp_id == 2:
-                        temp_bc = temp_boundary["boundary"]
+                        temp_bc = temp_boundary["type"]
                         outf.write(str(temp_bc) + "\n")
                     if temp_id > 0:
                         nudge = temp_boundary["nudge"]
@@ -459,7 +463,7 @@ class boundary(object):
 
                     ## salt bc parameters
                     if salt_id == 2:
-                        salt_bc = salt_boundary["boundary"]
+                        salt_bc = salt_boundary["type"]
                         outf.write(str(salt_bc) + "\n")
                     if salt_id > 0:
                         nudge = salt_boundary["nudge"]
@@ -471,7 +475,7 @@ class boundary(object):
                         tracer = self.open_boundaries[i]["tracers"][tracer_index]
                         tracer_bc_type = tracer_boundary_types[ii]
                         if tracer_bc_type == 2:
-                            tracer_bc_const = tracer["boundary"]
+                            tracer_bc_const = tracer["type"]
                             if isinstance(tracer_bc_const, list):
                                 for val in tracer_bc_const:
                                     outf.write(str(val) + " ")
@@ -479,8 +483,8 @@ class boundary(object):
                                 outf.write(str(tracer_bc_const))
                             outf.write("\n")
                         if tracer_bc_type > 0:
-                            nudge = tracer["nudge"]
-                            outf.write(str(nudge) + "\n ")
+                            relax = tracer["relax"]
+                            outf.write(str(relax) + "\n ")
 
 
 if __name__ == "__main__":
@@ -497,37 +501,37 @@ if __name__ == "__main__":
 #     hgrid_input_file: G:\schism\bctides\hgrid.gr3
 #     earth_tidals:
 #         tidal_cutoff_depth: 40
-#         tidal_constitutes:
-#           - tidal_constitute: Sa
+#         tidal_constituents:
+#           - name: Sa
 #             amplitude: 0.05
 #             node_factor: 1.0
 #             angular_frequency: 0.0027
 #             earth_equilibrium_argument: 0.01
-#           - tidal_constitute: O1
+#           - name: O1
 #             amplitude: 0.2
 #             node_factor: 1.1
 #             angular_frequency: 4.001
 #             earth_equilibrium_argument: 0.0
-#           - tidal_constitute: M2
+#           - name: M2
 #             amplitude: 0.5
 #             node_factor: 0.99
 #             angular_frequency: 1.9323
 #             earth_equilibrium_argument: 0.0
 #     bounary_forcing_tidals:
-#         tidal_constitutes:
-#           - tidal_constitute: Z0
+#         tidal_constituents:
+#           - name: Z0
 #             angular_frequency: 0.0
 #             node_factor: 1
 #             earth_equilibrium_argument: 0
-#           - tidal_constitute: O1
+#           - name: O1
 #             angular_frequency: 0.675977E-04
 #             node_factor: 1.11945
 #             earth_equilibrium_argument: 7.47302
-#           - tidal_constitute: K1
+#           - name: K1
 #             angular_frequency: 0.729212E-04
 #             node_factor: 1.07391
 #             earth_equilibrium_argument: 206.78674
-#           - tidal_constitute: M2
+#           - name: M2
 #             angular_frequency: 0.140519E-04
 #             node_factor: 0.97907
 #             earth_equilibrium_argument: 217.04138
@@ -536,38 +540,38 @@ if __name__ == "__main__":
 #         name: ocean
 #         elevation_boundary:
 #             boundary: tidal
-#             tidal_constitutes:
-#               - tidal_constitute: Z0
-#                 tidal_amplitude: 1.0
-#                 tidal_phase: 0.0
-#               - tidal_constitute: O1
-#                 tidal_amplitude: 0.226
-#                 tidal_phase: 206
-#               - tidal_constitute: K1
-#                 tidal_amplitude: 0.369
-#                 tidal_phase: 220
-#               - tidal_constitute: M2
-#                 tidal_amplitude: 0.578
-#                 tidal_phase: 190
+#             tidal_constituents:
+#               - name : Z0
+#                 amplitude: 1.0
+#                 phase: 0.0
+#               - name: O1
+#                 amplitude: 0.226
+#                 phase: 206
+#               - name: K1
+#                 amplitude: 0.369
+#                 phase: 220
+#               - name: M2
+#                 amplitude: 0.578
+#                 phase: 190
 #         velocity_boundary:
 #             boundary: tidal
-#             tidal_constitutes:
-#               - tidal_constitute: Z0
+#             tidal_constituents:
+#               - name: Z0
 #                 u_amplitude: 0.20
 #                 u_phase: 0.0
 #                 v_amplitude: 0.10
 #                 v_phase: 0.0
-#               - tidal_constitute: O1
+#               - name: O1
 #                 u_amplitude: 0.0226
 #                 u_phase: 206
 #                 v_amplitude: 0.0226
 #                 v_phase: 206
-#               - tidal_constitute: K1
+#               - name: K1
 #                 u_amplitude: 0.0369
 #                 u_phase: 220
 #                 v_amplitude: 0.0226
 #                 v_phase: 206
-#               - tidal_constitute: M2
+#               - name: M2
 #                 u_amplitude: 0.0578
 #                 u_phase: 190
 #                 v_amplitude: 0.0226
@@ -727,38 +731,38 @@ if __name__ == "__main__":
 #         name: north bay
 #         elevation_boundary:
 #             boundary: tidal elev2D.th.nc
-#             tidal_constitutes:
-#               - tidal_constitute: Z0
-#                 tidal_amplitude: 1.0
-#                 tidal_phase: 0.0
-#               - tidal_constitute: O1
-#                 tidal_amplitude: 0.226
-#                 tidal_phase: 206
-#               - tidal_constitute: K1
-#                 tidal_amplitude: 0.369
-#                 tidal_phase: 220
-#               - tidal_constitute: M2
-#                 tidal_amplitude: 0.578
-#                 tidal_phase: 190
+#             tidal_constituents:
+#               - name: Z0
+#                 amplitude: 1.0
+#                 phase: 0.0
+#               - name: O1
+#                 amplitude: 0.226
+#                 phase: 206
+#               - name: K1
+#                 amplitude: 0.369
+#                 phase: 220
+#               - name: M2
+#                 amplitude: 0.578
+#                 phase: 190
 #         velocity_boundary:
 #              boundary: tidal uv3D.th.nc
-#              tidal_constitutes:
-#               - tidal_constitute: Z0
+#              tidal_constituents:
+#               - name: Z0
 #                 u_amplitude: 0.20
 #                 u_phase: 0.0
 #                 v_amplitude: 0.10
 #                 v_phase: 0.0
-#               - tidal_constitute: O1
+#               - name: O1
 #                 u_amplitude: 0.0226
 #                 u_phase: 206
 #                 v_amplitude: 0.0226
 #                 v_phase: 206
-#               - tidal_constitute: K1
+#               - name: K1
 #                 u_amplitude: 0.0369
 #                 u_phase: 220
 #                 v_amplitude: 0.0226
 #                 v_phase: 206
-#               - tidal_constitute: M2
+#               - name: M2
 #                 u_amplitude: 0.0578
 #                 u_phase: 190
 #                 v_amplitude: 0.0226
