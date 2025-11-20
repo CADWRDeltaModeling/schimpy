@@ -14,7 +14,38 @@ import numbers
 __all__ = ["load_boundary"]
 
 
-def load_boundary(fn):
+def load_main_input(main_yaml):
+     """ read in main yaml file which contians the grid topology and
+         boundary condtion yaml files, this input file looks like below
+         mesh:
+         mesh_inputfile: ./hgrid.gr3  
+         open_boundaries: !include open_boundary.yaml
+  
+         bctides:
+         bctides.in.2d: !include bctides.in.2d.yaml
+         bctides.in.3d: !include bctides.in.3d.yaml
+         bctides.in.sed.3d: !include bctides.in.sed.3d.yaml
+
+         for each boundary condition yaml file, it will generate the corresponding boundary
+         class and write out the SCHISM boundary condition btdides input file.
+         """
+     with open(main_yaml, "r") as fn:
+         main_yaml_dict = load(fn)
+
+     mesh_in = main_yaml_dict["mesh"]["mesh_inputfile"]
+     sr = SchismMeshGr3Reader()
+     hgrid = sr.read(mesh_in)
+     open_boundary = None
+     if "open_boundaries" in main_yaml_dict["mesh"].keys():
+         open_boundary = main_yaml_dict["mesh"]["open_boundaries"]
+    
+     bctides_dic = main_yaml_dict["bctides"]
+     for bctides_key in bctides_dic.keys():
+         bctides_yaml = bctides_dic[bctides_key]
+         by = load_boundary(bctides_yaml,hgrid)
+         by.write_bctides(bctides_key)
+
+def load_boundary(hgrid,fn):
     return boundary(fn)
 
 
@@ -23,78 +54,76 @@ class boundary(object):
     A class to generate boundary condition input file for SCHISM
     """
 
-    def __init__(self, yaml_fn=None):
+    def __init__(self, hgrid,bc_yaml=None):
+        """ initialize the boundary condition from yaml file"""
 
-        with open(yaml_fn, "r") as fn:
-            bc_yaml = load(fn)
+        main_id = "bctides"
+        self.date = bc_yaml[main_id]["date"]
+        if "earth_tidals" in bc_yaml[main_id].keys():
+            self.earth_tidals = bc_yaml[main_id]["earth_tidals"]
+        else:
+            self.earth_tidals = None
+        if "bounary_forcing_tidals" in bc_yaml[main_id].keys():
+            self.boundary_tidals = bc_yaml[main_id]["bounary_forcing_tidals"]
+        else:
+            self.boundary_tidals = None
+        
+        self.open_boundaries = bc_yaml[main_id]["open_boundaries"]
+        self.hgrid = hgrid
 
-            main_id = "bctides"
-            self.date = bc_yaml[main_id]["date"]
-            if "earth_tidals" in bc_yaml[main_id].keys():
-                self.earth_tidals = bc_yaml[main_id]["earth_tidals"]
-            else:
-                self.earth_tidals = None
-            if "bounary_forcing_tidals" in bc_yaml[main_id].keys():
-                self.boundary_tidals = bc_yaml[main_id]["bounary_forcing_tidals"]
-            else:
-                self.boundary_tidals = None
-            
-            self.open_boundaries = bc_yaml[main_id]["open_boundaries"]
-            self.hgrid = bc_yaml[main_id]["hgrid_input_file"]
+        self.elev_type = {
+            "elev.th": 1,
+            "constant": 2,
+            "tidal": 3,
+            "elev2D.th.nc": 4,
+            "tidal elev2D.th.nc": 5,
+            "none": 0,
+        }
+        self.vel_type = {
+            "flux.th": 1,
+            "constant": 2,
+            "tidal": 3,
+            "uv3D.th.nc": 4,
+            "tidal uv3D.th.nc": 5,
+            "flather 1": -1,
+            "none": 0,
+        }
 
-            self.elev_type = {
-                "elev.th": 1,
-                "constant": 2,
-                "tidal": 3,
-                "elev2D.th.nc": 4,
-                "tidal elev2D.th.nc": 5,
-                "none": 0,
-            }
-            self.vel_type = {
-                "flux.th": 1,
-                "constant": 2,
-                "tidal": 3,
-                "uv3D.th.nc": 4,
-                "tidal uv3D.th.nc": 5,
-                "flather 1": -1,
-                "none": 0,
-            }
+        self.temp_type = {
+            "TEM_1.th": 1,
+            "constant": 2,
+            "initial profile": 3,
+            "TEM_3D.th.nc": 4,
+            "none": 0,
+        }
 
-            self.temp_type = {
-                "TEM_1.th": 1,
-                "constant": 2,
-                "initial profile": 3,
-                "TEM_3D.th.nc": 4,
-                "none": 0,
-            }
+        self.salt_type = {
+            "SAL_1.th": 1,
+            "constant": 2,
+            "initial profile": 3,
+            "SAL_3D.th.nc": 4,
+            "none": 0,
+        }
 
-            self.salt_type = {
-                "SAL_1.th": 1,
-                "constant": 2,
-                "initial profile": 3,
-                "SAL_3D.th.nc": 4,
-                "none": 0,
-            }
-
-            ## tracer order
-            self.tracer_lst = {
-                "GEN": 1,
-                "AGE": 2,
-                "SED": 3,
-                "ECO": 4,
-                "ICM": 5,
-                "COSINE": 6,
-                "FECO": 7,
-                "TIMOR": 8,
-                "FABM": 9,
-                "DVD": 10,
-            }
-            self.tracer_type = {
-                "time history": 1,
-                "constant": 2,
-                "initial profile": 3,
-                "none": 0,
-            }
+        ## tracer order
+        self.tracer_lst = {
+            "GEN": 1,
+            "AGE": 2,
+            "SED": 3,
+            "ECO": 4,
+            "ICM": 5,
+            "COSINE": 6,
+            "FECO": 7,
+            "TIMOR": 8,
+            "FABM": 9,
+            "DVD": 10,
+        }
+        self.tracer_type = {
+            "time history": 1,
+            "constant": 2,
+            "initial profile": 3,
+            "none": 0,
+        }
 
     def write_bctides(self, bctides_file):
 
@@ -162,10 +191,8 @@ class boundary(object):
                 num_tidal = 0
                 outf.write(str(num_tidal) + "\n")
 
-            ## output open boundaries
-            ## read in mesh grid file
-            sr = SchismMeshGr3Reader()
-            hgrid = sr.read(self.hgrid)
+            
+            hgrid = self.hgrid
 
             if len(hgrid.boundaries) < len(self.open_boundaries):
                 raise ValueError(
