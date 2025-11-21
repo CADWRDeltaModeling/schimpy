@@ -35,18 +35,18 @@ def load_main_input(main_yaml):
      mesh_in = main_yaml_dict["mesh"]["mesh_inputfile"]
      sr = SchismMeshGr3Reader()
      hgrid = sr.read(mesh_in)
-     open_boundary = None
+     open_boundary_grd = None
      if "open_boundaries" in main_yaml_dict["mesh"].keys():
-         open_boundary = main_yaml_dict["mesh"]["open_boundaries"]
+         open_boundary_grd = main_yaml_dict["mesh"]["open_boundaries"]
     
      bctides_dic = main_yaml_dict["bctides"]
      for bctides_key in bctides_dic.keys():
          bctides_yaml = bctides_dic[bctides_key]
-         by = load_boundary(bctides_yaml,hgrid)
+         by = load_boundary(hgrid,bctides_yaml,open_boundary_grd)
          by.write_bctides(bctides_key)
 
-def load_boundary(hgrid,fn):
-    return boundary(fn)
+def load_boundary(hgrid,fn,open_boundary_grid):
+    return boundary(hgrid,fn,open_boundary_grid)
 
 
 class boundary(object):
@@ -54,7 +54,7 @@ class boundary(object):
     A class to generate boundary condition input file for SCHISM
     """
 
-    def __init__(self, hgrid,bc_yaml=None):
+    def __init__(self, hgrid,bc_yaml=None,boundary_grid=None):
         """ initialize the boundary condition from yaml file"""
 
         main_id = "bctides"
@@ -69,7 +69,11 @@ class boundary(object):
             self.boundary_tidals = None
         
         self.open_boundaries = bc_yaml[main_id]["open_boundaries"]
-        self.hgrid = hgrid
+        self.hgrid = hgrid  
+
+        ## if boundary grid is provided, use it to override the hgrid boundary 
+        ## grid
+        self.boundary_grid = boundary_grid
 
         self.elev_type = {
             "elev.th": 1,
@@ -126,7 +130,7 @@ class boundary(object):
         }
 
     def write_bctides(self, bctides_file):
-
+ 
         with open(bctides_file, "w") as outf:
             tt = self.date.strftime("%Y-%m-%d %H:%M")
             outf.write(tt)
@@ -515,10 +519,9 @@ class boundary(object):
 
 
 if __name__ == "__main__":
-    bcyaml = "G:\\schism\\bctides\\bctides.yaml"
-    bctides = "G:\\schism\\bctides\\bctides.in"
-    by = load_boundary(bcyaml)
-    by.write_bctides(bctides)
+    bcyaml = "bctides_main.yaml"
+    by = load_main_input(bcyaml)
+
 
 
 ##################### YAML EXMAPLE #####################################################
