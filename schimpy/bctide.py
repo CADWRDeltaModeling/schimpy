@@ -7,12 +7,24 @@ At the end of this script, there is a synthetic example which demonstrates the f
 
 """
 from schimpy.schism_yaml import load
-from schimpy.schism_mesh import SchismMeshGr3Reader
+from schimpy.schism_mesh import SchismMeshGr3Reader, BoundaryType
 import numbers
+import numpy as np
+import click
 
 
 __all__ = ["load_boundary"]
 
+
+@click.command(
+    help=(
+        "The tool create SCHISM bctide inputs by reading a number of open boundary condition yaml and mesh \
+         from a  main input yaml \n\n"
+        "Example:\n"
+        "  bctide bctide_main.yaml\n "
+    )
+)
+@click.argument('main_yaml', type=click.Path(exists=True))
 
 def load_main_input(main_yaml):
      """ read in main yaml file which contians the grid topology and
@@ -34,19 +46,45 @@ def load_main_input(main_yaml):
 
      mesh_in = main_yaml_dict["mesh"]["mesh_inputfile"]
      sr = SchismMeshGr3Reader()
+
      hgrid = sr.read(mesh_in)
-     open_boundary_grd = None
+     open_boundary_segments = None
      if "open_boundaries" in main_yaml_dict["mesh"].keys():
-         open_boundary_grd = main_yaml_dict["mesh"]["open_boundaries"]
+         open_boundary_segments = main_yaml_dict["mesh"]["open_boundaries"]
     
      bctides_dic = main_yaml_dict["bctides"]
      for bctides_key in bctides_dic.keys():
          bctides_yaml = bctides_dic[bctides_key]
-         by = load_boundary(hgrid,bctides_yaml,open_boundary_grd)
+         by = load_boundary(hgrid,bctides_yaml,open_boundary_segments)
          by.write_bctides(bctides_key)
 
-def load_boundary(hgrid,fn,open_boundary_grid):
-    return boundary(hgrid,fn,open_boundary_grid)
+def update_mesh_open_boundaries(mesh, segments):
+    """Overtide mesh open boundaries with linestrings from segments dict
+       borrowed from schism_setup.py
+       segments: dict containing "linestrings" key
+    """
+    mesh.clear_boundaries()
+    boundary_only = True
+    linestrings = segments.get("linestrings")
+    if linestrings is None:
+        raise ValueError("Linestrings is required for open boundaries specification")
+    for item in linestrings:
+        name = item.get("name")
+        if name is None:
+            name = item.get("Name")
+        p = np.array(item["coordinates"])
+        start = mesh.find_closest_nodes(p[0], 1, boundary_only)
+        end = mesh.find_closest_nodes(p[1], 1, boundary_only)
+        path = mesh._build_boundary_node_string(start, end, boundary_only)
+        comment = '! Open boundary "%s"' % name
+        mesh.add_boundary(path, BoundaryType.OPEN, comment)
+    mesh.fill_land_and_island_boundaries()
+
+
+
+
+def load_boundary(hgrid,fn,open_boundary_segments):
+    return boundary(hgrid,fn,open_boundary_segments)
 
 
 class boundary(object):
@@ -54,7 +92,7 @@ class boundary(object):
     A class to generate boundary condition input file for SCHISM
     """
 
-    def __init__(self, hgrid,bc_yaml=None,boundary_grid=None):
+    def __init__(self, hgrid,bc_yaml=None,boundary_segments=None):
         """ initialize the boundary condition from yaml file"""
 
         main_id = "bctides"
@@ -73,7 +111,25 @@ class boundary(object):
 
         ## if boundary grid is provided, use it to override the hgrid boundary 
         ## grid
-        self.boundary_grid = boundary_grid
+        self.boundary_segments = boundary_segments
+        if self.boundary_segments is not None:
+            ## also check if the number of open boundaries and names match
+            ## with bctides open boundaries
+            num_boundary_segments = len(self.boundary_segments["linestrings"])
+            if num_boundary_segments != len(self.open_boundaries):
+                raise ValueError(
+                    "number of boundary segments from included open_boundary yaml does not match number of open boundaries in bctides YAML: %s vs %s"
+                    % (num_boundary_segments, len(self.open_boundaries))
+                )
+            for i in range(num_boundary_segments):
+                bname_yaml = self.open_boundaries[i]["name"]
+                bname_segment = self.boundary_segments["linestrings"][i]["name"]
+                if bname_yaml != bname_segment:
+                    raise ValueError(
+                        "boundary name mismatch between included open_boundary YAML and bctides YAML: %s vs %s"
+                        % (bname_yaml, bname_segment)
+                    )       
+            update_mesh_open_boundaries(self.hgrid, self.boundary_segments)
 
         self.elev_type = {
             "elev.th": 1,
@@ -197,14 +253,38 @@ class boundary(object):
 
             
             hgrid = self.hgrid
+        
+            
+            hgrd_open_boundaries = list(
+            boundary
+            for boundary in hgrid.boundaries
+            if boundary.btype == BoundaryType.OPEN
+            )
 
-            if len(hgrid.boundaries) < len(self.open_boundaries):
+            if len(hgrd_open_boundaries) != len(self.open_boundaries):
                 raise ValueError(
-                    "boundary YAML has more number of openbounary than model hgrid, YAML:%s hgrid:%s"
-                    % (len(self.open_boundaries), len(hgrid.boundaries))
+                    "boundary YAML has different number of openbounary than model hgrid, YAML:%s hgrid:%s"
+                    % (len(self.open_boundaries), len(hgrd_open_boundaries))
                 )
             else:
                 num_open_boundaries = len(self.open_boundaries)
+                ## check to make sure all open_boundaries name match
+                ## with hgrid boundary names
+                for i in range(num_open_boundaries):
+                    bname_yaml = self.open_boundaries[i]["name"]
+                    if  hgrd_open_boundaries[i].comment is None:
+                        print("Warning: hgrid boundary %s has no name, skipping boundary name check" % i)
+                        continue ## skip if hgrid boundary name is empty
+                    bname_hgrid =  hgrd_open_boundaries[i].comment.strip().split('"')[1]
+                    ## if bname in hgrid is empty, skip the check   
+                    if bname_hgrid == "":
+                        continue
+                    if bname_yaml != bname_hgrid:
+                        raise ValueError(
+                            "boundary name mismatch between YAML and hgrid: %s vs %s"
+                            % (bname_yaml, bname_hgrid)
+                        )
+
                 num_tracer_mod = 0
                 tracer_mods = []
                 tracer_mod_pos = {}
@@ -519,8 +599,7 @@ class boundary(object):
 
 
 if __name__ == "__main__":
-    bcyaml = "bctides_main.yaml"
-    by = load_main_input(bcyaml)
+    by = load_main_input()
 
 
 
