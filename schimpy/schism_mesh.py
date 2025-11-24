@@ -899,6 +899,12 @@ class SchismMeshGr3Reader(SchismMeshReader):
                 if len(tkns) < 1:
                     self._logger.error("Error reading: %s", line)
                     raise ValueError("Boundary block is corrupt")
+                ## if comment exists, additional handling here
+                ## to add as bounary comment
+                comment = None
+                if "!" in line:
+                    comment_index = line.index("!")
+                    comment = line[comment_index:].strip()
                 n_nodes = int(tkns[0])
                 nodes = []
                 for j in range(n_nodes):
@@ -909,7 +915,7 @@ class SchismMeshGr3Reader(SchismMeshReader):
                         raise ValueError("Boundary block is corrupt")
                     node = int(tkns[0]) - 1  # Zero based
                     nodes.append(node)
-                self._mesh.add_boundary(nodes, BoundaryType.OPEN)
+                self._mesh.add_boundary(nodes, BoundaryType.OPEN,comment)
 
             line = f.readline()
             tkns = line.split()
