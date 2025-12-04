@@ -122,6 +122,25 @@ class Params(object):
 
     run_start = property(get_run_start, set_run_start)
 
+
+    # NEW: getter/setter for total run length (days), stored in CORE::rnday
+    def get_run_nday(self):
+        """
+        Return total run length (in days) as an int, based on CORE::rnday.
+        """
+        core = self._require_section_keys("CORE", ("rnday",))
+        return int(core["rnday"]["value"])
+
+    def set_run_nday(self, nday):
+        """
+        Set total run length (in days), writing CORE::rnday as an int.
+        """
+        core = self._require_section_keys("CORE", ("rnday",))
+        core["rnday"]["value"] = int(nday)
+
+    run_nday = property(get_run_nday, set_run_nday)
+
+
     def set_interval(self, name, freq):
         """Set binary output frequency using Pandas offset or string that evaluates as offset"""
         dt = int(self["dt"])
