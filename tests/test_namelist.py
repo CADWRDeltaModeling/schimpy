@@ -1,3 +1,5 @@
+from schimpy import nml
+
 def test_namelist_parser():
 
     file_content = """&NAMELIST1
@@ -9,8 +11,6 @@ def test_namelist_parser():
     VAR3 = 3
     VAR4 = 4
     /"""
-
-    from schimpy import nml
     namelists = nml.parse(file_content)
     print(namelists)
 
@@ -24,7 +24,6 @@ def test_namelist_parser():
     assert namelists == expected_namelists
 
 def test_write_namelist():
-    from schimpy import nml
     namelist_data = {
         "first_namelist": {
             "comment": "This is the first namelist",

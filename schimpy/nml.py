@@ -76,9 +76,11 @@ def parse(file_content):
                 "full_line_comment": full_line_comment,
                 "inline_comment": inline_comment,
             }
-            # NEW: remember if the key's full-line comment was preceded by a blank line
-            if len(full_line_comment) != 0:
-                entry["full_line_comment_leading_blank"] = full_line_comment_leading_blank
+            # Remember if the key's full-line comment was preceded by a blank line.
+            # Only persist the flag if it's actually True, so we don't introduce extra
+            # False-valued keys that break simple dict equality tests and downstream code.
+            if len(full_line_comment) != 0 and full_line_comment_leading_blank:
+                entry["full_line_comment_leading_blank"] = True
 
             namelists[current_namelist][key] = entry
 

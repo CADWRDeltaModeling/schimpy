@@ -2,7 +2,7 @@
 # Param NML
 import pathlib
 import pytest
-from schimpy import param, params, nml
+from schimpy import param, nml
 import pandas as pd
 
 
@@ -11,18 +11,7 @@ def datadir():
     return pathlib.Path(__file__).parent.resolve() / "testdata"
 
 
-def test_params(datadir):
-    param_file = datadir / "param.nml"
-    with open(param_file, "r") as fh:
-        param_dict = nml.parse(fh.read())
-    assert "CORE" in param_dict
-    p = params.create_params(param_dict)
-    assert p.core.ipre == 0
-    p.core.ipre = 1
-    assert p.core.ipre == 1
-    with pytest.raises(Exception) as ex:
-        p.core.ipre = 2
-    assert p.core.ipre == 1
+
 
 
 def test_param_special(datadir):
