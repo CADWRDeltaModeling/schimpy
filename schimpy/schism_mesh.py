@@ -1683,7 +1683,7 @@ def read_mesh(fpath_mesh, fpath_vmesh=None, vgrid_version="5.10", **kwargs):
     SchismMesh
     """
 
-    if fpath_mesh.endswith(".gr3"):
+    if fpath_mesh.endswith(".gr3") or fpath_mesh.endswith(".ll") or fpath_mesh.endswith(".ic"):
         reader = SchismMeshIoFactory().get_reader("gr3")
         mesh = reader.read(fpath_mesh)
         if fpath_vmesh is not None:
