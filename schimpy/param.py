@@ -5,6 +5,196 @@ import schimpy.nml as nml
 import pandas as pd
 from pathlib import Path
 import os
+import click
+
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
+
+@dataclass(frozen=True)
+class ParamAlias:
+    """
+    Metadata for a user-facing alias.
+
+    Attributes
+    ----------
+    target : str
+        Name of the underlying SCHISM parameter or Params property.
+    kind : {"raw", "property"}
+        "raw"      -> use Params.__getitem__/__setitem__ with SCHISM name.
+        "property" -> use getattr/setattr on Params (e.g. run_nday, nc_out_interval).
+    description : str
+        Human-readable explanation for help/--help text.
+    value_hint : str
+        Short hint about the value format (e.g. "integer days", "pandas offset").
+    """
+    target: str
+    kind: str
+    description: str
+    value_hint: str = ""
+
+
+#: Registry of aliases that can be used from code or CLI (set_param)
+PARAM_ALIASES: Dict[str, ParamAlias] = {
+    # --- Run length -----------------------------------------------------------
+    "run_nday": ParamAlias(
+        target="run_nday",
+        kind="property",
+        description="Total simulation length in days (maps to CORE::rnday).",
+        value_hint="integer days, e.g. 252",
+    ),
+
+    # --- Hotstart mode --------------------------------------------------------
+    "hotstart_mode": ParamAlias(
+        target="ihot",
+        kind="raw",
+        description=(
+            "Hotstart option: 0 = cold start; 1 = restart from hotstart.nc but "
+            "reset model time to 0; 2 = restart and continue from the time "
+            "stored in hotstart.nc."
+        ),
+        value_hint="0, 1, or 2",
+    ),
+
+    # --- Global NetCDF output interval ---------------------------------------
+
+    # --- Time span per NetCDF file -------------------------------------------
+    "nc_out_file_span": ParamAlias(
+        target="nc_stack",
+        kind="property",
+        description=(
+            "Wall-clock time covered by each history file. Must be "
+            "a multiple of nc_out_interval. Used to derive ihfskip, "
+            "the number of (dt) time steps in the file, which is the parameter "
+            " actually used by SCHISM. nc_out_steps_per_file is an alias " 
+            " that more directly expresses the ihfskip parameter."
+        ),
+        value_hint="'1d', '10d', etc.",
+    ),
+
+    "nc_out_steps_per_file": ParamAlias(
+        target="ihfskip",
+        kind="raw",
+        description=(
+            "Number of model time steps per history file stack (ihfskip). "
+            "Derived so that ihfskip is a multiple of nspool."
+        ),
+        value_hint="integer time steps, e.g. 960",
+    ),
+
+    # --- Hotstart writing frequency ------------------------------------------
+    "hotstart_interval": ParamAlias(
+        target="hotstart_interval",
+        kind="property",
+        description=(
+            "Wall-clock interval between writing hotstart.nc files. Implemented "
+            "via nhot and nhot_write; nhot_write must be a multiple of the nc_out_file_span "
+            "or, more directly in schism-speak, nhot must be a multiple of ihfskip "            
+        ),
+        value_hint="'5d', '12h', or 'none'",
+    ),
+
+    # --- Station outputs: wall-clock interval --------------------------------
+    "station_interval": ParamAlias(
+        target="station_interval",
+        kind="property",
+        description=(
+            "Wall-clock interval between samples written to station output files "
+            "(staout_*). Use 'none' to disable station output."
+        ),
+        value_hint="'15min', '1h', etc. or 'none'",
+    ),
+
+    # --- Station outputs: step interval (low-level) --------------------------
+    "station_intervel_in_model_steps": ParamAlias(
+        target="nspool_sta",
+        kind="raw",
+        description=(
+            "Number of model time steps between station outputs (nspool_sta). "
+            "Only used when station output is enabled (iout_sta != 0)."
+        ),
+        value_hint="integer time steps",
+    ),
+}
+
+
+def _coerce_scalar_from_string(raw: str) -> Any:
+    s = str(raw).strip()
+    lower = s.lower()
+
+    if lower in ("true", "t", "yes", "y"):
+        return 1
+    if lower in ("false", "f", "no", "n"):
+        return 0
+
+    try:
+        return int(s)
+    except ValueError:
+        pass
+
+    try:
+        return float(s)
+    except ValueError:
+        pass
+
+    return s
+
+def _parse_alias_value(alias: ParamAlias, raw: str) -> Any:
+    """
+    Interpret CLI/programmatic values for aliases.
+
+    For interval-like properties we normalize to lowercase freq strings
+    (e.g. '1h', '30min', '3d') to avoid uppercase pandas warnings.
+    """
+    s = str(raw).strip()
+
+    # Allow disabling for some interval-like aliases
+    if alias.target in ("hotstart_freq", "station_out_interval"):
+        if s.lower() in ("none", "off", "0", "disable", "disabled"):
+            return None
+        return _normalize_freq_string(s)
+
+    # Core global output controls (intervals and spans)
+    if alias.target in ("nc_out_interval", "nc_stack"):
+        return _normalize_freq_string(s)
+
+    if alias.target in ("run_nday",):
+        return int(s)
+
+    # Low-level step counts
+    if alias.target in ("nspool", "ihfskip", "nspool_sta", "nhot_write"):
+        return _coerce_scalar_from_string(s)
+
+    # Fallback
+    return _coerce_scalar_from_string(s)
+
+
+def _normalize_freq_string(freq: str | pd.tseries.offsets.BaseOffset | None) -> Optional[str]:
+    """
+    Normalize a pandas-style frequency:
+
+    - Accepts None
+    - Accepts offsets or strings
+    - Returns a lower-case string (e.g. '1h', '30min', '3d') to avoid pandas
+      deprecation warnings about uppercase codes like 'H'.
+    """
+    if freq is None:
+        return None
+    if isinstance(freq, pd.tseries.offsets.BaseOffset):
+        # The .rule_code is often something like '1H' or '15T'
+        s = freq.rule_code
+    else:
+        s = str(freq)
+    return s.strip().lower()
+
+
+def _timedelta_from_offset_str(freq: str) -> pd.Timedelta:
+    """
+    Convert a (normalized) pandas offset string like '30min', '1h', '3d'
+    to a Timedelta.
+    """
+    return pd.to_timedelta(freq)
+
+
 
 class Params(object):
 
@@ -35,6 +225,48 @@ class Params(object):
             )
 
         self.default = self.process_default(default)
+
+    # ------------------------------------------------------------------
+    # Programmatic helper: set by SCHISM name or alias
+    # ------------------------------------------------------------------
+    def set_by_name_or_alias(self, name: str, value: Any) -> None:
+        """
+        Set a parameter value using either:
+
+        - The original SCHISM name (e.g. 'ihot', 'rnday', 'ihfskip'), or
+        - A friendly alias from PARAM_ALIASES (e.g. 'run_nday', 'nc_out_interval').
+
+        Examples
+        --------
+        >>> p.set_by_name_or_alias("ihot", 0)
+        >>> p.set_by_name_or_alias("run_nday", 365)
+        >>> p.set_by_name_or_alias("nc_out_interval", "1h")
+        """
+        alias = PARAM_ALIASES.get(name)
+
+        if alias is None:
+            # No alias: treat 'name' as a raw SCHISM key
+            if isinstance(value, str):
+                value = _coerce_scalar_from_string(value)
+            self[name] = value
+            return
+
+        # Alias: either go through underlying SCHISM key or property
+        if alias.kind == "raw":
+            target_key = alias.target
+            if isinstance(value, str):
+                value = _parse_alias_value(alias, value)
+            self[target_key] = value
+            return
+
+        if alias.kind == "property":
+            # property on Params, e.g. run_nday, nc_out_interval, station_out_interval
+            parsed = _parse_alias_value(alias, value)
+            setattr(self, alias.target, parsed)
+            return
+
+        raise ValueError(f"Unknown alias kind {alias.kind!r} for {name!r}")
+
 
     def _require_section_keys(self, section: str, keys: tuple[str, ...]) -> dict:
         """
@@ -90,19 +322,54 @@ class Params(object):
 
         return pd.tseries.frequencies.to_offset(freq)
 
-    def get_hotstart_freq(self):
+    # 1) Hotstart
+    def get_hotstart_interval(self):
         return self.get_interval("nhot_write")
 
-    def get_nc_out_freq(self):
+    def set_hotstart_interval(self, freq):
+        if freq is None:
+            self["nhot"] = 0
+        else:
+            self["nhot"] = 1
+            self.set_interval("nhot_write", freq)
+
+    hotstart_interval = property(get_hotstart_interval, set_hotstart_interval)
+
+    # 2) NetCDF history output *interval* (between writes)
+    def get_nc_out_interval(self):
+        # should use nspool * dt
+        return self.get_interval("nspool")
+
+    def set_nc_out_interval(self, freq):
+        self.set_interval("nspool", freq)
+
+    nc_out_interval = property(get_nc_out_interval, set_nc_out_interval)
+
+    # 3) NetCDF history file *span* (time per file)
+    def get_nc_out_file_span(self):
+        # ihfskip * dt
         return self.get_interval("ihfskip")
 
-    def get_nc_stack(self):
-        return self.get_interval("ihfskip")
+    def set_nc_out_file_span(self, freq):
+        self.set_interval("ihfskip", freq)
 
-    def get_station_out_freq(self):
+    nc_out_file_span = property(get_nc_out_file_span, set_nc_out_file_span)
+
+    # 4) Station output interval
+    def get_station_interval(self):
         return self.get_interval("nspool_sta")
 
-    def get_baro(self):
+    def set_station_interval(self, freq):
+        if freq is None:
+            self["iout_sta"] = 0
+        else:
+            self.set_interval("nspool_sta", freq)
+            self["iout_sta"] = 1
+
+    station_interval = property(get_station_interval, set_station_interval)
+
+
+    def get_mode(self):
         ibc = self._namelist["CORE"]["ibc"]["value"]
 
         return "clinic" if ibc == 0 else "tropic"
@@ -162,37 +429,10 @@ class Params(object):
             )
         self[name] = int(nspool)
 
-    def set_hotstart_freq(self, freq):
-        """Set hotstart frequency using Pandas offset or string that evaluates as offset
+    def get_station_out_interval(self):
+        return self.get_interval("nspool_sta")
 
-        Parameters
-        ----------
-        freq
-
-        If None, frequency will be set using default (or 1 Hour) and station output disabled
-        """
-        if freq is None:
-            self["nhot"] = 0
-            return
-        else:
-            self["nhot"] = 1
-            self.set_interval("nhot_write", freq)
-
-    hotstart_freq = property(get_hotstart_freq, set_hotstart_freq)
-
-    def set_nc_out_freq(self, freq):
-        """Set binary output frequency using Pandas offset or string that evaluates as offset"""
-        self.set_interval("ihfskip", freq)
-
-    nc_out_freq = property(get_nc_out_freq, set_nc_out_freq)
-
-    def set_nc_stack(self, freq):
-        """Set binary output frequency using Pandas offset or string that evaluates as offset"""
-        self.set_interval("ihfskip", freq)
-
-    nc_stack = property(get_nc_stack, set_nc_stack)
-
-    def set_station_out_freq(self, freq):
+    def set_station_out_interval(self, freq):
         """Set station output frequency
 
         Parameters
@@ -209,7 +449,7 @@ class Params(object):
             self.set_interval("nspool_sta", freq)
             self["iout_sta"] = 1
 
-    station_out_freq = property(get_station_out_freq, set_station_out_freq)
+    station_out_interval = property(get_station_out_interval, set_station_out_interval)
 
     def sections(self, defaults=False):
         sections = self._namelist.keys()
@@ -322,37 +562,44 @@ class Params(object):
         "nhot_write": "CORE", "ihfskip": "CORE",
     }
 
-    def __getitem__(self, key):
-        sect_name = self._SECTION_HINTS.get(key)
-        if sect_name:
-            # deterministic, section-specific
-            item = self.searchfor(key, section=sect_name)
-            return item["value"]
-        # fallback (legacy)
-        item = self.searchfor(key)
-        return item["value"]
 
-    def __setitem__(self, key, val):
-        sect_name = self._SECTION_HINTS.get(key)
-        if sect_name:
-            sect_name, _ = self.searchfor(key, section=sect_name)  # raises if absent
-            self._namelist[sect_name][key]["value"] = val
-            return
-        sect_name, _ = self.searchfor(key, section=True)  # legacy path
-        self._namelist[sect_name][key]["value"] = val
+
 
     # 5) Validate also reads from the known section (no global scan)
     def validate(self):
+        """
+        Basic consistency checks for output controls:
+
+        - nhot_write must be divisible by ihfskip when nhot == 1
+        - if iout_sta != 0, nhot_write must also be divisible by nspool_sta
+        """
+        # CORE: ihfskip (stack steps)
         core = self._require_section_keys("CORE", ("ihfskip",))
+        ihfskip = core["ihfskip"]["value"]
+
+        # SCHOUT: nhot, nhot_write, station options
         schout = self._require_section_keys("SCHOUT", ("nhot_write",))
-        nhotwrite = schout["nhot_write"]["value"]
-        ihfskip   = core["ihfskip"]["value"]
-        ratio = nhotwrite / ihfskip
-        if abs(ratio - round(ratio)) > 1e-3:
-            raise ValueError("nhot_write not divisible by ihfskip")
+        nhot_write = schout["nhot_write"]["value"]
+        nhot = schout.get("nhot", {}).get("value", 0)
+
+        if nhot == 1:
+            ratio = nhot_write / ihfskip
+            if abs(ratio - round(ratio)) > 1e-3:
+                raise ValueError("nhot_write not divisible by ihfskip when nhot=1")
+
+        # Station relationship: mod(nhot_write, nspool_sta) must == 0 if iout_sta != 0
+        iout_sta = schout.get("iout_sta", {}).get("value", 0)
+        if iout_sta != 0 and "nspool_sta" in schout:
+            nspool_sta = schout["nspool_sta"]["value"]
+            ratio2 = nhot_write / nspool_sta
+            if abs(ratio2 - round(ratio2)) > 1e-3:
+                raise ValueError(
+                    "nhot_write not divisible by nspool_sta when iout_sta != 0"
+                )
+
 
     def __getitem__(self, key):
-        item = self.searchfor(key)
+        item = self.searchfor(key)     # returns {"value": ...}
         return item["value"]
 
     def __setitem__(self, key, val):
@@ -364,6 +611,30 @@ class Params(object):
         txt = nml.write(self._namelist)
         with open(fname, "w") as outfile:
             outfile.write(txt)
+            
+def format_param_alias_help() -> str:
+    lines: list[str] = []
+    lines.append("Alias names you can use for NAME:\n")
+
+    for key in sorted(PARAM_ALIASES):
+        a = PARAM_ALIASES[key]
+        kind_label = "Params property" if a.kind == "property" else "raw SCHISM name"
+        lines.append(f"  {key}")
+        lines.append(f"    maps to : {a.target} ({kind_label})")
+        if a.value_hint:
+            lines.append(f"    value   : {a.value_hint}")
+        lines.append(f"    meaning : {a.description}")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+
+PARAM_ALIAS_HELP_TEXT = "\n" + format_param_alias_help()
+
+
+PARAM_ALIAS_HELP_TEXT = format_param_alias_help()
+
 
 
 def param_from_template(name):
@@ -393,13 +664,13 @@ def test_param():
     print(parms.nc_stack)
     print("IHFSKIP")
     print(parms["ihfskip"])
-    print(parms.nc_out_freq)
-    print(parms.station_out_freq)
+    print(parms.nc_out_interval)
+    print(parms.station_out_interval)
     parms.station_out = None
-    print(parms.station_out_freq)
+    print(parms.station_out_interval)
     print(parms["iout_sta"])
-    parms.station_out_freq = "15min"
-    print(parms.station_out_freq)
+    parms.station_out_interval = "15min"
+    print(parms.station_out_interval)
     print(parms["iout_sta"])
 
     print(parms.hotstart_freq)
@@ -421,6 +692,132 @@ def test_param():
     parms.nc_stack = pd.tseries.frequencies.to_offset("1D")
     parms.validate()
     parms.write("./junk.nml")
+
+@click.command(
+    name="set_param",
+    context_settings={"help_option_names": ["-h", "--help"]},
+    epilog=PARAM_ALIAS_HELP_TEXT,
+)
+@click.argument(
+    "param_file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, path_type=Path),
+)
+@click.argument("pairs", nargs=-1)
+@click.option(
+    "-o",
+    "--output",
+    type=click.Path(dir_okay=False, writable=True, path_type=Path),
+    help=(
+        "Write to this file instead of editing PARAM_FILE in place. "
+        "If omitted, PARAM_FILE is overwritten."
+    ),
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Parse and report changes but do not write anything.",
+)
+def main(param_file: Path, pairs: tuple[str, ...], output: Path | None, dry_run: bool):
+    """
+    Set one or more parameters in a SCHISM param.nml file.
+
+    PARAM_FILE is the path to the existing param.nml
+    (e.g. param.nml, param.nml.clinic, retro_2013/param.nml).
+
+    Remaining arguments must be NAME VALUE pairs:
+
+        NAME1 VALUE1 [NAME2 VALUE2 [...]]
+
+    NAME can be either:
+
+      * the original SCHISM name (ihot, rnday, ihfskip, nspool_sta, ...)
+      * an alias defined in PARAM_ALIASES
+        (run_nday, nc_out_interval, station_out_interval, hotstart_freq, ...)
+
+    VALUE is a scalar or interval:
+
+      * integers / floats: 0, 252, 90.0
+      * time intervals:    15min, 1H, 3D (pandas-style offsets)
+      * 'none' for aliases like hotstart_freq / station_out_interval to disable them
+    """
+    if not pairs:
+        raise click.ClickException(
+            "No NAME VALUE pairs supplied.\n"
+            "Usage: set_param PARAM_FILE NAME VALUE [NAME VALUE ...]"
+        )
+
+    if len(pairs) % 2 != 0:
+        raise click.ClickException(
+            "Expect an even number of arguments after PARAM_FILE: NAME VALUE pairs.\n"
+            "Example: set_param param.nml ihot 0 run_nday 365"
+        )
+
+    changes = list(zip(pairs[::2], pairs[1::2]))
+
+    # --- read once ---
+    try:
+        params = read_params(str(param_file))
+    except Exception as e:
+        raise click.ClickException(f"Failed to read {param_file}: {e}") from e
+
+    click.echo(f"PARAM_FILE: {param_file}")
+
+    # apply all changes in-memory
+    for name, value in changes:
+        # best-effort "before"
+        before = None
+        try:
+            if name in PARAM_ALIASES:
+                alias = PARAM_ALIASES[name]
+                if alias.kind == "raw":
+                    before = params[alias.target]
+                else:
+                    before = getattr(params, alias.target)
+            else:
+                before = params[name]
+        except Exception:
+            pass
+
+        # apply via alias-aware helper
+        try:
+            params.set_by_name_or_alias(name, value)
+        except Exception as e:
+            raise click.ClickException(
+                f"Failed to set {name} to {value!r}: {e}"
+            ) from e
+
+        # best-effort "after"
+        after = None
+        try:
+            if name in PARAM_ALIASES:
+                alias = PARAM_ALIASES[name]
+                if alias.kind == "raw":
+                    after = params[alias.target]
+                else:
+                    after = getattr(params, alias.target)
+            else:
+                after = params[name]
+        except Exception:
+            pass
+
+        if before is not None or after is not None:
+            click.echo(f"  {name}: {before!r} -> {after!r}")
+        else:
+            click.echo(f"  {name}: set to {value!r}")
+
+    if dry_run:
+        click.echo("Dry-run: no file written.")
+        return
+
+    dest = output or param_file
+
+    # --- write once ---
+    try:
+        params.write(str(dest))
+    except Exception as e:
+        raise click.ClickException(f"Failed to write {dest}: {e}") from e
+
+    click.echo(f"Wrote updated parameters to {dest}")
 
 
 if __name__ == "__main__":
