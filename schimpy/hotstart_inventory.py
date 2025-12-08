@@ -103,7 +103,7 @@ def hotstart_inventory(
 
     hots = glob.glob(os.path.join(workdir, "hotstart_000000_*.nc"))
     is_existing = len(hots) > 0
-    print(workdir)
+    
     param_needed = (
         (dt is None)
         or (run_start is None)
@@ -118,7 +118,6 @@ def hotstart_inventory(
     if param_needed:
         if paramfile is None or paramfile == "":
             paramfile = "param.nml"
-        print("got here", paramfile, workdir)
         if os.path.exists(os.path.join(workdir, "..", paramfile)):
             paramfile = os.path.join(workdir, "..", paramfile)
         params = read_params(paramfile)
@@ -185,8 +184,9 @@ def hotstart_inventory_exist(start, dt=90, workdir=".", do_print=True):
     if len(hots) == 0:
         hots = glob.glob(os.path.join("hotstart_0000_*.nc"))
     hots.sort()
-    iters = [int(x.split("_")[2].replace(".nc", "")) for x in hots]
-
+    iters = [
+        int(os.path.splitext(os.path.basename(x))[0].split("_")[2]) for x in hots
+    ]
     iters.sort()
     times = [start + seconds(x * dt) for x in iters]
     df = pd.DataFrame(index=times, data=iters)
@@ -196,7 +196,6 @@ def hotstart_inventory_exist(start, dt=90, workdir=".", do_print=True):
     if do_print:
         for it, t in zip(iters, times):
             print("{}: {}".format(it, t))
-
     return df
 
 
