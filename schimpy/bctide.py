@@ -131,37 +131,37 @@ class boundary(object):
                     )       
             update_mesh_open_boundaries(self.hgrid, self.boundary_segments)
 
-        self.elev_type = {
-            "elev.th": 1,
+        self.elev_source = {
+            "elev history": 1,
             "constant": 2,
             "tidal": 3,
-            "elev2D.th.nc": 4,
-            "tidal elev2D.th.nc": 5,
+            "2D elev history": 4,
+            "tidal and 2D elev history": 5,
             "none": 0,
         }
-        self.vel_type = {
-            "flux.th": 1,
+        self.vel_source = {
+            "flux history": 1,
             "constant": 2,
             "tidal": 3,
-            "uv3D.th.nc": 4,
-            "tidal uv3D.th.nc": 5,
+            "3D uv history": 4,
+            "tidal and 3D uv history": 5,
             "flather 1": -1,
             "none": 0,
         }
 
-        self.temp_type = {
-            "TEM_1.th": 1,
+        self.temp_source = {
+            "temperature history": 1,
             "constant": 2,
             "initial profile": 3,
-            "TEM_3D.th.nc": 4,
+            "3D temperature history": 4,
             "none": 0,
         }
 
-        self.salt_type = {
-            "SAL_1.th": 1,
+        self.salt_source = {
+            "salinity history": 1,
             "constant": 2,
             "initial profile": 3,
-            "SAL_3D.th.nc": 4,
+            "3D salinity history": 4,
             "none": 0,
         }
 
@@ -178,7 +178,7 @@ class boundary(object):
             "FABM": 9,
             "DVD": 10,
         }
-        self.tracer_type = {
+        self.tracer_source = {
             "time history": 1,
             "constant": 2,
             "initial profile": 3,
@@ -315,7 +315,7 @@ class boundary(object):
                     elev_boundary = None
                     if "elevation_boundary" in self.open_boundaries[i].keys():
                         elev_boundary = self.open_boundaries[i]["elevation_boundary"]
-                        elev_source = elev_boundary["type"]
+                        elev_source = elev_boundary["source"]
                         elev_key = elev_source
                         if isinstance(elev_source, numbers.Number):
                             elev_key = "constant"
@@ -323,7 +323,7 @@ class boundary(object):
                             elev_key = "tidal elev2D.th.nc"
 
                         try:
-                            elev_id = self.elev_type[elev_key]
+                            elev_id = self.elev_source[elev_key]
                         except:
                             raise ValueError(
                                 elev_key + " elevation boundary is not supported"
@@ -333,7 +333,7 @@ class boundary(object):
                     vel_boundary = None
                     if "velocity_boundary" in self.open_boundaries[i].keys():
                         vel_boundary = self.open_boundaries[i]["velocity_boundary"]
-                        vel_source = vel_boundary["type"]
+                        vel_source = vel_boundary["source"]
                         vel_key = vel_source
 
                         if isinstance(vel_source, numbers.Number):
@@ -345,7 +345,7 @@ class boundary(object):
                             vel_key = "flather 1"
 
                         try:
-                            vel_id = self.vel_type[vel_key]
+                            vel_id = self.vel_source[vel_key]
                         except:
                             raise ValueError(
                                 vel_key + " velocity boundary is not supported"
@@ -356,13 +356,13 @@ class boundary(object):
                     temp_boundary = None
                     if "temperature_boundary" in self.open_boundaries[i].keys():
                         temp_boundary = self.open_boundaries[i]["temperature_boundary"]
-                        temp_source = temp_boundary["type"]
+                        temp_source = temp_boundary["source"]
                         temp_key = temp_source
                         if isinstance(temp_source, numbers.Number):
                             temp_key = "constant"
 
                         try:
-                            temp_id = self.vel_type[vel_key]
+                            temp_id = self.vel_source[vel_key]
                         except:
                             raise ValueError(
                                 temp_key + " temperature boundary is not supported"
@@ -371,20 +371,20 @@ class boundary(object):
                     salt_boundary = None
                     if "salinity_boundary" in self.open_boundaries[i].keys():
                         salt_boundary = self.open_boundaries[i]["salinity_boundary"]
-                        salt_source = salt_boundary["type"]
+                        salt_source = salt_boundary["source"]
                         salt_key = salt_source
                         if isinstance(salt_source, numbers.Number):
                             salt_key = "constant"
 
                         try:
-                            salt_id = self.salt_type[salt_key]
+                            salt_id = self.salt_source[salt_key]
                         except:
                             raise ValueError(
                                 salt_key + " temperature boundary is not supported"
                             )
 
                     ## output tracer boundary
-                    tracer_boundary_types = [0] * num_tracer_mod
+                    tracer_boundary_sources = [0] * num_tracer_mod
                     ## this list save sorted tracer boundary index according to SCHISM code order
                     tracer_boundary_lst_sorted = []
                     if "tracers" in self.open_boundaries[i].keys():
@@ -392,7 +392,7 @@ class boundary(object):
                             self.open_boundaries[i]["tracers"]
                         )
                         for j in range(boundary_tracer_mod_num):
-                            tracer_boundary = self.open_boundaries[i]["tracers"][j]["type"]
+                            tracer_boundary = self.open_boundaries[i]["tracers"][j]["source"]
                             tracer_mod = self.open_boundaries[i]["tracers"][j]["tracer"]
                             tracer_boundary_key = tracer_boundary
                             if isinstance(tracer_boundary, numbers.Number):
@@ -410,9 +410,9 @@ class boundary(object):
                                         + str(tracer_boundary)
                                         + " boundary is not supported"
                                     )
-                            tracer_boundary_type = self.tracer_type[tracer_boundary_key]
+                            tracer_boundary_source = self.tracer_source[tracer_boundary_key]
                             pos = tracer_mod_pos[tracer_mod]
-                            tracer_boundary_types[pos] = tracer_boundary_type
+                            tracer_boundary_sources[pos] = tracer_boundary_source
                             tracer_boundary_lst_sorted.append(j)
 
                         tracer_boundary_lst_sorted.sort(
@@ -426,7 +426,7 @@ class boundary(object):
                     outf.write(str(temp_id) + " ")
                     outf.write(str(salt_id) + " ")
                     for ii in range(num_tracer_mod):
-                        outf.write(str(tracer_boundary_types[ii]) + " ")
+                        outf.write(str(tracer_boundary_sources[ii]) + " ")
                     outf.write("\n")
 
                     ## output all the boundary parameters
@@ -566,7 +566,7 @@ class boundary(object):
 
                     ## temperature bc parameters
                     if temp_id == 2:
-                        temp_bc = temp_boundary["type"]
+                        temp_bc = temp_boundary["source"]
                         outf.write(str(temp_bc) + "\n")
                     if temp_id > 0:
                         nudge = temp_boundary["nudge"]
@@ -574,7 +574,7 @@ class boundary(object):
 
                     ## salt bc parameters
                     if salt_id == 2:
-                        salt_bc = salt_boundary["type"]
+                        salt_bc = salt_boundary["source"]
                         outf.write(str(salt_bc) + "\n")
                     if salt_id > 0:
                         nudge = salt_boundary["nudge"]
@@ -584,16 +584,16 @@ class boundary(object):
                     for ii in range(len(tracer_boundary_lst_sorted)):
                         tracer_index = tracer_boundary_lst_sorted[ii]
                         tracer = self.open_boundaries[i]["tracers"][tracer_index]
-                        tracer_bc_type = tracer_boundary_types[ii]
-                        if tracer_bc_type == 2:
-                            tracer_bc_const = tracer["type"]
+                        tracer_bc_source = tracer_boundary_sources[ii]
+                        if tracer_bc_source == 2:
+                            tracer_bc_const = tracer["source"]
                             if isinstance(tracer_bc_const, list):
                                 for val in tracer_bc_const:
                                     outf.write(str(val) + " ")
                             else:
                                 outf.write(str(tracer_bc_const))
                             outf.write("\n")
-                        if tracer_bc_type > 0:
+                        if tracer_bc_source > 0:
                             relax = tracer["relax"]
                             outf.write(str(relax) + "\n ")
 
