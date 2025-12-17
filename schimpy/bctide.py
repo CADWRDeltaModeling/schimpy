@@ -626,7 +626,7 @@ if __name__ == "__main__":
 #             node_factor: 0.99
 #             angular_frequency: 1.9323
 #             earth_equilibrium_argument: 0.0
-#     bounary_forcing_tidals:
+#     boundary_forcing_tidals:
 #         tidal_constituents:
 #           - name: Z0
 #             angular_frequency: 0.0
@@ -648,7 +648,7 @@ if __name__ == "__main__":
 #       - open_boundary:
 #         name: ocean
 #         elevation_boundary:
-#             boundary: tidal
+#             source: tidal
 #             tidal_constituents:
 #               - name : Z0
 #                 amplitude: 1.0
@@ -663,7 +663,7 @@ if __name__ == "__main__":
 #                 amplitude: 0.578
 #                 phase: 190
 #         velocity_boundary:
-#             boundary: tidal
+#             source: tidal
 #             tidal_constituents:
 #               - name: Z0
 #                 u_amplitude: 0.20
@@ -687,19 +687,19 @@ if __name__ == "__main__":
 #                 v_phase: 206
 
 #         temperature_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 0.5
 #         salinity_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 0.5
 #         tracer_boundaries:
-#             boundary: none
+#             source: none
 #       - open_boundary:
 #         name: coyote
 #         elevation_boundary:
-#             boundary: elev2D.th.nc
+#             source: 2D elev history
 #         velocity_boundary:
-#             boundary: uv3D.th.nc
+#             boundary: 3D uv history
 #         temperature_boundary:
 #             boundary: initial profile
 #             nudge: 0.5
@@ -709,7 +709,7 @@ if __name__ == "__main__":
 #       - open_boundary:
 #         name: ccc_rock_slough
 #         velocity_boundary:
-#             boundary: flux.th
+#             boundary: flux history
 #         temperature_boundary:
 #             boundary: initial profile
 #             nudge: 1.0
@@ -747,32 +747,32 @@ if __name__ == "__main__":
 #       - open_boundary:
 #         name: swp
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: cvp
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: sjr
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: calaveras
@@ -784,62 +784,62 @@ if __name__ == "__main__":
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: moke
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: american
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history 
 #             nudge: 1.0
 #       - open_boundary:
 #         name: sac
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: yolo_toedrain
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: yolo
 #         velocity_boundary:
-#              boundary: flux.th
+#              boundary: flux history
 #         temperature_boundary:
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: north bay
 #         elevation_boundary:
-#             boundary: tidal elev2D.th.nc
+#             boundary: tidal 2D elev history 
 #             tidal_constituents:
 #               - name: Z0
 #                 amplitude: 1.0
@@ -854,7 +854,7 @@ if __name__ == "__main__":
 #                 amplitude: 0.578
 #                 phase: 190
 #         velocity_boundary:
-#              boundary: tidal uv3D.th.nc
+#              boundary: tidal 3D uv history
 #              tidal_constituents:
 #               - name: Z0
 #                 u_amplitude: 0.20
@@ -880,7 +880,7 @@ if __name__ == "__main__":
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: napa
@@ -897,18 +897,18 @@ if __name__ == "__main__":
 #             boundary: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: ccc_vic
 #         elevation_boundary:
-#             boundary: elev.th
+#             boundary: elev history
 #         velocity_boundary:
-#             boundary: flux.th
+#             boundary: flux history
 #         temperature_boundary:
 #             boundary:  10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: SAL_3D.th.nc
+#             boundary: 3D salinity history
 #             nudge: 1.0
 #############################################################################################################################
