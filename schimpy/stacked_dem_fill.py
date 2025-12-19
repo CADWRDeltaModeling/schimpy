@@ -82,6 +82,7 @@ def _stacked_dem_fill(
         else:
             print(message)
     if na_fill is not None:
+        miss_idx = np.isnan(values)
         values[miss_idx] = na_fill
     return values
 
