@@ -587,6 +587,7 @@ class BatchMetrics(object):
                     for simout in sim_outputs:
                         if (station_id, subloc) in simout.columns:
                             s = simout.loc[:, (station_id, subloc)]
+                            s = s.squeeze()
                             if isinstance(s, pd.DataFrame):
                                 raise (
                                     "Station,Sublocation pair ({},{}) not unique or some other uniqueness problem in station files".format(
