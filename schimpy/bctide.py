@@ -191,7 +191,96 @@ class boundary(object):
             tt = self.date.strftime("%Y-%m-%d %H:%M")
             outf.write(tt)
             outf.write("\n")
+            # normalize tidal-constituent input formats so downstream code can
+            # expect a list of dicts with explicit keys.
+            def _norm_earth(consts):
+                out = []
+                for item in consts:
+                    if isinstance(item, dict):
+                        # either {"name":..., "amplitude":..., ...} or {"K1": [..]}
+                        if "name" in item:
+                            name = item.get("name")
+                            amp = item.get("amplitude", item.get("amp", 0.0))
+                            node = item.get("node_factor", 1.0)
+                            freq = item.get("angular_frequency", item.get("frequency", 0.0))
+                            eqa = item.get("earth_equilibrium_argument", item.get("eqa", 0.0))
+                        else:
+                            key = next(iter(item))
+                            vals = item[key]
+                            name = key
+                            if isinstance(vals, (list, tuple)):
+                                # support common lengths used in examples
+                                if len(vals) == 5:
+                                    # example: [?, amplitude, freq, node_factor, eqa]
+                                    amp = vals[1]
+                                    freq = vals[2]
+                                    node = vals[3]
+                                    eqa = vals[4]
+                                elif len(vals) == 4:
+                                    # example: [amp, freq, node, eqa]
+                                    amp = vals[0]
+                                    freq = vals[1]
+                                    node = vals[2]
+                                    eqa = vals[3]
+                                else:
+                                    amp = vals[0] if len(vals) > 0 else 0.0
+                                    freq = vals[2] if len(vals) > 2 else 0.0
+                                    node = vals[3] if len(vals) > 3 else 1.0
+                                    eqa = vals[-1] if len(vals) > 0 else 0.0
+                            else:
+                                # unsupported format -> skip
+                                continue
+                    else:
+                        continue
+                    out.append({
+                        "name": name,
+                        "amplitude": amp,
+                        "node_factor": node,
+                        "angular_frequency": freq,
+                        "earth_equilibrium_argument": eqa,
+                    })
+                return out
 
+            def _norm_boundary(consts):
+                out = []
+                for item in consts:
+                    if isinstance(item, dict):
+                        if "name" in item:
+                            name = item.get("name")
+                            freq = item.get("angular_frequency", item.get("frequency", 0.0))
+                            node = item.get("node_factor", 1.0)
+                            eqa = item.get("earth_equilibrium_argument", item.get("eqa", 0.0))
+                        else:
+                            key = next(iter(item))
+                            vals = item[key]
+                            name = key
+                            if isinstance(vals, (list, tuple)):
+                                if len(vals) >= 3:
+                                    freq, node, eqa = vals[0], vals[1], vals[2]
+                                else:
+                                    freq = vals[0] if len(vals) > 0 else 0.0
+                                    node = vals[1] if len(vals) > 1 else 1.0
+                                    eqa = vals[-1] if len(vals) > 0 else 0.0
+                            else:
+                                continue
+                    else:
+                        continue
+                    out.append({
+                        "name": name,
+                        "angular_frequency": freq,
+                        "node_factor": node,
+                        "earth_equilibrium_argument": eqa,
+                    })
+                return out
+
+            if self.earth_tidals and "tidal_constituents" in self.earth_tidals:
+                self.earth_tidals["tidal_constituents"] = _norm_earth(
+                    self.earth_tidals["tidal_constituents"]
+                )
+            if self.boundary_tidals and "tidal_constituents" in self.boundary_tidals:
+                self.boundary_tidals["tidal_constituents"] = _norm_boundary(
+                    self.boundary_tidals["tidal_constituents"]
+                )
             ##out earth tidal potential if any
             if self.earth_tidals:
                 num_tidal = len(self.earth_tidals["tidal_constituents"])
@@ -604,88 +693,39 @@ if __name__ == "__main__":
 
 
 ##################### YAML EXMAPLE #####################################################
-
+#
 # bctides:
 #     date: 2011-01-28
 #     hgrid_input_file: G:\schism\bctides\hgrid.gr3
 #     earth_tidals:
 #         tidal_cutoff_depth: 40
 #         tidal_constituents:
-#           - name: Sa
-#             amplitude: 0.05
-#             node_factor: 1.0
-#             angular_frequency: 0.0027
-#             earth_equilibrium_argument: 0.01
-#           - name: O1
-#             amplitude: 0.2
-#             node_factor: 1.1
-#             angular_frequency: 4.001
-#             earth_equilibrium_argument: 0.0
-#           - name: M2
-#             amplitude: 0.5
-#             node_factor: 0.99
-#             angular_frequency: 1.9323
-#             earth_equilibrium_argument: 0.0
+#           - K1: [0,0.0417807,0.00007292,1.0,0.0]
+#           - O1: [0,0.0751136,0.00006758,1.0,0.0]
+#           - SSA: [0,0.0002282,0.00000040,,1.0,260.4229976]
 #     boundary_forcing_tidals:
 #         tidal_constituents:
-#           - name: Z0
-#             angular_frequency: 0.0
-#             node_factor: 1
-#             earth_equilibrium_argument: 0
-#           - name: O1
-#             angular_frequency: 0.675977E-04
-#             node_factor: 1.11945
-#             earth_equilibrium_argument: 7.47302
-#           - name: K1
-#             angular_frequency: 0.729212E-04
-#             node_factor: 1.07391
-#             earth_equilibrium_argument: 206.78674
-#           - name: M2
-#             angular_frequency: 0.140519E-04
-#             node_factor: 0.97907
-#             earth_equilibrium_argument: 217.04138
+#           - Z0: [0.0,1.0,0.0]
+#           - O1: [0.00006758,1.11945,7.47302]
+#           - K1: [0.00007292 ,1.07391,206.78674]
+#           - M2: [0.00014023,0.97907,217.04138]
 #     open_boundaries:
 #       - open_boundary:
 #         name: ocean
 #         elevation_boundary:
 #             source: tidal
 #             tidal_constituents:
-#               - name : Z0
-#                 amplitude: 1.0
-#                 phase: 0.0
-#               - name: O1
-#                 amplitude: 0.226
-#                 phase: 206
-#               - name: K1
-#                 amplitude: 0.369
-#                 phase: 220
-#               - name: M2
-#                 amplitude: 0.578
-#                 phase: 190
+#               - Z0 : [1.0,0.0]
+#               - O1 : [0.226,206]
+#               - K1 : [0.369,220]
+#               - M2 : [0.578,190]
 #         velocity_boundary:
 #             source: tidal
 #             tidal_constituents:
-#               - name: Z0
-#                 u_amplitude: 0.20
-#                 u_phase: 0.0
-#                 v_amplitude: 0.10
-#                 v_phase: 0.0
-#               - name: O1
-#                 u_amplitude: 0.0226
-#                 u_phase: 206
-#                 v_amplitude: 0.0226
-#                 v_phase: 206
-#               - name: K1
-#                 u_amplitude: 0.0369
-#                 u_phase: 220
-#                 v_amplitude: 0.0226
-#                 v_phase: 206
-#               - name: M2
-#                 u_amplitude: 0.0578
-#                 u_phase: 190
-#                 v_amplitude: 0.0226
-#                 v_phase: 206
-
+#               - Z0 : [0.2,0.0,0.1,0.0]
+#               - O1 : [0.0226,206,0.0226,206]
+#               - K1 : [0.0369,220,0.0226,206]
+#               - M2 : [0.0578,190,0.0226,206]
 #         temperature_boundary:
 #             source: initial profile
 #             nudge: 0.5
