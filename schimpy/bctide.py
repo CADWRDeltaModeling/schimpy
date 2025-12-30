@@ -185,6 +185,200 @@ class boundary(object):
             "none": 0,
         }
 
+    def _norm_earth(consts):
+        out = []
+        for item in consts:
+            if not isinstance(item, dict):
+                # unsupported format -> skip
+                continue
+
+            # case: explicit dict with "name" key
+            if "name" in item:
+                name = item.get("name")
+                amp = item.get("amplitude", item.get("amp", 0.0))
+                node = item.get("node_factor", item.get("node", 1.0))
+                freq = item.get("angular_frequency", item.get("frequency", 0.0))
+                eqa = item.get(
+                    "earth_equilibrium_argument",
+                    item.get("eqa", item.get("phase", 0.0)),
+                )
+                out.append(
+                    {
+                        "name": name,
+                        "amplitude": amp,
+                        "node_factor": node,
+                        "angular_frequency": freq,
+                        "earth_equilibrium_argument": eqa,
+                    }
+                )
+                continue
+
+            # case: mapping like {K1: {...}} or {K1: [..]}
+            key = next(iter(item))
+            vals = item[key]
+            name = key
+
+            if isinstance(vals, dict):
+                amp = vals.get("amplitude", vals.get("amp", 0.0))
+                node = vals.get("node_factor", vals.get("node", 1.0))
+                freq = vals.get("angular_frequency", vals.get("frequency", 0.0))
+                eqa = vals.get(
+                    "earth_equilibrium_argument",
+                    vals.get("eqa", vals.get("phase", 0.0)),
+                )
+                out.append(
+                    {
+                        "name": name,
+                        "amplitude": amp,
+                        "node_factor": node,
+                        "angular_frequency": freq,
+                        "earth_equilibrium_argument": eqa,
+                    }
+                )
+                continue
+
+            if isinstance(vals, (list, tuple)):
+                # support common list formats used historically
+                if len(vals) == 5:
+                    # example: [?, amplitude, freq, node_factor, eqa]
+                    amp = vals[1]
+                    freq = vals[2]
+                    node = vals[3]
+                    eqa = vals[4]
+                elif len(vals) == 4:
+                    # example: [amp, freq, node, eqa]
+                    amp = vals[0]
+                    freq = vals[1]
+                    node = vals[2]
+                    eqa = vals[3]
+                else:
+                    amp = vals[0] if len(vals) > 0 else 0.0
+                    freq = vals[2] if len(vals) > 2 else 0.0
+                    node = vals[3] if len(vals) > 3 else 1.0
+                    eqa = vals[-1] if len(vals) > 0 else 0.0
+                out.append(
+                    {
+                        "name": name,
+                        "amplitude": amp,
+                        "node_factor": node,
+                        "angular_frequency": freq,
+                        "earth_equilibrium_argument": eqa,
+                    }
+                )
+                continue
+
+            # unsupported nested format -> skip
+            continue
+
+        return out
+
+
+    def _norm_boundary(consts):
+        """
+        Normalize boundary (forcing) tidal constituent specifications into list of dicts with keys:
+          name, angular_frequency, node_factor, earth_equilibrium_argument
+
+        Supported input shapes (from YAML examples):
+          - explicit dict with "name": {...}
+          - mapping like {O1: {...}} or {O1: [freq, node, eqa]}
+          - list/tuple forms [freq, node, eqa] when provided as the value for a key
+          - simple string -> defaults
+        """
+        out = []
+        for item in consts or []:
+            try:
+                # explicit dict with 'name'
+                if isinstance(item, dict) and "name" in item:
+                    name = item.get("name")
+                    freq = item.get("angular_frequency", item.get("frequency", 0.0))
+                    node = item.get("node_factor", item.get("node", 1.0))
+                    eqa = item.get(
+                        "earth_equilibrium_argument", item.get("eqa", item.get("phase", 0.0))
+                    )
+                    out.append(
+                        {
+                            "name": name,
+                            "angular_frequency": freq,
+                            "node_factor": node,
+                            "earth_equilibrium_argument": eqa,
+                        }
+                    )
+                    continue
+
+                # mapping {NAME: {...}} or {NAME: [...]}
+                if isinstance(item, dict):
+                    key = next(iter(item))
+                    vals = item[key]
+                    name = key
+
+                    if isinstance(vals, dict):
+                        freq = vals.get("angular_frequency", vals.get("frequency", 0.0))
+                        node = vals.get("node_factor", vals.get("node", 1.0))
+                        eqa = vals.get(
+                            "earth_equilibrium_argument", vals.get("eqa", vals.get("phase", 0.0))
+                        )
+                        out.append(
+                            {
+                                "name": name,
+                                "angular_frequency": freq,
+                                "node_factor": node,
+                                "earth_equilibrium_argument": eqa,
+                            }
+                        )
+                        continue
+
+                    if isinstance(vals, (list, tuple)):
+                        if len(vals) >= 3:
+                            freq, node, eqa = vals[0], vals[1], vals[2]
+                        else:
+                            # partial lists: fill with defaults
+                            freq = vals[0] if len(vals) > 0 else 0.0
+                            node = vals[1] if len(vals) > 1 else 1.0
+                            eqa = vals[-1] if len(vals) > 0 else 0.0
+                        out.append(
+                            {
+                                "name": name,
+                                "angular_frequency": freq,
+                                "node_factor": node,
+                                "earth_equilibrium_argument": eqa,
+                            }
+                        )
+                        continue
+
+                    # vals is scalar (frequency) or unsupported -> try to use as frequency
+                    if isinstance(vals, (int, float)):
+                        out.append(
+                            {
+                                "name": name,
+                                "angular_frequency": vals,
+                                "node_factor": 1.0,
+                                "earth_equilibrium_argument": 0.0,
+                            }
+                        )
+                        continue
+
+                    # otherwise skip
+                    continue
+
+                # plain string -> treat as name with defaults
+                if isinstance(item, str):
+                    out.append(
+                        {
+                            "name": item,
+                            "angular_frequency": 0.0,
+                            "node_factor": 1.0,
+                            "earth_equilibrium_argument": 0.0,
+                        }
+                    )
+                    continue
+
+            except Exception:
+                # skip malformed entries
+                continue
+
+        return out
+
+
     def write_bctides(self, bctides_file):
  
         with open(bctides_file, "w") as outf:
@@ -192,86 +386,9 @@ class boundary(object):
             outf.write(tt)
             outf.write("\n")
             # normalize tidal-constituent input formats so downstream code can
+            # normalize tidal-constituent input formats so downstream code can
             # expect a list of dicts with explicit keys.
-            def _norm_earth(consts):
-                out = []
-                for item in consts:
-                    if isinstance(item, dict):
-                        # either {"name":..., "amplitude":..., ...} or {"K1": [..]}
-                        if "name" in item:
-                            name = item.get("name")
-                            amp = item.get("amplitude", item.get("amp", 0.0))
-                            node = item.get("node_factor", 1.0)
-                            freq = item.get("angular_frequency", item.get("frequency", 0.0))
-                            eqa = item.get("earth_equilibrium_argument", item.get("eqa", 0.0))
-                        else:
-                            key = next(iter(item))
-                            vals = item[key]
-                            name = key
-                            if isinstance(vals, (list, tuple)):
-                                # support common lengths used in examples
-                                if len(vals) == 5:
-                                    # example: [?, amplitude, freq, node_factor, eqa]
-                                    amp = vals[1]
-                                    freq = vals[2]
-                                    node = vals[3]
-                                    eqa = vals[4]
-                                elif len(vals) == 4:
-                                    # example: [amp, freq, node, eqa]
-                                    amp = vals[0]
-                                    freq = vals[1]
-                                    node = vals[2]
-                                    eqa = vals[3]
-                                else:
-                                    amp = vals[0] if len(vals) > 0 else 0.0
-                                    freq = vals[2] if len(vals) > 2 else 0.0
-                                    node = vals[3] if len(vals) > 3 else 1.0
-                                    eqa = vals[-1] if len(vals) > 0 else 0.0
-                            else:
-                                # unsupported format -> skip
-                                continue
-                    else:
-                        continue
-                    out.append({
-                        "name": name,
-                        "amplitude": amp,
-                        "node_factor": node,
-                        "angular_frequency": freq,
-                        "earth_equilibrium_argument": eqa,
-                    })
-                return out
-
-            def _norm_boundary(consts):
-                out = []
-                for item in consts:
-                    if isinstance(item, dict):
-                        if "name" in item:
-                            name = item.get("name")
-                            freq = item.get("angular_frequency", item.get("frequency", 0.0))
-                            node = item.get("node_factor", 1.0)
-                            eqa = item.get("earth_equilibrium_argument", item.get("eqa", 0.0))
-                        else:
-                            key = next(iter(item))
-                            vals = item[key]
-                            name = key
-                            if isinstance(vals, (list, tuple)):
-                                if len(vals) >= 3:
-                                    freq, node, eqa = vals[0], vals[1], vals[2]
-                                else:
-                                    freq = vals[0] if len(vals) > 0 else 0.0
-                                    node = vals[1] if len(vals) > 1 else 1.0
-                                    eqa = vals[-1] if len(vals) > 0 else 0.0
-                            else:
-                                continue
-                    else:
-                        continue
-                    out.append({
-                        "name": name,
-                        "angular_frequency": freq,
-                        "node_factor": node,
-                        "earth_equilibrium_argument": eqa,
-                    })
-                return out
+ 
 
             if self.earth_tidals and "tidal_constituents" in self.earth_tidals:
                 self.earth_tidals["tidal_constituents"] = _norm_earth(
