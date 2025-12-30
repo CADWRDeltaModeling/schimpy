@@ -97,14 +97,14 @@ class boundary(object):
 
         main_id = "bctides"
         self.date = bc_yaml[main_id]["date"]
-        if "earth_tidals" in bc_yaml[main_id].keys():
-            self.earth_tidals = bc_yaml[main_id]["earth_tidals"]
+        if "earth_tides" in bc_yaml[main_id].keys():
+            self.earth_tides = bc_yaml[main_id]["earth_tides"]
         else:
-            self.earth_tidals = None
+            self.earth_tides = None
         if "bounary_forcing_tidals" in bc_yaml[main_id].keys():
-            self.boundary_tidals = bc_yaml[main_id]["bounary_forcing_tidals"]
+            self.boundary_tides = bc_yaml[main_id]["bounary_forcing_tidals"]
         else:
-            self.boundary_tidals = None
+            self.boundary_tides = None
         
         self.open_boundaries = bc_yaml[main_id]["open_boundaries"]
         self.hgrid = hgrid  
@@ -390,32 +390,32 @@ class boundary(object):
             # expect a list of dicts with explicit keys.
  
 
-            if self.earth_tidals and "tidal_constituents" in self.earth_tidals:
-                self.earth_tidals["tidal_constituents"] = _norm_earth(
-                    self.earth_tidals["tidal_constituents"]
+            if self.earth_tides and "tidal_constituents" in self.earth_tides:
+                self.earth_tides["tidal_constituents"] = self._norm_earth(
+                    self.earth_tides["tidal_constituents"]
                 )
-            if self.boundary_tidals and "tidal_constituents" in self.boundary_tidals:
-                self.boundary_tidals["tidal_constituents"] = _norm_boundary(
-                    self.boundary_tidals["tidal_constituents"]
+            if self.boundary_tides and "tidal_constituents" in self.boundary_tides:
+                self.boundary_tides["tidal_constituents"] = self._norm_boundary(
+                    self.boundary_tides["tidal_constituents"]
                 )
             ##out earth tidal potential if any
-            if self.earth_tidals:
-                num_tidal = len(self.earth_tidals["tidal_constituents"])
-                cutoff_depth = self.earth_tidals["tidal_cutoff_depth"]
+            if self.earth_tides:
+                num_tidal = len(self.earth_tides["tidal_constituents"])
+                cutoff_depth = self.earth_tides["tidal_cutoff_depth"]
                 outf.write(str(num_tidal) + " " + str(cutoff_depth) + "\n")
                 for i in range(num_tidal):
                     outf.write(
-                        self.earth_tidals["tidal_constituents"][i]["name"]
+                        self.earth_tides["tidal_constituents"][i]["name"]
                     )
                     outf.write("\n")
-                    amp = self.earth_tidals["tidal_constituents"][i]["amplitude"]
-                    node_factor = self.earth_tidals["tidal_constituents"][i][
+                    amp = self.earth_tides["tidal_constituents"][i]["amplitude"]
+                    node_factor = self.earth_tides["tidal_constituents"][i][
                         "node_factor"
                     ]
-                    freq = self.earth_tidals["tidal_constituents"][i][
+                    freq = self.earth_tides["tidal_constituents"][i][
                         "angular_frequency"
                     ]
-                    eqa = self.earth_tidals["tidal_constituents"][i][
+                    eqa = self.earth_tides["tidal_constituents"][i][
                         "earth_equilibrium_argument"
                     ]
                     outf.write(
@@ -434,21 +434,21 @@ class boundary(object):
                 outf.write(str(num_tidal) + " " + str(cutoff_depth) + "\n")
 
             ## out boundary forcing tidal
-            if self.boundary_tidals:
-                num_tidal = len(self.boundary_tidals["tidal_constituents"])
+            if self.boundary_tides:
+                num_tidal = len(self.boundary_tides["tidal_constituents"])
                 outf.write(str(num_tidal) + "\n")
                 for i in range(num_tidal):
                     outf.write(
-                        self.boundary_tidals["tidal_constituents"][i]["name"]
+                        self.boundary_tides["tidal_constituents"][i]["name"]
                     )
                     outf.write("\n")
-                    freq = self.boundary_tidals["tidal_constituents"][i][
+                    freq = self.boundary_tides["tidal_constituents"][i][
                         "angular_frequency"
                     ]
-                    node_factor = self.boundary_tidals["tidal_constituents"][i][
+                    node_factor = self.boundary_tides["tidal_constituents"][i][
                         "node_factor"
                     ]
-                    eqa = self.boundary_tidals["tidal_constituents"][i][
+                    eqa = self.boundary_tides["tidal_constituents"][i][
                         "earth_equilibrium_argument"
                     ]
                     outf.write(str(freq) + " " + str(node_factor) + " " + str(eqa))
