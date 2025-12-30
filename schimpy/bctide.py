@@ -693,10 +693,8 @@ if __name__ == "__main__":
 
 
 ##################### YAML EXMAPLE #####################################################
-#
 # bctides:
 #     date: 2011-01-28
-#     hgrid_input_file: G:\schism\bctides\hgrid.gr3
 #     earth_tides:
 #         tidal_cutoff_depth: 40
 #         tidal_constituents:
@@ -802,7 +800,7 @@ if __name__ == "__main__":
 #                                   0.533248,0.523087,0.511687,0.518907,0.523257,0.527558,0.531142,0.534991,0.539671,
 #                                   0.542802,0.547462,0.550491,0.554966,0.557482,0.559349,0.561967,0.564318,0.565828,
 #                                   0.567531,0.569445]
-#                   - phase: [33., 33.02409639, 33.04819277, 33.07228916, 33.09638554,
+#                     - phase: [33., 33.02409639, 33.04819277, 33.07228916, 33.09638554,
 #                            33.12048193, 33.14457831, 33.1686747 , 33.19277108, 33.21686747,
 #                            33.24096386, 33.26506024, 33.28915663, 33.31325301, 33.3373494 ,
 #                            33.36144578, 33.38554217, 33.40963855, 33.43373494, 33.45783133,
@@ -915,7 +913,7 @@ if __name__ == "__main__":
 #                              124.73493976, 124.75903614, 124.78313253, 124.80722892,
 #                              124.8313253 , 124.85542169, 124.87951807, 124.90361446,
 #                              124.92771084, 124.95180723, 124.97590361]
-#
+
 #               - M2 : 
 #                     - u_amplitude: [0.965402,0.96116,0.957983,0.953339,0.948823,0.946419,0.942846,0.940093,0.937487,
 #                                   0.934799,0.931827,0.929234,0.926892,0.924831,0.922732,0.9194,0.915553,0.910812,
@@ -927,7 +925,7 @@ if __name__ == "__main__":
 #                                   0.533248,0.523087,0.511687,0.518907,0.523257,0.527558,0.531142,0.534991,0.539671,
 #                                   0.542802,0.547462,0.550491,0.554966,0.557482,0.559349,0.561967,0.564318,0.565828,
 #                                   0.567531,0.569445]
-#                   - u_phase: [33., 33.02409639, 33.04819277, 33.07228916, 33.09638554,
+#                     - u_phase: [33., 33.02409639, 33.04819277, 33.07228916, 33.09638554,
 #                            33.12048193, 33.14457831, 33.1686747 , 33.19277108, 33.21686747,
 #                            33.24096386, 33.26506024, 33.28915663, 33.31325301, 33.3373494 ,
 #                            33.36144578, 33.38554217, 33.40963855, 33.43373494, 33.45783133,
@@ -954,7 +952,7 @@ if __name__ == "__main__":
 #                                   0.533248,0.523087,0.511687,0.518907,0.523257,0.527558,0.531142,0.534991,0.539671,
 #                                   0.542802,0.547462,0.550491,0.554966,0.557482,0.559349,0.561967,0.564318,0.565828,
 #                                   0.567531,0.569445]
-#                   - v_phase: [33., 33.02409639, 33.04819277, 33.07228916, 33.09638554,
+#                     - v_phase: [33., 33.02409639, 33.04819277, 33.07228916, 33.09638554,
 #                            33.12048193, 33.14457831, 33.1686747 , 33.19277108, 33.21686747,
 #                            33.24096386, 33.26506024, 33.28915663, 33.31325301, 33.3373494 ,
 #                            33.36144578, 33.38554217, 33.40963855, 33.43373494, 33.45783133,
@@ -984,162 +982,164 @@ if __name__ == "__main__":
 #         elevation_boundary:
 #             source: 2D elev history
 #         velocity_boundary:
-#             boundary: 3D uv history
+#             source: 3D uv history
 #         temperature_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 0.5
 #         salinity_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 0.5
 #       - open_boundary:
 #         name: ccc_rock_slough
 #         velocity_boundary:
-#             boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 1.0
 #         tracers:
 #           - tracer: GEN
 #             number_of_tracers: 2
-#             boundary: time history
+#             source: time history
 #             nudge: 0.5
 #           - tracer: AGE
 #             number_of_tracers: 2
-#             boundary: [10, 20]
+#             source: [10, 20]
 #             nudge: 1.0
 #           - tracer: SED
 #             number_of_tracers: 5
-#             boundary: [0.1, 0.2, 0.1, 0.12, 0.23]
+#             source: [0.1, 0.2, 0.1, 0.12, 0.23]
 #             nudge: 0.3
 #       - open_boundary:
 #         name: ccc_old
 #         velocity_boundary:
-#             boundary: flux.th
+#             source: flux history
 #         temperature_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 0.5
 #         salinity_boundary:
-#             boundary: initial profile
+#             source: initial profile
 #             nudge: 0.5
 #         tracers:
 #           - tracer: GEN
 #             number_of_tracers: 1
-#             boundary: 10
+#             source: 10
 #             nudge: 0.5
 #       - open_boundary:
 #         name: swp
 #         velocity_boundary:
-#              boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: cvp
 #         velocity_boundary:
-#              boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: sjr
 #         velocity_boundary:
-#              boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: calaveras
 #         elevation_boundary:
-#              boundary: 0.3
+#              source: 0.3
 #         velocity_boundary:
-#              boundary: 0.3
+#              source: 0.3
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: moke
 #         velocity_boundary:
-#              boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: american
 #         velocity_boundary:
-#              boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history 
+#             source: 3D salinity history 
 #             nudge: 1.0
 #       - open_boundary:
 #         name: sac
 #         velocity_boundary:
-#              boundary: flux history
+#              source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: yolo_toedrain
 #         velocity_boundary:
-#              boundary: flux history
+#              source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: yolo
 #         velocity_boundary:
-#              boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: north bay
 #         elevation_boundary:
-#             boundary: tidal 2D elev history 
+#             source: tidal 2D elev history 
+#             spatial: uniform
 #             tidal_constituents:
-#               - name: Z0
+#               - Z0:
 #                 amplitude: 1.0
 #                 phase: 0.0
-#               - name: O1
+#               - O1:
 #                 amplitude: 0.226
 #                 phase: 206
-#               - name: K1
+#               - K1:
 #                 amplitude: 0.369
 #                 phase: 220
-#               - name: M2
+#               - M2:
 #                 amplitude: 0.578
 #                 phase: 190
 #         velocity_boundary:
 #              boundary: tidal 3D uv history
+#              spatial: uniform
 #              tidal_constituents:
 #               - name: Z0
 #                 u_amplitude: 0.20
@@ -1162,15 +1162,15 @@ if __name__ == "__main__":
 #                 v_amplitude: 0.0226
 #                 v_phase: 206
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: napa
 #         velocity_boundary:
-#              boundary: flather 1
+#              source: flather 1
 #              eta_mean: 0.23
 #              eta_m0: [0.23,0.23,0.23]
 #              vnormal_mean: 0.01
@@ -1179,21 +1179,21 @@ if __name__ == "__main__":
 #                - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.01, 0.01]
 #                - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.01, 0.01]
 #         temperature_boundary:
-#             boundary: 10.0
+#             source: 10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #       - open_boundary:
 #         name: ccc_vic
 #         elevation_boundary:
-#             boundary: elev history
+#             source: elev history
 #         velocity_boundary:
-#             boundary: flux history
+#             source: flux history
 #         temperature_boundary:
-#             boundary:  10.0
+#             source:  10.0
 #             nudge: 1.0
 #         salinity_boundary:
-#             boundary: 3D salinity history
+#             source: 3D salinity history
 #             nudge: 1.0
 #############################################################################################################################
