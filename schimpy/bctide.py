@@ -185,7 +185,7 @@ class boundary(object):
             "none": 0,
         }
 
-    def _norm_earth(consts):
+    def _norm_earth(self,consts):
         out = []
         for item in consts:
             if not isinstance(item, dict):
@@ -273,7 +273,7 @@ class boundary(object):
         return out
 
 
-    def _norm_boundary(consts):
+    def _norm_boundary(self,consts):
         """
         Normalize boundary (forcing) tidal constituent specifications into list of dicts with keys:
           name, angular_frequency, node_factor, earth_equilibrium_argument
@@ -377,6 +377,79 @@ class boundary(object):
                 continue
 
         return out
+    
+    def _handle_tidal_constituents_val(self,vals,consts_name,const_type_str,boundary_id,node_id):
+        """
+        Determine and return the numeric amplitude (value) for a tidal constituent given a
+        variety of accepted input formats.
+
+        The function accepts a scalar numeric value, an indexable sequence (list/tuple/np.ndarray)
+        from which a per-node value will be selected, or a string expression which will be
+        evaluated to produce a numeric result.
+
+        Args:
+            vals: add argument meaning comment here
+                The input value(s) for the tidal constituent. Accepted types:
+                - numbers.Number: treated as a scalar amplitude and returned as-is.
+                - list, tuple, np.ndarray: treated as a per-node collection; the element at
+                  index `node_id` is returned. A mismatched length will raise ValueError.
+                - str: treated as a Python expression and evaluated with eval(); the
+                  evaluated result is returned if successful.
+            consts_name: 
+                Human-readable name or identifier of the tidal constituent (used in error
+                messages).
+            const_type_str: a
+                Short description of the constituent paramter (such as elev_phase
+                elev_amp,u_amp,u_phase) type (used in error messages).
+            boundary_id: 
+                Identifier for the boundary to which the constituent applies (used in
+                error messages).
+            node_id: 
+                Integer index of the node for which a per-node value should be selected
+                when `vals` is an indexable collection.
+
+        Returns:
+            float: The resolved amplitude value for the constituent at the requested node.
+
+        Raises:
+            ValueError: If
+              - `vals` is an indexable collection but indexing with `node_id` fails
+                (e.g., length mismatch).
+              - `vals` is a string but its evaluation via eval() fails.
+              - `vals` is of an unsupported type.
+
+        Notes:
+            - The function uses eval() to evaluate string expressions. For safety, ensure
+              inputs are trusted or consider replacing eval() with a safer parser if
+              untrusted input must be supported.
+            - The returned value is a float-compatible numeric; callers may want to cast
+              or validate the result further if required by downstream code.
+        """
+        ##
+        # amplitude value determination
+        val = 0.0
+        if isinstance(vals, numbers.Number):
+            val = vals
+        elif isinstance(vals, (list, tuple, np.ndarray)):
+            try:
+                val = vals[node_id]
+            except Exception:
+                raise ValueError(
+                    f"{const_type_str} list length does not match number of nodes for \
+                    tidal constituent {consts_name} at boundary {boundary_id} \n"
+                )
+        elif isinstance(vals, str):
+            try:
+                val = eval(vals)
+            except Exception:
+                raise ValueError(f"{val} is not a supported tidal expressionfor tidal constituent \
+                                 {const_type_str} for tidal constituent {consts_name} at boundary \
+                                    {boundary_id} \n "
+                )
+        else:
+            raise ValueError(f"Unsupported tidal type {vals} for tidal constituent {const_type_str} for\
+                              tidal constituent {consts_name} at boundary {boundary_id} \n")
+        return val
 
 
     def write_bctides(self, bctides_file):
@@ -389,7 +462,6 @@ class boundary(object):
             # normalize tidal-constituent input formats so downstream code can
             # expect a list of dicts with explicit keys.
  
-
             if self.earth_tides and "tidal_constituents" in self.earth_tides:
                 self.earth_tides["tidal_constituents"] = self._norm_earth(
                     self.earth_tides["tidal_constituents"]
@@ -515,6 +587,7 @@ class boundary(object):
                     tracer_mod_pos[tracer_mods[kk]] = kk
 
                 for i in range(num_open_boundaries):
+                    print("processing open boundary %s " % self.open_boundaries[i]["name"])
                     num_nodes = len(hgrid.boundaries[i].nodes)
                     node_id_lst = hgrid.boundaries[i].nodes
                     elev_id = 0
@@ -642,106 +715,64 @@ class boundary(object):
                         outf.write(str(elev_source))
                     elif (elev_id == 3) or (elev_id == 5):
                         ## tidal forcing
-                        num_tidal_constituents = elev_boundary["tidal_constituents"]
+                        # write each tidal constituent: name line then amplitude/phase per node
                         for tidal_constituent in elev_boundary["tidal_constituents"]:
-                            outf.write(tidal_constituent["name"] + "\n")
+                            # name must exist (YAML examples use 'name' after normalization)
+                            name = tidal_constituent.get("name")
+                            if name is None:
+                                # fallback to first key if mapping style was used
+                                if isinstance(tidal_constituent, dict) and len(tidal_constituent) > 0:
+                                    name = next(iter(tidal_constituent))
+                                else:
+                                    ## raise error  
+                                    raise ValueError(f" elev tidal constituent name is empty for open boundary {i} \n")
+                            outf.write(name + "\n")
+                            amp = tidal_constituent[name][0]["amplitude"]
+                            phase = tidal_constituent[name][1]["phase"]
+
                             for kk in range(num_nodes):
-                                amp = tidal_constituent["amplitude"]
-                                phase = tidal_constituent["phase"]
                                 node_id = node_id_lst[kk]
                                 x = hgrid.nodes[node_id, 0]
                                 y = hgrid.nodes[node_id, 1]
-                                if isinstance(amp, numbers.Number):
-                                    amp_val = amp
-                                elif isinstance(amp, str):  # try to evalate expression
-                                    try:
-                                        amp_val = eval(amp)
-                                    except:
-                                        raise ValueError(
-                                            amp
-                                            + " is not a supported tidal amp expression\n"
-                                        )
-                                if isinstance(phase, numbers.Number):
-                                    phase_val = phase
-                                elif isinstance(
-                                    phase, str
-                                ):  # try to evalate expression
-                                    try:
-                                        phase_val = eval(phase)
-                                    except:
-                                        raise ValueError(
-                                            phase
-                                            + " is not a supported tidal phase expression\n"
-                                        )
+                                amp_val = self._handle_tidal_constituents_val(amp,name,"elev_amplitude",i,kk)
+                                phase_val = self._handle_tidal_constituents_val(phase,name,"elev_phase",i,kk)
+
                                 outf.write(str(amp_val) + "   " + str(phase_val) + "\n")
 
                     ## velocity boundary parameters
                     if vel_id == 2:
-                        ## const
+                        ## constp 
                         outf.write(str(vel_source))
                     elif (vel_id == 3) or (vel_id == 5):
                         ## tidal forcing
                         for tidal_constituent in vel_boundary["tidal_constituents"]:
-                            outf.write(tidal_constituent["name"] + "\n")
+                            # name must exist (YAML examples use 'name' after normalization)
+                            name = tidal_constituent.get("name")
+                            if name is None:
+                                # fallback to first key if mapping style was used
+                                if isinstance(tidal_constituent, dict) and len(tidal_constituent) > 0:
+                                    name = next(iter(tidal_constituent))
+                                else:
+                                    ## raise error  
+                                    raise ValueError(f" vel tidal constituent name is empty for open boundary {i} \n")
+                            outf.write(name + "\n")
+                            u_amp = tidal_constituent[name][0]["u_amplitude"]
+                            u_phase = tidal_constituent[name][1]["u_phase"]
+                            v_amp = tidal_constituent[name][2]["v_amplitude"]
+                            v_phase = tidal_constituent[name][3]["v_phase"]
+
                             for kk in range(num_nodes):
-                                u_amp = tidal_constituent["u_amplitude"]
-                                u_phase = tidal_constituent["u_phase"]
-                                v_amp = tidal_constituent["v_amplitude"]
-                                v_phase = tidal_constituent["v_phase"]
+
                                 node_id = node_id_lst[kk]
                                 x = hgrid.nodes[node_id, 0]
                                 y = hgrid.nodes[node_id, 1]
+
+                                u_amp_val = self._handle_tidal_constituents_val(u_amp,name,"u_amplitude",i,kk)
+                                u_phase_val = self._handle_tidal_constituents_val(u_phase,name,"u_phase",i,kk)
+                                v_amp_val = self._handle_tidal_constituents_val(v_amp,name,"v_amplitude",i,kk)
+                                v_phase_val = self._handle_tidal_constituents_val(v_phase,name,"v_phase",i,kk)
                                 
-                                if isinstance(u_amp, numbers.Number):
-                                    u_amp_val = u_amp
-                                elif isinstance(
-                                    u_amp, str
-                                ):  # try to evalate expression
-                                    try:
-                                        u_amp_val = eval(u_amp)
-                                    except:
-                                        raise ValueError(
-                                            u_amp
-                                            + " is not a supported tidal amp expression\n"
-                                        )
-                                if isinstance(u_phase, numbers.Number):
-                                    u_phase_val = u_phase
-                                elif isinstance(
-                                    u_phase, str
-                                ):  # try to evalate expression
-                                    try:
-                                        u_phase_val = eval(u_phase)
-                                    except:
-                                        raise ValueError(
-                                            u_phase
-                                            + " is not a supported tidal phase expression\n"
-                                        )
-
-                                if isinstance(v_amp, numbers.Number):
-                                    v_amp_val = v_amp
-                                elif isinstance(
-                                    v_amp, str
-                                ):  # try to evalate expression
-                                    try:
-                                        v_amp_val = eval(v_amp)
-                                    except:
-                                        raise ValueError(
-                                            u_amp
-                                            + " is not a supported tidal amp expression\n"
-                                        )
-                                if isinstance(v_phase, numbers.Number):
-                                    v_phase_val = v_phase
-                                elif isinstance(
-                                    v_phase, str
-                                ):  # try to evalate expression
-                                    try:
-                                        v_phase_val = eval(v_phase)
-                                    except:
-                                        raise ValueError(
-                                            v_phase
-                                            + " is not a supported tidal phase expression\n"
-                                        )
-
+                                
                                 outf.write(
                                     str(u_amp_val)
                                     + " "
