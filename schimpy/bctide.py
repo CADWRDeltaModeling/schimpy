@@ -1274,41 +1274,41 @@ if __name__ == "__main__":
 #             spatial: uniform
 #             tidal_constituents:
 #               - Z0:
-#                 amplitude: 1.0
-#                 phase: 0.0
+#                 - amplitude: 1.0
+#                 - phase: 0.0
 #               - O1:
-#                 amplitude: 0.226
-#                 phase: 206
+#                 - amplitude: 0.226
+#                 - phase: 206
 #               - K1:
-#                 amplitude: 0.369
-#                 phase: 220
+#                 - amplitude: 0.369
+#                 - phase: 220
 #               - M2:
-#                 amplitude: 0.578
-#                 phase: 190
+#                 - amplitude: 0.578
+#                 - phase: 190
 #         velocity_boundary:
 #              boundary: tidal 3D uv history
 #              spatial: uniform
 #              tidal_constituents:
-#               - name: Z0
-#                 u_amplitude: 0.20
-#                 u_phase: 0.0
-#                 v_amplitude: 0.10
-#                 v_phase: 0.0
-#               - name: O1
-#                 u_amplitude: 0.0226
-#                 u_phase: 206
-#                 v_amplitude: 0.0226
-#                 v_phase: 206
-#               - name: K1
-#                 u_amplitude: 0.0369
-#                 u_phase: 220
-#                 v_amplitude: 0.0226
-#                 v_phase: 206
-#               - name: M2
-#                 u_amplitude: 0.0578
-#                 u_phase: 190
-#                 v_amplitude: 0.0226
-#                 v_phase: 206
+#               - Z0:
+#                 - u_amplitude: 0.20
+#                 - u_phase: 0.0
+#                 - v_amplitude: 0.10
+#                 - v_phase: 0.0
+#               - O1:
+#                 - u_amplitude: 0.0226
+#                 - u_phase: 206
+#                 - v_amplitude: 0.0226
+#                 - v_phase: 206
+#               - K1:
+#                 - u_amplitude: 0.0369
+#                 - u_phase: 220
+#                 - v_amplitude: 0.0226
+#                 - v_phase: 206
+#               - M2:
+#                 - u_amplitude: 0.0578
+#                 - u_phase: 190
+#                 - v_amplitude: 0.0226
+#                 - v_phase: 206
 #         temperature_boundary:
 #             source: 10.0
 #             nudge: 1.0
