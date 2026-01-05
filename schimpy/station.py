@@ -15,7 +15,7 @@ if sys.version_info[0] < 3:
 else:
     u = lambda x: x
 
-import argparse
+import click
 from vtools.data.timeseries import *
 
 station_variables = [
@@ -556,13 +556,13 @@ def read_flux_out(fpath, names, reftime):
         names=["time"] + names,
         dtype="d",
     )
-    #print("ref",reftime)
+    # print("ref",reftime)
     if reftime is not None:
-        dtsec = round((data.index[1] - data.index[0])*86400)
+        dtsec = round((data.index[1] - data.index[0]) * 86400)
         freqstr = f"{dtsec}s"
-        newindex=pd.date_range(start=reftime, freq=freqstr, periods = len(data))
-        data.index=newindex
-        #data = elapsed_datetime(data, reftime=reftime, time_unit="d")
+        newindex = pd.date_range(start=reftime, freq=freqstr, periods=len(data))
+        data.index = newindex
+        # data = elapsed_datetime(data, reftime=reftime, time_unit="d")
         data = data.asfreq(freqstr)
 
     # todo: freq when start is none?
@@ -650,7 +650,7 @@ def station_subset(
         swapped in.
 
     """
-    
+
     locs.station_id = locs.station_id.str.lower()
     locs = locs.set_index("station_id")
 
@@ -660,7 +660,7 @@ def station_subset(
         elif "flux" in fpath:
             isflux = True
         else:
-            raise ValueError("Station output type (flux,staout) could not be inferred") 
+            raise ValueError("Station output type (flux,staout) could not be inferred")
 
     if isflux:
         if not os.path.exists(stationfile):
@@ -738,12 +738,12 @@ def station_subset_multidir(
     isflux="infer",
     miss="raise",
 ):
-    """ Extract a subset of stations from an staout file or flux.out file across a list of directories
+    """Extract a subset of stations from an staout file or flux.out file across a list of directories
 
     Parameters
     ----------
 
-    dirs : list(str) 
+    dirs : list(str)
         List of directories. The output dataframe will have a column multindex (dir,station_id) where dir is the directory of the output.
 
 
@@ -830,47 +830,37 @@ def convert_db_station_in(
     write_station_in(outfile, stations_in, request=station_request)
 
 
-def create_arg_parser():
-    """Create an argument parser"""
-    parser = argparse.ArgumentParser(
-        description="Create station.in file from station database (stations_utm.csv) and station subloc listing station_subloc.csv"
-    )
-    parser.add_argument(
-        "--station_db",
-        default=None,
-        help="station database, otherwise station_dbase as configured in dms_datastore dstore_config file",
-    )
-    parser.add_argument(
-        "--subloc_db",
-        default=None,
-        help="subloc listings for stations (otherwise default subloc from dms_datastore dstore_config file)",
-    )
-    parser.add_argument(
-        "--request",
-        default="all",
-        nargs="+",
-        help="requested variables or 'all' for all of them. Possibilities are: {}".format(
-            ",".join(station_variables)
-        ),
-    )
-    parser.add_argument(
-        "--default_zcor",
-        default="-0.5",
-        help="z coordinate used when there is no listing for station id (z coordinate, not subloc from surface)",
-    )
-    parser.add_argument("--out", default="station.in", help="station.in formatted file")
-    return parser
-
-
-def main():
-    """A main function to convert polygon files"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    stationdb = args.station_db
-    sublocdb = args.subloc_db
-    default = args.default_zcor
-    request = args.request
-    outfile = args.out
+@click.command()
+@click.option(
+    "--station_db",
+    default=None,
+    help="station database, otherwise station_dbase as configured in dms_datastore dstore_config file",
+)
+@click.option(
+    "--subloc_db",
+    default=None,
+    help="subloc listings for stations (otherwise default subloc from dms_datastore dstore_config file)",
+)
+@click.option(
+    "--request",
+    default="all",
+    multiple=True,
+    help="requested variables or 'all' for all of them. Possibilities are: {}".format(
+        ",".join(station_variables)
+    ),
+)
+@click.option(
+    "--default_zcor",
+    default="-0.5",
+    help="z coordinate used when there is no listing for station id (z coordinate, not subloc from surface)",
+)
+@click.option("--out", default="station.in", help="station.in formatted file")
+def convert_station_cli(station_db, subloc_db, request, default_zcor, out):
+    """Create station.in file from station database (stations_utm.csv) and station subloc listing station_subloc.csv"""
+    stationdb = station_db
+    sublocdb = subloc_db
+    default = default_zcor
+    outfile = out
     if stationdb is None:
         stationdb = config_file("station_dbase")
     if sublocdb is None:
@@ -880,5 +870,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # example()
-    main()
+    convert_station_cli()
