@@ -6,7 +6,7 @@
 from schimpy import schism_mesh
 from schimpy.schism_setup import ensure_outdir
 import numpy as np
-import argparse
+import click
 import os
 from pathlib import Path
 
@@ -194,69 +194,21 @@ def write_prop(elems_to_split, n_elems, fpath):
     )
 
 
-def create_arg_parser():
-    """Create an argument parser
-
-    Returns
-    -------
-    argparse.ArgumentParser
-    """
-    description = (
-        "Split quadrilateral elements that have higher skewness "
-        "value than the given skewness into triangular elements."
+@click.command()
+@click.argument('meshinput', type=click.Path(exists=True))
+@click.argument('meshoutput', type=str)
+@click.option('--outdir', type=click.Path(), default='./', help='Output directory for the mesh file and prop file.')
+@click.option('--skewness', type=float, default=None, help='Maximum skewness (not normalized.) to split. If the skewness of an element is bigger than this, the element will be split.')
+@click.option('--minangle', type=float, default=None, help='Minimum angle (degrees) to keep in quads. If any of internal angles of a quad is smaller than mingangle, the quad will be split.')
+@click.option('--maxangle', type=float, default=None, help='Minimum angle (degrees) to keep in quads. If any of internal angles of a quad is larger than maxgangle, the quad will be split.')
+@click.option('--propfile', type=str, default=None, help='Write a prop file that shows elements that are split')
+def split_quads_cli(meshinput, meshoutput, outdir, skewness, minangle, maxangle, propfile):
+    """Split quadrilateral elements that have higher skewness value than the given skewness into triangular elements."""
+    if not os.path.exists(meshinput):
+        raise ValueError("The given input file not found")
+    split_quad(
+        meshinput, outdir, skewness, minangle, maxangle, meshoutput, propfile
     )
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument(
-        "meshinput",
-        type=str,
-        help="Mesh input file to process in gr3 or SMS 2dm format.",
-    )
-    parser.add_argument(
-        "meshoutput", type=str, help="Output mesh file name in gr3 format."
-    )
-    parser.add_argument(
-        "--outdir",
-        dest="outdir",
-        type=Path,
-        default="./",
-        help="Output directory for the mesh file and prop file.",
-    )
-    parse
-    parser.add_argument(
-        "--skewness",
-        dest="skewness",
-        type=float,
-        default=None,
-        help="Maximum skewness (not normalized.) to split. "
-        "If the skewness of an element is bigger than this, "
-        "the element will be split.",
-    )
-    parser.add_argument(
-        "--minangle",
-        dest="minangle",
-        type=float,
-        default=None,
-        help="Minimum angle (degrees) to keep in quads. If any of "
-        "internal angles of a quad is smaller than mingangle, "
-        "the quad will be split.",
-    )
-    parser.add_argument(
-        "--maxangle",
-        dest="maxangle",
-        type=float,
-        default=None,
-        help="Minimum angle (degrees) to keep in quads. If any of "
-        "internal angles of a quad is larger than maxgangle, "
-        "the quad will be split.",
-    )
-    parser.add_argument(
-        "--propfile",
-        dest="propfile",
-        type=str,
-        default=None,
-        help="Write a prop file that shows elements that are split",
-    )
-    return parser
 
 
 def split_quad(
@@ -329,24 +281,5 @@ def split_quad(
     return mesh
 
 
-def main():
-    """main function for CLI"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    meshin = args.meshinput
-    if not os.path.exists(meshin):
-        raise ValueError("The given input file not found")
-    meshout = args.meshoutput
-    fpath_prop = args.propfile
-    skewness = args.skewness
-    minangle = args.minangle
-    maxangle = args.maxangle
-    outdir = args.outdir
-    newmesh = split_quad(
-        meshin, outdir, skewness, minangle, maxangle, meshout, fpath_prop
-    )
-    return
-
-
 if __name__ == "__main__":
-    main()
+    split_quads_cli()
