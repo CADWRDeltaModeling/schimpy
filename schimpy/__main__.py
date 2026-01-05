@@ -25,6 +25,7 @@ from schimpy.check_mesh_skewness import check_skewness_cli
 from schimpy.combine_flux import combine_flux_cli
 from schimpy.convert_sav_class_to_number import convert_sav_class_to_number_cli
 from schimpy.create_mesh_n_levels import create_mesh_n_levels_cli
+from schimpy.cruise import cruise_plot_cli
 
 
 @click.group(
@@ -63,6 +64,7 @@ cli.add_command(check_skewness_cli, "check_skewness")
 cli.add_command(combine_flux_cli, "combine_flux")
 cli.add_command(convert_sav_class_to_number_cli, "convert_sav_class_to_number")
 cli.add_command(create_mesh_n_levels_cli, "create_mesh_n_levels")
+cli.add_command(cruise_plot_cli, "cruise_plot")
 
 if __name__ == "__main__":
     cli()

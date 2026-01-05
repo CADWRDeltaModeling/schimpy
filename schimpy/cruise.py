@@ -11,7 +11,7 @@ from dateutil import parser
 import errno
 from shutil import copyfile
 import subprocess
-import argparse
+import click
 import textwrap
 
 RED = (228 / 256.0, 26 / 256.0, 28 / 256.0)
@@ -411,76 +411,24 @@ def gen_station_xyt(base_date, cruise_time, survey_file, station_file, xytfile):
     casts = cruise_xyt(filename, station_data, base_date, xytfile)
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        prog="cruise.py",
-        description=textwrap.dedent(
-            """
-      Loop over a number of USGS polaris cruise water quality data in a folder, read observed salinity
-      data, generate station.xyt file and extract SCHISM model salinity from output nc files respectively. 
-      Finally plot and compared observed and model transect salinity profile along the centerline took
-      by USGS polaris cruise.
-      
-      Inputs: SCHISM model base time, a path containing SCHISM output files and a path
-      containing USGS polaris water quaility data files.
-      
-      Outputs: A png files comparing observed and model salinity profile.
-      
-      USGS polaris cruise data should have csv format like below:
-          
-          Date,Time,Station Number,Depth,Salinity,Temperature
-          MM/DD/YYYY,24 hr.,,[meters],[psu],[°C]
-          6/22/2017,7:20,2,1,0.14,22.48
-          6/22/2017,7:20,2,2,0.13,22.48
-          6/22/2017,7:20,2,3,0.13,22.48
-          6/22/2017,7:20,2,4,0.13,22.48
-          ......
-      
-      Here is a example of command
-      
-      python cruise.py --data_path ./ --start 04/18/2017 --schism_output_path I:\\itp\\hist_2017\\
-          
+def cruise_plot(data_path, start, schism_output_path):
+    """Loop over USGS polaris cruise water quality data, extract SCHISM model salinity,
+    and plot observed vs model transect salinity profiles.
     
-      Your system should include SCHISM postprocess tool path in the environment.
-        
-      You can get help by typing $ cruise.py  --help
-      """
-        ),
-    )
-
-    parser.add_argument(
-        "--data_path",
-        default=None,
-        required=True,
-        help="path contains downloaded USGS crusier water quality data",
-    )
-
-    parser.add_argument(
-        "--start",
-        type=str,
-        required=True,
-        help="Starting date and time basis for SCHISM model output",
-    )
-    parser.add_argument(
-        "--schism_output_path",
-        default=None,
-        required=True,
-        help="path contains SCHISM output data",
-    )
-
-    return parser
-
-
-if __name__ == "__main__":
-
-    usgs_cruise_file_lst = []
-
-    aug_parser = create_arg_parser()
-    args = aug_parser.parse_args()
-    data_folder = args.data_path
-    base_date = parser.parse(args.start)
-    schism_output_folder = args.schism_output_path
+    USGS polaris cruise data should have CSV format:
+    
+        Date,Time,Station Number,Depth,Salinity,Temperature
+        MM/DD/YYYY,24 hr.,,[meters],[psu],[°C]
+        6/22/2017,7:20,2,1,0.14,22.48
+        ...
+    
+    Example:
+    
+        cruise.py --data_path ./ --start 04/18/2017 --schism_output_path I:\\itp\\hist_2017\\
+    """
+    data_folder = data_path
+    base_date = parser.parse(start)
+    schism_output_folder = schism_output_path
 
     schism_vgrid_in = os.path.join(schism_output_folder, "vgrid.in")
     if not (os.path.exists(schism_vgrid_in)):
@@ -537,3 +485,30 @@ if __name__ == "__main__":
                 os.path.join(data_folder, station_file),
                 os.path.join(schism_output_folder, xyt_file),
             )
+
+
+@click.command()
+@click.option(
+    "--data_path",
+    required=True,
+    help="Path containing downloaded USGS cruise water quality data.",
+)
+@click.option(
+    "--start",
+    type=str,
+    required=True,
+    help="Starting date and time basis for SCHISM model output (e.g., 04/18/2017).",
+)
+@click.option(
+    "--schism_output_path",
+    required=True,
+    help="Path containing SCHISM output data.",
+)
+def cruise_plot_cli(data_path, start, schism_output_path):
+    """Command line utility for plotting cruise salinity profiles against SCHISM model output"""
+
+    cruise_plot(data_path, start, schism_output_path)
+
+
+if __name__ == "__main__":
+    cruise_plot_cli()
