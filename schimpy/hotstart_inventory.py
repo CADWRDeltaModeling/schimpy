@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse
+import click
 import glob
 import os
 import pandas as pd
@@ -199,60 +199,26 @@ def hotstart_inventory_exist(start, dt=90, workdir=".", do_print=True):
     return df
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser(
-        "Lookup station metadata by partial string match on id or name"
-    )
-    parser.add_argument(
-        "--dt", default=90, type=int, help="Time step in seconds of model"
-    )
-    parser.add_argument(
-        "--run_start", default="", help="Start time in iso-like format, e.g. 2013-12-03"
-    )
-    parser.add_argument(
-        "--nday",
-        default=0,
-        type=int,
-        help="Number of days in simulation (rnday) or maximum to catalog",
-    )
-    parser.add_argument(
-        "--workdir",
-        default=".",
-        type=str,
-        help="Working directory, which is the outputs dir",
-    )
-    parser.add_argument(
-        "--paramfile",
-        default="",
-        type=str,
-        help="Name of param.nml file if file is used to infer runtime. If neither params nor paramfile provided, ./param.nmo or ../param.nml will be tried. ",
-    )
-    parser.add_argument(
-        "--hot_freq",
-        default=None,
-        help="Hotstart frequency in pandas freq terms (e.g. '5D')",
-    )
-    parser.add_argument(
-        "--expected",
-        action="store_true",
-        help="Flag to generate expected hotstarts instead of inventory of existing files",
-    )
-    return parser
-
-
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
+@click.command()
+@click.option('--dt', default=90, type=int, help='Time step in seconds of model')
+@click.option('--run_start', default='', help='Start time in iso-like format, e.g. 2013-12-03')
+@click.option('--nday', default=0, type=int, help='Number of days in simulation (rnday) or maximum to catalog')
+@click.option('--workdir', default='.', type=str, help='Working directory, which is the outputs dir')
+@click.option('--paramfile', default='', type=str, help='Name of param.nml file if file is used to infer runtime. If neither params nor paramfile provided, ./param.nmo or ../param.nml will be tried.')
+@click.option('--hot_freq', default=None, help="Hotstart frequency in pandas freq terms (e.g. '5D')")
+@click.option('--expected', is_flag=True, help='Flag to generate expected hotstarts instead of inventory of existing files')
+def hotstart_inventory_cli(dt, run_start, nday, workdir, paramfile, hot_freq, expected):
+    """Lookup station metadata by partial string match on id or name"""
     hotstart_inventory(
-        args.run_start,
-        args.dt,
-        args.nday,
-        args.workdir,
-        args.paramfile,
-        args.hot_freq,
-        args.expected,
+        run_start,
+        dt,
+        nday,
+        workdir,
+        paramfile,
+        hot_freq,
+        expected,
     )
 
 
 if __name__ == "__main__":
-    main()
+    hotstart_inventory_cli()
