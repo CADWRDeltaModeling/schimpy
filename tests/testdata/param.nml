@@ -29,7 +29,7 @@
   eco_class = 27 !EcoSim (USE_ECO): must be between [25,60]
 ! Global output controls
   nspool = 36 !output step spool
-  ihfskip = 864 !stack spool; every ihfskip steps will be put into 1_*, 2_*, etc...
+  ihfskip = 960 !stack spool; every ihfskip steps will be put into 1_*, 2_*, etc...
 /
 &OPT
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
