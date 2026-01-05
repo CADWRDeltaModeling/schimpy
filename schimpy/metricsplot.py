@@ -177,6 +177,7 @@ def plot_metrics_to_figure(
     label_loc=1,
     legend_size=12,
     metrics_in_figure=True,
+    shade_inst=False,
 ):
     """Plot a metrics plot
 
@@ -191,7 +192,7 @@ def plot_metrics_to_figure(
     )
 
     plot_inst_and_avg(
-        axes, tss, window_inst, window_avg, labels, label_loc, legend_size
+        axes, tss, window_inst, window_avg, labels, label_loc, legend_size, shade_inst
     )
     if title is not None:
         axes["inst"].set_title(title)
@@ -218,7 +219,7 @@ def plot_metrics_to_figure(
 
 
 def plot_inst_and_avg(
-    axes, tss, window_inst, window_avg, labels, label_loc, legend_size
+    axes, tss, window_inst, window_avg, labels, label_loc, legend_size, shade_inst=False
 ):
     """Plot instantaneous and filtered time series plot"""
     if window_inst is None:
@@ -242,6 +243,20 @@ def plot_inst_and_avg(
     tss_clipped = [safe_window(ts, window_to_filter) for ts in tss]
     tss_filtered = filter_timeseries(tss_clipped)
     plot_tss(axes["avg"], tss_filtered, labels, window_avg, cell_method="ave")
+    
+    # Add shaded region for instantaneous window if requested
+    if shade_inst and window_inst is not None:
+        # Get min and max times from the instantaneous window
+        inst_min = window_inst[0]
+        inst_max = window_inst[1]
+        
+        # Clip to the averaged window bounds
+        shade_min = max(inst_min, window_avg[0])
+        shade_max = min(inst_max, window_avg[1])
+        
+        # Only shade if there's overlap between instantaneous and averaged windows
+        if shade_min < shade_max:
+            axes["avg"].axvspan(shade_min, shade_max, alpha=0.15, color='grey', zorder=0)
 
 
 def plot_comparison_to_figure(

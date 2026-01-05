@@ -768,6 +768,12 @@ class BatchMetrics(object):
                 metrics_in_figure = params["metrics_in_figure"]
             else:
                 metrics_in_figure = True
+                
+            # shade the instantaneous window in the averaged window
+            if "shade_inst" in params.keys():
+                shade_inst = params["shade_inst"]
+            else:
+                shade_inst = False
 
             if plot_format == "simple":
                 fig = plot_comparison(
@@ -789,6 +795,7 @@ class BatchMetrics(object):
                     title=title,
                     style_palette=style_palette,
                     metrics_in_figure=metrics_in_figure,
+                    shade_inst=shade_inst,
                 )
                 if metrics[0]:
                     metric_out.write(
