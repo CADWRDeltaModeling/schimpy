@@ -137,5 +137,4 @@ create_nudging = "schimpy.nudging:create_nudge_cli"
 interpolate_structure = "schimpy.interpolate_structure:interpolate_structure_cli"
 merge_th = "schimpy.merge_th:merge_th_cli"
 create_station_output = "schimpy.create_station_output:create_station_output_cli"
-
-set_param = "schimpy.param:main"
+set_param = "schimpy.param:set_param_cli"

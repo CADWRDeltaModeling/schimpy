@@ -647,32 +647,7 @@ def read_params(fname, default=None):
     p = Params(content, default)
     return p
 
-
-@click.command(
-    name="set_param",
-    context_settings={"help_option_names": ["-h", "--help"]},
-    epilog=PARAM_ALIAS_HELP_TEXT,
-)
-@click.argument(
-    "param_file",
-    type=click.Path(exists=True, dir_okay=False, readable=True, path_type=Path),
-)
-@click.argument("pairs", nargs=-1)
-@click.option(
-    "-o",
-    "--output",
-    type=click.Path(dir_okay=False, writable=True, path_type=Path),
-    help=(
-        "Write to this file instead of editing PARAM_FILE in place. "
-        "If omitted, PARAM_FILE is overwritten."
-    ),
-)
-@click.option(
-    "--dry-run",
-    is_flag=True,
-    help="Parse and report changes but do not write anything.",
-)
-def main(param_file: Path, pairs: tuple[str, ...], output: Path | None, dry_run: bool):
+def set_param(param_file: Path, pairs: tuple[str, ...], output: Path | None, dry_run: bool):
     """
     Set one or more parameters in a SCHISM param.nml file.
 
@@ -694,19 +669,7 @@ def main(param_file: Path, pairs: tuple[str, ...], output: Path | None, dry_run:
       * integers / floats: 0, 252, 90.0
       * time freqs:    15min, 1H, 3D (pandas-style offsets)
       * 'none' for aliases like hotstart_freq / station_out_freq to disable them
-    """
-    if not pairs:
-        raise click.ClickException(
-            "No NAME VALUE pairs supplied.\n"
-            "Usage: set_param PARAM_FILE NAME VALUE [NAME VALUE ...]"
-        )
-
-    if len(pairs) % 2 != 0:
-        raise click.ClickException(
-            "Expect an even number of arguments after PARAM_FILE: NAME VALUE pairs.\n"
-            "Example: set_param param.nml ihot 0 run_nday 365"
-        )
-
+      """
     changes = list(zip(pairs[::2], pairs[1::2]))
 
     # --- read once ---
@@ -774,6 +737,49 @@ def main(param_file: Path, pairs: tuple[str, ...], output: Path | None, dry_run:
 
     click.echo(f"Wrote updated parameters to {dest}")
 
+@click.command(
+    name="set_param",
+    context_settings={"help_option_names": ["-h", "--help"]},
+    epilog=PARAM_ALIAS_HELP_TEXT,
+)
+@click.argument(
+    "param_file",
+    type=click.Path(exists=True, dir_okay=False, readable=True, path_type=Path),
+)
+@click.argument("pairs", nargs=-1)
+@click.option(
+    "-o",
+    "--output",
+    type=click.Path(dir_okay=False, writable=True, path_type=Path),
+    help=(
+        "Write to this file instead of editing PARAM_FILE in place. "
+        "If omitted, PARAM_FILE is overwritten."
+    ),
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Parse and report changes but do not write anything.",
+)
+def set_param_cli(param_file: Path, pairs: tuple[str, ...], output: Path | None, dry_run: bool):
+    """
+    Command line tool to set SCHISM model parameters in PARAM_FILE.
+    """
+    if not pairs:
+        raise click.ClickException(
+            "No NAME VALUE pairs supplied.\n"
+            "Usage: set_param PARAM_FILE NAME VALUE [NAME VALUE ...]"
+        )
+
+    if len(pairs) % 2 != 0:
+        raise click.ClickException(
+            "Expect an even number of arguments after PARAM_FILE: NAME VALUE pairs.\n"
+            "Example: set_param param.nml ihot 0 run_nday 365"
+        )
+
+    set_param(param_file, pairs, output, dry_run)
+
+
 
 if __name__ == "__main__":
-    test_param()
+    set_param_cli()
