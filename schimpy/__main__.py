@@ -17,8 +17,8 @@ from schimpy.split_quad import split_quads_cli
 from schimpy.small_areas import small_areas_cli
 from schimpy.station import convert_station_cli
 from schimpy.nudging import create_nudge_cli
+from schimpy.interpolate_structure import interpolate_structure_cli
 
-# from schimpy.interpolate_structure import interpolate_structure
 # from schimpy.merge_th import merge_th
 
 
@@ -50,8 +50,8 @@ cli.add_command(split_quads_cli, "split_quad")
 cli.add_command(small_areas_cli, "small_areas")
 cli.add_command(convert_station_cli, "station")
 cli.add_command(create_nudge_cli, "create_nudging")
+cli.add_command(interpolate_structure_cli, "interpolate_structure")
 
-# cli.add_command(interpolate_structure, "interpolate_structure")
 # cli.add_command(merge_th, "merge_th")
 
 

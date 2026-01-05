@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse
+import click
 import pandas as pd
 from vtools import hours
 
@@ -61,7 +61,7 @@ def interpolate_structure(
     th_orig = pd.read_csv(
         template_th,
         comment="#",
-        sep="\s+",
+        sep=r"\s+",
         header=0,
         dtype={"install": int, "ndup": int},
         index_col=0,
@@ -96,38 +96,29 @@ def ensure_offset(arg):
         return arg
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--template_th",
-        default=None,
-        help="th file path containing skeleton of operations.",
-    )
-    parser.add_argument("--output_th", default=None, help="Output file path")
-    parser.add_argument(
-        "--dt",
-        default=None,
-        help="Time step of output.  Input template timestamps must be neat with respect to this",
-    )
-    parser.add_argument(
-        "--int_cols",
-        default=None,
-        nargs="*",
-        help="List of column names to treat as integers. Default is instll, ndup, ndup_culvert,ndup_pipe,ndup_weir.",
-    )
-    return parser
-
-
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    template_th = args.template_th
-    output_th = args.output_th
-    dt = args.dt
-    int_cols = args.int_cols
+@click.command()
+@click.option(
+    "--template_th",
+    default=None,
+    help="th file path containing skeleton of operations.",
+)
+@click.option("--output_th", default=None, help="Output file path")
+@click.option(
+    "--dt",
+    default=None,
+    help="Time step of output. Input template timestamps must be neat with respect to this",
+)
+@click.option(
+    "--int_cols",
+    multiple=True,
+    default=None,
+    help="List of column names to treat as integers. Default is install, ndup, ndup_culvert, ndup_pipe, ndup_weir.",
+)
+def interpolate_structure_cli(template_th, output_th, dt, int_cols):
+    """Interpolate a dated th template for a structure"""
     if dt is None:
         dt = hours(1)
-    if int_cols is None:
+    if int_cols is None or len(int_cols) == 0:
         int_cols = ["install", "ndup_weir", "ndup_culvert", "ndup_pipe"]
     interpolate_structure(
         template_th=template_th, output_th=output_th, dt=dt, int_cols=int_cols
@@ -135,4 +126,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    interpolate_structure_cli()
