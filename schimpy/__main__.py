@@ -9,8 +9,8 @@ from schimpy.convert_points import convert_points_cli
 from schimpy.combine_consume import combine_consume_cli
 from schimpy.model_time import model_time_cli
 from schimpy.sms2gr3 import convert_2dm_cli
+from schimpy.prepare_schism import prepare_schism_cli
 
-# from schimpy.prepare_schism import prepare_schism
 # from schimpy.hotstart_inventory import hotstart_inventory
 # from schimpy.create_vgrid_lsc2 import create_vgrid_lsc2
 # from schimpy.schism_hotstart import schism_hotstart
@@ -42,7 +42,7 @@ cli.add_command(convert_points_cli, "convert_points")
 cli.add_command(combine_consume_cli, "combine_consume")
 cli.add_command(model_time_cli, "model_time")
 cli.add_command(convert_2dm_cli, "convert_2dm")
-# cli.add_command(prepare_schism, "prepare_schism")
+cli.add_command(prepare_schism_cli, "prepare_schism")
 # cli.add_command(hotstart_inventory, "hotstart_inventory")
 # cli.add_command(create_vgrid_lsc2, "create_vgrid_lsc2")
 # cli.add_command(schism_hotstart, "schism_hotstart")

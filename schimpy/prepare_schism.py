@@ -25,22 +25,13 @@ import importlib
 import numpy as np
 import subprocess
 import os
-import argparse
+import click
 import logging
 import warnings
 import shutil
 
 
 __all__ = ["prepare_schism"]
-
-
-def create_arg_parser():
-    """Create ArgumentParser"""
-    parser = argparse.ArgumentParser(description="Prepare SCHISM input files.")
-    parser.add_argument(
-        dest="main_inputfile", default=None, help="main input file name"
-    )
-    return parser
 
 
 def check_min_schimpy_version(inputs) -> None:
@@ -675,10 +666,14 @@ def setup_logger(outdir):
     logging.getLogger("").addHandler(console)
 
 
-def main():
-    """main function"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
+@click.command()
+@click.argument('main_inputfile', type=click.Path(exists=True))
+def prepare_schism_cli(main_inputfile):
+    """Prepare SCHISM input files."""
+    class Args:
+        pass
+    args = Args()
+    args.main_inputfile = main_inputfile
     prepare_schism(args)
 
 
@@ -825,4 +820,4 @@ def prepare_schism(args, use_logging=True):
 
 
 if __name__ == "__main__":
-    main()
+    prepare_schism_cli()
