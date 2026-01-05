@@ -12,8 +12,8 @@ from schimpy.sms2gr3 import convert_2dm_cli
 from schimpy.prepare_schism import prepare_schism_cli
 from schimpy.hotstart_inventory import hotstart_inventory_cli
 from schimpy.create_vgrid_lsc2 import create_vgrid_lsc2_cli
+from schimpy.schism_hotstart import create_hotstart_cli
 
-# from schimpy.schism_hotstart import schism_hotstart
 # from schimpy.split_quad import split_quad
 # from schimpy.small_areas import small_areas
 # from schimpy.station import station
@@ -45,8 +45,8 @@ cli.add_command(convert_2dm_cli, "convert_2dm")
 cli.add_command(prepare_schism_cli, "prepare_schism")
 cli.add_command(hotstart_inventory_cli, "hotstart_inventory")
 cli.add_command(create_vgrid_lsc2_cli, "create_vgrid_lsc2")
+cli.add_command(create_hotstart_cli, "schism_hotstart")
 
-# cli.add_command(schism_hotstart, "schism_hotstart")
 # cli.add_command(split_quad, "split_quad")
 # cli.add_command(small_areas, "small_areas")
 # cli.add_command(station, "station")

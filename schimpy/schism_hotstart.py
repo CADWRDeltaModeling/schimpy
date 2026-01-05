@@ -1992,21 +1992,14 @@ def project_mesh(mesh, new_crs):
         return mesh
 
 
-def create_arg_parser():
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Create hotstart for a schism run")
-    parser.add_argument(
-        "--input", type=str, help="input yaml file for hotstart", required=True
-    )
-    return parser
+import click
 
 
-def main():
-    # User inputs override the yaml file inputs.
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    h = hotstart(args.input)
+@click.command()
+@click.option('--input', type=str, required=True, help='input yaml file for hotstart')
+def create_hotstart_cli(input):
+    """Create hotstart for a schism run"""
+    h = hotstart(input)
     h.create_hotstart()
     output_fn = h.output_fn
     hnc = h.nc_dataset
@@ -2015,7 +2008,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    create_hotstart_cli()
     # os.chdir("PATH/TO/HOTSTART/FILES")
     # h = hotstart("./hotstart_2018.yaml")
     # h.read_yaml()
