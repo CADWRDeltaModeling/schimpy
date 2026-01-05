@@ -7,7 +7,7 @@ import numpy as np
 import re
 import math
 import os
-import argparse
+import click
 import logging
 
 
@@ -194,28 +194,15 @@ def convert_2dm(file, outfile=None, elev2depth=False, logger=None):
     logger.info("Finished converting a 2dm file.")
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser(
-        description="Convert a *.2dm SMS mesh to a *.gr3 SCHISM mesh."
-    )
-    parser.add_argument(
-        "--elev2depth",
-        action="store_true",
-        default=False,
-        help="SMS geometry is in terms of elevation and should be flipped in sign.",
-    )
-    parser.add_argument("--outfile", default=None, help="name of output file")
-    parser.add_argument(dest="infile", default=None, help="name of input file")
-    return parser
+@click.command()
+@click.argument('infile', type=click.Path(exists=True))
+@click.option('--outfile', default=None, help='name of output file')
+@click.option('--elev2depth', is_flag=True, default=False, 
+              help='SMS geometry is in terms of elevation and should be flipped in sign.')
+def convert_2dm_cli(infile, outfile, elev2depth):
+    """Convert a *.2dm SMS mesh to a *.gr3 SCHISM mesh."""
+    convert_2dm(infile, outfile, elev2depth)
 
 
 if __name__ == "__main__":
-    import sys
-
-    filename = sys.argv[1]
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    elev2depth = args.elev2depth
-    infile = args.infile
-    outfile = args.outfile
-    convert_2dm(infile, outfile, elev2depth)
+    convert_2dm_cli()
