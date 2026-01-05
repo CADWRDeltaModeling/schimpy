@@ -21,7 +21,7 @@ from shapely.geometry import Polygon
 from schimpy import interp_2d
 import time as timer
 from vtools.data.vtime import hours, days
-import argparse
+import click
 
 log_file = "log_nudging.out"
 
@@ -1133,14 +1133,6 @@ class Nudging(object):
         return inpoly
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser(description="Create nudging for a schism run")
-    parser.add_argument(
-        "--input", type=str, help="input yaml file for nudging", required=True
-    )
-    return parser
-
-
 def write_to_log(message):
     if type(message) == pd.core.indexes.base.Index:
         message = ", ".join(message.to_list()) + "\n"
@@ -1152,13 +1144,18 @@ def write_to_log(message):
         f.write(message)
 
 
-def main():
-    # User inputs override the yaml file inputs.
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    if args.input.endswith(".yaml"):
-        os.chdir(os.path.abspath(os.path.dirname(args.input)))
-        nudge = Nudging(args.input)
+@click.command()
+@click.argument('input_file', required=False)
+@click.option('--input', 'input_opt', type=str, default=None, help='input yaml file for nudging')
+def create_nudge_cli(input_file, input_opt):
+    """Create nudging for a schism run"""
+    input_path = input_opt if input_opt is not None else input_file
+    if input_path is None:
+        raise click.UsageError("Please provide an input file either as an argument or with --input")
+    
+    if input_path.endswith(".yaml"):
+        os.chdir(os.path.abspath(os.path.dirname(input_path)))
+        nudge = Nudging(input_path)
         nudge.read_yaml()
         nudge.create_nudging()
     else:
@@ -1166,4 +1163,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    create_nudge_cli()
