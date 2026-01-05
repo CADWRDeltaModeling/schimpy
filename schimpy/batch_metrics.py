@@ -467,7 +467,7 @@ class BatchMetrics(object):
         assert len(sim_outputs) > 0
         assert sim_outputs[0] is not None
 
-        metric_out = open(os.path.join(dest_dir, "metrics.csv"), "w")
+        metric_out = open(os.path.join(dest_dir, f"metrics_{variable}.csv"), "w")
         metric_out.writelines(
             "station, RMSE, lag, bias, NSE, Willmott_skill, Correlation\n"
         )
