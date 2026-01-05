@@ -23,6 +23,7 @@ from schimpy.create_station_output import create_station_output_cli
 from schimpy.param import set_param_cli
 from schimpy.check_mesh_skewness import check_skewness_cli
 from schimpy.combine_flux import combine_flux_cli
+from schimpy.convert_sav_class_to_number import convert_sav_class_to_number_cli
 
 
 @click.group(
@@ -59,6 +60,7 @@ cli.add_command(create_station_output_cli, "create_station_output")
 cli.add_command(set_param_cli, "set_param")
 cli.add_command(check_skewness_cli, "check_skewness")
 cli.add_command(combine_flux_cli, "combine_flux")
+cli.add_command(convert_sav_class_to_number_cli, "convert_sav_class_to_number")
 
 if __name__ == "__main__":
     cli()

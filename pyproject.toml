@@ -140,3 +140,4 @@ create_station_output = "schimpy.create_station_output:create_station_output_cli
 set_param = "schimpy.param:set_param_cli"
 check_skewness = "schimpy.check_skewness:check_skewness_cli"
 combine_flux = "schimpy.combine_flux:combine_flux_cli"
+convert_sav_class_to_number = "schimpy.convert_sav_class_to_number:convert_sav_class_to_number_cli"

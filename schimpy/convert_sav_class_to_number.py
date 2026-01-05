@@ -2,33 +2,11 @@
 # -*- coding: utf-8 -*-
 
 
-import argparse
+import click
 import numpy as np
 from osgeo import gdal
 from schimpy.schism_polygon import read_polygons, Point
 from scipy.ndimage import gaussian_filter as gfilt
-
-
-def create_arg_parse():
-    """Create argument parser
-    Parameters
-    ----------
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--mesh",
-        type=str,
-        default="hgrid.gr3",
-        help="mesh file for the horizontal mesh",
-    )
-    parser.add_argument("--density", required=True, help="tiff file for density")
-    parser.add_argument(
-        "--target", type=str, help="Target polygons to calculate density"
-    )
-    parser.add_argument(
-        "--output", type=str, default="sav_D.gr3", help="output file name"
-    )
-    return parser
 
 
 def read_density_tiff(fpath_densitiy_tiff):
@@ -57,11 +35,9 @@ def read_density_tiff(fpath_densitiy_tiff):
     return (upper_left_x, x_size, x_rotation, upper_left_y, y_rotation, y_size), array
 
 
-def main():
-    parser = create_arg_parse()
-    args = parser.parse_args()
-
-    tiff = gdal.Open(args.density)
+def convert_sav_class_to_number(mesh, density, target, output):
+    """Convert SAV class to number and process density data."""
+    tiff = gdal.Open(density)
     (upper_left_x, x_size, x_rotation, upper_left_y, y_rotation, y_size) = (
         tiff.GetGeoTransform()
     )
@@ -128,10 +104,38 @@ def main():
     # polygons = read_polygons(args.target)
 
 
-if __name__ == "__main__":
-    import sys
+@click.command()
+@click.option(
+    "--mesh",
+    type=str,
+    default="hgrid.gr3",
+    help="Mesh file for the horizontal mesh.",
+)
+@click.option(
+    "--density",
+    required=True,
+    help="TIFF file for density.",
+)
+@click.option(
+    "--target",
+    type=str,
+    help="Target polygons to calculate density.",
+)
+@click.option(
+    "--output",
+    type=str,
+    default="sav_D.gr3",
+    help="Output file name.",
+)
+def convert_sav_class_to_number_cli(mesh, density, target, output):
 
-    sys.argv.extend(["--density", "delta_2016_20_28_mosaic_NDVI_tif.tif"])
-    sys.argv.extend(["--mesh", "hgrid.gr3"])
-    sys.argv.extend(["--target", "test/testdata/sav/frankstract.yaml"])
-    main()
+    convert_sav_class_to_number(mesh, density, target, output)
+
+
+if __name__ == "__main__":
+    # import sys
+
+    # sys.argv.extend(["--density", "delta_2016_20_28_mosaic_NDVI_tif.tif"])
+    # sys.argv.extend(["--mesh", "hgrid.gr3"])
+    # sys.argv.extend(["--target", "test/testdata/sav/frankstract.yaml"])
+    convert_sav_class_to_number_cli()
