@@ -15,7 +15,8 @@ from schimpy.lsc2 import *  # default_num_layers, gen_sigma, flip_sigma
 from schimpy.schism_vertical_mesh import SchismLocalVerticalMesh, write_vmesh
 from schimpy.schism_mesh import read_mesh, write_mesh
 from schimpy.schism_polygon import read_polygons
-#from schimpy.lsc2 import default_num_layers
+
+# from schimpy.lsc2 import default_num_layers
 from schimpy.vgrid_opt2 import *
 from schimpy.schism_setup import ensure_outdir
 import numpy as np
@@ -27,66 +28,50 @@ fixed_min = 1
 fixed_max = 40
 
 
-def create_arg_parser():
-    """Create argument parser for"""
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--hgrid", default="hgrid.gr3", help="hgrid file name")
-    parser.add_argument("--vgrid", default="vgrid.in", help="vgrid output file name")
-    help_region = "Polygon file that contains min and max layer information"
-    parser.add_argument("--minmaxregion", required=True, help=help_region)
-    parser.add_argument(
-        "--ngen",
-        type=int,
-        default=60,
-        help="Number of iterations for layer simplification",
-    )
-    parser.add_argument(
-        "--eta", type=float, default=1.5, help="Reference surface elevation"
-    )
-    parser.add_argument(
-        "--plot_transects",
-        default=None,
-        help="Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc",
-    )
-    parser.add_argument(
-        "--archive_nlayer",
-        default="out",
-        help="Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc",
-    )
-    parser.add_argument(
-        "--nlayer_gr3",
-        default="nlayer.gr3",
-        help="Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc",
-    )
-    parser.add_argument(
-        "--vgrid_version",
-        required=True,
-        default="5.10",
-        type=str,
-        help="SCHISM version number as string (e.g. '5.8' and below for old style vgrid, '5.10' is the current new style vgrid",
-    )
-
-    return parser
+import click
 
 
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    hgrid = args.hgrid
-    minmax_region = args.minmaxregion
-    vgrid_out = args.vgrid
-    archive_nlayer = args.archive_nlayer
-    nlayer_gr3 = args.nlayer_gr3
+def create_vgrid_lsc2(
+    hgrid,
+    vgrid,
+    minmaxregion,
+    ngen,
+    eta,
+    plot_transects,
+    archive_nlayer,
+    nlayer_gr3,
+    vgrid_version,
+):
+    """Create LSC2 vertical grid
+
+    Parameters
+    ----------
+    hgrid : str
+        hgrid file name
+    vgrid : str
+        vgrid output file name
+    minmaxregion : str
+        Polygon file that contains min and max layer information
+    ngen : int
+        Number of iterations for layer simplification
+    eta : float
+        Reference surface elevation
+    plot_transects : str, optional
+        Filename or glob prefix of transects to plot
+    archive_nlayer : str
+        Output directory for nlayer files
+    nlayer_gr3 : str
+        nlayer.gr3 output file name
+    vgrid_version : str
+        SCHISM version number as string (e.g. '5.8' or '5.10')
+    """
+    minmax_region = minmaxregion
+    vgrid_out = vgrid
     if nlayer_gr3 == hgrid:
         raise ValueError("Nlayer archive gr3 and hgrid.gr3 the same")
-    eta = args.eta
     vgrid0 = vgrid_out.replace(".in", "_int.in")
     maxiter = 200
-    ngen = args.ngen
-    transect = args.plot_transects
-    vgrid_version = args.vgrid_version
+    transect = plot_transects
     from os import getcwd
     import os.path
 
@@ -140,6 +125,65 @@ def main():
         vgrid_out = "vgrid.in"
         vgrid0_out = "vgrid.in"
         plot_vgrid(hgrid, vgrid_out, vgrid0_out, vgrid_version, eta, transectfiles)
+
+
+@click.command()
+@click.option("--hgrid", default="hgrid.gr3", help="hgrid file name")
+@click.option("--vgrid", default="vgrid.in", help="vgrid output file name")
+@click.option(
+    "--minmaxregion",
+    required=True,
+    help="Polygon file that contains min and max layer information",
+)
+@click.option(
+    "--ngen", type=int, default=60, help="Number of iterations for layer simplification"
+)
+@click.option("--eta", type=float, default=1.5, help="Reference surface elevation")
+@click.option(
+    "--plot_transects",
+    default=None,
+    help="Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc",
+)
+@click.option(
+    "--archive_nlayer",
+    default="out",
+    help="Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc",
+)
+@click.option(
+    "--nlayer_gr3",
+    default="nlayer.gr3",
+    help="Filename or glob prefix of transects to plot (e.g. mallard for files mallard_1.csv, mallard_2.csv, etc",
+)
+@click.option(
+    "--vgrid_version",
+    required=True,
+    default="5.10",
+    type=str,
+    help="SCHISM version number as string (e.g. '5.8' and below for old style vgrid, '5.10' is the current new style vgrid",
+)
+def create_vgrid_lsc2_cli(
+    hgrid,
+    vgrid,
+    minmaxregion,
+    ngen,
+    eta,
+    plot_transects,
+    archive_nlayer,
+    nlayer_gr3,
+    vgrid_version,
+):
+    """Create LSC2 vertical grid"""
+    create_vgrid_lsc2(
+        hgrid,
+        vgrid,
+        minmaxregion,
+        ngen,
+        eta,
+        plot_transects,
+        archive_nlayer,
+        nlayer_gr3,
+        vgrid_version,
+    )
 
 
 def vgrid_gen(
@@ -311,4 +355,4 @@ def plot_vgrid(hgrid_file, vgrid0_file, vgrid_file, vgrid_version, eta, transect
 
 
 if __name__ == "__main__":
-    main()
+    create_vgrid_lsc2_cli()
