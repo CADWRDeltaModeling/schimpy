@@ -19,6 +19,7 @@ from schimpy.station import convert_station_cli
 from schimpy.nudging import create_nudge_cli
 from schimpy.interpolate_structure import interpolate_structure_cli
 from schimpy.merge_th import merge_th_cli
+from schimpy.create_station_output import create_station_output_cli
 
 
 @click.group(
@@ -51,6 +52,7 @@ cli.add_command(convert_station_cli, "station")
 cli.add_command(create_nudge_cli, "create_nudging")
 cli.add_command(interpolate_structure_cli, "interpolate_structure")
 cli.add_command(merge_th_cli, "merge_th")
+cli.add_command(create_station_output_cli, "create_station_output")
 
 
 if __name__ == "__main__":
