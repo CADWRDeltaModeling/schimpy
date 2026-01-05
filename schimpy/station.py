@@ -843,7 +843,7 @@ def convert_db_station_in(
 )
 @click.option(
     "--request",
-    default="all",
+    default=("all",),
     multiple=True,
     help="requested variables or 'all' for all of them. Possibilities are: {}".format(
         ",".join(station_variables)
