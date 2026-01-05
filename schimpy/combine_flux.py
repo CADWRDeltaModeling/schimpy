@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Command line tool to merge possibly overlapping flux.dat files from hotstart runs"""
-import argparse
+import click
 import numpy as np
 
 
@@ -78,35 +78,34 @@ def test_combine_flux():
     combine_flux(fnames, fout, prefer_last=False)
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser(
-        description="Merge possibly-overlapping flux.dat files from hotstarted runs. "
-    )
-    parser.add_argument("--prefer_last", action="store_true")
-    parser.add_argument("--output", help="output file")
-    parser.add_argument(
-        "files",
-        type=argparse.FileType("r"),
-        nargs="+",
-        help="List of input files in chronological order",
-    )
-
-    return parser
-
-
-def main():
-    """Driver to parse arguments"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    filelist = args.files
-    inputs = [x.name for x in filelist]
-    prefer_last = args.prefer_last
-    output = args.output
+@click.command()
+@click.option(
+    "--prefer_last",
+    is_flag=True,
+    help="Prefer the last file when overlapping data exists.",
+)
+@click.option(
+    "--output",
+    required=True,
+    help="Output file path.",
+)
+@click.argument(
+    "files",
+    nargs=-1,
+    required=True,
+    type=click.Path(exists=True),
+)
+def combine_flux_cli(prefer_last, output, files):
+    """Merge possibly-overlapping flux.dat files from hotstarted runs.
+    
+    FILES are the list of input files in chronological order.
+    """
+    inputs = list(files)
     if output in inputs:
-        raise ValueError("Cannot overwrite input file names")
-    combine_flux(filelist, output, prefer_last)
+        raise click.ClickException("Cannot overwrite input file names")
+    combine_flux(inputs, output, prefer_last)
 
 
 if __name__ == "__main__":
     # test_combine_flux()
-    main()
+    combine_flux_cli()
