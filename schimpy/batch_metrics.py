@@ -124,7 +124,12 @@ class BatchMetrics(object):
         else:
             for i, working_dir in enumerate(outputs_dir):
                 if stations_input is None:
-                    station_infile = os.path.join(working_dir, "station.in")
+                    if os.path.basename(working_dir) == "outputs":
+                        station_infile = os.path.join(
+                            os.path.dirname(working_dir), "station.in"
+                        )
+                    else:
+                        station_infile = os.path.join(working_dir, "station.in")
                 else:
                     station_infile = stations_input[i]
                 datafname = os.path.join(working_dir, station.staout_name(variable))
