@@ -42,11 +42,11 @@ def make_valid_bc_yaml(date=None):
     # immediately after the "date" key (dict insertion order is preserved).
     return {
         "date": date,
-        "earth_tidals": {
+        "earth_tides": {
             "tidal_cutoff_depth": 40,
             "tidal_constituents": earth_tidal_constituents,
         },
-        "boundary_forcing_tidals": {
+        "boundary_forcing_tides": {
             "tidal_constituents": [
                 {
                     "name": "M2",
@@ -92,10 +92,10 @@ def make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=3, date=Non
     bc_yaml["open_boundaries"] = [
         {
             "name": f"{i}",
-            "elevation_boundary": {"source": "constant"},
-            "velocity_boundary": {"source": "constant"},
-            "temperature_boundary": {"source": "constant", "nudge": 0.5},
-            "salinity_boundary": {"source": "constant", "nudge": 0.5}
+            "elevation_boundary": {"source": 0.2},
+            "velocity_boundary": {"source": 10},
+            "temperature_boundary": {"source": 25, "nudge": 0.5},
+            "salinity_boundary": {"source": 5, "nudge": 0.5}
         }
         for i in range(num_boundaries)
     ]
@@ -104,9 +104,9 @@ def make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=3, date=Non
 def test_write_bctides_valid(tmp_path):
     """Test write_bctides with typical valid input."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=2, nodes_per_boundary=2)
-    b = boundary(mesh, bc_yaml)
+    bb = boundary(mesh, bc_yaml)
     out_file = tmp_path / "bctides_test.in"
-    b.write_bctides(str(out_file))
+    bb.write_bctides(str(out_file))
     content = out_file.read_text()
     assert "2020-01-01 00:00" in content
     assert "M2" in content
@@ -129,15 +129,15 @@ def test_write_bctides_mismatched_boundaries(tmp_path):
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=2)
     # Remove one open boundary from YAML
     bc_yaml["open_boundaries"] = bc_yaml["open_boundaries"][:1]
-    with pytest.raises(ValueError, match="boundary YAML has different number of openbounary"):
+    with pytest.raises(ValueError, match="boundary YAML has different number of openboundary"):
         boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail.in")
 
 def test_write_bctides_missing_fields(tmp_path):
     """Test missing optional fields (should not raise)."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    # Remove earth_tidals and bounary_forcing_tidals
+    # Remove earth_tidals and boundary_forcing_tidals
     bc_yaml.pop("earth_tidals", None)
-    bc_yaml.pop("bounary_forcing_tidals", None)
+    bc_yaml.pop("boundary_forcing_tidals", None)
     b = boundary(mesh, bc_yaml)
     out_file = tmp_path / "bctides_missing_fields.in"
     b.write_bctides(str(out_file))
