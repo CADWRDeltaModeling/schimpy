@@ -1,4 +1,4 @@
-import argparse
+import click
 
 import pandas as pd
 import numpy as np
@@ -214,20 +214,13 @@ def _write_output(mdf, th_out, dated_output, ref_time):
         write_th(mdf, dated_name, elapsed=False)
 
 
-def create_arg_parser():
-    parser = argparse.ArgumentParser(
-        description="Merge multicolumn th files to form union of columns and (for tracers) variables."
-    )
-    parser.add_argument("--input", help="Config file")
-    return parser
-
-
-def main():
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    configfile = args.input
-    merge_th(configfile)
+@click.command()
+@click.option('--input', required=True, help='Config file')
+def merge_th_cli(input):
+    """Merge multicolumn th files to form union of columns and (for tracers) variables."""
+    merge_th(input)
 
 
 if __name__ == "__main__":
-    merge_th("source_sink_data_test.yaml")
+    merge_th_cli()
+    # merge_th("source_sink_data_test.yaml")
