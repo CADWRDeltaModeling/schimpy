@@ -4,7 +4,7 @@
 
 import schimpy.schism_mesh
 import schimpy.sms2gr3
-import argparse
+import click
 import os
 import numpy as np
 
@@ -63,43 +63,10 @@ def write_prop(fpath, data):
     np.savetxt(fpath, output, fmt="%d %g")
 
 
-def create_arg_parser():
-    """Create an argument parser"""
-    parser = argparse.ArgumentParser(help)
-    parser.add_argument(
-        "--meshfile",
-        default="hgrid.gr3",
-        help="mesh file to analyze, default=hgrid.gr3, If the file is 2dm format, it will be converted into temp.gr3 and processed",
-    )
-    parser.add_argument(
-        "--propfile", default="skewness.prop", help="prop output, default=skewness.prop"
-    )
-    parser.add_argument(
-        "--mask_tri",
-        dest="mask_tri",
-        action="store_true",
-        help="Mask triangular elements with values, default=True",
-    )
-    parser.set_defaults(mask_tri=False)
-    parser.add_argument(
-        "--normalize",
-        dest="normalize",
-        action="store_true",
-        help="Normalize skewness between 0 and 1, default=True",
-    )
-    parser.set_defaults(normalize=False)
-    return parser
-
-
-def main():
-    """main function"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
-
-    fpath_mesh = args.meshfile
-    fpath_prop = args.propfile
-    mask_tri = args.mask_tri
-    normalize = args.normalize
+def check_skewness(meshfile, propfile, mask_tri, normalize):
+    """Calculate skewness of elements from gr3 file."""
+    fpath_mesh = meshfile
+    fpath_prop = propfile
     if not os.path.exists(fpath_mesh):
         raise ValueError("Mesh file not found")
     if fpath_mesh.endswith(".2dm"):
@@ -111,5 +78,31 @@ def main():
     write_prop(fpath_prop, skewness)
 
 
+@click.command()
+@click.option(
+    "--meshfile",
+    default="hgrid.gr3",
+    help="Mesh file to analyze. If the file is 2dm format, it will be converted into temp.gr3 and processed.",
+)
+@click.option(
+    "--propfile",
+    default="skewness.prop",
+    help="Prop output file.",
+)
+@click.option(
+    "--mask_tri",
+    is_flag=True,
+    help="Mask triangular elements with zero values.",
+)
+@click.option(
+    "--normalize",
+    is_flag=True,
+    help="Normalize skewness between 0 and 1.",
+)
+def check_skewness_cli(meshfile, propfile, mask_tri, normalize):
+
+    check_skewness(meshfile, propfile, mask_tri, normalize)
+
+
 if __name__ == "__main__":
-    main()
+    check_skewness_cli()
