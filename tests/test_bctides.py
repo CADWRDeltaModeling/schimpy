@@ -192,7 +192,7 @@ def test_write_bctides_tracer_constant_list(tmp_path):
     """Test tracer with constant list as source."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
     bc_yaml["bctides"]["open_boundaries"][0]["tracers"] = [
-        {"tracer": "GEN", "source": [1.0, 2.0, 3.0], "nudge": 0.5}
+        {"tracer": "GEN", "source": [1.0, 2.0, 3.0], "nudge": 0.5, "relax": 0.5}
     ]
     b = boundary(mesh, bc_yaml)
     out_file = tmp_path / "bctides_tracer_list.in"
@@ -204,7 +204,7 @@ def test_write_bctides_tracer_constant_scalar(tmp_path):
     """Test tracer with constant scalar as source."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
     bc_yaml["bctides"]["open_boundaries"][0]["tracers"] = [
-        {"tracer": "GEN", "source": 5.0, "nudge": 0.5}
+        {"tracer": "GEN", "source": 5.0, "nudge": 0.5, "relax": 0.5}
     ]
     b = boundary(mesh, bc_yaml)
     out_file = tmp_path / "bctides_tracer_scalar.in"
