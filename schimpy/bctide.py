@@ -51,12 +51,14 @@ def load_main_input(main_yaml):
      open_boundary_segments = None
      if "open_boundaries" in main_yaml_dict["mesh"].keys():
          open_boundary_segments = main_yaml_dict["mesh"]["open_boundaries"]
-    
-     bctides_dic = main_yaml_dict["bctides"]
-     for bctides_key in bctides_dic.keys():
-         bctides_yaml = bctides_dic[bctides_key]
+
+     bctides_dic = main_yaml_dict.get("bctides")
+#     for bctides_key in bctides_dic.keys():
+     for out in bctides_dic:
+         bctides_yaml = bctides_dic[out]
          by = load_boundary(hgrid,bctides_yaml,open_boundary_segments)
-         by.write_bctides(bctides_key)
+  #       by.write_bctides(bctides_key)
+         by.write_bctides(out)
 
 def update_mesh_open_boundaries(mesh, segments):
     """Overtide mesh open boundaries with linestrings from segments dict
@@ -95,18 +97,18 @@ class boundary(object):
     def __init__(self, hgrid,bc_yaml=None,boundary_segments=None):
         """ initialize the boundary condition from yaml file"""
 
-        main_id = "bctides"
-        self.date = bc_yaml[main_id]["date"]
-        if "earth_tides" in bc_yaml[main_id].keys():
-            self.earth_tides = bc_yaml[main_id]["earth_tides"]
+        #main_id = "bctides"
+        self.date = bc_yaml["date"]
+        if "earth_tides" in bc_yaml.keys():
+            self.earth_tides = bc_yaml["earth_tides"]
         else:
             self.earth_tides = None
-        if "bounary_forcing_tidals" in bc_yaml[main_id].keys():
-            self.boundary_tides = bc_yaml[main_id]["bounary_forcing_tidals"]
+        if "boundary_forcing_tides" in bc_yaml.keys():
+            self.boundary_tides = bc_yaml["boundary_forcing_tides"]
         else:
             self.boundary_tides = None
         
-        self.open_boundaries = bc_yaml[main_id]["open_boundaries"]
+        self.open_boundaries = bc_yaml["open_boundaries"]
         self.hgrid = hgrid  
 
         ## if boundary grid is provided, use it to override the hgrid boundary 
@@ -541,7 +543,7 @@ class boundary(object):
 
             if len(hgrd_open_boundaries) != len(self.open_boundaries):
                 raise ValueError(
-                    "boundary YAML has different number of openbounary than model hgrid, YAML:%s hgrid:%s"
+                    "boundary YAML has different number of openboundary than model hgrid, YAML:%s hgrid:%s"
                     % (len(self.open_boundaries), len(hgrd_open_boundaries))
                 )
             else:
