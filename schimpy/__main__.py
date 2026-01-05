@@ -14,8 +14,8 @@ from schimpy.hotstart_inventory import hotstart_inventory_cli
 from schimpy.create_vgrid_lsc2 import create_vgrid_lsc2_cli
 from schimpy.schism_hotstart import create_hotstart_cli
 from schimpy.split_quad import split_quads_cli
+from schimpy.small_areas import small_areas_cli
 
-# from schimpy.small_areas import small_areas
 # from schimpy.station import station
 # from schimpy.nudging import create_nudging
 # from schimpy.interpolate_structure import interpolate_structure
@@ -47,8 +47,8 @@ cli.add_command(hotstart_inventory_cli, "hotstart_inventory")
 cli.add_command(create_vgrid_lsc2_cli, "create_vgrid_lsc2")
 cli.add_command(create_hotstart_cli, "schism_hotstart")
 cli.add_command(split_quads_cli, "split_quad")
+cli.add_command(small_areas_cli, "small_areas")
 
-# cli.add_command(small_areas, "small_areas")
 # cli.add_command(station, "station")
 # cli.add_command(create_nudging, "create_nudging")
 # cli.add_command(interpolate_structure, "interpolate_structure")
