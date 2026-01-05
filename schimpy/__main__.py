@@ -26,6 +26,7 @@ from schimpy.combine_flux import combine_flux_cli
 from schimpy.convert_sav_class_to_number import convert_sav_class_to_number_cli
 from schimpy.create_mesh_n_levels import create_mesh_n_levels_cli
 from schimpy.cruise import cruise_plot_cli
+from schimpy.cut_mesh import cut_mesh_cli
 
 
 @click.group(
@@ -65,6 +66,7 @@ cli.add_command(combine_flux_cli, "combine_flux")
 cli.add_command(convert_sav_class_to_number_cli, "convert_sav_class_to_number")
 cli.add_command(create_mesh_n_levels_cli, "create_mesh_n_levels")
 cli.add_command(cruise_plot_cli, "cruise_plot")
+cli.add_command(cut_mesh_cli, "cut_mesh")
 
 if __name__ == "__main__":
     cli()

@@ -6,6 +6,8 @@ from schimpy.schism_mesh import read_mesh, write_mesh
 import numpy as np
 import os
 
+import click
+
 
 def read_lines(fpath):
     """Read coordinates of cutting line segments from a plain text file.
@@ -102,23 +104,32 @@ def cut_mesh(fpath_gr3_in, lines, fpath_gr3_out, cut_side="left"):
     write_mesh(s, fpath_gr3_out)
 
 
-if __name__ == "__main__":
-    import argparse
 
-    parser = argparse.ArgumentParser(description="A mesh cutting tool.")
-    parser.add_argument("gr3_in", type=str, help="a filename of an input grid")
-    parser.add_argument("lines", type=str, help="a filename containing lines to cut")
-    parser.add_argument("gr3_out", type=str, help="a filename of an output grid")
-    parser.add_argument(
-        "--cut-side",
-        default="left",
-        help="Which side to cut. If 'right', the right side will be removed.",
-    )
-    args = parser.parse_args()
-
-    ext = os.path.splitext(args.lines)
+@click.command()
+@click.argument("gr3_in", type=str)
+@click.argument("lines", type=str)
+@click.argument("gr3_out", type=str)
+@click.option(
+    "--cut-side",
+    default="left",
+    help="Which side to cut. If 'right', the right side will be removed.",
+)
+def cut_mesh_cli(gr3_in, lines, gr3_out, cut_side):
+    """A mesh cutting tool.
+    
+    GR3_IN: Filename of an input grid.
+    
+    LINES: Filename containing lines to cut.
+    
+    GR3_OUT: Filename of an output grid.
+    """
+    ext = os.path.splitext(lines)
     if ext[1] == ".shp":
-        lines = read_lines_from_shapefile(args.lines)
+        line_coords = read_lines_from_shapefile(lines)
     else:
-        lines = read_lines(args.lines)
-    cut_mesh(args.gr3_in, lines, args.gr3_out, args.cut_side)
+        line_coords = read_lines(lines)
+    cut_mesh(gr3_in, line_coords, gr3_out, cut_side)
+
+
+if __name__ == "__main__":
+    cut_mesh_cli()
