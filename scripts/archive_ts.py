@@ -18,85 +18,7 @@ import os
 import yaml
 import re
 import glob
-
-
-def create_arg_parser():
-    """Create an argument parser
-    return: argparse.ArgumentParser
-    """
-
-    # Read in the input file
-    parser = argparse.ArgumentParser(
-        description="""
-            Archive time series from one simulation in a large with many alternatives 
-            and store in a common location with better names and formats.
-        """,
-        epilog="""        
-        Usage:\n                           
-            
-            $ archive_ts --ardir archive_ts --rundir mss_base --label base 
-              --scenario_data '{year: 2001, sjr: 1400, exports: 1500}' 
-              --extracted '{flux.out: flux}' --stationfile fluxflag.prop --run_start 2021-01-01
-
-            $ archive_ts --ardir archive_ts --rundir mss_base --label base 
-              --scenario_data '{year: 2001, sjr: 1400, exports:1500}' \n
-
-            $ archive_ts --ardir archive_ts --rundir mss_base --label base 
-              --scenario_data '{year: 2001, sjr: 1400, 
-              exports: 1500}' --stationfile outputs/south_delta.bp 
-              --extracted  '{fracsjr_*.out: fracsjr, fracdelta_*.out: fracdelta}' 
-              --time_sharded
-         """,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        "--rundir",
-        default=None,
-        help="location of the run launch dir where param.nml resides.",
-    )
-    parser.add_argument(
-        "--ardir", default=None, help="path to the archive receiving the data"
-    )
-    parser.add_argument(
-        "--label",
-        default=None,
-        help="scenario label for output. Final name inarchive will be variable_label.csv",
-    )
-    parser.add_argument(
-        "--scenario_data",
-        default={},
-        type=yaml.safe_load,
-        help="dictionary of data that identifies scenario, which will be added as a column to the output. This is very helpful for stitching. ",
-    )
-
-    parser.add_argument(
-        "--stationfile",
-        default="station.in",
-        type=yaml.safe_load,
-        help="name of annotated station.in, build pointfile or fluxflag.prop/flow_xsects.yaml",
-    )
-
-    parser.add_argument(
-        "--extracted",
-        default=None,
-        type=yaml.safe_load,
-        help='dictionary of extracted data in rundir/outputs in the form of "file_name: variable_name". '
-        "You can only one atation.in OR flux.out OR the files associated with a single build point per invocation."
-        "On the command line note that this is quoted and requires a space after the colons"
-        'Example: "{staout_1: elev, staout_5: temp, staout_6: salt}"',
-    )
-
-    parser.add_argument(
-        "--run_start", default=None, type=pd.to_datetime, help="start date of run. "
-    )
-
-    parser.add_argument(
-        "--time_sharded",
-        action="store_true",
-        help="if true, assume the extracted file is sharded in time. ",
-    )
-
-    return parser
+import click
 
 
 def archive_time_series(
@@ -313,21 +235,31 @@ def ex():
     print(shard_sorter("hello_2.out", "hello_120.out"))
 
 
-def main():
+def archive_ts(
+    rundir, ardir, label, scenario_data, stationfile, extracted, run_start, time_sharded
+):
+    """Archive time series from one simulation in a large study with many alternatives."""
 
-    parser = create_arg_parser()
-    args = parser.parse_args()
+    # Parse YAML strings
+    scenario_data = yaml.safe_load(scenario_data)
+    if stationfile and stationfile != "station.in":
+        # Only parse as YAML if it looks like YAML, otherwise keep as string
+        try:
+            stationfile_parsed = yaml.safe_load(stationfile)
+            if isinstance(stationfile_parsed, (dict, list)):
+                stationfile = stationfile_parsed
+        except:
+            pass  # Keep as string if YAML parsing fails
 
-    rundir = args.rundir
-    ardir = args.ardir
-    label = args.label
-    stationfile = args.stationfile
-    scenario_data = args.scenario_data
-    scenario_data = args.scenario_data
-    staouts = args.extracted
-    time_sharded = args.time_sharded
+    if extracted:
+        staouts = yaml.safe_load(extracted)
+    else:
+        staouts = None
+
+    # Parse datetime
+    runstart = pd.to_datetime(run_start) if run_start else None
+
     print("time_sharded", time_sharded)
-    runstart = args.run_start
 
     for key, val in scenario_data.items():
         if val is None:
@@ -361,5 +293,87 @@ def main():
     print(staouts)
 
 
+@click.command(
+    help="""
+    Archive time series from one simulation in a large with many alternatives 
+    and store in a common location with better names and formats.
+    
+    Examples:
+    
+    $ archive_ts --ardir archive_ts --rundir mss_base --label base 
+      --scenario_data '{year: 2001, sjr: 1400, exports: 1500}' 
+      --extracted '{flux.out: flux}' --stationfile fluxflag.prop --run_start 2021-01-01
+
+    $ archive_ts --ardir archive_ts --rundir mss_base --label base 
+      --scenario_data '{year: 2001, sjr: 1400, exports:1500}'
+
+    $ archive_ts --ardir archive_ts --rundir mss_base --label base 
+      --scenario_data '{year: 2001, sjr: 1400, exports: 1500}' 
+      --stationfile outputs/south_delta.bp 
+      --extracted '{fracsjr_*.out: fracsjr, fracdelta_*.out: fracdelta}' 
+      --time_sharded
+    """
+)
+@click.option(
+    "--rundir",
+    default=None,
+    help="location of the run launch dir where param.nml resides.",
+)
+@click.option(
+    "--ardir",
+    default=None,
+    help="path to the archive receiving the data",
+)
+@click.option(
+    "--label",
+    default=None,
+    help="scenario label for output. Final name in archive will be variable_label.csv",
+)
+@click.option(
+    "--scenario_data",
+    default="{}",
+    help="dictionary of data that identifies scenario, which will be added as a column to the output. This is very helpful for stitching.",
+)
+@click.option(
+    "--stationfile",
+    default="station.in",
+    help="name of annotated station.in, build pointfile or fluxflag.prop/flow_xsects.yaml",
+)
+@click.option(
+    "--extracted",
+    default=None,
+    help='dictionary of extracted data in rundir/outputs in the form of "file_name: variable_name". '
+    "You can only one station.in OR flux.out OR the files associated with a single build point per invocation. "
+    "On the command line note that this is quoted and requires a space after the colons. "
+    'Example: "{staout_1: elev, staout_5: temp, staout_6: salt}"',
+)
+@click.option(
+    "--run_start",
+    default=None,
+    help="start date of run.",
+)
+@click.option(
+    "--time_sharded",
+    is_flag=True,
+    default=False,
+    help="if true, assume the extracted file is sharded in time.",
+)
+def archive_ts_cli(
+    rundir, ardir, label, scenario_data, stationfile, extracted, run_start, time_sharded
+):
+    """Command Line Interface for archiving time series from one simulation in a large study with many alternatives."""
+
+    archive_ts(
+        rundir,
+        ardir,
+        label,
+        scenario_data,
+        stationfile,
+        extracted,
+        run_start,
+        time_sharded,
+    )
+
+
 if __name__ == "__main__":
-    main()
+    archive_ts_cli()
