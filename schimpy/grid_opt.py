@@ -33,8 +33,8 @@ from scipy.sparse.linalg import lsqr
 from scipy.optimize import fmin_l_bfgs_b
 from scipy.sparse import lil_matrix, eye, vstack
 import numpy as np
-from . import schism_yaml
-import argparse
+from schimpy.schism_yaml import load
+import click
 import logging
 
 
@@ -58,11 +58,11 @@ class GridOptimizer(object):
         """Constructor"""
         self.mesh = kwargs["mesh"]
         self.demfiles = kwargs["demfiles"]
-        self.na_fill = kwargs["na_fill"]
+        self.na_fill = kwargs.get("na_fill")
         self.logger = kwargs.get("logger")
         self.order_quadrature_tri_dem = 4
         self.order_quadrature_quad_dem = 5
-        self.out_dir = kwargs["out_dir"]
+        self.out_dir = kwargs.get("out_dir", ".")
 
     def select_solver(self, solver):
         """Select solver
@@ -838,33 +838,6 @@ class GridOptimizer(object):
         return volumes
 
 
-def create_arg_parser():
-    """Create argument parser"""
-    parser = argparse.ArgumentParser(
-        description=r"Perform grid optimization with a \*.2dm SMS mesh or gr3 file. An optimized gr3 file with extension _opt.gr3 will be created if only one set of optimization parameter specified."
-    )
-    parser.add_argument("filename", default=None, help="name of 2dm or gr3 file")
-    parser.add_argument(
-        "demfile",
-        default=None,
-        help="file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs",
-    )
-    parser.add_argument(
-        "optparm",
-        default=None,
-        help="file containing optimization parameters: damp, damp_shoreline, face_coeff, volume_coeff",
-    )
-    parser.add_argument(
-        "--optfile", help="name for the gr3 file for the optimized results"
-    )
-    parser.add_argument(
-        "--solver",
-        default="L-BFGS-B",
-        help="solver used for optimization, either L-BFGS-B (default) or lsqr",
-    )
-    return parser
-
-
 def init_logger():
     logging_level = logging.INFO
     logging_fname = "grid_opt.log"
@@ -877,34 +850,59 @@ def init_logger():
     return logging.getLogger("grid_opt")
 
 
-def grid_opt_with_args(args):
-    """Optimize grid with arguments parsed by argparse"""
-    with open(args.optparam) as f:
-        opt_param = schism_yaml.load(f)
-    mesh = read_mesh(args.filename, nodestring_option="land")
-    with open(args.demfile, "r") as f:
-        demfiles = schism_yaml.load(f)
-        # dir = os.path.dirname(args.demfile)
+def grid_opt_with_args(filename, demfile, optparam, optfile, na_fill=None, solver="L-BFGS-B"):
+    """Optimize grid with arguments"""
+    with open(optparam) as f:
+        opt_param = load(f)
+    mesh = read_mesh(filename, nodestring_option="land")
+    with open(demfile, "r") as f:
+        demfiles = load(f)
+        # dir = os.path.dirname(demfile)
         # demfiles_full = [os.path.join(dir, fname) for fname in demfiles]
     logger = init_logger()
     kwargs = {
         "mesh": mesh,
         "demfiles": demfiles,  # demfiles_full,
-        "na_fill": args.na_fill,
+        "na_fill": na_fill,
         "logger": logger,
+        "out_dir": ".",
     }
     optimizer = GridOptimizer(**kwargs)
-    optimized = optimizer.optimize(opt_param)
-    fpath_output = args.optfile
+    optimized = optimizer.optimize(opt_param, solver=solver)
+    fpath_output = optfile
     write_mesh(mesh, fpath_output, node_attr=-optimized)
 
 
-def main():
-    """A main function to manage command line run"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    grid_opt_with_args(args)
+@click.command()
+@click.argument("filename", type=click.Path(exists=True))
+@click.argument("demfile", type=click.Path(exists=True))
+@click.argument("optparam", type=click.Path(exists=True))
+@click.option(
+    "--optfile",
+    required=True,
+    help="Name for the gr3 file for the optimized results.",
+)
+@click.option(
+    "--solver",
+    default="L-BFGS-B",
+    help="Solver used for optimization, either L-BFGS-B (default) or lsqr.",
+)
+@click.option(
+    "--na_fill",
+    type=float,
+    help="Fill value for NA/missing data.",
+)
+def grid_opt_cli(filename, demfile, optparam, optfile, solver, na_fill):
+    """Perform grid optimization with a *.2dm SMS mesh or gr3 file.
+    
+    FILENAME: Name of 2dm or gr3 file.
+    
+    DEMFILE: File containing list of DEMs (ESRI ascii format or GeoTiffs).
+    
+    OPTPARAM: File containing optimization parameters (damp, damp_shoreline, face_coeff, volume_coeff).
+    """
+    grid_opt_with_args(filename, demfile, optparam, optfile, na_fill, solver)
 
 
 if __name__ == "__main__":
-    main()
+    grid_opt_cli()
