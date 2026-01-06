@@ -15,7 +15,7 @@ import os
 import re
 import shutil
 from dms_datastore.logging_config import logger
-import argparse
+import click
 import netCDF4
 
 
@@ -604,41 +604,6 @@ def subset_schism_scribeIO_output(partition_shp):
 # subset_schism_output()
 
 
-def create_arg_parser():
-    """Create an argument parser
-    return: argparse.ArgumentParser
-    """
-
-    # Read in the input file
-    parser = argparse.ArgumentParser(
-        description="""
-        
-        Extract SCHISM output variables contained in predefined polygons
-        and save to a subset folder under current folder
-        
-        Usage:
-        subset_schism_output --subset_polygon cut.shp
-                     """
-    )
-    parser.add_argument(
-        "--subset_polygon",
-        default=None,
-        required=True,
-        help="a shape file defines polygons where outputs\
-                        are desired",
-    )
-
-    return parser
-
-
-if __name__ == "__main__":
-
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    partition_shp = args.subset_polygon
-    subset_schism_scribeIO_output(partition_shp)
-
-
 # ------------------------------------------------------------------------------------------------------------
 # create_partition
 # ------------------------------------------------------------------------------------------------------------
@@ -663,3 +628,23 @@ def create_partition(mesh, polygons, enforce_exact=False):
 def write_global_local_maps(dest, global_local, local_global):
     """writes maps out in the schism + visit format. Note that the global owner
     of a shared node is the lowest rank that contains it."""
+
+
+@click.command(
+    help="""
+    Extract SCHISM output variables contained in predefined polygons
+    and save to a subset folder under current folder
+    """
+)
+@click.option(
+    "--subset_polygon",
+    required=True,
+    help="a shape file defines polygons where outputs are desired",
+)
+def subset_schism_output_cli(subset_polygon):
+    """Extract SCHISM output variables contained in predefined polygons."""
+    subset_schism_scribeIO_output(subset_polygon)
+
+
+if __name__ == "__main__":
+    subset_schism_output_cli()

@@ -35,6 +35,7 @@ from schimpy.material_poly import material_poly_cli
 from schimpy.simulation_timing import simulation_timing_cli
 from schimpy.stacked_dem_fill import stacked_fill_cli
 from schimpy.mesh_volume_tvd import mesh_volume_tvd_cli
+from schimpy.subset_schism_output import subset_schism_output_cli
 
 
 @click.group(
@@ -82,6 +83,7 @@ cli.add_command(grid_opt_cli, "grid_opt")
 cli.add_command(material_poly_cli, "material_poly")
 cli.add_command(simulation_timing_cli, "simulation_timing")
 cli.add_command(mesh_volume_tvd_cli, "mesh_volume_tvd")
+cli.add_command(subset_schism_output_cli, "subset_schism_output")
 
 if __name__ == "__main__":
     cli()
