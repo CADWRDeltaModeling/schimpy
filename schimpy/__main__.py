@@ -29,6 +29,7 @@ from schimpy.cruise import cruise_plot_cli
 from schimpy.cut_mesh import cut_mesh_cli
 from schimpy.download_hrrr import download_hrr_clip_cli
 from schimpy.embed_raster import embed_raster_cli
+from schimpy.schism_yaml import schism_yaml_cli
 
 
 @click.group(
@@ -71,6 +72,7 @@ cli.add_command(cruise_plot_cli, "cruise_plot")
 cli.add_command(cut_mesh_cli, "cut_mesh")
 cli.add_command(download_hrr_clip_cli, "download_hrrr")
 cli.add_command(embed_raster_cli, "embed_raster")
+cli.add_command(schism_yaml_cli, "schism_yaml")
 
 if __name__ == "__main__":
     cli()

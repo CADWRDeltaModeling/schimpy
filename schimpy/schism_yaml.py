@@ -17,11 +17,10 @@ import collections
 import string
 import re
 import os
-import argparse
 import warnings
 import sys
 
-__all__ = ["load", "dump", "YamlAction", "ArgumentParserYaml"]
+__all__ = ["load", "dump"]
 include_keywords = [
     "include",
 ]
@@ -340,174 +339,17 @@ def safe_dump(data, stream=None, **kwds):
     return yaml.safe_dump(data, stream, **kwds)
 
 
-class YamlAction(argparse.Action):
-    """Custom action to parse YAML files for argparse.
-    This action reads in simple pairs of data from a YAML file, and
-    feeds them to the parser. A YAML file must be a list of pairs
-    without multiple levels of tree.
-    Example:
-    parser.add_argument("--yaml", action=YamlAction)
-    """
-
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super(YamlAction, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        if not isinstance(values, list):
-            values = [values]
-        args_string = []
-        for value in values:
-            with open(value) as f:
-                loader = RawLoader(f)
-                try:
-                    data = loader.get_single_data()
-                finally:
-                    loader.dispose()
-                for k, v in data.items():
-                    if re.search(r"[\s]", k):
-                        raise ValueError("No whitespace is allowed in the key.")
-                    if not isinstance(v, str):
-                        raise ValueError("Only plain string is allowed in the value.")
-                    arg = "--%s %s" % (k, v)
-                    args_string.extend(arg.split())
-        args, argv = parser.parse_known_args(args_string, namespace)
+import click
 
 
-class ArgumentParserYaml(argparse.ArgumentParser):
-    """Extended parser to handle YAML file as file input for ArgumentParser.
-    If a file input given with 'fromfile_prefix_chars' has a YAML extension,
-    '.yaml', it will be handled as optional pairs for ArgumentParser.
-    For example, 'script.py' can use a YAML file for an input file of
-    ArgumentParser as follow:
-    parser = schism_yaml.ArgumentParserYaml(fromfile_prefix_chars='@')
-    parser.parse_arg()
-
-    $script.py @args.yaml
-
-    And when 'args.yaml' contains:
-    input1: 1
-    input2: 2 3
-
-    it has the same effect as
-    $script.py --input1 1 --input2 2 3
-    """
-
-    def __init__(
-        self,
-        prog=None,
-        usage=None,
-        description=None,
-        epilog=None,
-        version=None,
-        parents=[],
-        formatter_class=argparse.HelpFormatter,
-        prefix_chars="-",
-        fromfile_prefix_chars=None,
-        argument_default=None,
-        conflict_handler="error",
-        add_help=True,
-    ):
-        if sys.version_info[0] == 2:
-            super(ArgumentParserYaml, self).__init__(
-                prog,
-                usage,
-                description,
-                epilog,
-                version,
-                parents,
-                formatter_class,
-                prefix_chars,
-                fromfile_prefix_chars,
-                argument_default,
-                conflict_handler,
-                add_help,
-            )
-        elif sys.version_info[0] == 3:
-            super(ArgumentParserYaml, self).__init__(
-                prog,
-                usage,
-                description,
-                epilog,
-                parents,
-                formatter_class,
-                prefix_chars,
-                fromfile_prefix_chars,
-                argument_default,
-                conflict_handler,
-                add_help,
-            )
-        else:
-            raise NotImplementedError("Not supported Python version")
-
-    def _read_args_from_files(self, arg_strings):
-        """Override this function to handle YAML files"""
-        # expand arguments referencing files
-        new_arg_strings = []
-        for arg_string in arg_strings:
-            # for regular arguments, just add them back into the list
-            if not arg_string or arg_string[0] not in self.fromfile_prefix_chars:
-                new_arg_strings.append(arg_string)
-
-            # replace arguments referencing files with the file content
-            else:
-                _, ext = os.path.splitext(arg_string[1:])
-                if ext in yaml_extensions:
-                    try:
-                        with open(arg_string[1:]) as args_file:
-                            loader = RawLoader(args_file)
-                            try:
-                                data = loader.get_single_data()
-                            finally:
-                                loader.dispose()
-                            for k, v in data.items():
-                                if re.search(r"[\s]", k):
-                                    raise ValueError(
-                                        "No whitespace is allowed in the key."
-                                    )
-                                if not isinstance(v, str):
-                                    raise ValueError(
-                                        "Only plain string is allowed in the value."
-                                    )
-                                arg = "--%s %s" % (k, v)
-                                arg = arg.split()
-                                # No recursive call
-                                new_arg_strings.extend(arg)
-                    except IOError:
-                        err = sys.exc_info()[1]
-                        self.error(str(err))
-                else:
-                    try:
-                        args_file = open(arg_string[1:])
-                        try:
-                            arg_strings = []
-                            for arg_line in args_file.read().splitlines():
-                                for arg in self.convert_arg_line_to_args(arg_line):
-                                    arg_strings.append(arg)
-                            arg_strings = self._read_args_from_files(arg_strings)
-                            new_arg_strings.extend(arg_strings)
-                        finally:
-                            args_file.close()
-                    except IOError:
-                        err = sys.exc_info()[1]
-                        self.error(str(err))
-
-        # return the modified argument list
-        return new_arg_strings
-
-
-def create_arg_parser():
-    """Create a command line argument parser"""
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "filename", type=str, help="A YAML file that follows SCHSIM YAML."
-    )
-    return parser
+@click.command()
+@click.argument("filename", type=click.Path(exists=True))
+def schism_yaml_cli(filename):
+    """Load and display a YAML file that follows SCHISM YAML format."""
+    with open(filename, "r") as f:
+        data_ = load(f)
+        print(yaml.safe_dump(data_))
 
 
 if __name__ == "__main__":
-    parser_ = create_arg_parser()
-    args_ = parser_.parse_args()
-    fname_ = args_.filename
-    with open(fname_, "r") as f:
-        data_ = load(f)
-        print(yaml.safe_dump(data_))
+    schism_yaml_cli()
