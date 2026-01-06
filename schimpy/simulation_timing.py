@@ -73,7 +73,7 @@ def schism_timing(workdir, start=1, end=None, block_days=1.0):
     type=float,
     help="Number of simulated days in one output block.",
 )
-def schism_timing_cli(dir, start, end, blocklen):
+def simulation_timing_cli(dir, start, end, blocklen):
     """Analyze SCHISM simulation timing from output files."""
     print(start)
     print(end)
@@ -83,4 +83,4 @@ def schism_timing_cli(dir, start, end, blocklen):
 
 
 if __name__ == "__main__":
-    schism_timing_cli()
+    simulation_timing_cli()
