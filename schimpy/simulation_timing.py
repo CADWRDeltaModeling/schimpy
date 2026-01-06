@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import click
 
 
 def schism_timing(workdir, start=1, end=None, block_days=1.0):
@@ -47,39 +48,39 @@ def schism_timing(workdir, start=1, end=None, block_days=1.0):
     plt.show()
 
 
-def create_arg_parser():
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--dir", default=".", type=str, help="Name of working directory"
-    )
-    parser.add_argument(
-        "--start", default=None, type=int, help="Start block (integer) of analysis."
-    )
-    parser.add_argument(
-        "--end", default=None, type=int, help="End day (integer) of analysis."
-    )
-    parser.add_argument(
-        "--blocklen",
-        default=1.0,
-        type=float,
-        help="Number of simulated days in one output block",
-    )
-    return parser
+@click.command()
+@click.option(
+    "--dir",
+    default=".",
+    type=str,
+    help="Name of working directory.",
+)
+@click.option(
+    "--start",
+    default=None,
+    type=int,
+    help="Start block (integer) of analysis.",
+)
+@click.option(
+    "--end",
+    default=None,
+    type=int,
+    help="End day (integer) of analysis.",
+)
+@click.option(
+    "--blocklen",
+    default=1.0,
+    type=float,
+    help="Number of simulated days in one output block.",
+)
+def schism_timing_cli(dir, start, end, blocklen):
+    """Analyze SCHISM simulation timing from output files."""
+    print(start)
+    print(end)
+    print(dir)
+    print(blocklen)
+    schism_timing(dir, start, end, blocklen)
 
 
 if __name__ == "__main__":
-    import sys
-
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    workdir = args.dir
-    start = args.start
-    end = args.end
-    blocklen = args.blocklen
-    print(start)
-    print(end)
-    print(workdir)
-    print(blocklen)
-    schism_timing(workdir, start, end, blocklen)
+    schism_timing_cli()

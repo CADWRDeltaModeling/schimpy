@@ -32,6 +32,7 @@ from schimpy.embed_raster import embed_raster_cli
 from schimpy.schism_yaml import schism_yaml_cli
 from schimpy.grid_opt import grid_opt_cli
 from schimpy.material_poly import material_poly_cli
+from schimpy.simulation_timing import schism_timing_cli
 
 
 @click.group(
@@ -77,6 +78,7 @@ cli.add_command(embed_raster_cli, "embed_raster")
 cli.add_command(schism_yaml_cli, "schism_yaml")
 cli.add_command(grid_opt_cli, "grid_opt")
 cli.add_command(material_poly_cli, "material_poly")
+cli.add_command(simulation_timing_cli, "simulation_timing")
 
 if __name__ == "__main__":
     cli()
