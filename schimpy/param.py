@@ -8,7 +8,7 @@ import os
 import click
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional,Union
 
 @dataclass(frozen=True)
 class ParamAlias:
@@ -168,7 +168,7 @@ def _parse_alias_value(alias: ParamAlias, raw: str) -> Any:
     return _coerce_scalar_from_string(s)
 
 
-def _normalize_freq_string(freq: str | pd.tseries.offsets.BaseOffset | None) -> Optional[str]:
+def _normalize_freq_string(freq: Union[str , pd.tseries.offsets.BaseOffset , None]) -> Optional[str]:
     """
     Normalize a pandas-style frequency:
 
