@@ -21,6 +21,7 @@ except ImportError:
     import gdal
     from gdalconst import *
 
+import click
 
 def embed_raster(
     input_fg,
@@ -169,80 +170,71 @@ def embed_raster(
     ds_coarse.write_copy(output, dem_final)
 
 
-def create_arg_parser():
-    import schism_yaml
-    import argparse
-    import textwrap
 
-    def convert_arg_line_to_args(arg_line):
-        for arg in arg_line.split():
-            if not arg.strip():
-                continue
-            yield arg
-
-    parser = schism_yaml.ArgumentParserYaml(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        prog="embed_raster.py",
-        fromfile_prefix_chars="@",
-        description=textwrap.dedent(
-            """
-      Embed coarser gridded data in finer using contour_smooth to avoid discontinuity
-      
-      """
-        ),
-    )
-    parser.convert_arg_line_to_args = convert_arg_line_to_args
-    parser.add_argument(
-        "--input_fg",
-        type=str,
-        help="Foreground input file name, tiff format, extent should be covered by background.",
-    )
-    parser.add_argument(
-        "--input_bg", type=str, help="Background input file name, tiff format."
-    )
-    parser.add_argument("--plot", action="store_true", help="Show diagnostic plot.")
-    parser.add_argument("--output", type=str, help="Output file name, tiff format.")
-    parser.add_argument(
-        "--nsmooth_init",
-        type=int,
-        default=1,
-        help="Max smoothing scale applied to fine file before resampling, in multiples of original file pixel size.",
-    )
-    parser.add_argument(
-        "--nsmooth_final",
-        type=int,
-        default=1,
-        help="Max smoothing scale applied to final output file.",
-    )
-    parser.add_argument(
-        "--max_time_init",
-        type=float,
-        default=2.0,
-        help="Pseudo time representing the total amount of smoothing for the background raster. This parameter controls the completeness of smoothing, whereas nstep controls the accuracy of it. ",
-    )
-    parser.add_argument(
-        "--max_time_final",
-        type=float,
-        default=1.0,
-        help="Pseudo time representing the total amount of smoothing for the final smooth.",
-    )
-    parser.add_argument(
-        "--nstep",
-        type=int,
-        default=50,
-        help="Number of integration steps between reports. More will give a more accurate integration, but takes more time.",
-    )
-    parser.add_argument(
-        "--report_interval",
-        type=float,
-        default=1.0,
-        help="Intermediate interval at which smoothed DEMs will be dumped. So if --max_time is 2.0 and --report_interval is 1. you will get 2 intermediate reports.",
-    )
-
-    return parser
+@click.command()
+@click.option(
+    "--input_fg",
+    type=str,
+    required=True,
+    help="Foreground input file name, tiff format. Extent should be covered by background.",
+)
+@click.option(
+    "--input_bg",
+    type=str,
+    required=True,
+    help="Background input file name, tiff format.",
+)
+@click.option(
+    "--plot",
+    is_flag=True,
+    help="Show diagnostic plot.",
+)
+@click.option(
+    "--output",
+    type=str,
+    required=True,
+    help="Output file name, tiff format.",
+)
+@click.option(
+    "--nsmooth_init",
+    type=int,
+    default=1,
+    help="Max smoothing scale applied to fine file before resampling, in multiples of original file pixel size.",
+)
+@click.option(
+    "--nsmooth_final",
+    type=int,
+    default=1,
+    help="Max smoothing scale applied to final output file.",
+)
+@click.option(
+    "--max_time_init",
+    type=float,
+    default=2.0,
+    help="Pseudo time representing the total amount of smoothing for the background raster.",
+)
+@click.option(
+    "--max_time_final",
+    type=float,
+    default=1.0,
+    help="Pseudo time representing the total amount of smoothing for the final smooth.",
+)
+@click.option(
+    "--nstep",
+    type=int,
+    default=50,
+    help="Number of integration steps between reports.",
+)
+@click.option(
+    "--report_interval",
+    type=float,
+    default=1.0,
+    help="Intermediate interval at which smoothed DEMs will be dumped.",
+)
+def embed_raster_cli(**kwargs):
+    """Embed coarser gridded data in finer using contour_smooth to avoid discontinuity."""
+    embed_raster(**kwargs)
 
 
 if __name__ == "__main__":
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    embed_raster(**vars(args))
+    embed_raster_cli()
