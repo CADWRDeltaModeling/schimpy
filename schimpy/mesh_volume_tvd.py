@@ -57,7 +57,7 @@ import matplotlib.pyplot as plt
 from collections import defaultdict, deque
 import geopandas as gpd
 import csv
-import argparse
+import click
 import logging
 
 try:
@@ -2108,80 +2108,40 @@ def refine_volume_tvd(
     return res
 
 
-# ------------------------------------ CLI ------------------------------------
-
-
-def _cli():
-
-    ap = argparse.ArgumentParser(
-        description="TVD-regularized volume tuning (shoreline + floor + TVD)."
-    )
-    ap.add_argument("--mesh", required=True, help="Input mesh file (hgrid.gr3)")
-    ap.add_argument("--dem", required=True, help="DEM YAML (file or object in YAML)")
-    ap.add_argument("--out", required=True, help="Output mesh file")
-    ap.add_argument("--cache", default="./.dem_cache", help="Disk cache directory")
-    ap.add_argument(
-        "--log_level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"]
-    )
-
-    # TVD controls
-    ap.add_argument("--steps", type=int, default=16)
-    ap.add_argument("--dt", type=float, default=1.0)
-    ap.add_argument("--mu", type=float, default=1.0)
-    ap.add_argument("--lambda_l2", type=float, default=1000.0)
-    ap.add_argument("--tv_weight", type=float, default=1.0)
-    ap.add_argument("--l2_weight", type=float, default=2.5e-5)
-    ap.add_argument("--cfl_target", type=float, default=1.0)
-    ap.add_argument("--clip_eps", type=float, default=None)
-
-    # Shoreline detection
-    ap.add_argument(
-        "--href",
-        default=-0.35,
-        help="Reference *depth* (not elev) for determining the 'always wet' contour (float or gr3 path).",
-    )
-    ap.add_argument(
-        "--deep_delta",
-        type=float,
-        default=0.35,
-        help="Additional depth from href for a shore to be classified 'deep' for purposes of regularization",
-    )
-    ap.add_argument(
-        "--shore_delta",
-        type=float,
-        default=0.35,
-        help="Additional distance above href for a shore to still be classified 'shallow' for purposes of regularization",
-    )
-    ap.add_argument("--use_default_seeds", action="store_true")
-    ap.add_argument("--seed", nargs=2, type=float, action="append", default=None)
-    ap.add_argument("--smooth_relax_factor", type=float, default=1.2)
-    ap.add_argument("--smooth_strip_max", type=int, default=24)
-    ap.add_argument("--smooth_eps_deg", type=float, default=55.0)
-    ap.add_argument("--filter_deep", action="store_true")  # todo: necessary?
-    ap.add_argument(
-        "--epsg", type=int, default=26910
-    )  # todo: shouldn't be unique to this process
-    ap.add_argument(
-        "--shore_csv", default=None, help="Output CSV file for node diagnostics"
-    )
-    ap.add_argument(
-        "--shore_shp", default=None, help="Output Shapefile for shoreline diagnostics"
-    )
-
-    # Floor regularization
-    ap.add_argument("--shore_floor_filter", choices=["max", "median"], default="median")
-    ap.add_argument("--shore_floor_window", type=int, default=5)
-    ap.add_argument("--reg_weight", type=float, default=8.0e-2)
-    ap.add_argument("--enforce_floor", action="store_true")
-
-    # Profiles (optional)
-    ap.add_argument(
-        "--profiles", nargs="*", type=int, default=None, help="poly_id(s) to plot"
-    )
-    ap.add_argument("--profiles_dir", default=None, help="Directory for profile PNGs")
-
-    args = ap.parse_args()
-
+def mesh_volume_tvd(
+    mesh,
+    dem,
+    out,
+    cache,
+    log_level,
+    steps,
+    dt,
+    mu,
+    lambda_l2,
+    tv_weight,
+    l2_weight,
+    cfl_target,
+    clip_eps,
+    href,
+    deep_delta,
+    shore_delta,
+    use_default_seeds,
+    seed,
+    smooth_relax_factor,
+    smooth_strip_max,
+    smooth_eps_deg,
+    filter_deep,
+    epsg,
+    shore_csv,
+    shore_shp,
+    shore_floor_filter,
+    shore_floor_window,
+    reg_weight,
+    enforce_floor,
+    profiles,
+    profiles_dir,
+):
+    """TVD-regularized volume tuning (shoreline + floor + TVD)."""
     # Logger for CLI
     logger = logging.getLogger("mesh_volume_tvd")
     logger.handlers.clear()
@@ -2189,62 +2149,210 @@ def _cli():
     h.setFormatter(logging.Formatter("%(message)s"))
     logger.addHandler(h)
 
-    logger.setLevel(getattr(logging, args.log_level.upper(), logging.INFO))
-    mesh = read_mesh(args.mesh, nodestring_option="land")
+    logger.setLevel(getattr(logging, log_level.upper(), logging.INFO))
+    mesh_obj = read_mesh(mesh, nodestring_option="land")
 
     # Prepopulate the mesh based on point samples at nodes
-    dem_sampler = create_dem_sampler(args.dem, cache_dir=args.cache)
-    z0 = dem_sampler(mesh.nodes[:, :2]).astype(float)
-    mesh.nodes[:, 2] = z0
+    dem_sampler = create_dem_sampler(dem, cache_dir=cache)
+    z0 = dem_sampler(mesh_obj.nodes[:, :2]).astype(float)
+    mesh_obj.nodes[:, 2] = z0
 
     tvd = TVDOptions(
-        steps=args.steps,
-        dt=args.dt,
-        mu=args.mu,
-        lambda_l2=args.lambda_l2,
-        tv_weight=args.tv_weight,
-        l2_weight=args.l2_weight,
-        cfl_target=args.cfl_target,
-        clip_eps=args.clip_eps,
+        steps=steps,
+        dt=dt,
+        mu=mu,
+        lambda_l2=lambda_l2,
+        tv_weight=tv_weight,
+        l2_weight=l2_weight,
+        cfl_target=cfl_target,
+        clip_eps=clip_eps,
     )
+
+    # Convert seed tuples to list format if provided
+    seed_list = list(seed) if seed else None
+
     shoreline = ShorelineOptions(
-        href=args.href,
-        deep_delta=args.deep_delta,
-        shore_delta=args.shore_delta,
-        seeds=args.seed,
-        use_default_seeds=bool(args.use_default_seeds),
-        smooth_relax_factor=args.smooth_relax_factor,
-        smooth_strip_max=args.smooth_strip_max,
-        smooth_eps_deg=args.smooth_eps_deg,
-        filter_deep=bool(args.filter_deep),
-        epsg=int(args.epsg),
-        shore_csv=args.shore_csv or None,
-        shore_shp=args.shore_shp or None,
+        href=href,
+        deep_delta=deep_delta,
+        shore_delta=shore_delta,
+        seeds=seed_list,
+        use_default_seeds=use_default_seeds,
+        smooth_relax_factor=smooth_relax_factor,
+        smooth_strip_max=smooth_strip_max,
+        smooth_eps_deg=smooth_eps_deg,
+        filter_deep=filter_deep,
+        epsg=epsg,
+        shore_csv=shore_csv or None,
+        shore_shp=shore_shp or None,
     )
     floor = FloorOptions(
-        filter=args.shore_floor_filter,
-        window=int(args.shore_floor_window),
-        enforce_floor=bool(args.enforce_floor),
-        reg_weight=float(args.reg_weight),
+        filter=shore_floor_filter,
+        window=shore_floor_window,
+        enforce_floor=enforce_floor,
+        reg_weight=reg_weight,
     )
+
+    # Convert profiles tuple to list if provided
+    profiles_list = list(profiles) if profiles else None
+
     res = refine_volume_tvd(
-        mesh,
-        dem_spec=args.dem,
-        out_dir=os.path.dirname(args.out) or ".",
+        mesh_obj,
+        dem_spec=dem,
+        out_dir=os.path.dirname(out) or ".",
         shoreline=shoreline,
         floor=floor,
         tvd=tvd,
-        cache_dir=args.cache,
-        profiles=args.profiles,
-        profiles_dir=args.profiles_dir,
+        cache_dir=cache,
+        profiles=profiles_list,
+        profiles_dir=profiles_dir,
         logger=logger,
     )
 
-    mesh.nodes[:, 2] = res["z"]
+    mesh_obj.nodes[:, 2] = res["z"]
 
-    write_mesh(mesh, args.out)
-    logger.info(f"Wrote {args.out}")
+    write_mesh(mesh_obj, out)
+    logger.info(f"Wrote {out}")
+
+
+# ------------------------------------ CLI ------------------------------------
+
+
+@click.command(help="TVD-regularized volume tuning (shoreline + floor + TVD).")
+@click.option("--mesh", required=True, help="Input mesh file (hgrid.gr3)")
+@click.option("--dem", required=True, help="DEM YAML (file or object in YAML)")
+@click.option("--out", required=True, help="Output mesh file")
+@click.option("--cache", default="./.dem_cache", help="Disk cache directory")
+@click.option(
+    "--log_level",
+    type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"], case_sensitive=False),
+    default="INFO",
+)
+# TVD controls
+@click.option("--steps", type=int, default=16)
+@click.option("--dt", type=float, default=1.0)
+@click.option("--mu", type=float, default=1.0)
+@click.option("--lambda_l2", type=float, default=1000.0)
+@click.option("--tv_weight", type=float, default=1.0)
+@click.option("--l2_weight", type=float, default=2.5e-5)
+@click.option("--cfl_target", type=float, default=1.0)
+@click.option("--clip_eps", type=float, default=None)
+# Shoreline detection
+@click.option(
+    "--href",
+    default=-0.35,
+    help="Reference *depth* (not elev) for determining the 'always wet' contour (float or gr3 path).",
+)
+@click.option(
+    "--deep_delta",
+    type=float,
+    default=0.35,
+    help="Additional depth from href for a shore to be classified 'deep' for purposes of regularization",
+)
+@click.option(
+    "--shore_delta",
+    type=float,
+    default=0.35,
+    help="Additional distance above href for a shore to still be classified 'shallow' for purposes of regularization",
+)
+@click.option("--use_default_seeds", is_flag=True, default=False)
+@click.option(
+    "--seed",
+    type=(float, float),
+    multiple=True,
+    default=None,
+    help="Seed coordinates (can be specified multiple times)",
+)
+@click.option("--smooth_relax_factor", type=float, default=1.2)
+@click.option("--smooth_strip_max", type=int, default=24)
+@click.option("--smooth_eps_deg", type=float, default=55.0)
+@click.option("--filter_deep", is_flag=True, default=False)
+@click.option("--epsg", type=int, default=26910)
+@click.option("--shore_csv", default=None, help="Output CSV file for node diagnostics")
+@click.option(
+    "--shore_shp", default=None, help="Output Shapefile for shoreline diagnostics"
+)
+# Floor regularization
+@click.option(
+    "--shore_floor_filter",
+    type=click.Choice(["max", "median"], case_sensitive=False),
+    default="median",
+)
+@click.option("--shore_floor_window", type=int, default=5)
+@click.option("--reg_weight", type=float, default=8.0e-2)
+@click.option("--enforce_floor", is_flag=True, default=False)
+# Profiles (optional)
+@click.option(
+    "--profiles", type=int, multiple=True, default=None, help="poly_id(s) to plot"
+)
+@click.option("--profiles_dir", default=None, help="Directory for profile PNGs")
+def mesh_volume_tvd_cli(
+    mesh,
+    dem,
+    out,
+    cache,
+    log_level,
+    steps,
+    dt,
+    mu,
+    lambda_l2,
+    tv_weight,
+    l2_weight,
+    cfl_target,
+    clip_eps,
+    href,
+    deep_delta,
+    shore_delta,
+    use_default_seeds,
+    seed,
+    smooth_relax_factor,
+    smooth_strip_max,
+    smooth_eps_deg,
+    filter_deep,
+    epsg,
+    shore_csv,
+    shore_shp,
+    shore_floor_filter,
+    shore_floor_window,
+    reg_weight,
+    enforce_floor,
+    profiles,
+    profiles_dir,
+):
+    """CLI wrapper for mesh_volume_tvd."""
+    mesh_volume_tvd(
+        mesh,
+        dem,
+        out,
+        cache,
+        log_level,
+        steps,
+        dt,
+        mu,
+        lambda_l2,
+        tv_weight,
+        l2_weight,
+        cfl_target,
+        clip_eps,
+        href,
+        deep_delta,
+        shore_delta,
+        use_default_seeds,
+        seed,
+        smooth_relax_factor,
+        smooth_strip_max,
+        smooth_eps_deg,
+        filter_deep,
+        epsg,
+        shore_csv,
+        shore_shp,
+        shore_floor_filter,
+        shore_floor_window,
+        reg_weight,
+        enforce_floor,
+        profiles,
+        profiles_dir,
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover
-    _cli()
+    mesh_volume_tvd_cli()
