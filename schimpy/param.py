@@ -195,7 +195,16 @@ def _timedelta_from_offset_str(freq: str) -> pd.Timedelta:
     return pd.to_timedelta(freq)
 
 
-
+##reserved SCHISM parameter names for tracer modules
+## THOSE NAMES ARE ONLY FOR SCHISM TRACER MODULES THAT NEEDS
+## TO BE SPECIFIED IN PARAM.NML
+RESERVED_TRACER_PARAM_NAMES = {
+    "ntracer_gen":"GEN",
+    "ntracer_age":"AGE",
+    "sed_class":"SED",
+    "eco_class":"ECO",
+    "ntrs_icm":"ICM"
+}
 class Params(object):
 
     def __init__(self, fname, default=None):
@@ -226,9 +235,30 @@ class Params(object):
 
         self.default = self.process_default(default)
 
+    def get_tracers(self):
+        """Get tracers types and number of tracers defined in param.nml
+
+        Returns
+        -------
+        tracers : a dict
+            dictionary whose keys are tracer names defined in param.nml, 
+            and values are number of tracers for that tracer type.
+
+        """
+  
+        tracers = {}
+        for key in self._namelist["CORE"].keys():
+            if key in RESERVED_TRACER_PARAM_NAMES.keys():
+                tracer_name = RESERVED_TRACER_PARAM_NAMES[key]
+                ntracer = self._namelist["CORE"][key]["value"]
+                tracers[tracer_name] = ntracer
+        return tracers
     # ------------------------------------------------------------------
     # Programmatic helper: set by SCHISM name or alias
     # ------------------------------------------------------------------
+
+
+
     def set_by_name_or_alias(self, name: str, value: Any) -> None:
         """
         Set a parameter value using either:
