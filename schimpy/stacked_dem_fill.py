@@ -1,5 +1,7 @@
 """Routines to fill elevation (or other scalar) values at points from a prioritized list of rasters"""
 
+import click
+
 try:
     from osgeo import gdal
     gdal.UseExceptions()
@@ -566,43 +568,20 @@ def fill_gr3(infile, outfile, files, elev2depth=True, na_fill=DEFAULT_NA_FILL):
         fout.write(line)
     return None
 
-
-def create_arg_parser():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Fill node elevations in a .2dm SMS mesh or gr3 file using a prioritized list of DEMs."
-    )
-    parser.add_argument(dest="filename", default=None, help="name of 2dm or gr3 file")
-    parser.add_argument(
-        "demfile",
-        default=None,
-        help="file containing list of DEMs. These can be in any form that gdal accepts, which includes ESRI ascii format and GeoTiffs",
-    )
-    parser.add_argument(
-        "--elev2depth",
-        action="store_true",
-        default=False,
-        help="Convert elevation to depth by flipping sign. This is typical when using gr3 format, less so with 2dm.",
-    )
-    parser.add_argument(
-        "--fill",
-        default=DEFAULT_NA_FILL,
-        help="Fill value for areas not covered by supplied rasters.",
-    )
-    return parser
-
-
-def main():
+def stacked_dem_fill_interpolate(filename, demfile, elev2depth, fill):
+    """Fill node elevations in a .2dm SMS mesh or gr3 file using a prioritized list of DEMs.
+    
+    FILENAME: Name of 2dm or gr3 file.
+    
+    DEMFILE: File containing list of DEMs (ESRI ascii format or GeoTiffs).
+    """
     import shutil
 
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    infile = args.filename
+    infile = filename
     bakfile = infile + ".bak"
     print("Backing up file to %s" % bakfile)
     shutil.copyfile(infile, bakfile)
-    demlistfile = args.demfile
+    demlistfile = demfile
 
     if demlistfile.endswith(".txt"):
         files = [
@@ -618,8 +597,7 @@ def main():
     else:
         raise ValueError("Not supported DEM list file extension")
 
-    elev2depth = args.elev2depth
-    na_fill = args.fill
+    na_fill = fill
     if infile.endswith(".2dm"):
         if elev2depth:
             print("Warning: --elev2depth is an unusual option for 2dm files")
@@ -632,5 +610,25 @@ def main():
         raise ValueError("Input file format not recognized (no gr3 or 2dm extension")
 
 
+@click.command()
+@click.argument("filename", type=click.Path(exists=True))
+@click.argument("demfile", type=click.Path(exists=True))
+@click.option(
+    "--elev2depth",
+    is_flag=True,
+    default=False,
+    help="Convert elevation to depth by flipping sign. Typical for gr3 format, less so with 2dm.",
+)
+@click.option(
+    "--fill",
+    default=DEFAULT_NA_FILL,
+    type=float,
+    help="Fill value for areas not covered by supplied rasters.",
+)
+def stacked_fill_cli():
+    """Command line interface to stacked_dem_fill."""
+    
+    stacked_dem_fill_interpolate(filename, demfile, elev2depth, fill)
+
 if __name__ == "__main__":
-    main()
+    stacked_fill_cli()

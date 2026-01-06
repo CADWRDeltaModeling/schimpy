@@ -33,6 +33,7 @@ from schimpy.schism_yaml import schism_yaml_cli
 from schimpy.grid_opt import grid_opt_cli
 from schimpy.material_poly import material_poly_cli
 from schimpy.simulation_timing import schism_timing_cli
+from schimpy.stacked_dem_fill import stacked_fill_cli
 
 
 @click.group(
