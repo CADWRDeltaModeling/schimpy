@@ -3,62 +3,9 @@
 Created on Fri Jan 20 09:07:50 2023
 Download NOAA High-Resolution Rapid Refresh (HRRR) Model using AWS bucket service
 """
-import argparse
+import click
 from schimpy.hrr3 import *
 import datetime
-
-
-def create_arg_parser():
-    """Create an argument parser
-    return: argparse.ArgumentParser
-    """
-
-    # Read in the input file
-    parser = argparse.ArgumentParser(
-        description="""
-                       Download Download NOAA High-Resolution Rapid Refresh (HRRR) Model using AWS bucket service.
-                       
-                     Usage:
-                           download_hrrr 01/01/2023  g:\\temp 15  37.3  39.0 -123.15 -121.1
-                     """
-    )
-    parser.add_argument(
-        "start_date",
-        default=None,
-        help="starting date of HRRR data, must be format like 09/19/2018",
-    )
-    parser.add_argument(
-        "destination", default=None, help="path to store downloaded HRRR data"
-    )
-    parser.add_argument(
-        "rnday", default=None, type=int, help="number of days of data to be downloaded"
-    )
-    parser.add_argument(
-        "latitude_min",
-        default=None,
-        type=float,
-        help="Minimal latitude of bounding box for raw data to be downloaded",
-    )
-    parser.add_argument(
-        "latitude_max",
-        default=None,
-        type=float,
-        help="Maximal latitude of bounding box for raw data to be downloaded",
-    )
-    parser.add_argument(
-        "longitude_min",
-        default=None,
-        type=float,
-        help="Minimal longititude of bounding box for raw data to be downloaded",
-    )
-    parser.add_argument(
-        "longitude_max",
-        default=None,
-        type=float,
-        help="Maximal longititude of bounding box for raw data to be downloaded",
-    )
-
-    return parser
 
 
 def download_hrr(start_date, rnday, pscr, bbox):
@@ -66,25 +13,98 @@ def download_hrr(start_date, rnday, pscr, bbox):
     hr3 = HRRR(start_date=start_date, rnday=rnday, pscr=pscr, bbox=bbox)
 
 
-def main():
-    """Main function"""
-    parser = create_arg_parser()
-    args = parser.parse_args()
+def download_hrr_clip(
+    start_date,
+    destination,
+    rnday,
+    latitude_min,
+    latitude_max,
+    longitude_min,
+    longitude_max,
+):
+    """Download NOAA High-Resolution Rapid Refresh (HRRR) Model using AWS bucket service.
 
+    START_DATE: Starting date of HRRR data (format: MM/DD/YYYY, e.g., 09/19/2018)
+
+    DESTINATION: Path to store downloaded HRRR data
+
+    RNDAY: Number of days of data to be downloaded
+
+    LATITUDE_MIN: Minimal latitude of bounding box
+
+    LATITUDE_MAX: Maximal latitude of bounding box
+
+    LONGITUDE_MIN: Minimal longitude of bounding box
+
+    LONGITUDE_MAX: Maximal longitude of bounding box
+
+    Example:
+
+        download_hrrr 01/01/2023 g:\\temp 15 37.3 39.0 -123.15 -121.1
+    """
     bbox = [
-        args.longitude_min,
-        args.latitude_min,
-        args.longitude_max,
-        args.latitude_max,
+        longitude_min,
+        latitude_min,
+        longitude_max,
+        latitude_max,
     ]
-    pscr = args.destination
-    rnday = args.rnday
-    start_date = datetime.datetime.strptime(args.start_date, "%m/%d/%Y")
-    download_hrr(start_date, rnday, pscr, bbox)
+    pscr = destination
+    start_date_parsed = datetime.datetime.strptime(start_date, "%m/%d/%Y")
+    download_hrr(start_date_parsed, rnday, pscr, bbox)
+
+
+@click.command()
+@click.argument(
+    "start_date",
+    type=str,
+)
+@click.argument(
+    "destination",
+    type=str,
+)
+@click.argument(
+    "rnday",
+    type=int,
+)
+@click.argument(
+    "latitude_min",
+    type=float,
+)
+@click.argument(
+    "latitude_max",
+    type=float,
+)
+@click.argument(
+    "longitude_min",
+    type=float,
+)
+@click.argument(
+    "longitude_max",
+    type=float,
+)
+def download_hrr_clip_cli(
+    start_date,
+    destination,
+    rnday,
+    latitude_min,
+    latitude_max,
+    longitude_min,
+    longitude_max,
+):
+    """Command Line Interface for download_hrr_clip function."""
+    download_hrr_clip(
+        start_date,
+        destination,
+        rnday,
+        latitude_min,
+        latitude_max,
+        longitude_min,
+        longitude_max,
+    )
 
 
 if __name__ == "__main__":
-    main()
+    download_hrr_clip_cli()
 
 
 # bbox=[-123.15,37.3,-121.1,39.0]
