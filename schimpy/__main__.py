@@ -31,6 +31,7 @@ from schimpy.download_hrrr import download_hrr_clip_cli
 from schimpy.embed_raster import embed_raster_cli
 from schimpy.schism_yaml import schism_yaml_cli
 from schimpy.grid_opt import grid_opt_cli
+from schimpy.material_poly import material_poly_cli
 
 
 @click.group(
@@ -75,6 +76,7 @@ cli.add_command(download_hrr_clip_cli, "download_hrrr")
 cli.add_command(embed_raster_cli, "embed_raster")
 cli.add_command(schism_yaml_cli, "schism_yaml")
 cli.add_command(grid_opt_cli, "grid_opt")
+cli.add_command(material_poly_cli, "material_poly")
 
 if __name__ == "__main__":
     cli()

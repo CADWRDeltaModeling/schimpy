@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import sys
+import click
+from osgeo import ogr
 
 
 def read_keyfile(keyfile):
@@ -70,39 +72,39 @@ def create_poly(shapefile, dsetname, keyfile, polyfile, type, default=None):
     f.close()
 
 
-def create_arg_parser():
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Convert shapefile from SMS into polygon format for preprocessor"
-    )
-    parser.add_argument(dest="shapefile", default=None, help="name of shapefile")
-    parser.add_argument(
-        dest="dset", default=None, help="name of dataset inside shapefile"
-    )
-    parser.add_argument(
-        "--keyfile",
-        default=None,
-        help="file mapping material property names to numerical values (space separated).",
-    )
-    parser.add_argument("--out", default=None, help="Output polygon file.")
-    parser.add_argument(
-        "--type", default="min", help="Polygon attribute type (min/max)"
-    )
-    parser.add_argument(
-        "--default", default=None, help="Global default in polygon specs"
-    )
-
-    return parser
+@click.command()
+@click.argument("shapefile", type=click.Path(exists=True))
+@click.argument("dset")
+@click.option(
+    "--keyfile",
+    required=True,
+    type=click.Path(exists=True),
+    help="File mapping material property names to numerical values (space separated).",
+)
+@click.option(
+    "--out",
+    required=True,
+    help="Output polygon file.",
+)
+@click.option(
+    "--type",
+    default="min",
+    help="Polygon attribute type (min/max).",
+)
+@click.option(
+    "--default",
+    default=None,
+    help="Global default in polygon specs.",
+)
+def material_poly_cli(shapefile, dset, keyfile, out, type, default):
+    """Convert shapefile from SMS into polygon format for preprocessor.
+    
+    SHAPEFILE: Name of shapefile.
+    
+    DSET: Name of dataset inside shapefile.
+    """
+    create_poly(shapefile, dset, keyfile, out, type, default)
 
 
 if __name__ == "__main__":
-    parser = create_arg_parser()
-    args = parser.parse_args()
-    shapefile = args.shapefile
-    dsetname = args.dset
-    keyfile = args.keyfile
-    polyfile = args.out
-    type = args.type
-    default = args.default
-    create_poly(shapefile, dsetname, keyfile, polyfile, type, default)
+    material_poly_cli()
