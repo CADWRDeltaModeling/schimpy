@@ -11,6 +11,7 @@ from schimpy.schism_mesh import SchismMeshGr3Reader, BoundaryType
 import numbers
 import numpy as np
 import click
+import datetime
 
 
 __all__ = ["load_boundary"]
@@ -98,6 +99,28 @@ class boundary(object):
         """ initialize the boundary condition from yaml file"""
 
         #main_id = "bctides"
+        # "date" is optional, default to Jan 1, 2020
+        # ensure bc_yaml is a dict and normalize/insert a datetime object so the
+        # later `self.date = bc_yaml["date"]` works reliably
+        if bc_yaml is None:
+            bc_yaml = {}
+        if "date" not in bc_yaml or bc_yaml["date"] is None:
+            bc_yaml["date"] = datetime.datetime(2020, 1, 1)
+        else:
+            d = bc_yaml["date"]
+            if isinstance(d, str):
+            # try ISO format first, then common YYYY-MM-DD
+                try:
+                    bc_yaml["date"] = datetime.datetime.fromisoformat(d)
+                except Exception:
+                    try:
+                       bc_yaml["date"] = datetime.datetime.strptime(d, "%Y-%m-%d")
+                    except Exception:
+                       raise ValueError(f"Unrecognized date format for bctides date: {d}")
+            elif isinstance(d, datetime.date) and not isinstance(d, datetime.datetime):
+                bc_yaml["date"] = datetime.datetime(d.year, d.month, d.day)
+            else:
+                raise ValueError(f"Unrecognized date format for bctides date: {d}")
         self.date = bc_yaml["date"]
         if "earth_tides" in bc_yaml.keys():
             self.earth_tides = bc_yaml["earth_tides"]
@@ -187,6 +210,11 @@ class boundary(object):
             "none": 0,
         }
 
+##   also reading tracer modules defined in the bctides yaml here
+        self.tracer_modules = bc_yaml.get("modules", [])
+
+
+
     def _norm_earth(self,consts):
         out = []
         for item in consts:
@@ -201,7 +229,7 @@ class boundary(object):
                 node = item.get("node_factor", item.get("node", 1.0))
                 freq = item.get("angular_frequency", item.get("frequency", 0.0))
                 eqa = item.get(
-                    "earth_equilibrium_argument",
+                    "equilibrium_argument",
                     item.get("eqa", item.get("phase", 0.0)),
                 )
                 out.append(
@@ -210,7 +238,7 @@ class boundary(object):
                         "amplitude": amp,
                         "node_factor": node,
                         "angular_frequency": freq,
-                        "earth_equilibrium_argument": eqa,
+                        "equilibrium_argument": eqa,
                     }
                 )
                 continue
@@ -225,7 +253,7 @@ class boundary(object):
                 node = vals.get("node_factor", vals.get("node", 1.0))
                 freq = vals.get("angular_frequency", vals.get("frequency", 0.0))
                 eqa = vals.get(
-                    "earth_equilibrium_argument",
+                    "equilibrium_argument",
                     vals.get("eqa", vals.get("phase", 0.0)),
                 )
                 out.append(
@@ -234,7 +262,7 @@ class boundary(object):
                         "amplitude": amp,
                         "node_factor": node,
                         "angular_frequency": freq,
-                        "earth_equilibrium_argument": eqa,
+                        "equilibrium_argument": eqa,
                     }
                 )
                 continue
@@ -264,7 +292,7 @@ class boundary(object):
                         "amplitude": amp,
                         "node_factor": node,
                         "angular_frequency": freq,
-                        "earth_equilibrium_argument": eqa,
+                        "equilibrium_argument": eqa,
                     }
                 )
                 continue
@@ -295,14 +323,14 @@ class boundary(object):
                     freq = item.get("angular_frequency", item.get("frequency", 0.0))
                     node = item.get("node_factor", item.get("node", 1.0))
                     eqa = item.get(
-                        "earth_equilibrium_argument", item.get("eqa", item.get("phase", 0.0))
+                        "equilibrium_argument", item.get("eqa", item.get("phase", 0.0))
                     )
                     out.append(
                         {
                             "name": name,
                             "angular_frequency": freq,
                             "node_factor": node,
-                            "earth_equilibrium_argument": eqa,
+                            "equilibrium_argument": eqa,
                         }
                     )
                     continue
@@ -317,14 +345,14 @@ class boundary(object):
                         freq = vals.get("angular_frequency", vals.get("frequency", 0.0))
                         node = vals.get("node_factor", vals.get("node", 1.0))
                         eqa = vals.get(
-                            "earth_equilibrium_argument", vals.get("eqa", vals.get("phase", 0.0))
+                            "equilibrium_argument", vals.get("eqa", vals.get("phase", 0.0))
                         )
                         out.append(
                             {
                                 "name": name,
                                 "angular_frequency": freq,
                                 "node_factor": node,
-                                "earth_equilibrium_argument": eqa,
+                                "equilibrium_argument": eqa,
                             }
                         )
                         continue
@@ -342,7 +370,7 @@ class boundary(object):
                                 "name": name,
                                 "angular_frequency": freq,
                                 "node_factor": node,
-                                "earth_equilibrium_argument": eqa,
+                                "equilibrium_argument": eqa,
                             }
                         )
                         continue
@@ -354,7 +382,7 @@ class boundary(object):
                                 "name": name,
                                 "angular_frequency": vals,
                                 "node_factor": 1.0,
-                                "earth_equilibrium_argument": 0.0,
+                                "equilibrium_argument": 0.0,
                             }
                         )
                         continue
@@ -369,7 +397,7 @@ class boundary(object):
                             "name": item,
                             "angular_frequency": 0.0,
                             "node_factor": 1.0,
-                            "earth_equilibrium_argument": 0.0,
+                            "equilibrium_argument": 0.0,
                         }
                     )
                     continue
@@ -464,33 +492,33 @@ class boundary(object):
             # normalize tidal-constituent input formats so downstream code can
             # expect a list of dicts with explicit keys.
  
-            if self.earth_tides and "tidal_constituents" in self.earth_tides:
-                self.earth_tides["tidal_constituents"] = self._norm_earth(
-                    self.earth_tides["tidal_constituents"]
+            if self.earth_tides and "constituents" in self.earth_tides:
+                self.earth_tides["constituents"] = self._norm_earth(
+                    self.earth_tides["constituents"]
                 )
-            if self.boundary_tides and "tidal_constituents" in self.boundary_tides:
-                self.boundary_tides["tidal_constituents"] = self._norm_boundary(
-                    self.boundary_tides["tidal_constituents"]
+            if self.boundary_tides and "constituents" in self.boundary_tides:
+                self.boundary_tides["constituents"] = self._norm_boundary(
+                    self.boundary_tides["constituents"]
                 )
             ##out earth tidal potential if any
             if self.earth_tides:
-                num_tidal = len(self.earth_tides["tidal_constituents"])
-                cutoff_depth = self.earth_tides["tidal_cutoff_depth"]
+                num_tidal = len(self.earth_tides["constituents"])
+                cutoff_depth = self.earth_tides["cutoff_depth"]
                 outf.write(str(num_tidal) + " " + str(cutoff_depth) + "\n")
                 for i in range(num_tidal):
                     outf.write(
-                        self.earth_tides["tidal_constituents"][i]["name"]
+                        self.earth_tides["constituents"][i]["name"]
                     )
                     outf.write("\n")
-                    amp = self.earth_tides["tidal_constituents"][i]["amplitude"]
-                    node_factor = self.earth_tides["tidal_constituents"][i][
+                    amp = self.earth_tides["constituents"][i]["amplitude"]
+                    node_factor = self.earth_tides["constituents"][i][
                         "node_factor"
                     ]
-                    freq = self.earth_tides["tidal_constituents"][i][
+                    freq = self.earth_tides["constituents"][i][
                         "angular_frequency"
                     ]
-                    eqa = self.earth_tides["tidal_constituents"][i][
-                        "earth_equilibrium_argument"
+                    eqa = self.earth_tides["constituents"][i][
+                        "equilibrium_argument"
                     ]
                     outf.write(
                         str(amp)
@@ -509,21 +537,21 @@ class boundary(object):
 
             ## out boundary forcing tidal
             if self.boundary_tides:
-                num_tidal = len(self.boundary_tides["tidal_constituents"])
+                num_tidal = len(self.boundary_tides["constituents"])
                 outf.write(str(num_tidal) + "\n")
                 for i in range(num_tidal):
                     outf.write(
-                        self.boundary_tides["tidal_constituents"][i]["name"]
+                        self.boundary_tides["constituents"][i]["name"]
                     )
                     outf.write("\n")
-                    freq = self.boundary_tides["tidal_constituents"][i][
+                    freq = self.boundary_tides["constituents"][i][
                         "angular_frequency"
                     ]
-                    node_factor = self.boundary_tides["tidal_constituents"][i][
+                    node_factor = self.boundary_tides["constituents"][i][
                         "node_factor"
                     ]
-                    eqa = self.boundary_tides["tidal_constituents"][i][
-                        "earth_equilibrium_argument"
+                    eqa = self.boundary_tides["constituents"][i][
+                        "equilibrium_argument"
                     ]
                     outf.write(str(freq) + " " + str(node_factor) + " " + str(eqa))
                     outf.write("\n")
