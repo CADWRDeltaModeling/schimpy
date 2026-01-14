@@ -11,7 +11,6 @@ from schimpy.schism_mesh import SchismMeshGr3Reader, BoundaryType
 import numbers
 import numpy as np
 import click
-import datetime
 
 
 __all__ = ["load_boundary"]
@@ -210,10 +209,32 @@ class boundary(object):
             "none": 0,
         }
 
-##   also reading tracer modules defined in the bctides yaml here
+##   also read in tracer modules defined in the bctides yaml here
         self.tracer_modules = bc_yaml.get("modules", [])
+##   find out number of tracer modules and set up tracer order list
+##   accroding to the self.tracer_lst defined above, if module not found
+##   module section in yaml file looks like:
+##    modules:
+##      - name: GEN
+##        num_tracers: 1
+##      - name: SED
+##        num_tracers: 5
 
-
+        self.tracer_mod_pos = {}
+        self.tracer_mod_num = {}
+        tracer_mods = []
+        for mod in self.tracer_modules:
+            mod_id = mod.get("name")
+            num_tracers = mod.get("num_tracers", 0) 
+            if mod_id in self.tracer_lst.keys():
+                tracer_mods.append(mod_id)
+                self.tracer_mod_num[mod_id] = num_tracers
+            else:
+                raise ValueError("tracer module %s not recognized" % mod) 
+        tracer_mods.sort(key=lambda d: self.tracer_lst[d])
+        for kk in range(len(tracer_mods)):
+            self.tracer_mod_pos[tracer_mods[kk]] = kk  
+            
 
     def _norm_earth(self,consts):
         out = []
@@ -593,28 +614,28 @@ class boundary(object):
                             % (bname_yaml, bname_hgrid)
                         )
 
-                num_tracer_mod = 0
-                tracer_mods = []
-                tracer_mod_pos = {}
-                for i in range(num_open_boundaries):
-                    if "tracers" in self.open_boundaries[i].keys():
-                        boundary_tracer_mod_num = len(
-                            self.open_boundaries[i]["tracers"]
-                        )
-                        if boundary_tracer_mod_num > num_tracer_mod:
-                            num_tracer_mod = boundary_tracer_mod_num
-                        for j in range(boundary_tracer_mod_num):
-                            tracer_mod = self.open_boundaries[i]["tracers"][j]["tracer"]
-                            if not (tracer_mod in self.tracer_lst.keys()):
-                                raise ValueError(
-                                    tracer_mod + " is not a supported tracer module\n"
-                                )
-                            else:
-                                if not (tracer_mod in tracer_mods):
-                                    tracer_mods.append(tracer_mod)
-                tracer_mods.sort(key=lambda d: self.tracer_lst[d])
-                for kk in range(len(tracer_mods)):
-                    tracer_mod_pos[tracer_mods[kk]] = kk
+                # num_tracer_mod = 0
+                # tracer_mods = []
+                # tracer_mod_pos = {}
+                # for i in range(num_open_boundaries):
+                #     if "tracers" in self.open_boundaries[i].keys():
+                #         boundary_tracer_mod_num = len(
+                #             self.open_boundaries[i]["tracers"]
+                #         )
+                #         if boundary_tracer_mod_num > num_tracer_mod:
+                #             num_tracer_mod = boundary_tracer_mod_num
+                #         for j in range(boundary_tracer_mod_num):
+                #             tracer_mod = self.open_boundaries[i]["tracers"][j]["tracer"]
+                #             if not (tracer_mod in self.tracer_lst.keys()):
+                #                 raise ValueError(
+                #                     tracer_mod + " is not a supported tracer module\n"
+                #                 )
+                #             else:
+                #                 if not (tracer_mod in tracer_mods):
+                #                     tracer_mods.append(tracer_mod)
+                # tracer_mods.sort(key=lambda d: self.tracer_lst[d])
+                # for kk in range(len(tracer_mods)):
+                #     tracer_mod_pos[tracer_mods[kk]] = kk
 
                 for i in range(num_open_boundaries):
                     print("processing open boundary %s " % self.open_boundaries[i]["name"])
@@ -693,7 +714,7 @@ class boundary(object):
                             )
 
                     ## output tracer boundary
-                    tracer_boundary_sources = [0] * num_tracer_mod
+                    tracer_boundary_sources = [0] * len(self.tracer_mod_pos)
                     ## this list save sorted tracer boundary index according to SCHISM code order
                     tracer_boundary_lst_sorted = []
                     if "tracers" in self.open_boundaries[i].keys():
@@ -702,11 +723,30 @@ class boundary(object):
                         )
                         for j in range(boundary_tracer_mod_num):
                             tracer_boundary = self.open_boundaries[i]["tracers"][j]["source"]
-                            tracer_mod = self.open_boundaries[i]["tracers"][j]["tracer"]
+                            tracer_mod = self.open_boundaries[i]["tracers"][j]["module"]
+                            ## if tracer mod not in self.tracer_mod_pos, raise error
+                            if not (tracer_mod in self.tracer_mod_pos.keys()):  
+                                raise ValueError(
+                                    tracer_mod + " is not in specified tracer module list at the begining \
+                                    of bctide yamal\n")
+
                             tracer_boundary_key = tracer_boundary
+                            ## set boundary key to "constant" if source is a number or list of numbers
                             if isinstance(tracer_boundary, numbers.Number):
                                 tracer_boundary_key = "constant"
                             elif isinstance(tracer_boundary, list):
+                                boundary_tracer_mod_num = len(tracer_boundary)
+                                ## if curent tracer mod has multiple tracers, check if the
+                                ## length of tracer_boundary match the number of tracers defined
+                                ## in self.tracer_mod_num
+                                if boundary_tracer_mod_num != self.tracer_mod_num[tracer_mod]:
+                                    raise ValueError( self.open_boundaries[i]["name"] + ": "
+                                        tracer_mod + " boundary source length "
+                                        + str(boundary_tracer_mod_num)
+                                        + " does not match number of tracers defined in module section: "
+                                        + str(self.tracer_mod_num[tracer_mod])
+                                    )
+
                                 if all(
                                     isinstance(x, numbers.Number)
                                     for x in tracer_boundary
@@ -720,12 +760,12 @@ class boundary(object):
                                         + " boundary is not supported"
                                     )
                             tracer_boundary_source = self.tracer_source[tracer_boundary_key]
-                            pos = tracer_mod_pos[tracer_mod]
+                            pos = self.tracer_mod_pos[tracer_mod]
                             tracer_boundary_sources[pos] = tracer_boundary_source
                             tracer_boundary_lst_sorted.append(j)
 
                         tracer_boundary_lst_sorted.sort(
-                            key=lambda jj: tracer_mod_pos[
+                            key=lambda jj: self.tracer_mod_pos[
                                 self.open_boundaries[i]["tracers"][jj]["tracer"]
                             ]
                         )
@@ -734,7 +774,7 @@ class boundary(object):
                     outf.write(str(vel_id) + " ")
                     outf.write(str(temp_id) + " ")
                     outf.write(str(salt_id) + " ")
-                    for ii in range(num_tracer_mod):
+                    for ii in range(len(self.tracer_mod_pos)):
                         outf.write(str(tracer_boundary_sources[ii]) + " ")
                     outf.write("\n")
 
