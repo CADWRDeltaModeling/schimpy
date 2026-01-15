@@ -639,11 +639,37 @@ class boundary(object):
                 #     tracer_mod_pos[tracer_mods[kk]] = kk
 
                 for i in range(num_open_boundaries):
-                    print("processing open boundary %s " % self.open_boundaries[i]["name"])
+                    bound_name = self.open_boundaries[i]["name"]
+                    print("processing open boundary %s " % bound_name)
                     num_nodes = len(hgrid.boundaries[i].nodes)
                     node_id_lst = hgrid.boundaries[i].nodes
                     elev_id = 0
                     elev_boundary = None
+                    ## if flow_direction is given and is outflow, then
+                    ## this boundary shouldn't have any tracer boundary, such
+                    ## as temperature, salinity or other scalars
+                    
+                    if "flow_direction" in self.open_boundaries[i].keys():
+                        flow_direction = self.open_boundaries[i]["flow_directions"]
+                        if "flow_direction" == "outflow":
+                            if "temperature" in self.open_boundaries[i].keys():
+                                raise ValueError(
+                                    f"Boundary '{bound_name}' is configured as an outflow; a temperature boundary "
+                                    "specification is not allowed."
+                                )
+                            if "salinity" in self.open_boundaries[i].keys():
+                                raise ValueError(
+                                    f"Boundary '{bound_name}' is configured as an outflow; a salinity boundary "
+                                    "specification is not allowed."
+                                )
+                            if "tracers" in self.open_boundaries[i].keys():
+                                raise ValueError(
+                                    f"Boundary '{bound_name}' is configured as an outflow; tracer "
+                                    "specification is not allowed."
+                                )
+
+
+
                     if "elevation" in self.open_boundaries[i]["variables"].keys():
                         elev_boundary = self.open_boundaries[i]["variables"]["elevation"]
                         elev_source = elev_boundary["source"]
