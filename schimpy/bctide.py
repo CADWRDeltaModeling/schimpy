@@ -8,6 +8,7 @@ At the end of this script, there is a synthetic example which demonstrates the f
 """
 from schimpy.schism_yaml import load
 from schimpy.schism_mesh import SchismMeshGr3Reader, BoundaryType
+import datetime
 import numbers
 import numpy as np
 import click
@@ -643,8 +644,8 @@ class boundary(object):
                     node_id_lst = hgrid.boundaries[i].nodes
                     elev_id = 0
                     elev_boundary = None
-                    if "elevation_boundary" in self.open_boundaries[i].keys():
-                        elev_boundary = self.open_boundaries[i]["elevation_boundary"]
+                    if "elevation" in self.open_boundaries[i]["variables"].keys():
+                        elev_boundary = self.open_boundaries[i]["variables"]["elevation"]
                         elev_source = elev_boundary["source"]
                         elev_key = elev_source
                         if isinstance(elev_source, numbers.Number):
@@ -661,8 +662,8 @@ class boundary(object):
 
                     vel_id = 0
                     vel_boundary = None
-                    if "velocity_boundary" in self.open_boundaries[i].keys():
-                        vel_boundary = self.open_boundaries[i]["velocity_boundary"]
+                    if "velocity" in self.open_boundaries[i]["variables"].keys():
+                        vel_boundary = self.open_boundaries[i]["variables"]["velocity"]
                         vel_source = vel_boundary["source"]
                         vel_key = vel_source
 
@@ -684,8 +685,8 @@ class boundary(object):
                     ## output temperature and salinity boundary
                     temp_id = 0
                     temp_boundary = None
-                    if "temperature_boundary" in self.open_boundaries[i].keys():
-                        temp_boundary = self.open_boundaries[i]["temperature_boundary"]
+                    if "temperature" in self.open_boundaries[i]["variables"].keys():
+                        temp_boundary = self.open_boundaries[i]["variables"]["temperature"]
                         temp_source = temp_boundary["source"]
                         temp_key = temp_source
                         if isinstance(temp_source, numbers.Number):
@@ -699,8 +700,8 @@ class boundary(object):
                             )
                     salt_id = 0
                     salt_boundary = None
-                    if "salinity_boundary" in self.open_boundaries[i].keys():
-                        salt_boundary = self.open_boundaries[i]["salinity_boundary"]
+                    if "salinity" in self.open_boundaries[i]["variables"].keys():
+                        salt_boundary = self.open_boundaries[i]["variables"]["salinity"]
                         salt_source = salt_boundary["source"]
                         salt_key = salt_source
                         if isinstance(salt_source, numbers.Number):
@@ -717,18 +718,20 @@ class boundary(object):
                     tracer_boundary_sources = [0] * len(self.tracer_mod_pos)
                     ## this list save sorted tracer boundary index according to SCHISM code order
                     tracer_boundary_lst_sorted = []
-                    if "tracers" in self.open_boundaries[i].keys():
+                    if "tracers" in self.open_boundaries[i]["variables"].keys():
                         boundary_tracer_mod_num = len(
-                            self.open_boundaries[i]["tracers"]
+                            self.open_boundaries[i]["variables"]["tracers"]
                         )
                         for j in range(boundary_tracer_mod_num):
-                            tracer_boundary = self.open_boundaries[i]["tracers"][j]["source"]
-                            tracer_mod = self.open_boundaries[i]["tracers"][j]["module"]
+                            tracer_boundary = self.open_boundaries[i]["variables"]["tracers"][j]["source"]
+                            tracer_mod = self.open_boundaries[i]["variables"]["tracers"][j]["module"]
                             ## if tracer mod not in self.tracer_mod_pos, raise error
                             if not (tracer_mod in self.tracer_mod_pos.keys()):  
                                 raise ValueError(
-                                    tracer_mod + " is not in specified tracer module list at the begining \
-                                    of bctide yamal\n")
+                                    f"Tracer module '{tracer_mod}' is not defined in the bctides 'modules' section. "
+                                    f"Please add it to the top-level modules list. "
+                                    f"Valid modules: {', '.join(sorted(self.tracer_mod_pos.keys()))}"
+                                )
 
                             tracer_boundary_key = tracer_boundary
                             ## set boundary key to "constant" if source is a number or list of numbers
@@ -740,7 +743,7 @@ class boundary(object):
                                 ## length of tracer_boundary match the number of tracers defined
                                 ## in self.tracer_mod_num
                                 if boundary_tracer_mod_num != self.tracer_mod_num[tracer_mod]:
-                                    raise ValueError( self.open_boundaries[i]["name"] + ": "
+                                    raise ValueError( self.open_boundaries[i]["name"] + ": "+
                                         tracer_mod + " boundary source length "
                                         + str(boundary_tracer_mod_num)
                                         + " does not match number of tracers defined in module section: "
