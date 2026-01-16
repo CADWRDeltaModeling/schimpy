@@ -600,6 +600,40 @@ class boundary(object):
                 num_open_boundaries = len(self.open_boundaries)
                 ## check to make sure all open_boundaries name match
                 ## with hgrid boundary names
+                ## summary all the bounary names from self.open_boundaries and
+                ## hgrid_open_boundaries, then compare them
+                bname_yaml_lst = []
+                bname_hgrid_lst = []
+                for i in range(num_open_boundaries):
+                    bname_yaml_lst.append(self.open_boundaries[i].get("name",""))
+                    if  hgrd_open_boundaries[i].comment is None:
+                        bname_hgrid_lst.append("")  
+                    else:
+                        bname_hgrid =  hgrd_open_boundaries[i].comment.strip().split('"')[1]
+                        bname_hgrid_lst.append(bname_hgrid)
+                ## if both boundary names are same, skip the check
+                if bname_yaml_lst != bname_hgrid_lst:
+                    ## if not same, check each boundary name defined in ymal can
+                    ## be found in hgrid boundary names, and reorder self.open_boundaries
+                    ## according to hgrid boundary order
+                    reordered_open_boundaries_tmp = [None]*num_open_boundaries
+                    order_indices = []
+                    for i in range(num_open_boundaries):
+                        bname_yaml = self.open_boundaries[i].get("name","")
+                        if bname_yaml not in bname_hgrid_lst:
+                            raise ValueError(
+                                "boundary name %s from YAML not found in hgrid boundary names"
+                                % bname_yaml
+                            )
+                        else:
+                            index_in_hgrid = bname_hgrid_lst.index(bname_yaml)   
+                            reordered_open_boundaries_tmp[index_in_hgrid] = self.open_boundaries[i] 
+                            order_indices.append(index_in_hgrid)
+                    self.open_boundaries = reordered_open_boundaries_tmp
+            
+                    
+                
+            
                 for i in range(num_open_boundaries):
                     bname_yaml = self.open_boundaries[i]["name"]
                     if  hgrd_open_boundaries[i].comment is None:
