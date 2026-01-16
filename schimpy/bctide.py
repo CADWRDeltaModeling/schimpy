@@ -650,7 +650,7 @@ class boundary(object):
                     ## as temperature, salinity or other scalars
                     
                     if "flow_direction" in self.open_boundaries[i].keys():
-                        flow_direction = self.open_boundaries[i]["flow_directions"]
+                        flow_direction = self.open_boundaries[i]["flow_direction"]
                         if "flow_direction" == "outflow":
                             if "temperature" in self.open_boundaries[i].keys():
                                 raise ValueError(
@@ -670,8 +670,16 @@ class boundary(object):
 
 
 
-                    if "elevation" in self.open_boundaries[i]["variables"].keys():
-                        elev_boundary = self.open_boundaries[i]["variables"]["elevation"]
+                    # variables in YAML are provided as a list of dicts; helper to find a variable entry
+                    vars_list = self.open_boundaries[i].get("variables", [])
+                    def _get_var(name):
+                        for vv in vars_list:
+                            if isinstance(vv, dict) and name in vv:
+                                return vv[name]
+                        return None
+
+                    if _get_var("elevation") is not None:
+                        elev_boundary = _get_var("elevation")
                         elev_source = elev_boundary["source"]
                         elev_key = elev_source
                         if isinstance(elev_source, numbers.Number):
@@ -688,8 +696,8 @@ class boundary(object):
 
                     vel_id = 0
                     vel_boundary = None
-                    if "velocity" in self.open_boundaries[i]["variables"].keys():
-                        vel_boundary = self.open_boundaries[i]["variables"]["velocity"]
+                    if _get_var("velocity") is not None:
+                        vel_boundary = _get_var("velocity")
                         vel_source = vel_boundary["source"]
                         vel_key = vel_source
 
@@ -711,23 +719,23 @@ class boundary(object):
                     ## output temperature and salinity boundary
                     temp_id = 0
                     temp_boundary = None
-                    if "temperature" in self.open_boundaries[i]["variables"].keys():
-                        temp_boundary = self.open_boundaries[i]["variables"]["temperature"]
+                    if _get_var("temperature") is not None:
+                        temp_boundary = _get_var("temperature")
                         temp_source = temp_boundary["source"]
                         temp_key = temp_source
                         if isinstance(temp_source, numbers.Number):
                             temp_key = "constant"
 
                         try:
-                            temp_id = self.vel_source[vel_key]
+                            temp_id = self.temp_source[temp_key]
                         except:
                             raise ValueError(
                                 temp_key + " temperature boundary is not supported"
                             )
                     salt_id = 0
                     salt_boundary = None
-                    if "salinity" in self.open_boundaries[i]["variables"].keys():
-                        salt_boundary = self.open_boundaries[i]["variables"]["salinity"]
+                    if _get_var("salinity") is not None:
+                        salt_boundary = _get_var("salinity")
                         salt_source = salt_boundary["source"]
                         salt_key = salt_source
                         if isinstance(salt_source, numbers.Number):
@@ -744,13 +752,12 @@ class boundary(object):
                     tracer_boundary_sources = [0] * len(self.tracer_mod_pos)
                     ## this list save sorted tracer boundary index according to SCHISM code order
                     tracer_boundary_lst_sorted = []
-                    if "tracers" in self.open_boundaries[i]["variables"].keys():
-                        boundary_tracer_mod_num = len(
-                            self.open_boundaries[i]["variables"]["tracers"]
-                        )
+                    if _get_var("tracers") is not None:
+                        tracers_var = _get_var("tracers")
+                        boundary_tracer_mod_num = len(tracers_var)
                         for j in range(boundary_tracer_mod_num):
-                            tracer_boundary = self.open_boundaries[i]["variables"]["tracers"][j]["source"]
-                            tracer_mod = self.open_boundaries[i]["variables"]["tracers"][j]["module"]
+                            tracer_boundary = tracers_var[j]["source"]
+                            tracer_mod = tracers_var[j]["module"]
                             ## if tracer mod not in self.tracer_mod_pos, raise error
                             if not (tracer_mod in self.tracer_mod_pos.keys()):  
                                 raise ValueError(
@@ -795,7 +802,7 @@ class boundary(object):
 
                         tracer_boundary_lst_sorted.sort(
                             key=lambda jj: self.tracer_mod_pos[
-                                self.open_boundaries[i]["tracers"][jj]["tracer"]
+                                tracers_var[jj]["module"]
                             ]
                         )
                     outf.write(str(num_nodes) + " ")
@@ -919,7 +926,7 @@ class boundary(object):
                     ## tracer bc paraemters
                     for ii in range(len(tracer_boundary_lst_sorted)):
                         tracer_index = tracer_boundary_lst_sorted[ii]
-                        tracer = self.open_boundaries[i]["tracers"][tracer_index]
+                        tracer = _get_var("tracers")[tracer_index]
                         tracer_bc_source = tracer_boundary_sources[ii]
                         if tracer_bc_source == 2:
                             tracer_bc_const = tracer["source"]
