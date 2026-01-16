@@ -630,24 +630,24 @@ class boundary(object):
                             reordered_open_boundaries_tmp[index_in_hgrid] = self.open_boundaries[i] 
                             order_indices.append(index_in_hgrid)
                     self.open_boundaries = reordered_open_boundaries_tmp
-            
+
                     
                 
             
-                for i in range(num_open_boundaries):
-                    bname_yaml = self.open_boundaries[i]["name"]
-                    if  hgrd_open_boundaries[i].comment is None:
-                        print("Warning: hgrid boundary %s has no name, skipping boundary name check" % i)
-                        continue ## skip if hgrid boundary name is empty
-                    bname_hgrid =  hgrd_open_boundaries[i].comment.strip().split('"')[1]
-                    ## if bname in hgrid is empty, skip the check   
-                    if bname_hgrid == "":
-                        continue
-                    if bname_yaml != bname_hgrid:
-                        raise ValueError(
-                            "boundary name mismatch between YAML and hgrid: %s vs %s"
-                            % (bname_yaml, bname_hgrid)
-                        )
+                # for i in range(num_open_boundaries):
+                #     bname_yaml = self.open_boundaries[i]["name"]
+                #     if  hgrd_open_boundaries[i].comment is None:
+                #         print("Warning: hgrid boundary %s has no name, skipping boundary name check" % i)
+                #         continue ## skip if hgrid boundary name is empty
+                #     bname_hgrid =  hgrd_open_boundaries[i].comment.strip().split('"')[1]
+                #     ## if bname in hgrid is empty, skip the check   
+                #     if bname_hgrid == "":
+                #         continue
+                #     if bname_yaml != bname_hgrid:
+                #         raise ValueError(
+                #             "boundary name mismatch between YAML and hgrid: %s vs %s"
+                #             % (bname_yaml, bname_hgrid)
+                #         )
 
                 # num_tracer_mod = 0
                 # tracer_mods = []
