@@ -822,7 +822,7 @@ class boundary(object):
                     elif (elev_id == 3) or (elev_id == 5):
                         ## tidal forcing
                         # write each tidal constituent: name line then amplitude/phase per node
-                        for tidal_constituent in elev_boundary["tidal_constituents"]:
+                        for tidal_constituent in elev_boundary["constituents"]:
                             # name must exist (YAML examples use 'name' after normalization)
                             name = tidal_constituent.get("name")
                             if name is None:
@@ -851,7 +851,7 @@ class boundary(object):
                         outf.write(str(vel_source))
                     elif (vel_id == 3) or (vel_id == 5):
                         ## tidal forcing
-                        for tidal_constituent in vel_boundary["tidal_constituents"]:
+                        for tidal_constituent in vel_boundary["constituents"]:
                             # name must exist (YAML examples use 'name' after normalization)
                             name = tidal_constituent.get("name")
                             if name is None:
