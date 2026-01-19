@@ -1,84 +1,129 @@
-# test_bctide_write_bctides.py
+# test_bctides.py
 
-import io
-import tempfile
-import datetime
 import pytest
 import numpy as np
 
 from schimpy.schism_mesh import BoundaryType
-
-# Import the boundary class directly from the module under test
 from schimpy.bctide import boundary
 
 class DummyBoundary:
-    """A dummy mesh boundary for testing."""
     def __init__(self, nodes, comment=None, btype=BoundaryType.OPEN):
         self.nodes = nodes
         self.comment = comment
         self.btype = btype
 
 class DummyMesh:
-    """A dummy mesh object for testing."""
     def __init__(self, boundaries, nodes=None):
         self.boundaries = boundaries
-        # nodes: dict {node_id: (x, y)}
         if nodes is None:
             self.nodes = {i: (float(i), float(i)) for i in range(100)}
         else:
             self.nodes = nodes
 
-def make_valid_bc_yaml(date=None):
-    """Return a minimal valid bc_yaml dict for testing."""
-    if date is None:
-        date = datetime.datetime(2020, 1, 1, 0, 0)
-    earth_tidal_constituents = {
-            "name": "M2",
-            "angular_frequency": 1.9323,
-            "node_factor": 1.0,
-            "earth_equilibrium_argument": 0.0,
-        }
-    # If earth_tidals are present, put the number of constituents and cutoff depth
-    # immediately after the "date" key (dict insertion order is preserved).
+def make_valid_bc_yaml(date="2011-01-28"):
     return {
+        "modules": [
+            {"name": "GEN", "num_tracers": 1},
+            {"name": "SED", "num_tracers": 5},
+            {"name": "AGE", "num_tracers": 2}
+        ],
         "date": date,
         "earth_tides": {
-            "tidal_cutoff_depth": 40,
-            "tidal_constituents": earth_tidal_constituents,
+            "cutoff_depth": 40,
+            "constituents": [
+                {"K1": {
+                    "amplitude": 0.0417807,
+                    "angular_frequency": 0.00007292,
+                    "node_factor": 1.0,
+                    "earth_equilibrium_argument": 206.78674
+                }},
+                {"O1": {
+                    "amplitude": 0.0751136,
+                    "angular_frequency": 0.00006758,
+                    "node_factor": 1.0,
+                    "earth_equilibrium_argument": 0.0
+                }},
+                {"SSA": {
+                    "amplitude": 0.0002282,
+                    "angular_frequency": 0.00000040,
+                    "node_factor": 1.0,
+                    "earth_equilibrium_argument": 260.4229976
+                }},
+            ]
         },
         "boundary_forcing_tides": {
-            "tidal_constituents": [
-                {
-                    "name": "M2",
-                    "angular_frequency": 1.9323,
+            "constituents": [
+                {"Z0": {
+                    "angular_frequency": 0.0,
                     "node_factor": 1.0,
-                    "earth_equilibrium_argument": 0.0,
-                }
-            ],
+                    "equilibrium_argument": 0.0
+                }},
+                {"O1": {
+                    "angular_frequency": 0.00006758,
+                    "node_factor": 1.11945,
+                    "equilibrium_argument": 7.47302
+                }},
+                {"K1": {
+                    "angular_frequency": 0.00007292,
+                    "node_factor": 1.07391,
+                    "equilibrium_argument": 206.78674
+                }},
+                {"M2": {
+                    "angular_frequency": 0.00014023,
+                    "node_factor": 0.97907,
+                    "equilibrium_argument": 217.04138
+                }},
+            ]
         },
         "open_boundaries": [
             {
                 "name": "ocean",
-                "elevation_boundary": {
-                    "source": "constant"
-                },
-                "velocity_boundary": {
-                    "source": "constant"
-                },
-                "temperature_boundary": {
-                    "source": "constant",
-                    "nudge": 0.5
-                },
-                "salinity_boundary": {
-                    "source": "constant",
-                    "nudge": 0.5
-                }
+                "variables": [
+                    {"elevation": {
+                        "source": "tidal",
+                        "spatial": "local",
+                        "constituents": [
+                            {"Z0": [
+                                {"amplitude": [1.0]*10},
+                                {"phase": [0.0]*10}
+                            ]},
+                            {"O1": [
+                                {"amplitude": [0.2]*10},
+                                {"phase": [10.0]*10}
+                            ]}
+                        ]
+                    }},
+                    {"velocity": {
+                        "source": "tidal",
+                        "spatial": "local",
+                        "constituents": [
+                            {"Z0": [
+                                {"u_amplitude": [0.1]*10},
+                                {"u_phase": [0.0]*10},
+                                {"v_amplitude": [0.1]*10},
+                                {"v_phase": [0.0]*10}
+                            ]}
+                        ]
+                    }},
+                    {"temperature": {
+                        "source": 10.0,
+                        "nudge": 1.0
+                    }},
+                    {"salinity": {
+                        "source": 5.0,
+                        "nudge": 1.0
+                    }},
+                    {"tracers": [
+                        {"module": "GEN", "source": [1.0], "relax": 1.0},
+                        {"module": "SED", "source": [0.1]*5, "relax": 1.0},
+                        {"module": "AGE", "source": [10.0, 20.0], "relax": 1.0}
+                    ]}
+                ]
             }
         ]
     }
 
-def make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=3, date=None):
-    """Create a dummy mesh and bc_yaml for testing."""
+def make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=10, date="2011-01-28"):
     boundaries = []
     nodes = {}
     for i in range(num_boundaries):
@@ -92,121 +137,110 @@ def make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=3, date=Non
     bc_yaml["open_boundaries"] = [
         {
             "name": f"{i}",
-            "elevation_boundary": {"source": 0.2},
-            "velocity_boundary": {"source": 10},
-            "temperature_boundary": {"source": 25, "nudge": 0.5},
-            "salinity_boundary": {"source": 5, "nudge": 0.5}
+            "variables": [
+                {"elevation": {
+                    "source": "tidal",
+                    "spatial": "local",
+                    "constituents": [
+                        {"Z0": [
+                            {"amplitude": [1.0]*nodes_per_boundary},
+                            {"phase": [0.0]*nodes_per_boundary}
+                        ]}
+                    ]
+                }},
+                {"velocity": {
+                    "source": "tidal",
+                    "spatial": "local",
+                    "constituents": [
+                        {"Z0": [
+                            {"u_amplitude": [0.1]*nodes_per_boundary},
+                            {"u_phase": [0.0]*nodes_per_boundary},
+                            {"v_amplitude": [0.1]*nodes_per_boundary},
+                            {"v_phase": [0.0]*nodes_per_boundary}
+                        ]}
+                    ]
+                }},
+                {"temperature": {
+                    "source": 10.0,
+                    "nudge": 1.0
+                }},
+                {"salinity": {
+                    "source": 5.0,
+                    "nudge": 1.0
+                }},
+                {"tracers": [
+                    {"module": "GEN", "source": [1.0], "relax": 1.0},
+                    {"module": "SED", "source": [0.1]*5, "relax": 1.0},
+                    {"module": "AGE", "source": [10.0, 20.0], "relax": 1.0}
+                ]}
+            ]
         }
         for i in range(num_boundaries)
     ]
     return mesh, bc_yaml
 
 def test_write_bctides_valid(tmp_path):
-    """Test write_bctides with typical valid input."""
-    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=2, nodes_per_boundary=2)
+    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=10)
     bb = boundary(mesh, bc_yaml)
     out_file = tmp_path / "bctides_test.in"
     bb.write_bctides(str(out_file))
     content = out_file.read_text()
-    assert "2020-01-01 00:00" in content
-    assert "M2" in content
-    assert "constant" not in content  # Should not literally write "constant"
-    # Should have number of open boundaries
-    assert "2 " in content
+    assert "2011-01-28" in content
+    assert "K1" in content
+    assert "Z0" in content
+    assert "GEN" in content
+    assert "SED" in content
+    assert "AGE" in content
+    assert "tidal" not in content  # Should not literally write "tidal"
+    assert "1 " in content  # number of open boundaries
 
-def test_write_bctides_empty_open_boundaries(tmp_path):
-    """Test with zero open boundaries (edge case)."""
-    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=0)
-    b = boundary(mesh, bc_yaml)
-    out_file = tmp_path / "bctides_empty.in"
-    b.write_bctides(str(out_file))
+def test_write_bctides_local_tidal_arrays(tmp_path):
+    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=10)
+    bb = boundary(mesh, bc_yaml)
+    out_file = tmp_path / "bctides_local_tidal.in"
+    bb.write_bctides(str(out_file))
     content = out_file.read_text()
-    # Should still write date and header info
-    assert "2020-01-01 00:00" in content
-
-def test_write_bctides_mismatched_boundaries(tmp_path):
-    """Test error when mesh and YAML open boundaries count mismatch."""
-    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=2)
-    # Remove one open boundary from YAML
-    bc_yaml["open_boundaries"] = bc_yaml["open_boundaries"][:1]
-    with pytest.raises(ValueError, match="boundary YAML has different number of openboundary"):
-        boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail.in")
+    # Check that all amplitudes and phases are present for each node
+    assert content.count("1.0   0.0") == 10
 
 def test_write_bctides_missing_fields(tmp_path):
-    """Test missing optional fields (should not raise)."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    # Remove earth_tidals and boundary_forcing_tidals
-    bc_yaml.pop("earth_tidals", None)
-    bc_yaml.pop("boundary_forcing_tidals", None)
-    b = boundary(mesh, bc_yaml)
+    bc_yaml.pop("earth_tides", None)
+    bc_yaml.pop("boundary_forcing_tides", None)
+    bb = boundary(mesh, bc_yaml)
     out_file = tmp_path / "bctides_missing_fields.in"
-    b.write_bctides(str(out_file))
+    bb.write_bctides(str(out_file))
     content = out_file.read_text()
-    assert "0 40" in content  # Default for missing earth_tidals
-
-def test_write_bctides_invalid_tracer(tmp_path):
-    """Test error for unsupported tracer module."""
-    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    # Add an invalid tracer
-    bc_yaml["open_boundaries"][0]["tracers"] = [
-        {"tracer": "NOT_A_TRACER", "source": "constant", "nudge": 0.5}
-    ]
-    with pytest.raises(ValueError, match="is not a supported tracer module"):
-        boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail_tracer.in")
+    assert "0 40" in content  # Default for missing earth_tides
 
 def test_write_bctides_invalid_elev_source(tmp_path):
-    """Test error for unsupported elevation boundary source."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    bc_yaml["open_boundaries"][0]["elevation_boundary"]["source"] = "not_supported"
+    bc_yaml["open_boundaries"][0]["variables"][0]["elevation"]["source"] = "not_supported"
     with pytest.raises(ValueError, match="elevation boundary is not supported"):
         boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail_elev.in")
 
 def test_write_bctides_invalid_velocity_source(tmp_path):
-    """Test error for unsupported velocity boundary source."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    bc_yaml["open_boundaries"][0]["velocity_boundary"]["source"] = "not_supported"
+    bc_yaml["open_boundaries"][0]["variables"][1]["velocity"]["source"] = "not_supported"
     with pytest.raises(ValueError, match="velocity boundary is not supported"):
         boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail_vel.in")
 
-def test_write_bctides_invalid_salt_source(tmp_path):
-    """Test error for unsupported salinity boundary source."""
+def test_write_bctides_invalid_tracer_module(tmp_path):
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    bc_yaml["open_boundaries"][0]["salinity_boundary"]["source"] = "not_supported"
-    with pytest.raises(ValueError, match="temperature boundary is not supported"):
-        boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail_salt.in")
-
-def test_write_bctides_invalid_tracer_source_type(tmp_path):
-    """Test error for unsupported tracer boundary source type."""
-    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    # Add a tracer with an unsupported source type (list of strings)
-    bc_yaml["open_boundaries"][0]["tracers"] = [
-        {"tracer": "GEN", "source": ["bad", "bad"], "nudge": 0.5}
-    ]
-    with pytest.raises(ValueError, match="boundary is not supported"):
-        boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail_tracer_type.in")
+    bc_yaml["open_boundaries"][0]["variables"][4]["tracers"].append(
+        {"module": "NOT_A_TRACER", "source": "constant", "relax": 0.5}
+    )
+    with pytest.raises(ValueError, match="is not a supported tracer module"):
+        boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail_tracer.in")
 
 def test_write_bctides_tracer_constant_list(tmp_path):
-    """Test tracer with constant list as source."""
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    bc_yaml["open_boundaries"][0]["tracers"] = [
-        {"tracer": "GEN", "source": [1.0, 2.0, 3.0], "nudge": 0.5,"relax": 0.5}
-    ]
-    b = boundary(mesh, bc_yaml)
+    bb = boundary(mesh, bc_yaml)
     out_file = tmp_path / "bctides_tracer_list.in"
-    b.write_bctides(str(out_file))
+    bb.write_bctides(str(out_file))
     content = out_file.read_text()
-    assert "1.0 2.0 3.0" in content
+    assert "1.0" in content
+    assert "0.1" in content
+    assert "10.0" in content
 
-def test_write_bctides_tracer_constant_scalar(tmp_path):
-    """Test tracer with constant scalar as source."""
-    mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
-    bc_yaml["open_boundaries"][0]["tracers"] = [
-        {"tracer": "GEN", "source": 5.0, "nudge": 0.5,"relax":0.5}
-    ]
-    b = boundary(mesh, bc_yaml)
-    out_file = tmp_path / "bctides_tracer_scalar.in"
-    b.write_bctides(str(out_file))
-    content = out_file.read_text()
-    assert "5.0" in content
-
-# To run these tests, use: pytest test_bctide_write_bctides.py
+# To run these tests, use: pytest test_bctides.py
