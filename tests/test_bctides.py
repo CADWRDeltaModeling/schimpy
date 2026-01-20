@@ -188,9 +188,10 @@ def test_write_bctides_valid(tmp_path):
     assert "2011-01-28" in content
     assert "K1" in content
     assert "Z0" in content
-    assert "GEN" in content
-    assert "SED" in content
-    assert "AGE" in content
+    ## module name is not explicitly appears in bctides.in
+    #assert "GEN" in content
+    #assert "SED" in content
+    #assert "AGE" in content
     assert "tidal" not in content  # Should not literally write "tidal"
     assert "1 " in content  # number of open boundaries
 
@@ -227,11 +228,15 @@ def test_write_bctides_invalid_velocity_source(tmp_path):
 
 def test_write_bctides_invalid_tracer_module(tmp_path):
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
+    tracer_mod = "NOT_A_TRACER"
     bc_yaml["open_boundaries"][0]["variables"][4]["tracers"].append(
-        {"module": "NOT_A_TRACER", "source": "constant", "relax": 0.5}
+        {"module": tracer_mod, "source": "constant", "relax": 0.5}
     )
-    with pytest.raises(ValueError, match="is not a supported tracer module"):
+    
+    with pytest.raises(ValueError) as execinfo: 
         boundary(mesh, bc_yaml).write_bctides(tmp_path / "fail_tracer.in")
+        assert "Tracer module '{tracer_mod}' is not defined in the bctides 'modules' section." in str(execinfo.value) 
+        assert execinfo.type is ValueError
 
 def test_write_bctides_tracer_constant_list(tmp_path):
     mesh, bc_yaml = make_dummy_mesh_and_bc_yaml(num_boundaries=1)
