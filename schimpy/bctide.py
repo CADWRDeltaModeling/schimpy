@@ -872,8 +872,8 @@ class boundary(object):
 
                             for kk in range(num_nodes):
                                 node_id = node_id_lst[kk]
-                                x = hgrid.nodes[node_id, 0]
-                                y = hgrid.nodes[node_id, 1]
+                                #x = hgrid.nodes[node_id, 0]
+                                #y = hgrid.nodes[node_id, 1]
                                 amp_val = self._handle_tidal_constituents_val(amp,name,"elev_amplitude",i,kk)
                                 phase_val = self._handle_tidal_constituents_val(phase,name,"elev_phase",i,kk)
 
@@ -904,8 +904,7 @@ class boundary(object):
                             for kk in range(num_nodes):
 
                                 node_id = node_id_lst[kk]
-                                x = hgrid.nodes[node_id, 0]
-                                y = hgrid.nodes[node_id, 1]
+
 
                                 u_amp_val = self._handle_tidal_constituents_val(u_amp,name,"u_amplitude",i,kk)
                                 u_phase_val = self._handle_tidal_constituents_val(u_phase,name,"u_phase",i,kk)
