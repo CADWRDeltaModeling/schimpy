@@ -672,6 +672,9 @@ class boundary(object):
                 # for kk in range(len(tracer_mods)):
                 #     tracer_mod_pos[tracer_mods[kk]] = kk
 
+                ## write out number of boundary here
+                outf.write(str(num_open_boundaries) + "\n")
+
                 for i in range(num_open_boundaries):
                     bound_name = self.open_boundaries[i]["name"]
                     print("processing open boundary %s " % bound_name)
