@@ -9,12 +9,13 @@ At the end of this script, there is a synthetic example which demonstrates the f
 from schimpy.schism_yaml import load
 from schimpy.schism_mesh import SchismMeshGr3Reader, BoundaryType
 import datetime
+from zoneinfo import ZoneInfo
 import numbers
 import numpy as np
 import click
 
 
-__all__ = ["load_boundary"]
+__all__ = ["bctide_cli"]
 
 
 @click.command(
@@ -27,7 +28,7 @@ __all__ = ["load_boundary"]
 )
 @click.argument('main_yaml', type=click.Path(exists=True))
 
-def load_main_input(main_yaml):
+def bctide_cli(main_yaml):
      """ read in main yaml file which contians the grid topology and
          boundary condtion yaml files, this input file looks like below
          mesh:
@@ -507,7 +508,7 @@ class boundary(object):
     def write_bctides(self, bctides_file):
  
         with open(bctides_file, "w") as outf:
-            tt = self.date.strftime("%Y-%m-%d %H:%M")
+            tt = self.date.strftime("%m/%d/%Y %H:%M")
             outf.write(tt)
             outf.write("\n")
             # normalize tidal-constituent input formats so downstream code can
@@ -978,7 +979,7 @@ class boundary(object):
 
 
 if __name__ == "__main__":
-    by = load_main_input()
+    by = bctide_cli()
 
 
 
