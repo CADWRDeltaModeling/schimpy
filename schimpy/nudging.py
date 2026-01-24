@@ -289,6 +289,12 @@ class Nudging(object):
                 ),
             )
 
+            # Global Attributes -- Metadata
+            rootgrp_T.history = "Created " + str(datetime.datetime.now())
+            rootgrp_T.start_date = str(self.start_date)
+            rootgrp_T.rnday = str(self.rnday)
+            rootgrp_T.hgrid = os.path.abspath(self.hgrid_fn)
+
             # in schism indices are 1 based
             id_map_T[:] = np.array(imap_merged) + 1
             itime_id_T[:] = self.time_seconds
