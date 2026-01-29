@@ -125,7 +125,6 @@ def write_points(fpath, points):
     required=True,
     type=click.Path(),
     help="Output file (.yml, .yaml, .in, .bp, or .shp).",
-    help="Output file (.yml, .yaml, .in, .bp, or .shp).",
 )
 @click.help_option("-h", "--help")
 def convert_points_cli(input, output):
