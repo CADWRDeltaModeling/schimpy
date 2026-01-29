@@ -5,6 +5,7 @@ import click
 import geopandas as gpd
 import pandas as pd
 import warnings
+import warnings
 from shapely.geometry import Point
 from schimpy.schism_sources_sinks import yaml2df
 import yaml
@@ -26,6 +27,9 @@ def points_to_yaml(fpath, points):
     # Ensure columns exist
     if "sites" not in points.columns or "stype" not in points.columns:
         raise ValueError("Shapefile must contain 'sites' and 'stype' fields.")
+    # Ensure columns exist
+    if "sites" not in points.columns or "stype" not in points.columns:
+        raise ValueError("Shapefile must contain 'sites' and 'stype' fields.")
 
     dict_file = {}
     for _, row in points.iterrows():
@@ -39,27 +43,20 @@ def points_to_bp(fpath, points):
     
     # Calculate cumulative distance along the transect
     points = points.reset_index(drop=True)
-    coords = points[['x', 'y']].values
-    
-    # Calculate distances between consecutive points
-    distances = np.sqrt(np.sum(np.diff(coords, axis=0)**2, axis=1))
-    
-    # Cumulative distance starting at 0
-    cumulative_distances = np.concatenate(([0], np.cumsum(distances)))
     
     # Write to file
     with open(fpath, 'w') as f:
         # Write header
-        f.write("point x y z distance\n")
+        f.write("point x y z name\n")
         f.write(f"{len(points)}  ! Number of points\n")
         
         # Write each point
         for i, (_, row) in enumerate(points.iterrows(), start=1):
             x = float(row['x'])
             y = float(row['y'])
-            z = -10000.0
-            distance = float(cumulative_distances[i-1])
-            f.write(f"{i} {x} {y} {z} {distance}\n")
+            z = float(row['z'])
+            name = row['sites'] if 'sites' in row else f"point_{i}"
+            f.write(f"{i} {x} {y} {z} {name}\n")
             
     print(f"\nBuild points file written to {fpath}.")
     
@@ -75,12 +72,15 @@ def shp_to_df(fpath):
     gdf["x"] = gdf.geometry.x
     gdf["y"] = gdf.geometry.y
     
+    
     # Select relevant columns
     cols = ["x", "y"]
     if "sites" in gdf.columns:
         cols.insert(0, "sites")
     if "stype" in gdf.columns:
         cols.insert(1 if "sites" in gdf.columns else 0, "stype")
+    if "z" in gdf.columns:
+        cols.insert(1 if "z" in gdf.columns else 0, "z")
     
     if "sites" not in gdf.columns or "stype" not in gdf.columns:
         warnings.warn("Shapefile must contain 'sites' and 'stype' fields for conversion to yaml")
@@ -125,6 +125,7 @@ def write_points(fpath, points):
     required=True,
     type=click.Path(),
     help="Output file (.yml, .yaml, .in, .bp, or .shp).",
+    help="Output file (.yml, .yaml, .in, .bp, or .shp).",
 )
 @click.help_option("-h", "--help")
 def convert_points_cli(input, output):
@@ -140,3 +141,4 @@ def main(input, output):
 
 if __name__ == "__main__":
     convert_points_cli()
+
