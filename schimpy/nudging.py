@@ -289,20 +289,21 @@ class Nudging(object):
                 ),
             )
 
-            # Global Attributes -- Metadata
-            rootgrp_T.history = "Created " + str(datetime.datetime.now())
-            rootgrp_T.start_date = str(self.start_date)
-            rootgrp_T.rnday = str(self.rnday)
-            rootgrp_T.hgrid = os.path.abspath(self.hgrid_fn)
-
             # in schism indices are 1 based
             id_map_T[:] = np.array(imap_merged) + 1
             itime_id_T[:] = self.time_seconds
 
-            # current var dimension [time, map_node, nlevel]
-            ivar_T[:, :, :, :] = values_merged[:, :, :, np.newaxis]
+            # Convert once to float32, C-contiguous
+            values_merged = np.asarray(values_merged, dtype="f4", order="C")
+            ntime = values_merged.shape[0]
+
+            # Write one time slice at a time
+            for it in range(ntime):
+                ivar_T[it, :, :, 0] = values_merged[it, :, :]
+
             rootgrp_T.close()
             print("%s file created" % nudging_fn)
+
 
             if v == "temperature":
                 nudge_gr3_fn = "TEM_nudge_%s.gr3" % suffix
