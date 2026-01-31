@@ -444,10 +444,10 @@ class Params(object):
         if type(freq) in (str, pd.Timedelta):
             freq = pd.tseries.frequencies.to_offset(freq)
             dt = pd.tseries.frequencies.to_offset(f"{dt}s")
-            nspool = freq / dt
+            nspool = pd.Timedelta(freq) / pd.Timedelta(dt)
         elif isinstance(freq, pd.offsets.DateOffset):
             dt = pd.tseries.frequencies.to_offset(f"{dt}s")
-            nspool = freq / dt
+            nspool = pd.Timedelta(freq) / pd.Timedelta(dt)
             if abs(nspool - round(nspool)) > 0.01:
                 raise ValueError("Output freq not divisible by dt")
             else:
