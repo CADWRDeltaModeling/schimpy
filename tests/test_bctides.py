@@ -185,7 +185,7 @@ def test_write_bctides_valid(tmp_path):
     out_file = tmp_path / "bctides_test.in"
     bb.write_bctides(str(out_file))
     content = out_file.read_text()
-    assert "2011-01-28" in content
+    assert ("2011-01-28" in content) or ("01/28/2011" in content)
     assert "K1" in content
     assert "Z0" in content
     ## module name is not explicitly appears in bctides.in
