@@ -642,14 +642,6 @@ def update_temporal_inputs(s, inputs):
             print(l)
 
 
-def check_nested_match(node):
-    for key, item in node.items():
-        if isinstance(item, dict):
-            if key in item.keys():
-                node[key] = item[key]
-            check_nested_match(item)
-
-
 def item_exist(inputs, name):
     return True if name in inputs else False
 
@@ -667,11 +659,13 @@ def setup_logger(outdir):
 
 
 @click.command()
-@click.argument('main_inputfile', type=click.Path(exists=True))
+@click.argument("main_inputfile", type=click.Path(exists=True))
 def prepare_schism_cli(main_inputfile):
     """Prepare SCHISM input files."""
+
     class Args:
         pass
+
     args = Args()
     args.main_inputfile = main_inputfile
     prepare_schism(args)
@@ -757,9 +751,6 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True):
     ] + schism_yaml.include_keywords
     logger.info("Processing the top level...")
     check_and_suggest(list(inputs.keys()), keys_top_level, logger)
-
-    logger.info("Checking for matching nested keys...")
-    check_nested_match(inputs)
 
     if write_echo:
         out_fname = (

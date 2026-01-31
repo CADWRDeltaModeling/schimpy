@@ -264,7 +264,15 @@ def check_unsubstituted_vars(data, path=None, found=None):
     return found
 
 
-def load(stream, envvar=None):
+def collapsed_nested_matches(node):
+    for key, item in node.items():
+        if isinstance(item, dict):
+            if key in item.keys():
+                node[key] = item[key]
+            collapsed_nested_matches(item)
+
+
+def load(stream, envvar=None, collapse_nested=True):
     """Load a schism YAML"""
     # First round to get environmental variables
     loader = RawLoader(stream)
@@ -294,6 +302,8 @@ def load(stream, envvar=None):
                 msg.append(f"  {path}: {matches}")
             msg.append(r"This could be an issue of using {var} instead of ${var}")
             warnings.warn("\n".join(msg))
+            
+        collapsed_nested_matches(data)
         return data
     finally:
         loader.dispose()
