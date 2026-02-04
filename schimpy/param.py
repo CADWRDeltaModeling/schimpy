@@ -441,23 +441,24 @@ class Params(object):
     def set_freq(self, name, freq):
         """Set binary output frequency using Pandas offset or string that evaluates as offset"""
         dt = int(self["dt"])
-        if type(freq) in (str, pd.Timedelta):
-            freq = pd.tseries.frequencies.to_offset(freq)
-            dt = pd.tseries.frequencies.to_offset(f"{dt}s")
-            nspool = pd.Timedelta(freq) / pd.Timedelta(dt)
-        elif isinstance(freq, pd.offsets.DateOffset):
-            dt = pd.tseries.frequencies.to_offset(f"{dt}s")
-            nspool = pd.Timedelta(freq) / pd.Timedelta(dt)
-            if abs(nspool - round(nspool)) > 0.01:
-                raise ValueError("Output freq not divisible by dt")
-            else:
-                nspool = round(nspool)
-        else:
-            print(type(freq))
+        
+        # Normalize to Timedelta
+        if isinstance(freq, str):
+            freq = pd.to_timedelta(freq)
+        elif isinstance(freq, pd.tseries.offsets.BaseOffset):
+            freq = pd.to_timedelta(str(freq))
+        elif not isinstance(freq, pd.Timedelta):
             raise ValueError(
-                "Entry must be string or offset or something that is convertible to offset"
+                "Entry must be string or offset or Timedelta that is convertible to offset"
             )
-        self[name] = int(nspool)
+        
+        dt_td = pd.Timedelta(seconds=dt)
+        nspool = freq / dt_td
+    
+        if abs(nspool - round(nspool)) > 0.01:
+            raise ValueError("Output freq not divisible by dt")
+    
+        self[name] = int(round(nspool))
 
     def get_station_out_freq(self):
         return self.get_freq("nspool_sta")
