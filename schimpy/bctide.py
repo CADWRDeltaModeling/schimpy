@@ -630,10 +630,19 @@ class boundary(object):
                             index_in_hgrid = bname_hgrid_lst.index(bname_yaml)   
                             reordered_open_boundaries_tmp[index_in_hgrid] = self.open_boundaries[i] 
                             order_indices.append(index_in_hgrid)
+                    ## reorered self.open_boundaries should be same as hgrid boundary names now
+                    ## if not, raise error
+                    for i in range(num_open_boundaries):
+                        bname_yaml = reordered_open_boundaries_tmp[i].get("name","")
+                        bname_hgrid = bname_hgrid_lst[i]
+                        if bname_yaml != bname_hgrid:
+                            raise ValueError(
+                                "after reordering, boundary name mismatch between YAML and hgrid: %s vs %s"
+                                % (bname_yaml, bname_hgrid)
+                            )
                     self.open_boundaries = reordered_open_boundaries_tmp
 
                     
-                
             
                 # for i in range(num_open_boundaries):
                 #     bname_yaml = self.open_boundaries[i]["name"]
