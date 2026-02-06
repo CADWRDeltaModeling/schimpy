@@ -516,6 +516,33 @@ class boundary(object):
                               tidal constituent {consts_name} at boundary {boundary_id} \n")
         return val
 
+    def check_inflow_boundary_spec(self,var_dic, bound_name,tracer_name):
+
+        if self.mode == "barotropic":
+            if not self.computation_temperature_salinity:
+                if var_dic is not None:
+                    raise ValueError(
+                        f"Boundary '{bound_name}' has specified '{tracer_name}' boundary conditions, but 'temperature_salinity_computation' \
+                        is set to false in barotropic mode. Please remove '{tracer_name}' specification or set 'temperature_salinity_computation' \
+                        to true."
+                    )
+            else:
+                 if var_dic is None and (tracer_name in ["temperature", "salinity"]):
+                    raise ValueError(
+                        f"Boundary '{bound_name}' is missing required '{tracer_name}' specification for inflow/bidirectional boundary in \
+                          barotropic mode with 'temperature_salinity_computation' enabled. Please specify '{tracer_name}' boundary conditions."
+                    )
+                 else:
+                    if var_dic is not None and not (tracer_name in ["temperature", "salinity"]):
+                        raise ValueError(
+                            f"Boundary '{bound_name}' has specified '{tracer_name}' boundary conditions in barotropic mode. \
+                              Please remove '{tracer_name}' specification" )
+        
+        else: # baroclinic mode,         
+            if var_dic is None:
+                raise ValueError(
+                    f"boundary '{bound_name}' is missing variable specification. Please specify {tracer_name} for inflow/bidirectional boundary."
+                )
 
     def write_bctides(self, bctides_file):
  
@@ -708,26 +735,12 @@ class boundary(object):
                     ## this boundary shouldn't have any tracer boundary, such
                     ## as temperature, salinity or other scalars
                     
-                    if "flow_direction" in self.open_boundaries[i].keys():
-                        flow_direction = self.open_boundaries[i]["flow_direction"]
-                        if "flow_direction" == "outflow":
-                            if "temperature" in self.open_boundaries[i].keys():
-                                raise ValueError(
-                                    f"Boundary '{bound_name}' is configured as an outflow; a temperature boundary "
-                                    "specification is not allowed."
-                                )
-                            if "salinity" in self.open_boundaries[i].keys():
-                                raise ValueError(
-                                    f"Boundary '{bound_name}' is configured as an outflow; a salinity boundary "
-                                    "specification is not allowed."
-                                )
-                            if "tracers" in self.open_boundaries[i].keys():
-                                raise ValueError(
-                                    f"Boundary '{bound_name}' is configured as an outflow; tracer "
-                                    "specification is not allowed."
-                                )
 
-
+                    ## flow_direction is must for open boundary, if not given, raise error
+                    if not("flow_direction" in self.open_boundaries[i].keys()):
+                        raise ValueError(
+                            f"Boundary '{bound_name}' is missing required 'flow_direction' specification. Please specify 'flow_direction' as either 'inflow' or 'outflow'."
+                        )
 
                     # variables in YAML are provided as a list of dicts; helper to find a variable entry
                     vars_list = self.open_boundaries[i].get("variables", [])
@@ -736,6 +749,45 @@ class boundary(object):
                             if isinstance(vv, dict) and name in vv:
                                 return vv[name]
                         return None
+                    
+                    flow_direction = self.open_boundaries[i]["flow_direction"]
+                    if flow_direction == "outflow":
+                        if "temperature" in self.open_boundaries[i].keys():
+                            raise ValueError(
+                                f"Boundary '{bound_name}' is configured as an outflow; a temperature boundary "
+                                "specification is not allowed."
+                            )
+                        if "salinity" in self.open_boundaries[i].keys():
+                            raise ValueError(
+                                f"Boundary '{bound_name}' is configured as an outflow; a salinity boundary "
+                                "specification is not allowed."
+                            )
+                        if "tracers" in self.open_boundaries[i].keys():
+                            raise ValueError(
+                                f"Boundary '{bound_name}' is configured as an outflow; tracer "
+                                "specification is not allowed."
+                            )
+                    elif flow_direction == "inflow" or flow_direction == "bidirection":
+
+                        check_list = ["temperature", "salinity","tracers"]
+                        if len(self.tracer_modules) == 0: ## if no tracer module is defined, then tracers should not be specified in the boundary
+                            check_list = ["temperature", "salinity"]
+                            ## if tracers is specified in the boundary but no tracer module is defined, raise error
+                            if "tracers" in self.open_boundaries[i].keys():
+                                raise ValueError(
+                                    f"Boundary '{bound_name}' has specified 'tracers' boundary conditions, but no tracer modules are defined in the bctides YAML. \
+                                        Please add tracer modules to the top-level 'modules' section or remove 'tracers' specification from the boundary."
+                                )
+                        for var in check_list:
+                            self.check_inflow_boundary_spec(_get_var(var), bound_name,var)
+                    else:
+                        raise ValueError(
+                            f"Boundary '{bound_name}' has invalid 'flow_direction' value: {flow_direction}. "
+                            "Expected 'inflow', 'outflow', or 'bidirection'."
+                        )   
+
+
+
 
                     if _get_var("elevation") is not None:
                         elev_boundary = _get_var("elevation")
