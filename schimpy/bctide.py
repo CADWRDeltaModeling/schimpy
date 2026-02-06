@@ -57,6 +57,7 @@ def bctide_cli(main_yaml):
      bctides_dic = main_yaml_dict.get("bctides")
 #     for bctides_key in bctides_dic.keys():
      for out in bctides_dic:
+         print("---------processing bctides file %s----------" % out)
          bctides_yaml = bctides_dic[out]
          by = load_boundary(hgrid,bctides_yaml,open_boundary_segments)
   #       by.write_bctides(bctides_key)
@@ -123,6 +124,17 @@ class boundary(object):
             else:
                 raise ValueError(f"Unrecognized date format for bctides date: {d}")
         self.date = bc_yaml["date"]
+        if "mode" not in bc_yaml or bc_yaml["mode"] is None: ## raise error if mode is not given, since it is required for determining the boundary condition type
+            raise ValueError(" 'mode' is required but not specified in bctides YAML. Please specify 'mode' as either 'barotropic' or 'baroclinic'.")
+        self.mode = bc_yaml.get("mode")
+        if self.mode not in ["barotropic", "baroclinic"]:
+            raise ValueError(f"Invalid mode specified in bctides YAML: {self.mode}. Expected 'barotropic' or 'baroclinic'.")
+        self.computation_temperature_salinity = True
+        if self.mode == "barotropic":
+            if not("temperature_salinity_computation" in bc_yaml.keys()):
+                raise ValueError("temperature_salinity_computation is required for barotropic mode but not specified in bctides YAML. Please specify 'temperature_salinity_computation' as true or false.")
+            self.computation_temperature_salinity = bc_yaml.get("temperature_salinity_computation")
+
         if "earth_tides" in bc_yaml.keys():
             self.earth_tides = bc_yaml["earth_tides"]
         else:
