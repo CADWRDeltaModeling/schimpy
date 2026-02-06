@@ -175,7 +175,7 @@ class boundary(object):
             "tidal": 3,
             "2D elev history": 4,
             "tidal and 2D elev history": 5,
-            "none": 0,
+            "unspecified": 0,
         }
         self.vel_source = {
             "flux history": 1,
@@ -184,7 +184,7 @@ class boundary(object):
             "3D uv history": 4,
             "tidal and 3D uv history": 5,
             "flather 1": -1,
-            "none": 0,
+            "unspecified": 0,
         }
 
         self.temp_source = {
@@ -192,7 +192,7 @@ class boundary(object):
             "constant": 2,
             "initial profile": 3,
             "3D temperature history": 4,
-            "none": 0,
+            "unspecified": 0,
         }
 
         self.salt_source = {
@@ -200,7 +200,7 @@ class boundary(object):
             "constant": 2,
             "initial profile": 3,
             "3D salinity history": 4,
-            "none": 0,
+            "unspecified": 0,
         }
 
         ## tracer order
@@ -220,7 +220,7 @@ class boundary(object):
             "time history": 1,
             "constant": 2,
             "initial profile": 3,
-            "none": 0,
+            "unspecified": 0,
         }
 
 ##   also read in tracer modules defined in the bctides yaml here
