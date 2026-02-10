@@ -662,8 +662,8 @@ class boundary(object):
                         bname_yaml = self.open_boundaries[i].get("name","")
                         if bname_yaml not in bname_hgrid_lst:
                             raise ValueError(
-                                "boundary name %s from YAML not found in hgrid boundary names"
-                                % bname_yaml
+                                "boundary name %s from YAML not found in hgrid boundary names %s"
+                                % (bname_yaml,bname_hgrid_lst)
                             )
                         else:
                             index_in_hgrid = bname_hgrid_lst.index(bname_yaml)   
