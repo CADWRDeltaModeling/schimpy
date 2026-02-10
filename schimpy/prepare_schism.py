@@ -18,6 +18,9 @@ from schimpy.mesh_volume_tvd import (
     FloorOptions,
     TVDOptions,
 )
+from schimpy.schism_yaml import load
+from schimpy.bctide import load_boundary
+
 import dms_datastore.dstore_config as configs
 from packaging.version import Version, InvalidVersion
 import datetime
@@ -748,6 +751,7 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True):
         "flow_outputs",
         "station_output",
         "copy_resources",
+        "bctides",
     ] + schism_yaml.include_keywords
     logger.info("Processing the top level...")
     check_and_suggest(list(inputs.keys()), keys_top_level, logger)
@@ -768,6 +772,7 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True):
 def prepare_schism(args, use_logging=True):
     inputs, outdir, logger = process_prepare_yaml(args.main_inputfile, use_logging)
 
+    hgrid = None
     # Mesh section
     if item_exist(inputs, "mesh"):
         logger.info("Processing mesh section...")
@@ -790,10 +795,25 @@ def prepare_schism(args, use_logging=True):
             mesh_input_fpath = os.path.expanduser(mesh_items["mesh_inputfile"])
             s = create_schism_setup(mesh_input_fpath, logger)
             update_spatial_inputs(s, inputs, logger)
+            hgrid = s.mesh
         else:
             raise ValueError("No mesh input file in the mesh section.")
     else:
         raise ValueError("No mesh section in the main input.")
+    
+    if item_exist(inputs, "bctides"):
+        logger.info("Processing bctides section...")
+        bctides_items = inputs["bctides"]
+        if hgrid is None:
+            raise ValueError("Mesh must be processed before bctides section.")
+       
+        # If mesh already loaded above, reuse it
+        for bctides_out in bctides_items:
+            logger.info(f"Processing bctides YAML: {bctides_out}")
+            by = load_boundary(hgrid, bctides_items[bctides_out], None)
+            # Output file name: use YAML path or key
+            by.write_bctides(bctides_out)
+
 
     if item_exist(inputs, "copy_resources"):
         logger.info("Copying resources to output dir")
