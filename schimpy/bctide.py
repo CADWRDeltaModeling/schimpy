@@ -53,12 +53,11 @@ def bctide_cli(main_yaml):
      open_boundary_segments = None
      if "open_boundaries" in main_yaml_dict["mesh"].keys():
          open_boundary_segments = main_yaml_dict["mesh"]["open_boundaries"]
-
      bctides_dic = main_yaml_dict.get("bctides")
 #     for bctides_key in bctides_dic.keys():
-     for out in bctides_dic:
+     for bctides_yaml in bctides_dic:
+         out = bctides_yaml["name"]
          print("---------processing bctides file %s----------" % out)
-         bctides_yaml = bctides_dic[out]
          by = load_boundary(hgrid,bctides_yaml,open_boundary_segments)
   #       by.write_bctides(bctides_key)
          by.write_bctides(out)
