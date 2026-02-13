@@ -22,12 +22,15 @@ class DummyMesh:
 
 def make_valid_bc_yaml(date="2011-01-28"):
     return {
+        "name": "bctides.sed.in.3d",
         "modules": [
             {"name": "GEN", "num_tracers": 1},
             {"name": "SED", "num_tracers": 5},
             {"name": "AGE", "num_tracers": 2}
         ],
         "date": date,
+        "mode": "baroclinic",
+        "temperature_salinity_computation": True,
         "earth_tides": {
             "cutoff_depth": 40,
             "constituents": [
@@ -78,6 +81,7 @@ def make_valid_bc_yaml(date="2011-01-28"):
         "open_boundaries": [
             {
                 "name": "ocean",
+                "flow_direction": "bidirection",
                 "variables": [
                     {"elevation": {
                         "source": "tidal",
@@ -137,6 +141,7 @@ def make_dummy_mesh_and_bc_yaml(num_boundaries=1, nodes_per_boundary=10, date="2
     bc_yaml["open_boundaries"] = [
         {
             "name": f"{i}",
+            "flow_direction": "bidirection",
             "variables": [
                 {"elevation": {
                     "source": "tidal",
