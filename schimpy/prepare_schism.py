@@ -881,11 +881,11 @@ def prepare_schism(args, use_logging=True):
        
         # If mesh already loaded above, reuse it
         for bctides_out in bctides_items:
-            out_name = bctides_out["name"]
-            logger.info(f"Processing bctides YAML: {out_name}")
+            logger.info(f"Processing bctides YAML for: {bctides_out['name']}")
             by = load_boundary(hgrid, bctides_out, None)
-            out_path = ensure_outdir(inputs["prepro_output_dir"], out_name)
-            by.write_bctides(out_path)
+            # by = load_boundary(hgrid, bctides_items[bctides_out], None)
+            # Output file name: use YAML path or key
+            by.write_bctides(os.path.join(outdir,bctides_out['name']))
 
 
     if item_exist(inputs, "copy_resources"):
