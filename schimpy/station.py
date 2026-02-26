@@ -124,7 +124,7 @@ def read_staout(
         newindex = pd.date_range(staout.index[0], freq=f2, periods=len(staout.index))
         staout.index = newindex
     else:
-        staout = staout.resample(f).asfreq(f)
+        staout = staout.resample(f, origin=staout.index[0]).asfreq()
     return (staout, station_infile) if ret_station_in else staout
 
 
