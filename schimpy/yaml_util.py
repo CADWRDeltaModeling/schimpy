@@ -109,4 +109,4 @@ def yaml_to_yaml(infile, outfile, envvar=None):
     """
     data = yaml_from_file(infile, envvar=envvar)
     with open(outfile, "w") as file:
-        file.write(data)
+        file.write(yaml.safe_dump(data))
