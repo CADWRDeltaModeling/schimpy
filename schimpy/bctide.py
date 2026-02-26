@@ -725,7 +725,7 @@ class boundary(object):
 
                 for i in range(num_open_boundaries):
                     bound_name = self.open_boundaries[i]["name"]
-                    print("processing open boundary %s " % bound_name)
+                    print("\tprocessing open boundary %s " % bound_name)
                     num_nodes = len(hgrid.boundaries[i].nodes)
                     node_id_lst = hgrid.boundaries[i].nodes
                     elev_id = 0
