@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import math
 import click
-from schimpy.prepare_schism import process_prepare_yaml
+import schimpy.schism_yaml as schism_yaml
 
 try:
     from osgeo import gdal
@@ -22,6 +22,19 @@ DEFAULT_NA_FILL = 6.0
 
 
 def bounding_coords(image):
+    """
+    Compute bounding coordinates (upper-left and lower-right) of a GDAL-readable raster.
+
+    Parameters
+    ----------
+    image : str
+        Path to an image/DEM readable by GDAL.
+
+    Returns
+    -------
+    (xlo, xhi) : tuple[tuple[float, float], tuple[float, float]]
+        xlo is (ulx, uly); xhi is (lrx, lry) in the raster’s coordinate system.
+    """    
     ds = gdal.Open(image, GA_ReadOnly)
     gt = ds.GetGeoTransform()
     cols = ds.RasterXSize
@@ -32,43 +45,79 @@ def bounding_coords(image):
     ds = None
     return xlo, xhi
 
+def load_dem_list(dem_spec_yaml):
+    """
+    Load a prioritized DEM list from a SCHISM-YAML spec (via `schism_yaml`).
 
-def open_demlist(demlist):
-    if not os.path.isfile(demlist):
-        raise ValueError("demlist file %s not found" % demlist)
-    try:
-        inputs, out_dir, logger = process_prepare_yaml(
-            demlist, use_logging=False, write_echo=False
+    The YAML must contain either:
+      - `dem_list: [...]`
+      - or `dem: { dem_list: [...] }`
+
+    Parameters
+    ----------
+    dem_spec_yaml : str
+        Path to YAML file.
+
+    Returns
+    -------
+    list[str]
+        DEM filenames in priority order (high → low).
+
+    Raises
+    ------
+    FileNotFoundError
+        If `dem_spec_yaml` does not exist.
+    KeyError
+        If no `dem_list` can be found in the supported locations.
+    TypeError
+        If the `dem_list` is not a list of strings.
+    ValueError
+        If the list is empty.
+    """
+    if not os.path.isfile(dem_spec_yaml):
+        raise FileNotFoundError(f"DEM spec YAML not found: {dem_spec_yaml}")
+
+    with open(dem_spec_yaml, "r") as f:
+        data = schism_yaml.load(f)
+
+    if isinstance(data, dict) and "dem_list" in data:
+        dem_list = data["dem_list"]
+    elif isinstance(data, dict) and "dem" in data and isinstance(data["dem"], dict) and "dem_list" in data["dem"]:
+        dem_list = data["dem"]["dem_list"]
+    else:
+        raise KeyError(
+            "DEM spec YAML must contain either `dem_list: [...]` or `dem: { dem_list: [...] }`"
         )
-        if "mesh" in inputs:
-            filelist = inputs["mesh"]["dem_list"]
-        else:
-            filelist = inputs.get("dem_list")
 
-    except:
-        print(f"Unable to open {demlist} as schimpy yaml")
-        with open(demlist, "r") as f:
-            filelist = f.readlines()
-        filelist = [
-            f.strip() for f in filelist if (not f.startswith("#")) and (f.strip())
-        ]
+    if not isinstance(dem_list, list) or not all(isinstance(x, str) for x in dem_list):
+        raise TypeError("`dem_list` must be a list of strings")
+    if len(dem_list) == 0:
+        raise ValueError("`dem_list` is empty")
 
-    if len(filelist) == 0:
-        raise ValueError("demlist file %s is empty" % demlist)
-
-    return filelist
+    return dem_list
 
 
-def clip_dem(
-    xlo,
-    xhi,
-    demlist="dem.txt",
-    outformat="AAIGrid",
-    hshift=False,
-    prefix="clipped",
-    verbose=False,
-):
-    filelist = open_demlist(demlist)
+def clip_dem(xlo, xhi, demlist="dem.txt", outformat="AAIGrid",
+             hshift=False, prefix="dem_clip", verbose=False):
+    """
+    Clip each DEM that intersects the requested bounding box, producing numbered outputs.
+
+    Parameters
+    ----------
+    xlo, xhi : tuple[float, float]
+        Upper-left (xlo) and lower-right (xhi) coordinates for the clipping box.
+    demlist : str
+        Path to DEM list YAML spec (see `load_dem_list`).
+    outformat : str
+        GDAL output format name (e.g. 'AAIGrid', 'GTiff', 'PNG', ...).
+    hshift : bool
+        Deprecated SMS < 11.1 half-cell shift option.
+    prefix : str
+        Output filename prefix; outputs are `{prefix}_{i}.{ext}`.
+    verbose : bool
+        If True, print details and show GDAL command.
+    """
+    filelist = load_dem_list(demlist)
 
     iout = 0
     if outformat == "AAIGrid":
