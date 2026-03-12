@@ -11,7 +11,7 @@ from schimpy.split_quad import split_quad
 from schimpy import schism_yaml
 from schimpy import station as station_mod
 from schimpy.create_vgrid_lsc2 import vgrid_gen
-from schimpy.util.yaml_load import yaml_from_file
+from schimpy.yaml_util import yaml_from_file
 from schimpy.mesh_volume_tvd import (
     refine_volume_tvd,
     ShorelineOptions,

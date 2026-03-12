@@ -52,7 +52,7 @@ from schimpy.schism_setup import create_schism_setup
 from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader, compare_mesh
 from schimpy import geo_tools
 from schimpy.schism_yaml import load
-from schimpy.util.yaml_load import yaml_from_file, yaml_from_dict
+from schimpy.yaml_util import yaml_from_file, yaml_from_dict
 
 
 class SCHISMHotstart(object):

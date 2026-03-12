@@ -6,7 +6,7 @@ to Shapefile and vice versa
 from schimpy.schism_linestring import read_linestrings, write_linestrings
 from schimpy.prepare_schism import get_structures_from_yaml
 from schimpy.schism_setup import check_and_suggest
-from schimpy.util.yaml_load import yaml_from_file
+from schimpy.yaml_util import yaml_from_file
 from shapely.geometry import LineString, mapping
 import click
 import geopandas as gpd
