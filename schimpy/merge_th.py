@@ -5,6 +5,7 @@ import numpy as np
 
 from vtools.data.timeseries import datetime_elapsed
 from schimpy import schism_yaml as syml
+from schimpy.th_io import write_th as th_io_write_th
 
 
 role_to_sign = {"source_tracer": 1, "source_flux": 1, "sink_flux": -1}
@@ -46,18 +47,34 @@ def read_locations_from_input(fname, role):
         # Assume sourc
 
 
-def write_th(df, fname, elapsed, ref_time=None):
+def write_th_merge(df, fname, elapsed, ref_time=None):
+    """Write a time-series to a .th file using common th_io formatting."""
     print("writing ", fname)
     print(f"dataframe dimensions: {df.shape}")
+
     if elapsed:
-        dfe = datetime_elapsed(df, reftime=ref_time, dtype=float)
-        dfe.index.name = "time"
-        with open(fname, mode="w", newline="\n") as outfile:
-            dfe.to_csv(outfile, sep=" ", float_format="%.3f", header=False)
-            # outfile.write("#"+str(dfe.columns.values.join(","))+"\n")
+        th_io_write_th(
+            df,
+            fname,
+            elapsed=True,
+            ref_time=ref_time,
+            elapsed_format="%.3f",
+            float_format="%.3f",
+            include_header=False,
+        )
     else:
-        sep = " " if fname.endswith("th") else ","
-        df.to_csv(fname, sep=sep, float_format="%.3f", date_format="%Y-%m-%dT%H:%M")
+        th_io_write_th(
+            df,
+            fname,
+            elapsed=False,
+            time_format="%Y-%m-%dT%H:%M",
+            float_format="%.3f",
+            include_header=True,
+        )
+
+
+# Backwards compatibility
+write_th = write_th_merge
 
 
 def read_data(fname, variable):

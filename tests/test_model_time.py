@@ -283,24 +283,6 @@ def test_clip_timestamped_multiindex_file_after_patch(tmp_path):
 
 
 # ---------------------------------------------------------------------
-# read_th comment handling
-# ---------------------------------------------------------------------
-
-def test_read_th_timestamped_preserves_inline_and_following_comments(tmp_path):
-    infile = make_single_timestamp_with_inline_comments(tmp_path / "comments.th")
-
-    df = model_time.read_th(str(infile))
-
-    assert isinstance(df, pd.DataFrame)
-    assert df.index.name == "datetime"
-    assert "__comment__" in df.columns
-    assert df["__comment__"].iloc[0] == "# note one"
-    assert df["__comment__"].iloc[1] == "# note for previous row"
-    assert df["__comment__"].iloc[2] == "# note three"
-
-
-
-# ---------------------------------------------------------------------
 # to_date round-trip smoke test
 # ---------------------------------------------------------------------
 

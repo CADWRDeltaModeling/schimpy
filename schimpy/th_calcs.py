@@ -1,4 +1,4 @@
-from schimpy.model_time import read_th
+from schimpy.th_io import read_th
 import pandas as pd
 
 
