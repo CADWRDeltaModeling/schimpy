@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 """Script to make model date conversion convenient, converting elapsed model seconds to or from dates"""
 
@@ -16,8 +17,71 @@ def model_time_cli():
     pass
 
 
+def _parse_datetime_token(timestr):
+    return datetime.datetime(*list(map(int, re.split(r"[^\d]", timestr))))
+
+
+def _is_timestamp_token(token):
+    try:
+        _parse_datetime_token(token)
+        return True
+    except Exception:
+        return False
+
+
+def _is_timestamp_header_token(token):
+    token = token.strip().lower()
+    return token in {"datetime", "date", "time"}
+
+
+def _iter_timestamp_data_lines(lines):
+    """
+    Yield only actual timestamped data lines from a dated .th file.
+
+    This tolerates pandas-written MultiIndex column headers like:
+        variable ...
+        location ...
+        datetime
+        2000-01-01T00:00 ...
+
+    Assumption: if a timestamped file has a formal index-name row, the
+    index name is one of datetime/date/time.
+    """
+    saw_header = False
+
+    for iline, raw_line in enumerate(lines):
+        line = raw_line.rstrip("\n")
+        stripped = line.strip()
+
+        if not stripped:
+            continue
+        if stripped.startswith("#"):
+            continue
+
+        first = stripped.split()[0]
+
+        if _is_timestamp_header_token(first):
+            saw_header = True
+            continue
+
+        if _is_timestamp_token(first):
+            yield iline, raw_line
+            continue
+
+        # Before the datetime row, tolerate pandas MultiIndex header rows
+        # like "variable ..." and "location ...".
+        if not saw_header:
+            continue
+
+        # After a datetime header, anything else is malformed.
+        raise ValueError(
+            f"Encountered non-data line after timestamp header at line {iline}: {line}"
+        )
+
+
 @model_time_cli.command(
-    help="Interpret model times in elapsed seconds and translate between calendar time and elapsed. The script requires a subcommand like: $ model_time.py to_elapsed. You can also get subject-specific help on a subcommand by typing $ model_time.py subcommand --help"
+    name="to_elapsed",
+    help="Interpret model times in elapsed seconds and translate between calendar time and elapsed. The script requires a subcommand like: $ model_time.py to_elapsed. You can also get subject-specific help on a subcommand by typing $ model_time.py subcommand --help",
 )
 @click.argument("dated_input", nargs=-1, required=True)
 @click.option(
@@ -68,7 +132,7 @@ def to_elapsed(dated_input, start, annotate, step, out, skip_nan):
         describe_timestamps(inputfile, s, dt)
 
 
-@model_time_cli.command()
+@model_time_cli.command(name="to_date")
 @click.argument("elapsed_input", nargs=-1, required=True)
 @click.option(
     "--start",
@@ -135,7 +199,7 @@ def to_date(elapsed_input, start, step, elapsed_unit, time_format, annotate, out
         describe_elapsed(input, s, dt)
 
 
-@model_time_cli.command()
+@model_time_cli.command(name="clip")
 @click.argument("elapsed_input", nargs=-1, required=True)
 @click.option(
     "--start",
@@ -170,35 +234,26 @@ def clip(elapsed_input, start, clip_start, out):
     with open(infile, "r") as thfile:
         prev_use = False
         prev_outline = None
-        for line in thfile:
-            if (
-                line
-                and len(line) > 1
-                and not (
-                    line.startswith("#")
-                    or line.startswith("date")
-                    or line.startswith("time")
-                )
-            ):
-                splitline = line.split()
-                timestr = splitline[0]
-                msec_orig = float(timestr)
-                mdtm = start_dt + datetime.timedelta(seconds=msec_orig)
-                mdelta = mdtm - scliptime
-                msec = mdelta.total_seconds()
-                exact = msec == 0.0
-                outline = line.replace(timestr, "%-10.1f " % msec)
-                use = msec >= 0.0
-                if use and not prev_use:
-                    if prev_outline and not exact:
-                        outfile.write(prev_outline)
-                    outfile.write(outline)
-                elif use and prev_use:
-                    outfile.write(outline)
-                prev_outline = outline
-                prev_use = use
+        for _, line in _iter_timestamp_data_lines(thfile):
+            splitline = line.split()
+            timestr = splitline[0]
+            mdtm = _parse_datetime_token(timestr)
+            mdelta = mdtm - scliptime
+            msec = mdelta.total_seconds()
+            exact = msec == 0.0
+            outline = line.replace(timestr, "%-10.1f " % msec, 1)
+            use = msec >= 0.0
+            if use and not prev_use:
+                if prev_outline and not exact:
+                    outfile.write(prev_outline)
+                outfile.write(outline)
+            elif use and prev_use:
+                outfile.write(outline)
+            prev_outline = outline
+            prev_use = use
     if outfile != sys.stdout:
         outfile.close()
+
 
 
 def prune_dated(name):
@@ -253,7 +308,6 @@ def multi_file_to_elapsed(input_files, output, start, name_transform="prune_date
         print(ifn)
         file_to_elapsed(ifn, start, ofn)
 
-
 def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False):
 
     if not isinstance(start, datetime.datetime):
@@ -263,72 +317,63 @@ def file_to_elapsed(infile, start, outpath=None, annotate=False, skip_nan=False)
         outfile = sys.stdout
     else:
         outfile = open(outpath, "w")
-        
-        
-        
+
     with open(infile, "r") as thfile:
         prev_use = False
         prev_outline = None
         no_record = True
-        for iline, line in enumerate(thfile):
-            if (
-                line
-                and len(line) > 1
-                and not (
-                    line.startswith("#")
-                    or line.startswith("date")
-                    or line.startswith("time")
-                )
-            ):
-                splitline = line.split()
-                if skip_nan and splitline[-1] == "nan":
-                    continue
-                if len(splitline) < 2:
-                    continue
-                timestr = splitline[0]
-                if len(timestr) == 10:
-                    # Only got the date,not the time
-                    #timestr += " %s" % splitline[1]
-                    pass
-                use = True
-                try:
-                    mdtm = datetime.datetime(
-                        *list(map(int, re.split(r"[^\d]", timestr)))
-                    )
-                except:
-                    print(line)
-                    raise ValueError(
-                        "Could not parse time {} in line {}".format(timestr, iline)
-                    )
-                mdelta = mdtm - start
-                mdtime = start + mdelta
-                msec = mdelta.total_seconds()
-                exact = msec == 0.0
-                if annotate:
-                    outline = "%s (%s,  %s)\n" % (line, mdtime, mdelta)
-                    use = True
-                else:
-                    outline = line.replace(timestr, "%-10.1f " % msec)
-                    use = msec >= 0.0
+        last_timestr = None
 
-                if use and not prev_use:
-                    if prev_outline and not exact:
-                        outfile.write(prev_outline)
-                    outfile.write(outline)
-                    no_record = False
-                elif use and prev_use:
-                    outfile.write(outline)
-                    no_record = False
-                prev_outline = outline
-                prev_use = use
-        print("Last time string processed: {}".format(timestr))
-        if no_record:
-            if prev_outline is not None:
-                outfile.write(prev_outline)
+        for iline, line in _iter_timestamp_data_lines(thfile):
+            splitline = line.split()
+            if skip_nan and splitline[-1] == "nan":
+                continue
+            if len(splitline) < 2:
+                continue
+
+            timestr = splitline[0]
+            last_timestr = timestr
+
+            try:
+                mdtm = _parse_datetime_token(timestr)
+            except Exception:
+                print(line)
+                raise ValueError(
+                    "Could not parse time {} in line {}".format(timestr, iline)
+                )
+
+            mdelta = mdtm - start
+            mdtime = start + mdelta
+            msec = mdelta.total_seconds()
+            exact = msec == 0.0
+
+            if annotate:
+                outline = "%s (%s,  %s)\n" % (line, mdtime, mdelta)
+                use = True
+            else:
+                outline = line.replace(timestr, "%-10.1f " % msec, 1)
+                use = msec >= 0.0
+
+            if use and not prev_use:
+                if prev_outline and not exact:
+                    outfile.write(prev_outline)
+                outfile.write(outline)
+                no_record = False
+            elif use and prev_use:
+                outfile.write(outline)
+                no_record = False
+
+            prev_outline = outline
+            prev_use = use
+
+        if last_timestr is not None:
+            print("Last time string processed: {}".format(last_timestr))
+
+        if no_record and prev_outline is not None:
+            outfile.write(prev_outline)
 
     if outfile != sys.stdout:
         outfile.close()
-
 
 def file_to_timestamp(
     infile,
