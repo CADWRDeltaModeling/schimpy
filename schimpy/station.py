@@ -5,7 +5,7 @@ import sys
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
-from vtools.functions.unit_conversions import *
+from vtools.functions.unit_conversions import  m_to_ft, psu_ec_25c, cms_to_cfs
 from dms_datastore.dstore_config import *
 
 
