@@ -35,7 +35,7 @@ keywords = ["schimpy", "SCHISM", "hydrodynamics", "mesh", "geometry", "GIS", "ge
 #    influence 
 dependencies = [
     "geopandas",
-    "vtools3>=3.9",
+    "vtools>=3.9",
     "dms-datastore",
     "gdal",
     "pyogrio",
