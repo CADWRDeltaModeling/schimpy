@@ -3,7 +3,7 @@ import click
 import os
 import pandas as pd
 import schimpy.station as station
-from schimpy.util.yaml_load import yaml_from_file
+from schimpy.yaml_util import yaml_from_file
 import glob
 import numpy as np
 from datetime import datetime
