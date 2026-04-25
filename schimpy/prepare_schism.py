@@ -663,14 +663,30 @@ def setup_logger(outdir):
 
 @click.command()
 @click.argument("main_inputfile", type=click.Path(exists=True))
-def prepare_schism_cli(main_inputfile):
+@click.option(
+    "--set",
+    "set_vars",
+    multiple=True,
+    metavar="KEY=VALUE",
+    help="Set a substitution variable, e.g. --set mesh_year=2018. May be repeated.",
+)
+def prepare_schism_cli(main_inputfile, set_vars):
     """Prepare SCHISM input files."""
+    envvar = {}
+    for item in set_vars:
+        if "=" not in item:
+            raise click.BadParameter(
+                f"Expected KEY=VALUE, got: {item!r}", param_hint="'--set'"
+            )
+        k, v = item.split("=", 1)
+        envvar[k.strip()] = v.strip()
 
     class Args:
         pass
 
     args = Args()
     args.main_inputfile = main_inputfile
+    args.envvar = envvar or None
     prepare_schism(args)
 
 
@@ -721,13 +737,13 @@ def echo_file_header():
     return echo_header
 
 
-def process_prepare_yaml(in_fname, use_logging=True, write_echo=True):
+def process_prepare_yaml(in_fname, use_logging=True, write_echo=True, envvar=None):
     """Process the main input YAML file and return the inputs dict without processing any SCHISM inputs."""
 
     if not os.path.exists(in_fname):
         raise ValueError("Main input file not found")
 
-    inputs = yaml_from_file(in_fname)
+    inputs = yaml_from_file(in_fname, envvar=envvar)
     outdir = process_output_dir(inputs)
 
     if use_logging is True:
@@ -770,7 +786,8 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True):
 
 
 def prepare_schism(args, use_logging=True):
-    inputs, outdir, logger = process_prepare_yaml(args.main_inputfile, use_logging)
+    envvar = getattr(args, "envvar", None)
+    inputs, outdir, logger = process_prepare_yaml(args.main_inputfile, use_logging, envvar=envvar)
 
     hgrid = None
     # Mesh section

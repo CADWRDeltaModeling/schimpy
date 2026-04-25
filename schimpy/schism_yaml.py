@@ -163,6 +163,21 @@ class SubstituteConstructor(SafeConstructor):
 
     def extractFile(self, filename):
         """Load an yaml file to include"""
+        if "$" in filename:
+            if self.env is None:
+                # Pass 1 (RawLoader): env not yet available; skip variable-named
+                # includes — top-level config/env is all we need at this stage.
+                return {}
+            else:
+                # Pass 2: apply substitution to the filename itself as a safety
+                # net (SubstituteComposer normally pre-substitutes scalar values,
+                # but this handles filenames that arrive without pre-substitution,
+                # e.g. from sequence or mapping include nodes).
+                filename = string.Template(filename).safe_substitute(**self.env)
+                if "$" in filename:
+                    raise ValueError(
+                        "Unresolvable variable in include filename: {}".format(filename)
+                    )
         filepath = os.path.join(self.root, filename)
         if os.path.exists(filepath):
             with open(filepath, "r") as f:
@@ -283,7 +298,8 @@ def load(stream, envvar=None, collapse_nested=True):
     stream.seek(0)
 
     # Second round with substitution
-    env = {}
+    # Priority (highest wins): envvar argument > YAML config/env section > OS environment
+    env = dict(os.environ)
     for key in substitute_keywords:
         if key in data:
             env.update(data[key])
@@ -354,10 +370,25 @@ import click
 
 @click.command()
 @click.argument("filename", type=click.Path(exists=True))
-def schism_yaml_cli(filename):
+@click.option(
+    "--set",
+    "set_vars",
+    multiple=True,
+    metavar="KEY=VALUE",
+    help="Set a substitution variable, e.g. --set mesh_year=2018. May be repeated.",
+)
+def schism_yaml_cli(filename, set_vars):
     """Load and display a YAML file that follows SCHISM YAML format."""
+    envvar = {}
+    for item in set_vars:
+        if "=" not in item:
+            raise click.BadParameter(
+                f"Expected KEY=VALUE, got: {item!r}", param_hint="'--set'"
+            )
+        k, v = item.split("=", 1)
+        envvar[k.strip()] = v.strip()
     with open(filename, "r") as f:
-        data_ = load(f)
+        data_ = load(f, envvar=envvar or None)
         print(yaml.safe_dump(data_))
 
 

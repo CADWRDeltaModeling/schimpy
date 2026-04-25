@@ -72,6 +72,14 @@ def test_envvar_in_argument():
     assert params["mesh"]["b"] == "/home/baydelta72.gr3"
 
 
+def test_var_in_include_filename():
+    """Test that config variables can be substituted into include filenames"""
+    fname = os.path.join(dir_testdata, "substitute_w_var_include.yaml")
+    with open(fname, "r") as f:
+        data = load(f)
+        assert data["mesh"]["work_dir"] == "dir1"
+
+
 def test_click_cli():
     """Test the click CLI"""
     fname = os.path.join(dir_testdata, "substitute_wo_including.yaml")
@@ -80,3 +88,15 @@ def test_click_cli():
     assert result.exit_code == 0
     # Check that the output contains the expected YAML content
     assert "work_dir: dir1" in result.output
+
+
+def test_click_cli_set():
+    """Test the --set option on the CLI injects substitution variables"""
+    fname = os.path.join(dir_testdata, "substitute_w_set.yaml")
+    runner = CliRunner()
+    result = runner.invoke(
+        schism_yaml_cli,
+        ["--set", "mesh_year=2018", "--set", "mesh_version=118", fname],
+    )
+    assert result.exit_code == 0
+    assert "work_dir: 2018/118" in result.output
