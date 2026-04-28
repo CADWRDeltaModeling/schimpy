@@ -1,0 +1,5 @@
+env:
+  included_file: substitute_included
+  sub1: dir1
+mesh:
+  include: ${included_file}.yaml

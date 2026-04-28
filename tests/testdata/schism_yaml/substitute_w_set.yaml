@@ -1,0 +1,2 @@
+mesh:
+  work_dir: ${mesh_year}/${mesh_version}
