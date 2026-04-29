@@ -207,8 +207,15 @@ def merge_th(th_spec):
         colmissing = colmissing[colmissing > 0]
 
         if colmissing.any():
-            print("Missing data in columns:")
-            print(colmissing)
+            nrows = len(mdf)
+            entirely_absent = colmissing[colmissing == nrows]
+            has_gaps = colmissing[colmissing < nrows]
+            if not entirely_absent.empty:
+                print("Columns not found in any input data source (label mismatch?):")
+                print(entirely_absent.index.tolist())
+            if not has_gaps.empty:
+                print("Columns found but with temporal gaps (missing values):")
+                print(has_gaps)
             print(mdf.loc[mdf.isnull().any(axis=1), :])
             mdf.loc[mdf.isnull().any(axis=1), :].to_csv("missing.csv")
             raise ValueError(
