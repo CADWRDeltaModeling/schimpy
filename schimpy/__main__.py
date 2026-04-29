@@ -22,6 +22,7 @@ from schimpy.merge_th import merge_th_cli
 from schimpy.create_station_output import create_station_output_cli
 from schimpy.param import set_param_cli
 from schimpy.bctide import bctide_cli
+from schimpy.relocate_source_sink import relocate_source_sink_cli
 
 # Commands to be checked for utility before re-adding
 # from schimpy.check_mesh_skewness import check_skewness_cli
@@ -75,6 +76,7 @@ cli.add_command(merge_th_cli, "merge_th")
 cli.add_command(create_station_output_cli, "create_station_output")
 cli.add_command(set_param_cli, "set_param")
 cli.add_command(bctide_cli, "bctide")
+cli.add_command(relocate_source_sink_cli, "relocate_source_sink")
 
 # Commands to be checked for utility before re-adding
 # cli.add_command(check_skewness_cli, "check_skewness")

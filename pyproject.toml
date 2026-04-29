@@ -141,6 +141,7 @@ merge_th = "schimpy.merge_th:merge_th_cli"
 create_station_output = "schimpy.create_station_output:create_station_output_cli"
 set_param = "schimpy.param:set_param_cli"
 bctide = "schimpy.bctide:bctide_cli"
+relocate_source_sink = "schimpy.relocate_source_sink:relocate_source_sink_cli"
 
 # check_skewness = "schimpy.check_skewness:check_skewness_cli"
 # combine_flux = "schimpy.combine_flux:combine_flux_cli"
