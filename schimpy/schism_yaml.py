@@ -56,6 +56,12 @@ def substitute_env(env):
     while True:
         count_substitutions = 0
         for k, v in env.items():
+            # Skip non-string values (e.g., integers, floats, bools)
+            if not isinstance(v, str):
+                warnings.warn(
+                    f"Skipping substitution for key '{k}' with non-string value: {v} (type: {type(v).__name__})"
+                )
+                continue
             template = string.Template(v)
             substituted = template.safe_substitute(**env)
             if v != substituted:
