@@ -22,8 +22,10 @@ from schimpy import interp_2d
 import time as timer
 from vtools.data.vtime import hours, days
 import click
-
-log_file = "log_nudging.out"
+from pathlib import Path
+from schimpy.logging_config import resolve_loglevel, configure_logging
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Nudging(object):
@@ -41,7 +43,7 @@ class Nudging(object):
         read yaml and load mesh grid
         """
 
-        write_to_log("---read_yaml---\n")
+        logger.info("---read_yaml---")
 
         with open(self.input) as file:
             info = yaml.load(file, Loader=yaml.FullLoader)
@@ -116,7 +118,7 @@ class Nudging(object):
 
     def organize_nudging(self, weights_comb, values_comb, imap_comb):
 
-        write_to_log("---organize_nudging---\n")
+        logger.info("---organize_nudging---")
 
         weights_list = []  # dimension [region, var, node]
         values_list = []  # dimensino [region, var, time, map_node, nlevel]
@@ -200,7 +202,7 @@ class Nudging(object):
         self, weights_var, values_var, imap_var, var_newlist, create_file=True
     ):
 
-        write_to_log("---concatenate_nudge---\n")
+        logger.info("---concatenate_nudge---")
         if len(var_newlist) == 0:
             print("No new variables to merge. Exiting..")
             return
@@ -345,7 +347,7 @@ class Nudging(object):
 
     def gen_nudge_3dfield(self, region_info):
 
-        write_to_log("---gen_nudge_3dfield---\n")
+        logger.info("---gen_nudge_3dfield---")
 
         rjunk = 9998  # !Define junk value for sid; the test is abs()>rjunk
         # used to check area ratios (m) /it used to be 1.e-2 when degree was used as distance.
@@ -417,7 +419,7 @@ class Nudging(object):
                 datetime.date(istart_year, istart_mon, istart_day)
                 - self.start_date.date()
             ).days + d
-            write_to_log("Time out (days)=%d\n" % day)
+            logger.info("Time out (days)=%d", day)
 
             ncfile = f'{ncfile1}{date.strftime("%Y%m%d")}.nc'
             ncdata = xr.open_dataset(ncfile)
@@ -477,7 +479,7 @@ class Nudging(object):
                     continue
 
                 irecout2 += 1
-                write_to_log("irecount: %d\n" % irecout)
+                logger.debug("irecount: %d", irecout)
 
                 # if  'temp' in var_list:
                 temp = (
@@ -535,7 +537,7 @@ class Nudging(object):
                 wetj = wetij[1]
 
                 if wetij[0].size == 0:
-                    write_to_log("no 3dfield  data available for: %s\n" % str(ctime))
+                    logger.info("no 3dfield  data available for: %s", ctime)
                     salt = -9999.0 * np.ones_like(salt)
                     temp = -9999.0 * np.ones_like(temp)
                 else:
@@ -549,7 +551,7 @@ class Nudging(object):
                         # vvel(i,j,:ilen)=vvel(weti[m],wetj[m],:ilen)
                         # ssh(i,j)=ssh(weti[m],wetj[m])
 
-                    write_to_log("dealing with horizontal nan values!\n")
+                    logger.debug("dealing with horizontal nan values!")
 
                 if d == 0 and t == time[0]:  # the first time step
                     ixy = np.zeros((self.nnode, 3)) * np.nan
@@ -768,10 +770,8 @@ class Nudging(object):
                 idST = np.where((kbp[ix, iy] != -1) & (self.z[i_in, :].T > -10))
                 tempout[idST[0], i_in[idST[1]]] = tempout[idST[0], i_in[idST[1]]] - 1
 
-                write_to_log("applying spatial interpolation!\n")
-                write_to_log(
-                    f"outputting at day , {dt.total_seconds()/86400}, {npout}\n"
-                )
+                logger.debug("applying spatial interpolation!")
+                logger.info("outputting at day , %s, %s", dt.total_seconds()/86400, npout)
 
                 # only save the nodes with valid values.
                 tempout_in = [temp_t[imap[:npout]] for temp_t in tempout]
@@ -797,7 +797,7 @@ class Nudging(object):
         salinity = np.transpose(salinity, (0, 2, 1))
         # Enforce lower bound for temp. for eqstate
         temperature[temperature < 0] == 0
-        write_to_log("reorganizing matrix!\n")
+        logger.info("reorganizing matrix!")
         # print("time=%f"%(timer.time() - start))
         max_time = self.time[-1].total_seconds() / 3600 / 24
         output_day = np.array(output_day)
@@ -827,7 +827,7 @@ class Nudging(object):
 
     def gen_nudge_obs(self, region_info):
 
-        write_to_log("---gen_nudge_obs---\n")
+        logger.info("---gen_nudge_obs---")
 
         cutoff = 1e3  # when weights are less than cutoff, they will be set to zero
         weights, obs_df = self.gen_region_weight(
@@ -1042,7 +1042,7 @@ class Nudging(object):
 
     def gen_region_weight(self, attribute, vertices):
 
-        write_to_log("---gen_region_weight---\n")
+        logger.info("---gen_region_weight---")
 
         if isinstance(attribute, str):
             if vertices:
@@ -1140,23 +1140,30 @@ class Nudging(object):
         return inpoly
 
 
-def write_to_log(message):
-    if type(message) == pd.core.indexes.base.Index:
-        message = ", ".join(message.to_list()) + "\n"
-    elif type(message) == pd.core.frame.DataFrame:
-        message = message.to_string() + "\n"
-    global log_file
-
-    with open(log_file, "a") as f:
-        f.write(message)
-
 
 @click.command()
 @click.argument('input_file', required=False)
 @click.option('--input', 'input_opt', type=str, default=None, help='input yaml file for nudging')
-def create_nudge_cli(input_file, input_opt):
+@click.option("--logdir", type=click.Path(path_type=Path), default=None)
+@click.option("--debug", is_flag=True)
+@click.option("--quiet", is_flag=True)
+@click.help_option("-h", "--help")
+def create_nudge_cli(input_file, input_opt, logdir, debug, quiet):
     """Create nudging for a schism run"""
+    level, console = resolve_loglevel(
+        debug=debug,
+        quiet=quiet,
+    )
+    configure_logging(
+          package_name="schimpy.nudging",
+          level=level,
+          console=console,
+          logdir=logdir,
+          logfile_prefix="nudging"
+    ) 
+
     input_path = input_opt if input_opt is not None else input_file
+
     if input_path is None:
         raise click.UsageError("Please provide an input file either as an argument or with --input")
     
