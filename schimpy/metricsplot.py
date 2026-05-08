@@ -365,7 +365,8 @@ def gen_metrics_string(metrics, names, unit=None):
             line_metrics += "RMSE=%.3f      " % (metric["rmse"])
         lag = metric["lag"]
         if lag is not None:
-            line_metrics += "Lag={}  ".format(lag)
+            lag_min = int(round(lag.total_seconds() / 60))
+            line_metrics += "Lag={}min  ".format(lag_min)
             line_metrics += r"Bias$_\phi$={:.3f}   ".format(metric["bias"])
             line_metrics += r"NSE$_\phi$={:.3f}   ".format(metric["nse"])
             line_metrics += r"Willmott_score$_\phi$={:.3f}   ".format(

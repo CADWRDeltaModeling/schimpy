@@ -71,14 +71,6 @@ class BatchMetrics(object):
 
     VAR_2D = ("elev",)
     VAR_3D = ("salt", "temp", "ssc")
-    MAP_VAR_FOR_STATIONDB = {
-        "flow": "flow",
-        "elev": "stage",
-        "salt": "quality",
-        "temp": "quality",
-        "ssc": "quality",
-        "turbidity": "quality",
-    }
     variable_units = {
         "flow": "cms",
         "elev": "m",
@@ -203,7 +195,7 @@ class BatchMetrics(object):
     #                 return True
     #             return False
 
-    def find_obs_file(self, station_id, subloc, variable, db_stations, db_obs):
+    def find_obs_file(self, station_id, subloc, variable, db_obs):
         """Find a file path of a given station_id from a link table
         of station_id and observation file names
 
@@ -212,14 +204,6 @@ class BatchMetrics(object):
         str
             a file path of an observation file
         """
-
-        mapvar = self.MAP_VAR_FOR_STATIONDB[variable]
-        if station_id in db_stations.index:
-            flag_station = db_stations.loc[station_id, mapvar]
-            data_expected = not (flag_station == "")
-        else:
-            data_expected = False
-
         fpath_obs_fnd = (station_id, subloc, variable) in db_obs.index
         if fpath_obs_fnd:
             try:
@@ -231,28 +215,13 @@ class BatchMetrics(object):
                     fpath_obs = os.path.join(repo, possible)
                     if os.path.exists(fpath_obs):
                         break
-
+            self.logger.info(
+                "Observation file for id {}: {}".format(station_id, os.path.abspath(fpath_obs))
+            )
         else:
             fpath_obs = None
-
-        if fpath_obs_fnd:
-            absfpath = os.path.abspath(fpath_obs)
             self.logger.info(
-                "Observation file for id {}: {}".format(station_id, absfpath)
-            )
-
-        else:
-            expectstr = (
-                "(Data not expected)"
-                if (not data_expected)
-                else "(Not in the file links)"
-            )
-            level = logging.WARNING if data_expected is True else logging.INFO
-            self.logger.log(
-                level,
-                "{} No {} data link listing for: {}".format(
-                    expectstr, variable, station_id
-                ),
+                "No {} data link listing for: {}".format(variable, station_id)
             )
         return fpath_obs
 
@@ -261,7 +230,7 @@ class BatchMetrics(object):
     ):
         """Retrieve a file name of a field data"""
         fpath_obs = self.find_obs_file(
-            station_id, subloc, variable, db_stations, db_obs
+            station_id, subloc, variable, db_obs
         )
 
         if fpath_obs:
@@ -802,6 +771,8 @@ class BatchMetrics(object):
                     shade_inst=shade_inst,
                 )
                 if metrics[0]:
+                    lag = metrics[0]["lag"]
+                    lag_min = int(round(lag.total_seconds() / 60)) if lag is not None else None
                     metric_out.write(
                         station_id
                         + " "
@@ -809,7 +780,7 @@ class BatchMetrics(object):
                         + ", %s, %s, %s, %s,%s, %s\n"
                         % (
                             metrics[0]["rmse"],
-                            metrics[0]["lag"],
+                            ("{}min".format(lag_min) if lag_min is not None else "N/A"),
                             metrics[0]["bias"],
                             metrics[0]["nse"],
                             metrics[0]["willmott_skill"],
