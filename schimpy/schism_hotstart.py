@@ -55,6 +55,26 @@ from schimpy.schism_yaml import load
 from schimpy.yaml_util import yaml_from_file, yaml_from_dict
 
 
+def _to_timestamp(val, field_name="date"):
+    """Convert *val* to ``pd.Timestamp``.
+
+    Accepted input types: ``str``, ``datetime.date``, ``datetime.datetime``,
+    ``pd.Timestamp``.  Integers (e.g. an unquoted 8-digit YAML value such as
+    ``20110329``) are explicitly rejected with a helpful message.
+    """
+    if isinstance(val, pd.Timestamp):
+        return val
+    if isinstance(val, (datetime.datetime, datetime.date)):
+        return pd.Timestamp(val)
+    if isinstance(val, str):
+        return pd.Timestamp(val)
+    raise ValueError(
+        f"'{field_name}' must be a quoted date string (e.g. '2011-03-29') or a "
+        f"YAML date value; got {type(val).__name__}: {val!r}. "
+        f"If the value is an 8-digit integer in the YAML file, add quotes around it."
+    )
+
+
 class SCHISMHotstart(object):
     """Mock object"""
 
@@ -109,8 +129,12 @@ class hotstart(object):
 
         hotstart_info = info["hotstart"]
         self.info = hotstart_info
-        self.date = hotstart_info["date"]
-        self.run_start = hotstart_info["run_start"]
+        self.date = _to_timestamp(hotstart_info["date"], "date")
+        run_start_raw = hotstart_info["run_start"]
+        if run_start_raw == "default":
+            self.run_start = "default"
+        else:
+            self.run_start = _to_timestamp(run_start_raw, "run_start")
         self.time_step = int(hotstart_info["time_step"])
         self.hgrid_fn = hotstart_info["hgrid_input_file"]
         self.vgrid_fn = hotstart_info["vgrid_input_file"]
@@ -128,7 +152,7 @@ class hotstart(object):
             variables.remove("elev.ic")
 
         if "restart_time" in hotstart_info.keys():
-            self.restart_time = hotstart_info["restart_time"]
+            self.restart_time = _to_timestamp(hotstart_info["restart_time"], "restart_time")
         else:
             self.restart_time = None
         if "crs" in hotstart_info.keys():
@@ -416,13 +440,13 @@ class hotstart(object):
             idry_s = np.zeros(self.mesh.n_edges()).astype(int)
             if self.run_start == "default":
                 self.run_start = self.date
-            run_start = pd.to_datetime(self.run_start)
+            run_start = self.run_start
             run_start_str = run_start.strftime("%Y-%m-%dT%H:%M")
 
             if self.restart_time is not None:
-                restart_time = pd.to_datetime(self.restart_time)
+                restart_time = self.restart_time
             else:
-                restart_time = pd.to_datetime(self.date)
+                restart_time = self.date
             restart_sec = (restart_time - run_start).total_seconds()
             restart_timestr = restart_time.strftime("%Y%m%d")
             dt = self.time_step
@@ -534,7 +558,7 @@ class hotstart(object):
                 var_dim = var_dim + ("ntracers",)
                 v1_sub = xr.Dataset({key: (var_dim, var_temp)})
                 nc_dataset = nc_dataset.merge(v1_sub)
-                nc_dataset = nc_dataset.drop(var_values)
+                nc_dataset = nc_dataset.drop_vars(var_values)
 
         if self.modules:
             nc_dataset["tracer_list"] = tr_mname
@@ -1066,7 +1090,7 @@ class VariableField(object):
         station_fn = ini_meta["station"]
         data_fn = ini_meta["data"]
         variable = ini_meta["variable"]
-        date = pd.to_datetime(self.date)
+        date = self.date
 
         polaris_data = pd.read_csv(data_fn)
         # find the nearest date for the cruise
@@ -1744,7 +1768,7 @@ def hotstart_to_outputnc(
 
     # if 'time' variable already in hnc, drop it.
     if "time" in list(hnc.variables):
-        hnc = hnc.drop("time")
+        hnc = hnc.drop_vars("time")
 
     # add zcor and time dimension
     # zcor is positive upwards: all wet node values are negative.
@@ -1758,7 +1782,7 @@ def hotstart_to_outputnc(
     hgrid_nc.zcor.attrs["i23d"] = hgrid_nc.z.i23d
     hgrid_nc.zcor.attrs["ivs"] = hgrid_nc.z.ivs
     hgrid_nc.zcor.attrs["missing_value"] = np.nan
-    hgrid_nc = hgrid_nc.drop("z")
+    hgrid_nc = hgrid_nc.drop_vars("z")
 
     # replace tr_nd by the actual variable name.
     for i, v in enumerate(hnc["tracer_list"].values):
@@ -1789,7 +1813,7 @@ def hotstart_to_outputnc(
         ds_v.attrs["i23d"] = 6  # 3d half level on element
         ds_v.attrs["ivs"] = hgrid_nc.zcor.ivs
         hnc = xr.merge([hnc, ds_v.astype(float)])
-    hnc = hnc.drop(["tr_el", "tracer_list", "tr_nd", "tr_nd0"])
+    hnc = hnc.drop_vars(["tr_el", "tracer_list", "tr_nd", "tr_nd0"])
 
     hvar_t = list(hnc.variables)  # entire list
     hvar = [v for v in hvar_t if "nSCHISM_hgrid" in hnc[v].dims[0]]
@@ -1953,7 +1977,7 @@ def hotstart_to_outputnc(
 
     output_nc = xr.merge([hgrid, output_nc, hc, tb, tf, mdepth, cs, csf, df, md])
 
-    output_nc = output_nc.drop(["q2", "xl", "su2", "sv2"])
+    output_nc = output_nc.drop_vars(["q2", "xl", "su2", "sv2"])
 
     output_nc["time"].attrs["long_name"] = "Time"
     # output_nc['time'].encoding['units'] = 'days since %s'%init_date
