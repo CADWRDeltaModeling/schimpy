@@ -367,9 +367,16 @@ def read_station_dbase(fpath):
 
     """
 
-    db = pd.read_csv(
-        fpath, sep=",", comment="#", header=0, index_col="id", dtype={"agency_id": str}
-    )
+    try:
+        db = pd.read_csv(
+          fpath, sep=",", comment="#", header=0, index_col="id", dtype={"agency_id": str}
+        )
+    except:
+        db = pd.read_csv(
+            fpath, sep=",", comment="#", header=0, index_col="station_id", dtype={"agency_id": str}
+        )   
+        db.index.name = "id"   
+
     db["agency_id"] = db["agency_id"].str.replace("'", "", regex=True)
 
     dup = db.index.duplicated()
@@ -535,12 +542,16 @@ def read_flux_out(fpath, names, reftime):
     # Check uniqueness of names
     seen = set()
     uniq = []
+    dups = []
     for x in names:
         if x not in seen:
             uniq.append(x)
             seen.add(x)
+        elif x not in dups:
+            dups.append(x)
     if len(uniq) != len(names):
-        raise ValueError("Duplicate station names.")
+        print("Duplicate station names (up to 5 shown): {}".format(dups[:5]))
+        raise ValueError("Duplicate station names in flux file.")
     names = [x.lower() for x in names]
     nstation = len(names)
     # probe = pd.read_csv(fpath,sep=r"\s+",index_col=0,header=None,dtype='d',nrows=2)
