@@ -17,3 +17,6 @@ except PackageNotFoundError:
         __version__ = get_version(root="..", relative_to=__file__)
     except Exception:
         __version__ = "unknown"
+        
+import logging
+logging.getLogger(__name__).addHandler(logging.NullHandler())
