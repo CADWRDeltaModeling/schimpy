@@ -11,6 +11,7 @@ from schimpy.split_quad import split_quad
 from schimpy import schism_yaml
 from schimpy import station as station_mod
 from schimpy.create_vgrid_lsc2 import vgrid_gen
+from schimpy.create_vgrid_lsc2_v2 import vgrid_gen_v2
 from schimpy.yaml_util import yaml_from_file
 from schimpy.mesh_volume_tvd import (
     refine_volume_tvd,
@@ -290,23 +291,77 @@ def create_hgrid(s, inputs, logger):
 def create_vgrid(s, inputs, logger):
     section_name = "vgrid"
     section = inputs.get(section_name)
-    if section is not None:
-        output_dir = inputs["prepro_output_dir"]
-        if "hgrid" in section:
-            hgrid = section["hgrid"]
-        else:
-            hgrid = s.mesh
-            #
-            # msection = inputs.get('mesh')
-            # if 'gr3_outputfile' in msection:
-            #    logger.info('Using gr3_outputfile from mesh section for generating vgrid')
-            #    hgrid = msection['gr3_outputfile']
-            # elif 'mesh_inputfile' in msection:
-            #    logger.warning('Using mesh_inputfile from mesh section for generating vgrid. This makes sense if you are doing an abbreviated or follow-up preprocessing job')
-            #    hgrid  = msection['mesh_inputfile']
-        vgrid_out = section["vgrid_out"]
-        section["vgrid_out"] = ensure_outdir(inputs["prepro_output_dir"], vgrid_out)
+    if section is None:
+        return
+
+    output_dir = inputs["prepro_output_dir"]
+
+    # --- Resolve hgrid (shared by v1 and v2) ---
+    if "hgrid" in section:
+        hgrid = section["hgrid"]
+    else:
+        hgrid = s.mesh
+
+    vgrid_out = section["vgrid_out"]
+    section["vgrid_out"] = ensure_outdir(output_dir, vgrid_out)
+
+    # --- Dispatch on vgrid_generator_version ---
+    gen_version = section.pop("vgrid_generator_version", None)
+    if gen_version is None:
+        raise ValueError(
+            "The 'vgrid' section requires 'vgrid_generator_version'.\n"
+            "  Use 'v1' for the stable legacy LSC2 generator,\n"
+            "  or  'v2' for the new LSC2 v2 generator (beta)."
+        )
+
+    gen_version = str(gen_version).strip().lower()
+
+    if gen_version == "v1":
+        logger.info("Using stable legacy vgrid generator (v1)")
+        # v1 passes the section dict (minus version key) as **kwargs to vgrid_gen
+        section.pop("hgrid", None)
+        v2_only_keys = {
+            "depth_function", "algorithm", "region_constraints",
+            "constraint_taper_rings", "dz_scale_gr3", "debug_prefix", "pileup_log",
+        }
+        stray = v2_only_keys & set(section.keys())
+        if stray:
+            logger.warning(
+                "vgrid v1: ignoring v2-only keys: %s. "
+                "Did you mean vgrid_generator_version: v2?",
+                ", ".join(sorted(stray)),
+            )
+            for k in stray:
+                section.pop(k)
         vgrid_gen(hgrid, **section)
+
+    elif gen_version == "v2":
+        logger.info(
+            "Using LSC2 v2 vgrid generator (BETA). "
+            "This generator is experimental; for the stable legacy "
+            "generator set vgrid_generator_version: v1"
+        )
+        # v2 passes named arguments
+        section.pop("hgrid", None)
+        vgrid_gen_v2(
+            hgrid=hgrid,
+            vgrid_out=section["vgrid_out"],
+            vgrid_version=section.get("vgrid_version", "5.10"),
+            eta=float(section["eta"]),
+            depth_function=section.get("depth_function"),
+            algorithm=section.get("algorithm"),
+            region_constraints=section.get("region_constraints"),
+            constraint_taper_rings=int(section.get("constraint_taper_rings", 3)),
+            dz_scale_gr3=section.get("dz_scale_gr3"),
+            debug_prefix=section.get("debug_prefix"),
+            pileup_log=section.get("pileup_log"),
+        )
+    else:
+        raise ValueError(
+            f"Unknown vgrid_generator_version: '{gen_version}'.\n"
+            "  Use 'v1' for the stable legacy LSC2 generator,\n"
+            "  or  'v2' for the new LSC2 v2 generator (beta)."
+        )
 
 
 def create_source_sink(s, inputs, logger):
