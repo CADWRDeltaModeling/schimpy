@@ -575,6 +575,44 @@ def fix_sigma_pileups(
                 "depth_m": D,
             })
 
+    # ------------------------------------------------------------------
+    # Final pass: snap sigma to the output precision used by the vgrid
+    # writer (6 decimal places, i.e. %14.6f).  Without this, two sigma
+    # values that differ by less than 5e-7 survive the TOL=1e-10 check
+    # above but become identical after rounding in vgrid.in, which causes
+    # SCHISM to abort with "Weird side (3)".
+    # ------------------------------------------------------------------
+    OUTPUT_DECIMALS = 6
+    for i in range(n):
+        Ni = int(NL[i])
+        if Ni < 2:
+            continue
+        s = np.round(S[i, :Ni], OUTPUT_DECIMALS)
+        # Ensure endpoints are exact
+        s[0] = 0.0
+        s[-1] = 1.0
+        # Remove consecutive duplicates introduced by rounding
+        keep = np.r_[True, np.diff(s) > 0.0]
+        # Always keep the last entry (surface = 1.0)
+        keep[-1] = True
+        if not keep.all():
+            s = s[keep]
+            S[i, :] = np.nan
+            S[i, :len(s)] = s
+            NL[i] = len(s)
+            logs.append({
+                "node": i,
+                "x": float(mesh.nodes[i, 0]) if have_xy else np.nan,
+                "y": float(mesh.nodes[i, 1]) if have_xy else np.nan,
+                "Ni_before": Ni,
+                "Ni_after": len(s),
+                "dupes_removed": int(Ni - len(s)),
+                "bottom_drops": 0,
+                "dz1_after_m": np.nan,
+                "dz2_after_m": np.nan,
+                "depth_m": float(depth[i]),
+            })
+
     df = pd.DataFrame(logs, columns=[
         "node","x","y","Ni_before","Ni_after",
         "dupes_removed","bottom_drops","dz1_after_m","dz2_after_m","depth_m"
@@ -1333,7 +1371,14 @@ def fit_interfaces(mesh,
     # Finalization: single forward guard + exact endpoints (+ strict nudge)
     for i in range(n):
         Ni = int(Nlevels[i]); D = depth[i]
-        if Ni < 2 or D <= 0.0:
+        if Ni < 2:
+            continue
+
+        # Dry / non-positive-depth nodes: assign uniform degenerate sigma
+        if D <= 0.0:
+            D_eff = max(D, 1e-6)
+            for k in range(Ni):
+                h[i, k] = D_eff * k / (Ni - 1)
             continue
 
         # Surface exactly 0
