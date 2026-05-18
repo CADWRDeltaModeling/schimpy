@@ -2,6 +2,7 @@
 It stores document in an ordered dict and supports variable substitution.
 """
 
+import re
 import yaml
 from yaml.reader import *
 from yaml.scanner import *
@@ -88,10 +89,12 @@ class SubstituteComposer(Composer):
         template = string.Template(event.value)
         value = template.safe_substitute(**self.env)
         if "$" in value:
+            missing = re.findall(r'\$\{(\w+)\}|\$(\w+)', value)
+            names = [m[0] or m[1] for m in missing]
             raise ComposerError(
                 "Expected a substitution",
                 event.start_mark,
-                "No corresponding config variable",
+                f"No corresponding config variable(s): {', '.join(names)}",
             )
         node = ScalarNode(
             tag, value, event.start_mark, event.end_mark, style=event.style
