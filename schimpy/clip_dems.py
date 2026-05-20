@@ -82,6 +82,8 @@ def load_dem_list(dem_spec_yaml):
 
     if isinstance(data, dict) and "dem_list" in data:
         dem_list = data["dem_list"]
+    elif isinstance(data, dict) and "dem_list" in data["mesh"]:
+        dem_list = data["mesh"]["dem_list"]
     elif isinstance(data, dict) and "dem" in data and isinstance(data["dem"], dict) and "dem_list" in data["dem"]:
         dem_list = data["dem"]["dem_list"]
     else:
@@ -195,7 +197,7 @@ def clip_dem(xlo, xhi, demlist="dem.txt", outformat="AAIGrid",
                     * ds_dy
                 )
                 print("Approx number of raster cells: %s " % int(approx_size))
-            outname = "%s_%s.%s" % (prefix, iout, extension)
+            outname = os.path.abspath("%s_%s.%s" % (prefix, iout, extension))
             if hshift:
                 shift = "-a_ullr %s %s %s %s " % (
                     win_xlo[0] + ds_dx / 2.0,
