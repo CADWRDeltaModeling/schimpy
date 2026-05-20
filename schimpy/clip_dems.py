@@ -100,7 +100,7 @@ def load_dem_list(dem_spec_yaml):
 
 
 def clip_dem(xlo, xhi, demlist="dem.txt", outformat="AAIGrid",
-             hshift=False, prefix="dem_clip", verbose=False):
+             hshift=False, prefix="dem_clip", verbose=False, merge=False):
     """
     Clip each DEM that intersects the requested bounding box, producing numbered outputs.
 
@@ -118,10 +118,13 @@ def clip_dem(xlo, xhi, demlist="dem.txt", outformat="AAIGrid",
         Output filename prefix; outputs are `{prefix}_{i}.{ext}`.
     verbose : bool
         If True, print details and show GDAL command.
+    merge : bool
+        If True, merge all clipped DEMs into a single output respecting priority order.
     """
     filelist = load_dem_list(demlist)
 
     iout = 0
+    clipped_files = []  # Track clipped files for merging
     if outformat == "AAIGrid":
         extension = "asc"
     elif outformat == "JPEG":
@@ -226,7 +229,140 @@ def clip_dem(xlo, xhi, demlist="dem.txt", outformat="AAIGrid",
             err = p.wait()
             if err:
                 raise Exception("Command failed:\n %s" % command)
-            print("Output file: %s" % outname)
+            if not merge:
+                print("Output file: %s" % outname)
+            clipped_files.append(outname)
+
+    if merge and len(clipped_files) > 0:
+        merge_output = os.path.abspath("%s_merged.%s" % (prefix, extension))
+        print("\nMerging %d clipped DEMs into: %s" % (len(clipped_files), merge_output))
+        
+        # Determine output grid parameters from first file
+        first_ds = gdal.Open(clipped_files[0], GA_ReadOnly)
+        first_gt = first_ds.GetGeoTransform()
+        base_proj = first_ds.GetProjection()
+        dx = first_gt[1]
+        dy = first_gt[5]
+        first_band = first_ds.GetRasterBand(1)
+        nodata = first_band.GetNoDataValue()
+        if nodata is None:
+            nodata = -9999.0
+        dtype = first_band.DataType
+        
+        # Calculate unified output grid dimensions
+        out_cols = int(np.ceil((xhi[0] - xlo[0]) / dx))
+        out_rows = int(np.ceil((xlo[1] - xhi[1]) / abs(dy)))
+        out_gt = (xlo[0], dx, 0, xlo[1], 0, dy)
+        
+        # Initialize output array with nodata
+        out_array = np.full((out_rows, out_cols), nodata, dtype=np.float32)
+        
+        # Read all clipped DEMs in reverse order (low to high priority)
+        for fname in reversed(clipped_files):
+            ds = gdal.Open(fname, GA_ReadOnly)
+            if ds is None:
+                print(f"Warning: Could not open {fname} for merging")
+                continue
+            
+            # Get this dataset's geotransform and data
+            ds_gt = ds.GetGeoTransform()
+            band = ds.GetRasterBand(1)
+            data = band.ReadAsArray()
+            ds_nodata = band.GetNoDataValue()
+            if ds_nodata is None:
+                ds_nodata = nodata
+            
+            # Calculate position in output grid
+            ds_ulx = ds_gt[0]
+            ds_uly = ds_gt[3]
+            
+            # Column and row offset in output grid
+            col_off = int(np.round((ds_ulx - xlo[0]) / dx))
+            row_off = int(np.round((xlo[1] - ds_uly) / abs(dy)))
+            
+            # Extract the region to paste
+            ds_rows, ds_cols = data.shape
+            
+            # Compute valid region bounds
+            out_row_start = max(0, row_off)
+            out_row_end = min(out_rows, row_off + ds_rows)
+            out_col_start = max(0, col_off)
+            out_col_end = min(out_cols, col_off + ds_cols)
+            
+            ds_row_start = max(0, -row_off)
+            ds_row_end = ds_row_start + (out_row_end - out_row_start)
+            ds_col_start = max(0, -col_off)
+            ds_col_end = ds_col_start + (out_col_end - out_col_start)
+            
+            # Extract the valid data region
+            data_region = data[ds_row_start:ds_row_end, ds_col_start:ds_col_end]
+            valid_mask = data_region != ds_nodata
+            
+            # Overwrite output where this dataset has valid data
+            out_array[out_row_start:out_row_end, out_col_start:out_col_end][valid_mask] = data_region[valid_mask]
+            
+            if verbose:
+                print(f"  Merged {os.path.basename(fname)}: {np.sum(valid_mask)} valid cells")
+            
+            ds = None
+        
+        # Write merged output
+        # AAIGrid doesn't support Create(), so create in memory/GTiff first
+        driver = gdal.GetDriverByName('GTiff')
+        temp_output = os.path.abspath("%s_merged_temp.tif" % prefix)
+        out_ds = driver.Create(
+            temp_output,
+            out_cols,
+            out_rows,
+            1,
+            dtype
+        )
+        if out_ds is None:
+            raise Exception("Failed to create temporary output file")
+        out_ds.SetGeoTransform(out_gt)
+        out_ds.SetProjection(base_proj)
+        out_band = out_ds.GetRasterBand(1)
+        out_band.SetNoDataValue(nodata)
+        out_band.WriteArray(out_array)
+        out_band.FlushCache()
+        out_ds = None
+        first_ds = None
+        
+        # Convert to requested format if not GTiff
+        if outformat != 'GTiff':
+            translate_cmd = "gdal_translate -of %s %s %s" % (outformat, temp_output, merge_output)
+            if verbose:
+                print("Converting to %s format: %s" % (outformat, translate_cmd))
+            p = subprocess.Popen(translate_cmd.split(), shell=True)
+            err = p.wait()
+            if err:
+                raise Exception("Format conversion failed:\n %s" % translate_cmd)
+            # Remove temp file
+            try:
+                os.remove(temp_output)
+            except:
+                pass
+        else:
+            # Already in GTiff, just rename
+            try:
+                if os.path.exists(merge_output):
+                    os.remove(merge_output)
+                os.rename(temp_output, merge_output)
+            except Exception as e:
+                print("Warning: Could not rename temp file: %s" % e)
+                merge_output = temp_output
+        
+        print("Merged DEM written to: %s" % merge_output)
+        
+        # Clean up temporary clipped files when merging
+        print("Cleaning up %d temporary files..." % len(clipped_files))
+        for fname in clipped_files:
+            try:
+                os.remove(fname)
+                if verbose:
+                    print(f"  Removed: {fname}")
+            except Exception as e:
+                print(f"  Warning: Could not remove {fname}: {e}")
 
 
 @click.command(
@@ -273,8 +409,14 @@ def clip_dem(xlo, xhi, demlist="dem.txt", outformat="AAIGrid",
     default=False,
     help="(Deprecated) Shift DEM by half cell for applications that incorrectly interpret the location of the origin and data centering of a DEM. This is a bug fix for SMS < 11.1",
 )
+@click.option(
+    "--merge",
+    is_flag=True,
+    default=False,
+    help="Merge all clipped DEMs into a single output file, respecting priority order (higher priority DEMs overwrite lower priority where they overlap).",
+)
 @click.help_option("-h", "--help")
-def clip_dems_cli(coords, infile, prefix, outformat, verbose, hshift, demlist):
+def clip_dems_cli(coords, infile, prefix, outformat, verbose, hshift, merge, demlist):
     """
     Trim each DEM on a prioritized list. The coordinates used for clipping are supplied either directly as an upper left and lower right coordinate or indirectly using the bounding coordinates of a sample image. In practice, this script is usually used with images saved from SMS.
     """
@@ -293,7 +435,7 @@ def clip_dems_cli(coords, infile, prefix, outformat, verbose, hshift, demlist):
     else:
         x0, x1 = bounding_coords(infile)
 
-    clip_dem(x0, x1, demlist, outformat, hshift, prefix, verbose)
+    clip_dem(x0, x1, demlist, outformat, hshift, prefix, verbose, merge)
 
 
 if __name__ == "__main__":
