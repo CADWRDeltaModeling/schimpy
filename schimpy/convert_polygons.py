@@ -20,20 +20,29 @@ import click
     type=click.Path(),
     help="Output file (YAML or Shapefile).",
 )
+@click.option(
+    "--yaml-root",
+    default=None,
+    type=str,
+    help="Dot-separated path to the parent of the polygons key in a nested YAML file, "
+    "e.g. --yaml-root=mesh.depth_enforcement. Only used with YAML input.",
+)
 @click.help_option("-h", "--help")
-def convert_polygons_cli(input, output):
+def convert_polygons_cli(input, output, yaml_root):
     """CLI wrapper for converting polygon files."""
-    convert_polys(input, output)
+    convert_polys(input, output, yaml_root=yaml_root)
 
 
-def convert_polys(input, output):
+def convert_polys(input, output, yaml_root=None):
     if input.endswith(".yaml"):
-        polygons = read_polygons(input)
+        polygons = read_polygons(input, yaml_root=yaml_root)
         if output.endswith(".shp"):
             write_polygons(output, polygons)
         else:
             raise ValueError("Not supported output file type")
     elif input.endswith(".shp"):
+        if yaml_root is not None:
+            raise ValueError("--yaml-root is only supported with YAML input files.")
         polygons = read_polygons(input)
         write_polygons(output, polygons)
     else:

@@ -156,10 +156,17 @@ class SchismPolygonDictConverter(SchismPolygonIo):
 class SchismPolygonYamlReader(SchismPolygonIo):
     """Read polygons from a SCHISM YAML polygon file"""
 
-    def read(self, fpath):
+    def read(self, fpath, yaml_root=None):
         if os.path.exists(fpath):
             with open(fpath, "r") as f_in:
                 raw = schism_yaml.load_raw(f_in)
+                if yaml_root is not None:
+                    for key in yaml_root.split("."):
+                        if not isinstance(raw, dict) or key not in raw:
+                            raise ValueError(
+                                f"yaml_root key '{key}' not found in YAML structure"
+                            )
+                        raw = raw[key]
                 return SchismPolygonDictConverter().read(raw)
         else:
             raise ValueError("File not found")
@@ -326,10 +333,19 @@ class SchismPolygonIoFactory(object):
             raise ValueError("Not in the SchismPolygonIoFactory")
 
 
-def read_polygons(fpath):
-    """Read a polygon file"""
+def read_polygons(fpath, yaml_root=None):
+    """Read a polygon file
+
+    Parameters
+    ----------
+    fpath : str
+        Path to the polygon file (YAML or Shapefile).
+    yaml_root : str, optional
+        Dot-separated path to navigate into a nested YAML structure
+        before reading polygons (e.g., 'mesh.depth_enforcement').
+    """
     if fpath.endswith(".yaml"):
-        return SchismPolygonIoFactory().get_reader("yaml").read(fpath)
+        return SchismPolygonIoFactory().get_reader("yaml").read(fpath, yaml_root=yaml_root)
     elif fpath.endswith(".shp"):
         return SchismPolygonIoFactory().get_reader("shp").read(fpath)
     else:
