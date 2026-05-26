@@ -84,7 +84,7 @@ def create_hgrid(s, inputs, logger):
             )
         small_area_param = section.get("small_areas")
         if small_area_param is not None:
-            small_area_param["prepro_output_dir"] = inputs["prepro_output_dir"]
+            small_area_param["prepro_output_dir"] = inputs["diagnostics_dir"]
             # This just emits warnings unless the fail threshold is met
             small_areas(s.mesh, logger=logger, **small_area_param)
 
@@ -151,7 +151,7 @@ def create_hgrid(s, inputs, logger):
                 s.mesh.nodes[:, 2] = stacked_dem_fill(
                     dem_list,
                     s.mesh.nodes[:, :2],
-                    inputs["prepro_output_dir"],
+                    inputs["diagnostics_dir"],
                     require_all=False,
                     na_fill=default_depth_for_missing_dem,
                     negate=True,
@@ -173,7 +173,8 @@ def create_hgrid(s, inputs, logger):
                         smooth = href_spec.get("smooth", None)
                         # reuse the exact machinery used by the 'gr3' section:
                         s.create_node_partitioning(
-                            href_path, polygons, default, smooth
+                            href_path, polygons, default, smooth,
+                            global_imports=inputs.get("imports"),
                         )  # writes GR3
                         href_arg = href_path
                     else:
@@ -244,7 +245,7 @@ def create_hgrid(s, inputs, logger):
                     stacked_dem_fill(
                         dem_list,
                         s.mesh.nodes[:, :2],
-                        inputs["prepro_output_dir"],
+                        inputs["diagnostics_dir"],
                         require_all=False,
                         na_fill=default_depth_for_missing_dem,
                     )
@@ -259,13 +260,16 @@ def create_hgrid(s, inputs, logger):
 
         depth_enforce_params = section.get("depth_enforcement")
         if depth_enforce_params is not None:
+            global_imports = inputs.get("imports")
             if "polygons" in depth_enforce_params:
                 s.mesh.nodes[:, 2] = s.apply_polygons(
-                    default=None, polygons=depth_enforce_params["polygons"]
+                    default=None, polygons=depth_enforce_params["polygons"],
+                    global_imports=global_imports,
                 )
             if "linestrings" in depth_enforce_params:
                 s.mesh.nodes[:, 2] = s.apply_linestring_ops(
-                    default=None, linestrings=depth_enforce_params["linestrings"]
+                    default=None, linestrings=depth_enforce_params["linestrings"],
+                    global_imports=global_imports,
                 )
 
         # Write hgrid.gr3
@@ -295,6 +299,7 @@ def create_vgrid(s, inputs, logger):
         return
 
     output_dir = inputs["prepro_output_dir"]
+    diagnostics_dir = inputs["diagnostics_dir"]
 
     # --- Resolve hgrid (shared by v1 and v2) ---
     if "hgrid" in section:
@@ -333,6 +338,7 @@ def create_vgrid(s, inputs, logger):
             )
             for k in stray:
                 section.pop(k)
+        section["diagnostics_dir"] = diagnostics_dir
         vgrid_gen(hgrid, **section)
 
     elif gen_version == "v2":
@@ -343,6 +349,10 @@ def create_vgrid(s, inputs, logger):
         )
         # v2 passes named arguments
         section.pop("hgrid", None)
+        # Route debug_prefix under diagnostics_dir if set
+        debug_prefix = section.get("debug_prefix")
+        if debug_prefix:
+            debug_prefix = os.path.join(diagnostics_dir, debug_prefix)
         vgrid_gen_v2(
             hgrid=hgrid,
             vgrid_out=section["vgrid_out"],
@@ -353,7 +363,7 @@ def create_vgrid(s, inputs, logger):
             region_constraints=section.get("region_constraints"),
             constraint_taper_rings=int(section.get("constraint_taper_rings", 3)),
             dz_scale_gr3=section.get("dz_scale_gr3"),
-            debug_prefix=section.get("debug_prefix"),
+            debug_prefix=debug_prefix,
             pileup_log=section.get("pileup_log"),
         )
     else:
@@ -394,6 +404,7 @@ def create_gr3_with_polygons(s, inputs, logger):
     if dict_gr3 is None:
         return
     logger.info("Processing gr3 outputs...")
+    global_imports = inputs.get("imports")
     expected_items = ("polygons", "default", "smooth")
     output_dir = inputs["prepro_output_dir"]
     for fname, item in dict_gr3.items():
@@ -419,7 +430,7 @@ def create_gr3_with_polygons(s, inputs, logger):
         default = item.get("default")
         logger.info("Creating %s..." % fname)
         smooth = item.get("smooth")
-        s.create_node_partitioning(fname, polygons, default, smooth)
+        s.create_node_partitioning(fname, polygons, default, smooth, global_imports=global_imports)
 
 
 def create_prop_with_polygons(s, inputs, logger):
@@ -428,6 +439,7 @@ def create_prop_with_polygons(s, inputs, logger):
     if dict_prop is None:
         return
     logger.info("Processing prop outputs...")
+    global_imports = inputs.get("imports")
     expected_items = ("default", "polygons")
     output_dir = inputs["prepro_output_dir"]
     for fname, item in dict_prop.items():
@@ -445,7 +457,7 @@ def create_prop_with_polygons(s, inputs, logger):
         polygons = item.get("polygons", [])
         default = item.get("default")
         logger.info("Creating %s..." % fname)
-        s.create_prop_partitioning(fname, polygons, default)
+        s.create_prop_partitioning(fname, polygons, default, global_imports=global_imports)
 
 
 def create_structures(s, inputs, logger):
@@ -761,6 +773,7 @@ def process_output_dir(inputs):
             os.mkdir(outdir)
         else:
             raise ValueError("Output directory (output_dir) does not exist")
+
     return outdir
 
 
@@ -811,6 +824,7 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True, envvar=Non
     keys_top_level = [
         "config",
         "env",
+        "imports",
         "min_schimpy_version",
         "prepro_output_dir",
         "mesh",
@@ -826,6 +840,11 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True, envvar=Non
     ] + schism_yaml.include_keywords
     logger.info("Processing the top level...")
     check_and_suggest(list(inputs.keys()), keys_top_level, logger)
+
+    # Create diagnostics subdirectory for intermediate/debug outputs
+    diagnostics_dir = os.path.join(outdir, "diagnostics")
+    os.makedirs(diagnostics_dir, exist_ok=True)
+    inputs["diagnostics_dir"] = diagnostics_dir
 
     if write_echo:
         out_fname = (

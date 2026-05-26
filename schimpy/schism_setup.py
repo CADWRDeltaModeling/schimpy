@@ -507,7 +507,7 @@ class SchismSetup(object):
         expr = re.sub(r"(\b)max(\b)", r"\g<1>numpy.maximum\g<2>", expr)
         return expr
 
-    def apply_linestring_ops(self, default, linestrings):
+    def apply_linestring_ops(self, default, linestrings, global_imports=None):
         mesh = self.mesh
         attr = np.copy(mesh.nodes[:, 2])
 
@@ -569,8 +569,19 @@ class SchismSetup(object):
                             node_local_nds[inode] = set(elnodes)
 
                 newglobals = {}
-                for item in newglobals:
-                    print(newglobals[item])
+                _ls_imports = ["numpy"] + (global_imports if global_imports else [])
+                for imp in _ls_imports:
+                    iname = imp.split(".")[-1]
+                    try:
+                        newglobals[iname] = importlib.import_module(imp)
+                    except (ModuleNotFoundError, ImportError):
+                        parent = ".".join(imp.split(".")[:-1])
+                        if parent:
+                            try:
+                                parent_mod = importlib.import_module(parent)
+                                newglobals[iname] = getattr(parent_mod, iname)
+                            except Exception:
+                                pass
                 for inode in node_local_nds:
                     # inode is the node being calculated
                     support_nodes = list(node_local_nds[inode])
@@ -594,7 +605,7 @@ class SchismSetup(object):
                     attr[inode] = valreplace
         return attr
 
-    def apply_polygons(self, polygons, default):
+    def apply_polygons(self, polygons, default, global_imports=None):
         """Partition the grid with the given polygons.
         Each node (not element) will be assigned with an integer ID
         which is the index of the polygons.
@@ -606,6 +617,9 @@ class SchismSetup(object):
         ----------
         polygons: list
             a list of polygon dict (from YAML most of time)
+
+        global_imports: list, optional
+            list of module paths available to all polygon expressions
 
         Returns
         -------
@@ -625,7 +639,7 @@ class SchismSetup(object):
         for polygon in polygons:
             name = polygon.get("name")
             imports_str = polygon.get("imports")
-            imports = ["numpy"]
+            imports = ["numpy"] + (global_imports if global_imports else [])
             if isinstance(imports_str, str):
                 imports.extend(imports_str.split())
             vertices = np.array(polygon.get("vertices"))
@@ -697,16 +711,23 @@ class SchismSetup(object):
         mesh = globals["mesh"]
         imports = globals["imports"]
         mod_names = {}
-        # if imports is not None:
         for imp in imports:
             iname = imp.split(".")[-1]
-            # ipack = '.'.join(imp.split('.')[0:-1])
             try:
-                # if len(ipack) > 0 else importlib.import_module(iname)
                 mod = importlib.import_module(imp)
                 mod_names[iname] = mod
-            except:
-                print("Failed to import {}".format(imp))
+            except (ModuleNotFoundError, ImportError):
+                # Support "from parent import attr" style, e.g.
+                # "schimpy.sav_density_raster.sav_density" -> sav_density function
+                parent = ".".join(imp.split(".")[:-1])
+                if parent:
+                    try:
+                        parent_mod = importlib.import_module(parent)
+                        mod_names[iname] = getattr(parent_mod, iname)
+                    except Exception:
+                        print("Failed to import {}".format(imp))
+                else:
+                    print("Failed to import {}".format(imp))
         globals.update(mod_names)
 
         box = np.array(polygon.bounds)[[0, 2, 1, 3]]
@@ -720,7 +741,7 @@ class SchismSetup(object):
         vals = eval(expr, globals)
         return nodes_in_polygon, vals
 
-    def create_node_partitioning(self, gr3_fname, polygons, default, smooth):
+    def create_node_partitioning(self, gr3_fname, polygons, default, smooth, global_imports=None):
         """Create a gr3 file with node partitioning using
         polygons in the polygon file.
         gr3_fname = output gr3 file name
@@ -728,7 +749,7 @@ class SchismSetup(object):
         """
         from schimpy.laplace_smooth_data import laplace_smooth_data2
 
-        attr = self.apply_polygons(polygons, default)
+        attr = self.apply_polygons(polygons, default, global_imports=global_imports)
         if smooth is not None:
             self._logger.info("Smoothing data. This process can take several minutes")
             attr = laplace_smooth_data2(self.mesh, data=attr, **smooth)
@@ -737,7 +758,7 @@ class SchismSetup(object):
         else:
             self.write_hgrid(gr3_fname, attr)
 
-    def create_prop_partitioning(self, prop_fname, polygons, default):
+    def create_prop_partitioning(self, prop_fname, polygons, default, global_imports=None):
         """Create a prop file with element partitioning using
         polygons in the polygon file.
         prop_fname = output prop file name
@@ -747,7 +768,7 @@ class SchismSetup(object):
         # # default = polygon_data[option_name]
         # polygons = polygon_data['polygons']
         # attr = self._partition_nodes_with_polygons(polygons, default)
-        attr = self.apply_polygons(polygons, default)
+        attr = self.apply_polygons(polygons, default, global_imports=global_imports)
         mesh = self.mesh
         elementflags = np.empty((mesh.n_elems(), 1))
         elementflags.fill(0.0)
