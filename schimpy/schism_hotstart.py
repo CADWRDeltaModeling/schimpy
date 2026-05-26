@@ -1233,14 +1233,14 @@ class VariableField(object):
 
         if "source_hgrid" not in ini_meta.keys():  # if the grids are exactly the same
             if self.tr_index is not None:
-                v = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
+                v = hotstart_data[yaml_var[var]].isel(ntracers=self.tr_index)
             else:
                 v = hotstart_data[yaml_var[var]]
         elif ("source_hgrid" in ini_meta.keys()) and (
             "source_vgrid" not in ini_meta.keys()
         ):
             if self.tr_index is not None:
-                vin = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
+                vin = hotstart_data[yaml_var[var]].isel(ntracers=self.tr_index)
             else:
                 vin = hotstart_data[yaml_var[var]]
             if "distance_threshold" in ini_meta.keys():
@@ -1257,7 +1257,7 @@ class VariableField(object):
             "source_vgrid" in ini_meta.keys()
         ):
             if self.tr_index is not None:
-                vin = hotstart_data[yaml_var[var]].sel(ntracers=self.tr_index)
+                vin = hotstart_data[yaml_var[var]].isel(ntracers=self.tr_index)
             else:
                 vin = hotstart_data[yaml_var[var]]
             if "distance_threshold" in ini_meta.keys():
