@@ -228,7 +228,7 @@ class Nudging(object):
             # check to see if there is any overlap among the regions, if yes,
             # take the weighted average
             weights_merged = np.zeros_like(weights_var[0][0])
-            values_merged = np.zeros((len(self.time), len(imap_merged), self.nvrt))
+            values_merged = np.zeros((len(self.time), len(imap_merged), self.nvrt), dtype=np.float32)
             for im in range(len(imap_merged)):
                 idx_r = np.where(~np.isnan(idx_list[im, :]))[0].astype(int)
                 if len(idx_r) > 1:  # overlapping regions
@@ -400,9 +400,11 @@ class Nudging(object):
 
         utm_xy = np.array([self.node_x, self.node_y])
 
-        temperature = []
-        salinity = []
+        temperature = None  # pre-allocated after npout is known
+        salinity = None
         output_day = []
+        istep = 0
+        max_steps = len(self.datetime)
         var_name = {
             "temperature": "temp",
             "salinity": "salt",
@@ -468,7 +470,7 @@ class Nudging(object):
                 ctime = pd.to_datetime(t)
                 dt = ctime - self.start_date
                 dt_in_days = dt.total_seconds() / 86400.0
-                print(f"Time out at hr stage (days)={ctime}, dt ={dt_in_days} ")
+                logger.debug("Time out at hr stage (days)=%s, dt =%s", ctime, dt_in_days)
                 irecout += 1
 
                 # Make sure it2=ilo is output (output at precisely the time interval)
@@ -487,14 +489,14 @@ class Nudging(object):
                     .sel(time=t)
                     .transpose("lon", "lat", "depth")
                     .values[:, :, -1::-1]
-                )
+                ).astype(np.float32)
                 # if 'salt' in var_list:
                 salt = (
                     ncdata["salt"]
                     .sel(time=t)
                     .transpose("lon", "lat", "depth")
                     .values[:, :, -1::-1]
-                )
+                ).astype(np.float32)
                 # Comments below for futhre implementation.
                 # if 'uvel' in var_list:
                 #     uvel = ncdata['uvel'].sel(time=t).transpose(
@@ -694,7 +696,7 @@ class Nudging(object):
                     vrat = vrat.T
 
                     # initialize interpolation coefficients
-                    wild2 = np.zeros((self.nvrt, npout, 4, 2))
+                    wild2 = np.zeros((self.nvrt, npout, 4, 2), dtype=np.float32)
                     ix = np.broadcast_to(ix, (self.nvrt, npout))
                     iy = np.broadcast_to(iy, (self.nvrt, npout))
                     intri1 = np.where(intri == 1)[0]
@@ -702,10 +704,14 @@ class Nudging(object):
                     i_in_1 = i_in[intri1]
                     i_in_2 = i_in[intri2]
 
-                    tempout = np.empty((self.nvrt, self.nnode))
-                    saltout = np.empty((self.nvrt, self.nnode))
+                    tempout = np.empty((self.nvrt, self.nnode), dtype=np.float32)
+                    saltout = np.empty((self.nvrt, self.nnode), dtype=np.float32)
                     tempout[:, i_out] = tem_outside
                     saltout[:, i_out] = sal_outside
+
+                    # Pre-allocate output arrays as float32
+                    temperature = np.empty((max_steps, self.nvrt, npout), dtype=np.float32)
+                    salinity = np.empty((max_steps, self.nvrt, npout), dtype=np.float32)
 
                 id_dry = np.where(kbp[ix, iy] == -1)[0]  # 3dfield dry cell
                 lev[:, id_dry] = int(ilen - 1 - 1)
@@ -771,15 +777,18 @@ class Nudging(object):
                 tempout[idST[0], i_in[idST[1]]] = tempout[idST[0], i_in[idST[1]]] - 1
 
                 logger.debug("applying spatial interpolation!")
-                logger.info("outputting at day , %s, %s", dt.total_seconds()/86400, npout)
+                current_day = int(dt.total_seconds() / 86400)
+                if not hasattr(self, '_last_logged_day') or current_day != self._last_logged_day:
+                    logger.info("outputting at day %s, npout=%s", current_day, npout)
+                    self._last_logged_day = current_day
+                else:
+                    logger.debug("outputting at day %s, npout=%s", dt.total_seconds()/86400, npout)
 
                 # only save the nodes with valid values.
-                tempout_in = [temp_t[imap[:npout]] for temp_t in tempout]
-                saltout_in = [salt_t[imap[:npout]] for salt_t in saltout]
-
-                temperature.append(tempout_in)
-                salinity.append(saltout_in)
+                temperature[istep, :, :] = tempout[:, imap[:npout]]
+                salinity[istep, :, :] = saltout[:, imap[:npout]]
                 output_day.append(dt.total_seconds() / 86400)
+                istep += 1
                 nudge_step = int(pd.Timedelta(self.nudge_step).total_seconds() / 3600)
                 if len(output_day) > 1:
                     if output_day[-1] - output_day[-2] > (nudge_step + 0.1) / 24:
@@ -790,13 +799,13 @@ class Nudging(object):
                             "The difference between current and previous time step is greater than assigned stride"
                         )
 
-        temperature = np.array(temperature)
-        salinity = np.array(salinity)
+        temperature = temperature[:istep]
+        salinity = salinity[:istep]
         # [var,time,node_map, nvrt]
         temperature = np.transpose(temperature, (0, 2, 1))
         salinity = np.transpose(salinity, (0, 2, 1))
         # Enforce lower bound for temp. for eqstate
-        temperature[temperature < 0] == 0
+        temperature[temperature < 0] = 0
         logger.info("reorganizing matrix!")
         # print("time=%f"%(timer.time() - start))
         max_time = self.time[-1].total_seconds() / 3600 / 24

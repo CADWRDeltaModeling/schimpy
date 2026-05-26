@@ -522,9 +522,11 @@ def gen_sigma(
                 latest_layer = np.maximum(old_layer + 0.5 * speed, new_layer)
                 zsmooth[:, nsmoothlev - 2 - i] = latest_layer
                 old_layer = latest_layer
-            np.savetxt("zsmoothsave.txt", zsmooth)
+            zsmooth_fn = ensure_outdir(out_dir, "zsmoothsave.txt")
+            np.savetxt(zsmooth_fn, zsmooth)
         else:
-            zsmooth = np.loadtxt("zsmoothsave.txt")
+            zsmooth_fn = ensure_outdir(out_dir, "zsmoothsave.txt")
+            zsmooth = np.loadtxt(zsmooth_fn)
 
         print("Linking")
         # Now generate new mesh depths using the smoothed elevations as a pseudo-bed

@@ -194,6 +194,7 @@ def vgrid_gen(
     minmaxlayerfile,
     archive_nlayer="out",
     nlayer_gr3="nlayer.gr3",
+    diagnostics_dir=None,
 ):
 
     if not vgrid_version in ["5.8", "5.10"]:
@@ -203,6 +204,8 @@ def vgrid_gen(
 
     # specify nlayer output dir:
     out_dir = os.path.dirname(vgrid_out)
+    if diagnostics_dir is None:
+        diagnostics_dir = out_dir
     nlayer_gr3 = ensure_outdir(out_dir, nlayer_gr3)
 
     meshfun = BilinearMeshDensity()
@@ -268,9 +271,13 @@ def vgrid_gen(
 
         if archive_nlayer == "out":
             print("writing out number of layers")
+            nlayer_default_path = ensure_outdir(
+                diagnostics_dir,
+                os.path.basename(nlayer_gr3).replace(".gr3", "_default.gr3"),
+            )
             write_mesh(
                 mesh,
-                nlayer_gr3.replace(".gr3", "_default.gr3"),
+                nlayer_default_path,
                 node_attr=nlayer_default,
             )
             write_mesh(mesh, nlayer_gr3, node_attr=nlayer)
@@ -294,7 +301,7 @@ def vgrid_gen(
         maxlayer = nlayer * 0 + fixed_max  # np.max(maxlayer)
 
     sigma2, nlayer_revised = gen_sigma(
-        nlayer, minlayer, maxlayer, eta, h0, mesh, meshfun, out_dir=out_dir
+        nlayer, minlayer, maxlayer, eta, h0, mesh, meshfun, out_dir=diagnostics_dir
     )
     print("Returned nlayer revised: {}".format(np.max(nlayer_revised)))
     nlayer = nlayer_revised
@@ -309,7 +316,7 @@ def vgrid_gen(
     print("Done")
 
 
-def plot_vgrid(hgrid_file, vgrid0_file, vgrid_file, vgrid_version, eta, transectfiles):
+def plot_vgrid(hgrid_file, vgrid0_file, vgrid_file, vgrid_version, eta, transectfiles, out_dir="."):
     from schimpy.lsc2 import default_num_layers, plot_mesh
     from schimpy.schism_vertical_mesh import read_vmesh
     import matplotlib.pylab as plt
@@ -321,6 +328,9 @@ def plot_vgrid(hgrid_file, vgrid0_file, vgrid_file, vgrid_version, eta, transect
     vmesh1 = read_vmesh(vgrid_file)
     h0 = mesh.nodes[:, 2]
     depth = eta + h0
+
+    images_dir = ospath.join(out_dir, "images")
+    os.makedirs(images_dir, exist_ok=True)
 
     zcor0 = vmesh0.build_z(mesh, eta)[:, ::-1]
     zcor1 = vmesh1.build_z(mesh, eta)[:, ::-1]
@@ -348,7 +358,7 @@ def plot_vgrid(hgrid_file, vgrid0_file, vgrid_file, vgrid_version, eta, transect
             plot_mesh(ax1, xpath, zcor1[path, :], 0, len(xpath), c="blue")
             ax0.plot(xpath, -h0[path], linewidth=2, c="black")
             ax1.plot(xpath, -h0[path], linewidth=2, c="black")
-            plt.savefig(ospath.join("images", base + ".png"))
+            plt.savefig(ospath.join(images_dir, base + ".png"))
             plt.show()
         except:
             print("Plotting of grid failed for transectfile: {}".format(transectfile))

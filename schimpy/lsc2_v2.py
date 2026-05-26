@@ -521,19 +521,22 @@ def fix_sigma_pileups(
         if abs(s[-1] - 1.0) <= TOL:
             s[-1] = 1.0
 
-        # 2) Bottom sliver fix (operate only if wet and we have an interior)
+        # 2a) Surface sliver fix: ensure the first cell (near σ=0, physical
+        #     surface) is at least tmin thick.
         bottom_adjusted = False
         bottom_drops = 0
+        bed_adjusted = False
+        bed_drops = 0
         dz1_after = np.nan
         dz2_after = np.nan
 
         if D > 0.0 and Ni >= 3 and tmin_i > 0.0:
             # Keep trying until first success or run out of interfaces
             while True:
-                # current bottom thickness
+                # current surface-cell thickness
                 dz = D * (s[1] - s[0])
                 if dz + 1e-15 >= tmin_i:
-                    bottom_adjusted = changed  # adjusted if we moved/dropped
+                    bottom_adjusted = changed
                     break
                 # try to raise s[1] to target
                 target = s[0] + (tmin_i / max(D, 1e-12))
@@ -548,13 +551,35 @@ def fix_sigma_pileups(
                 bottom_drops += 1
                 changed = True
                 if Ni < 3:
-                    # no more interior interface to adjust; infeasible
+                    break
+
+        # 2b) Bed sliver fix: ensure the last cell (near σ=1, physical
+        #     bottom / bed) is at least tmin thick.
+        if D > 0.0 and Ni >= 3 and tmin_i > 0.0:
+            while True:
+                dz = D * (s[-1] - s[-2])
+                if dz + 1e-15 >= tmin_i:
+                    bed_adjusted = changed
+                    break
+                # try to lower s[-2] to make room
+                target = s[-1] - (tmin_i / max(D, 1e-12))
+                if target > s[-3] + TOL:
+                    s[-2] = target
+                    changed = True
+                    bed_adjusted = True
+                    break
+                # blocked by s[-3] → drop s[-2] and retry
+                s = np.delete(s, -2)
+                Ni -= 1
+                bed_drops += 1
+                changed = True
+                if Ni < 3:
                     break
 
         # recompute dz1/dz2 after changes
         if D > 0.0 and Ni >= 3:
             dz1_after = D * (s[1] - s[0])
-            dz2_after = D * (s[2] - s[1])
+            dz2_after = D * (s[-1] - s[-2])
         elif D > 0.0 and Ni == 2:
             dz1_after = D  # single layer (bed→surface)
 
@@ -569,7 +594,8 @@ def fix_sigma_pileups(
                 "Ni_before": Ni0,
                 "Ni_after": Ni,
                 "dupes_removed": dupes_removed,
-                "bottom_drops": bottom_drops,
+                "surface_drops": bottom_drops,
+                "bed_drops": bed_drops,
                 "dz1_after_m": dz1_after,
                 "dz2_after_m": dz2_after,
                 "depth_m": D,
@@ -711,6 +737,8 @@ def smooth_interfaces_onepass_with_bed_fill_sparse(mesh,
 
         # Jacobi blend; update only nodes that actually have this level and are not bottom
         h_col_new = (1.0 - alpha) * hold[:, k] + alpha * nbr_mean
+        # Clamp: h must not exceed local depth (physically below bed)
+        h_col_new = np.minimum(h_col_new, depth)
         h[upd, k] = h_col_new[upd]
 
 def _get_row_stochastic_W(mesh, n_nodes):
@@ -1034,13 +1062,17 @@ def fit_interfaces(mesh,
                    valid: np.ndarray,
                    tbottom: np.ndarray,
                    params: FitParams = FitParams(),
-                   tmin_arr: Optional[np.ndarray] = None) -> Tuple[np.ndarray, np.ndarray]:
+                   tmin_arr: Optional[np.ndarray] = None,
+                   uniform_sigma_mask: Optional[np.ndarray] = None) -> Tuple[np.ndarray, np.ndarray]:
     """Fit interfaces h_k(x) to targets with smoothing, bottom anchoring, and guards.
 
     Parameters
     ----------
     tmin_arr : optional float array (n_nodes,)
         Per-node minimum layer thickness.  If None, uses params.tmin everywhere.
+    uniform_sigma_mask : optional bool array (n_nodes,)
+        If True for a node, reassert uniform sigma spacing in finalization
+        (protects shallow exception nodes from smoother cliff-pressure).
 
     Returns
     -------
@@ -1368,7 +1400,7 @@ def fit_interfaces(mesh,
         _assert_finite("h post FINISH (exist)", h, where_mask=exists)
 
 
-    # Finalization: single forward guard + exact endpoints (+ strict nudge)
+    # Finalization: exact endpoints + guards (+ strict nudge)
     for i in range(n):
         Ni = int(Nlevels[i]); D = depth[i]
         if Ni < 2:
@@ -1379,6 +1411,14 @@ def fit_interfaces(mesh,
             D_eff = max(D, 1e-6)
             for k in range(Ni):
                 h[i, k] = D_eff * k / (Ni - 1)
+            continue
+
+        # Exception nodes (shallow, forced Nlevels by hysteresis): reassert
+        # uniform sigma. The smoother pulls these toward deep neighbors;
+        # uniform is the correct answer for them.
+        if uniform_sigma_mask is not None and uniform_sigma_mask[i]:
+            for k in range(Ni):
+                h[i, k] = k * D / (Ni - 1)
             continue
 
         # Surface exactly 0
@@ -1392,6 +1432,25 @@ def fit_interfaces(mesh,
 
         # Pin bed exactly to D
         h[i, Ni - 1] = D
+
+        # Overflow fix: if smoother pushed levels above D, or the bed
+        # cell would be thinner than tmin, redistribute proportionally
+        # between a valid base and the bed.  Choose the split point so
+        # that the redistributed spacing >= tmin.
+        if Ni >= 3 and h[i, Ni - 2] > D - tmin_arr[i]:
+            tmin_i = tmin_arr[i]
+            # Scan downward: find the deepest level k whose value allows
+            # (Ni-1-k) layers of at least tmin between h[k] and D.
+            k_overflow = 1  # fallback: redistribute everything from level 1
+            for k in range(Ni - 2, 0, -1):
+                if h[i, k] <= D - (Ni - 1 - k) * tmin_i:
+                    k_overflow = k + 1
+                    break
+            # Linearly redistribute from h[k_overflow-1] to D
+            h_base = h[i, k_overflow - 1]
+            n_redist = Ni - k_overflow  # number of levels to redistribute
+            for j in range(n_redist):
+                h[i, k_overflow + j] = h_base + (j + 1) * (D - h_base) / n_redist
 
         # Strict separation nudge (fp safety)
         for k in range(1, Ni):
@@ -1694,7 +1753,8 @@ def run_pipeline(mesh,
     t3 = time.perf_counter()
     logger.info("D) Fitting interfaces ...")
     h, valid2 = fit_interfaces(mesh, depth, Nlevels, hhat, valid, tb, pp.fit,
-                               tmin_arr=tmin_arr)
+                               tmin_arr=tmin_arr,
+                               uniform_sigma_mask=uniform_sigma_mask)
     logger.info("   done in %.2f s", time.perf_counter() - t3)
 
     # E) sigma

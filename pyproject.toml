@@ -144,6 +144,7 @@ set_param = "schimpy.param:set_param_cli"
 bctide = "schimpy.bctide:bctide_cli"
 relocate_source_sink = "schimpy.relocate_source_sink:relocate_source_sink_cli"
 splice_netcdf = "schimpy.splice_netcdf:splice_netcdf_cli"
+check_vgrid = "schimpy.check_vgrid:check_vgrid_cli"
 
 # check_skewness = "schimpy.check_skewness:check_skewness_cli"
 # combine_flux = "schimpy.combine_flux:combine_flux_cli"
