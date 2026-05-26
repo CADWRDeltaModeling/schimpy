@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Line String data based on Shapely LineStrings"""
 from . import schism_yaml
+from schimpy.yaml_util import yaml_from_file
 import shapely.geometry
 from shapely.wkb import loads
 from osgeo.osr import SpatialReference
@@ -65,18 +66,17 @@ class LineStringIo(object):
 
 
 class LineStringYamlReader(LineStringIo):
-    def read(self, fpath, **kwargs):
-        with open(fpath, "r") as f:
-            data = schism_yaml.load(f)["linestrings"]
-            linestrings = []
-            for row in data:
-                linestrings.append(
-                    LineString(
-                        coordinates=row["coordinates"],
-                        prop=dict([(k, row[k]) for k in row if k != "coordinates"]),
-                    )
+    def read(self, fpath, envvar=None, **kwargs):
+        data = yaml_from_file(fpath, envvar=envvar)["linestrings"]
+        linestrings = []
+        for row in data:
+            linestrings.append(
+                LineString(
+                    coordinates=row["coordinates"],
+                    prop=dict([(k, row[k]) for k in row if k != "coordinates"]),
                 )
-            return linestrings
+            )
+        return linestrings
 
 
 class LineStringShapefileReader(LineStringIo):
@@ -207,10 +207,10 @@ class LineStringIoFactory(object):
             return globals()[self.registered_writers[name]]()
 
 
-def read_linestrings(fpath):
+def read_linestrings(fpath, envvar=None):
     fpath = str(fpath)  # Convert PosixPath to string
     if fpath.endswith(".yaml"):
-        return LineStringIoFactory().get_reader("yaml").read(fpath)
+        return LineStringIoFactory().get_reader("yaml").read(fpath, envvar=envvar)
     elif fpath.endswith(".shp"):
         return LineStringIoFactory().get_reader("shp").read(fpath)
     else:

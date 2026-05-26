@@ -33,9 +33,9 @@ def convert_polygons_cli(input, output, yaml_root):
     convert_polys(input, output, yaml_root=yaml_root)
 
 
-def convert_polys(input, output, yaml_root=None):
+def convert_polys(input, output, yaml_root=None, envvar=None):
     if input.endswith(".yaml"):
-        polygons = read_polygons(input, yaml_root=yaml_root)
+        polygons = read_polygons(input, yaml_root=yaml_root, envvar=envvar)
         if output.endswith(".shp"):
             write_polygons(output, polygons)
         else:

@@ -43,10 +43,10 @@ def convert_structures_main(input_yaml, output_fn):
         )
 
 
-def convert_linestrings_main(input_fn, output_fn):
+def convert_linestrings_main(input_fn, output_fn, envvar=None):
     """Function for converting line string files."""
     if input_fn.endswith(".yaml"):
-        linestrings = read_linestrings(input_fn)
+        linestrings = read_linestrings(input_fn, envvar=envvar)
         if output_fn.endswith(".shp"):
             write_linestrings(output_fn, linestrings)
         else:

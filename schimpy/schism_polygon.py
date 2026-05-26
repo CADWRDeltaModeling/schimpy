@@ -3,6 +3,7 @@
 Polygon data structure with preprocessor-related attributes and converters
 """
 from schimpy import schism_yaml
+from schimpy.yaml_util import yaml_from_file
 from shapely.geometry.polygon import orient
 from shapely.geometry import Polygon, Point
 from osgeo.osr import SpatialReference
@@ -156,18 +157,17 @@ class SchismPolygonDictConverter(SchismPolygonIo):
 class SchismPolygonYamlReader(SchismPolygonIo):
     """Read polygons from a SCHISM YAML polygon file"""
 
-    def read(self, fpath, yaml_root=None):
+    def read(self, fpath, yaml_root=None, envvar=None):
         if os.path.exists(fpath):
-            with open(fpath, "r") as f_in:
-                raw = schism_yaml.load_raw(f_in)
-                if yaml_root is not None:
-                    for key in yaml_root.split("."):
-                        if not isinstance(raw, dict) or key not in raw:
-                            raise ValueError(
-                                f"yaml_root key '{key}' not found in YAML structure"
-                            )
-                        raw = raw[key]
-                return SchismPolygonDictConverter().read(raw)
+            raw = yaml_from_file(fpath, envvar=envvar)
+            if yaml_root is not None:
+                for key in yaml_root.split("."):
+                    if not isinstance(raw, dict) or key not in raw:
+                        raise ValueError(
+                            f"yaml_root key '{key}' not found in YAML structure"
+                        )
+                    raw = raw[key]
+            return SchismPolygonDictConverter().read(raw)
         else:
             raise ValueError("File not found")
 
@@ -333,7 +333,7 @@ class SchismPolygonIoFactory(object):
             raise ValueError("Not in the SchismPolygonIoFactory")
 
 
-def read_polygons(fpath, yaml_root=None):
+def read_polygons(fpath, yaml_root=None, envvar=None):
     """Read a polygon file
 
     Parameters
@@ -345,7 +345,7 @@ def read_polygons(fpath, yaml_root=None):
         before reading polygons (e.g., 'mesh.depth_enforcement').
     """
     if fpath.endswith(".yaml"):
-        return SchismPolygonIoFactory().get_reader("yaml").read(fpath, yaml_root=yaml_root)
+        return SchismPolygonIoFactory().get_reader("yaml").read(fpath, yaml_root=yaml_root, envvar=envvar)
     elif fpath.endswith(".shp"):
         return SchismPolygonIoFactory().get_reader("shp").read(fpath)
     else:
