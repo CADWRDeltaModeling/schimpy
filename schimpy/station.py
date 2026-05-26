@@ -250,23 +250,32 @@ def read_station_in(fpath):
      Returns
      -------
      Result : DataFrame
-         DataFrame with hierarchical index (id,subloc) and columns x,y,z,name
+        DataFrame with hierarchical index (station_id,subloc) and columns x,y,z,name
 
     """
 
+    rows = []
     with open(fpath, "r") as f:
-        request = f.readline()
-        n_entry = f.readline()
-        stations = pd.read_csv(
-            f,
-            sep=r"\s+",
-            header=None,
-            names=["index", "x", "y", "z", "excl", "id", "subloc", "name"],
-            usecols=["x", "y", "z", "id", "subloc", "name"],
-            index_col=["id", "subloc"],
-            na_values="-",
-            keep_default_na=True,
-        )
+        f.readline()  # request line
+        f.readline()  # n_entry line
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            if "!" not in line:
+                continue
+            left, right = line.split("!", 1)
+            parts_left = left.split()
+            # parts_left: index, x, y, z
+            x, y, z = float(parts_left[1]), float(parts_left[2]), float(parts_left[3])
+            # right: station_id subloc name
+            parts_right = right.strip().split(None, 2)
+            station_id = parts_right[0]
+            subloc = parts_right[1] if len(parts_right) > 1 else "default"
+            name = parts_right[2].strip("'\" ") if len(parts_right) > 2 else ""
+            rows.append((station_id, subloc, x, y, z, name))
+    stations = pd.DataFrame(rows, columns=["station_id", "subloc", "x", "y", "z", "name"])
+    stations = stations.set_index(["station_id", "subloc"])
     return stations
 
 
@@ -303,7 +312,7 @@ def write_station_in(fpath, station_in, request=None):
     # Then the specific requests, here written to a string buffer
     buffer2 = dfmerged.to_csv(
         None,
-        columns=["x", "y", "z", "excl", "id", "subloc", "name"],
+        columns=["x", "y", "z", "excl", "station_id", "subloc", "name"],
         index_label="id",
         sep=" ",
         float_format="%.2f",
@@ -342,8 +351,8 @@ def read_station_subloc(fpath):
         DataFrame with hierarchical index (id,subloc) and data column z
 
     """
-
-    df = pd.read_csv(fpath, sep=",", header=0, index_col=["id", "subloc"], comment="#")
+    
+    df = pd.read_csv(fpath, sep=",", header=0, index_col=["station_id", "subloc"], comment="#")
     df["z"] = df.z
     return df[["z"]]
 
@@ -375,7 +384,7 @@ def read_station_dbase(fpath):
         db = pd.read_csv(
             fpath, sep=",", comment="#", header=0, index_col="station_id", dtype={"agency_id": str}
         )   
-        db.index.name = "id"   
+    db.index.name = "station_id"   
 
     db["agency_id"] = db["agency_id"].str.replace("'", "", regex=True)
 
@@ -405,12 +414,13 @@ def merge_station_subloc(station_dbase, station_subloc, default_z):
         DataFrame that links the information.
 
     """
-
+    print(station_dbase.head())
+    print(station_subloc.head())
     merged = station_dbase.reset_index().merge(
-        station_subloc.reset_index(), left_on="id", right_on="id", how="left"
+        station_subloc.reset_index(), left_on="station_id", right_on="station_id", how="left"
     )
     merged.fillna({"subloc": "default", "z": default_z}, inplace=True)
-    merged.set_index(["id", "subloc"], inplace=True)
+    merged = merged.set_index(["station_id", "subloc"])
 
     return merged
 
@@ -834,8 +844,11 @@ def convert_db_station_in(
     sublocdb=None,
     station_request="all",
     default=-0.5,
+    mask_col=None,
 ):
     stations_utm = read_station_dbase(stationdb)
+    if mask_col is not None:
+        stations_utm = stations_utm[stations_utm[mask_col] == 1]
     ssubloc = read_station_subloc(sublocdb)
     stations_in = merge_station_subloc(stations_utm, ssubloc, default_z=-0.5)
     write_station_in(outfile, stations_in, request=station_request)
@@ -866,7 +879,12 @@ def convert_db_station_in(
     help="z coordinate used when there is no listing for station id (z coordinate, not subloc from surface)",
 )
 @click.option("--out", default="station.in", help="station.in formatted file")
-def convert_station_cli(station_db, subloc_db, request, default_zcor, out):
+@click.option(
+    "--mask-col",
+    default=None,
+    help="Integer column in station dbase used to select stations (1=include)",
+)
+def convert_station_cli(station_db, subloc_db, request, default_zcor, out, mask_col):
     """Create station.in file from station database (stations_utm.csv) and station subloc listing station_subloc.csv"""
     stationdb = station_db
     sublocdb = subloc_db
@@ -877,7 +895,7 @@ def convert_station_cli(station_db, subloc_db, request, default_zcor, out):
     if sublocdb is None:
         sublocdb = config_file("sublocations")
 
-    convert_db_station_in(outfile, stationdb, sublocdb, request, default)
+    convert_db_station_in(outfile, stationdb, sublocdb, request, default, mask_col=mask_col)
 
 
 if __name__ == "__main__":

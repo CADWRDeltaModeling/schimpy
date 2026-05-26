@@ -47,7 +47,8 @@ import os
 import datetime
 import logging
 
-from schimpy.prepare_schism import create_gr3_with_polygons, setup_logger
+from schimpy.prepare_schism import create_gr3_with_polygons
+from schimpy.logging_config import configure_logging, resolve_loglevel
 from schimpy.schism_setup import create_schism_setup
 from schimpy.schism_mesh import read_mesh, write_mesh, SchismMeshGr3Reader, compare_mesh
 from schimpy import geo_tools
@@ -107,25 +108,19 @@ class hotstart(object):
                 raise ValueError("envvar must be a dictionary if provided.")
             self.envvar = envvar
 
-    def read_yaml(self, use_logging=True):
+    def read_yaml(self):
         """
         read yaml and load mesh grid
         """
-        print(self.input)
+        logger.info("Reading yaml: %s", self.input)
         info = yaml_from_file(self.input, envvar=self.envvar)
 
         if "out_dir" in info.keys():
             self.out_dir = info["out_dir"]
         else:
             self.out_dir = "./"
-            print("No out_dir specified, using current directory as output directory.")
-        self.use_logging = use_logging
-        if self.use_logging:
-            setup_logger(self.out_dir)
-            self.logger = logging.getLogger("SCHISM")
-        else:
-            self.logger = logging.getLogger("")
-        self.logger.info("Start generating SCHISM hotstart...")
+            logger.info("No out_dir specified, using current directory as output directory.")
+        logger.info("Start generating SCHISM hotstart...")
 
         hotstart_info = info["hotstart"]
         self.info = hotstart_info
@@ -147,8 +142,8 @@ class hotstart(object):
                 "prepro_output_dir": self.out_dir,
             }
             inputs = yaml_from_dict(inputs, envvar=self.envvar)
-            s = create_schism_setup(self.hgrid_fn, self.logger)
-            create_gr3_with_polygons(s, inputs, self.logger)
+            s = create_schism_setup(self.hgrid_fn, logger)
+            create_gr3_with_polygons(s, inputs, logger)
             variables.remove("elev.ic")
 
         if "restart_time" in hotstart_info.keys():
@@ -2017,13 +2012,34 @@ def project_mesh(mesh, new_crs):
 
 
 import click
+from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 @click.command()
-@click.option('--input', type=str, required=True, help='input yaml file for hotstart')
-def create_hotstart_cli(input):
-    """Create hotstart for a schism run"""
-    h = hotstart(input)
+@click.argument('input_file', required=False)
+@click.option('--input', 'input_opt', type=str, default=None, help='input yaml file for hotstart')
+@click.option('--logdir', type=click.Path(path_type=Path), default=None, help='directory for log file')
+@click.option('--debug', is_flag=True, help='enable debug logging')
+@click.option('--quiet', is_flag=True, help='suppress console logging')
+@click.help_option('-h', '--help')
+def create_hotstart_cli(input_file, input_opt, logdir, debug, quiet):
+    """Create hotstart initial condition for a SCHISM run"""
+    level, console = resolve_loglevel(debug=debug, quiet=quiet)
+    configure_logging(
+        package_name='schimpy',
+        level=level,
+        console=console,
+        logdir=logdir,
+        logfile_prefix='hotstart',
+    )
+
+    input_path = input_opt if input_opt is not None else input_file
+    if input_path is None:
+        raise click.UsageError('Please provide an input file as an argument or with --input')
+
+    h = hotstart(input_path)
     h.create_hotstart()
     output_fn = h.output_fn
     hnc = h.nc_dataset
