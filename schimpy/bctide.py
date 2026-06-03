@@ -565,7 +565,9 @@ class boundary(object):
             if self.earth_tides:
                 num_tidal = len(self.earth_tides["constituents"])
                 cutoff_depth = self.earth_tides["cutoff_depth"]
-                outf.write(str(num_tidal) + " " + str(cutoff_depth) + "\n")
+                outf.write(str(num_tidal) + " " + str(cutoff_depth) + 
+                           "! # of constituents used in earth tidal potential, \
+                           cut-off depth for applying tidal potential\n")
                 for i in range(num_tidal):
                     outf.write(
                         self.earth_tides["constituents"][i]["name"]
@@ -594,12 +596,14 @@ class boundary(object):
             else:
                 num_tidal = 0
                 cutoff_depth = 40
-                outf.write(str(num_tidal) + " " + str(cutoff_depth) + "\n")
+                outf.write(str(num_tidal) + " " + str(cutoff_depth) + 
+                           " ! # of constituents used in earth tidal potential," +
+                           "cut-off depth for applying tidal potential\n")
 
             ## out boundary forcing tidal
             if self.boundary_tides:
                 num_tidal = len(self.boundary_tides["constituents"])
-                outf.write(str(num_tidal) + "\n")
+                outf.write(str(num_tidal) + " ! total # of tidal boundary forcing frequencies  \n")
                 for i in range(num_tidal):
                     outf.write(
                         self.boundary_tides["constituents"][i]["name"]
@@ -618,7 +622,7 @@ class boundary(object):
                     outf.write("\n")
             else:
                 num_tidal = 0
-                outf.write(str(num_tidal) + "\n")
+                outf.write(str(num_tidal) + " ! total # of tidal boundary forcing frequencies  \n")
 
             
             hgrid = self.hgrid
@@ -721,7 +725,7 @@ class boundary(object):
                 #     tracer_mod_pos[tracer_mods[kk]] = kk
 
                 ## write out number of boundary here
-                outf.write(str(num_open_boundaries) + "\n")
+                outf.write(str(num_open_boundaries) + " ! # of open boundary \n")
 
                 for i in range(num_open_boundaries):
                     bound_name = self.open_boundaries[i]["name"]
@@ -922,6 +926,11 @@ class boundary(object):
                     outf.write(str(salt_id) + " ")
                     for ii in range(len(self.tracer_mod_pos)):
                         outf.write(str(tracer_boundary_sources[ii]) + " ")
+                    ## add boundary name in the end of the line, if boundary name is empty, write "boundary_i" instead
+                    if bound_name == "":
+                        outf.write("!  boundary_" + str(i))    
+                    else:
+                        outf.write("!  " + bound_name)  
                     outf.write("\n")
 
                     ## output all the boundary parameters
