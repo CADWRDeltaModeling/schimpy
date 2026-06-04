@@ -561,7 +561,7 @@ class hotstart(object):
                 nc_dataset = nc_dataset.drop_vars(var_values)
 
         if self.modules:
-            nc_dataset["tracer_list"] = tr_mname
+            nc_dataset["tracer_list"] = np.array(tr_mname, dtype='U')
         self.nc_dataset = nc_dataset
 
 
@@ -1163,7 +1163,7 @@ class VariableField(object):
         """
         obs_file includes Lat, Lon, and values for the variable.
         """
-        from . import interp_2d  # now onl 2D interpolation IDW is implemented.
+        from schimpy import interp_2d  # now onl 2D interpolation IDW is implemented.
 
         if ini_meta:
             obs_file = ini_meta["data"]
@@ -2027,16 +2027,32 @@ def create_hotstart_cli(input):
     h.create_hotstart()
     output_fn = h.output_fn
     hnc = h.nc_dataset
-    hnc.to_netcdf(output_fn)
+    # Ensure tracer_list is numpy string array, not ArrowStringArray
+    if 'tracer_list' in hnc.coords:
+        # Force conversion by dropping and recreating with object dtype
+        tracer_values = [str(x) for x in hnc['tracer_list'].values]
+        hnc = hnc.drop_vars('tracer_list')
+        hnc = hnc.assign_coords(tracer_list=('tracer_list', np.array(tracer_values, dtype=object)))
+    hnc.to_netcdf(output_fn, encoding={'tracer_list': {'dtype': 'S10'}})
     print(f"output to {output_fn} ")
 
 
 if __name__ == "__main__":
     create_hotstart_cli()
-    # os.chdir("PATH/TO/HOTSTART/FILES")
-    # h = hotstart("./hotstart_2018.yaml")
+    # os.chdir(r"PATH/TO/YAML")
+    # h = hotstart("./hotstart_2013.yaml")
     # h.read_yaml()
     # h.create_hotstart()
+    # output_fn = h.output_fn
+    # hnc = h.nc_dataset
+    # # Ensure tracer_list is numpy string array, not ArrowStringArray
+    # if 'tracer_list' in hnc.coords:
+    #     # Force conversion by dropping and recreating with object dtype
+    #     tracer_values = [str(x) for x in hnc['tracer_list'].values]
+    #     hnc = hnc.drop_vars('tracer_list')
+    #     hnc = hnc.assign_coords(tracer_list=('tracer_list', np.array(tracer_values, dtype=object)))
+    # hnc.to_netcdf(output_fn, encoding={'tracer_list': {'dtype': 'S10'}})
+    # print(f"output to {output_fn} ")
 
     # # %% making plot
     # v1 = h.nc_dataset
