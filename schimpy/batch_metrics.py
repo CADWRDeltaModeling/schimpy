@@ -87,6 +87,10 @@ class BatchMetrics(object):
         self.params = params
         if "obs_search_path" in params:
             self.obs_search_path = params["obs_search_path"]
+            if not isinstance(self.obs_search_path, list):
+                raise ValueError(
+                    "'obs_search_path' should be a list"
+                )
         else:
             self.obs_search_path = None
 
@@ -442,6 +446,10 @@ class BatchMetrics(object):
         )
 
         if selected_stations:
+            if not isinstance(selected_stations, list):
+                raise ValueError(
+                    "'selected_stations' should be a list"
+                )
             # Subset quietly to stations actually present for this variable.
             # Preserve the user’s order where possible.
             order = [s for s in selected_stations if isinstance(s, str)]
