@@ -11,9 +11,13 @@ labels:
 # Start times for the simulations (if only one simulation, then set as in-line, else set as list as per outputs_dir)
 time_basis: 2013-08-28   # ISO date (datetime)
 # Station database
-stations_csv: ../../Data/stations_utm.csv
+stations_csv: ../dms_datastore/dms_datastore/config_data/station_dbase.csv
 # Database of the field data file
-obs_links_csv: ../../Data/2013/obs_links.csv
+obs_links_csv: /scratch/nasbdo/modeling_data/repo/continuous/obs_links_screened_20250109.csv
+
+obs_search_path:
+ - "/scratch/nasbdo/modeling_data/repo/continuous/screened"
+
 # Time frame of plot data
 # Instantaneous plot window
 start_inst: 2013-12-01   # ISO date (datetime)
@@ -25,8 +29,8 @@ end_avg:    2014-01-20   # ISO date (datetime)
 variable: salt  # one of elev, salt, flow
 
 # Stations to plot
-# selected_stations: CCS
-# excluded_stations: CLC
+selected_stations: [CCS]
+# excluded_stations: [CLC]
 
 # Plotting options
 # plot_format: simple
