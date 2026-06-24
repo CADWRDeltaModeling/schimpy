@@ -328,6 +328,7 @@ def create_vgrid(s, inputs, logger):
         v2_only_keys = {
             "depth_function", "algorithm", "region_constraints",
             "constraint_taper_rings", "dz_scale_gr3", "debug_prefix", "pileup_log",
+            "diagnostics", "diagnostics_dir",
         }
         stray = v2_only_keys & set(section.keys())
         if stray:
@@ -349,10 +350,32 @@ def create_vgrid(s, inputs, logger):
         )
         # v2 passes named arguments
         section.pop("hgrid", None)
-        # Route debug_prefix under diagnostics_dir if set
+        # Route v2 diagnostics under prepare_schism's diagnostics area.
+        # Explicit legacy debug_prefix/pileup_log are preserved.
         debug_prefix = section.get("debug_prefix")
         if debug_prefix:
             debug_prefix = os.path.join(diagnostics_dir, debug_prefix)
+
+        vgrid_diagnostics = section.get("diagnostics", False)
+        vgrid_diagnostics_dir = section.get("diagnostics_dir")
+        if isinstance(vgrid_diagnostics, dict):
+            vgrid_diagnostics_dir = vgrid_diagnostics.get("dir", vgrid_diagnostics_dir)
+            vgrid_diagnostics_enabled = bool(
+                vgrid_diagnostics.get("enabled", vgrid_diagnostics.get("write", True))
+            )
+        else:
+            vgrid_diagnostics_enabled = bool(vgrid_diagnostics)
+        if vgrid_diagnostics_enabled:
+            if vgrid_diagnostics_dir:
+                if not os.path.isabs(str(vgrid_diagnostics_dir)):
+                    vgrid_diagnostics_dir = os.path.join(diagnostics_dir, str(vgrid_diagnostics_dir))
+            else:
+                vgrid_diagnostics_dir = os.path.join(diagnostics_dir, "vgrid_lsc2_v2")
+
+        pileup_log = section.get("pileup_log")
+        if pileup_log and not os.path.isabs(str(pileup_log)):
+            pileup_log = os.path.join(diagnostics_dir, str(pileup_log))
+
         vgrid_gen_v2(
             hgrid=hgrid,
             vgrid_out=section["vgrid_out"],
@@ -363,8 +386,10 @@ def create_vgrid(s, inputs, logger):
             region_constraints=section.get("region_constraints"),
             constraint_taper_rings=int(section.get("constraint_taper_rings", 3)),
             dz_scale_gr3=section.get("dz_scale_gr3"),
+            diagnostics=vgrid_diagnostics_enabled,
+            diagnostics_dir=vgrid_diagnostics_dir,
             debug_prefix=debug_prefix,
-            pileup_log=section.get("pileup_log"),
+            pileup_log=pileup_log,
         )
     else:
         raise ValueError(

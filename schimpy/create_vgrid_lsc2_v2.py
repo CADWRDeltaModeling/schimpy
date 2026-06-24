@@ -236,6 +236,8 @@ def vgrid_gen_v2(
     region_constraints=None,
     constraint_taper_rings=3,
     dz_scale_gr3=None,
+    diagnostics=False,
+    diagnostics_dir=None,
     debug_prefix=None,
     pileup_log=None,
     **kwargs,
@@ -267,10 +269,15 @@ def vgrid_gen_v2(
         Soft-blend rings at constraint polygon edges.
     dz_scale_gr3 : str, optional
         Path to a scalar GR3 for per-node dz scaling.
+    diagnostics : bool or dict, optional
+        If True, write the standard LSC2 v2 diagnostic GR3 files and pileup CSV.
+        A dict may be used as ``{enabled: true, dir: <path>}``.
+    diagnostics_dir : str, optional
+        Directory for standard diagnostics when diagnostics is True.
     debug_prefix : str, optional
-        Prefix path for debug GR3 snapshots.
+        Legacy prefix path for debug GR3 snapshots. Still supported.
     pileup_log : str, optional
-        Path for CSV log of fixed pileup nodes.
+        Legacy path for CSV log of fixed pileup nodes. Still supported.
     """
     if kwargs:
         unknown = sorted(kwargs.keys())
@@ -280,6 +287,23 @@ def vgrid_gen_v2(
 
     if vgrid_version not in ("5.8", "5.10"):
         raise ValueError(f"vgrid_version must be '5.8' or '5.10', got '{vgrid_version}'")
+
+    # --- Diagnostics output routing ---
+    # New config form is diagnostics: true|false plus diagnostics_dir.  Keep the
+    # legacy debug_prefix/pileup_log knobs intact; explicit legacy paths win.
+    if isinstance(diagnostics, dict):
+        diagnostics_dir = diagnostics.get("dir", diagnostics_dir)
+        diagnostics = bool(diagnostics.get("enabled", diagnostics.get("write", True)))
+    else:
+        diagnostics = bool(diagnostics)
+
+    if diagnostics:
+        diag_dir = diagnostics_dir or "vgrid_lsc2_v2_diagnostics"
+        os.makedirs(diag_dir, exist_ok=True)
+        if debug_prefix is None:
+            debug_prefix = os.path.join(diag_dir, "")
+        if pileup_log is None:
+            pileup_log = os.path.join(diag_dir, "pileups.csv")
 
     logger.info(
         "vgrid v2 (beta): generating vertical grid. "
@@ -397,13 +421,18 @@ def vgrid_gen_v2(
               help="Prefix for debug GR3 snapshots")
 @click.option("--pileup-log", type=str, default=None,
               help="CSV log of fixed pileup nodes")
+@click.option("--diagnostics/--no-diagnostics", default=None,
+              help="Write standard diagnostic GR3 files and pileup CSV")
+@click.option("--diagnostics-dir", type=str, default=None,
+              help="Directory for standard diagnostics")
 @click.option("--logdir", type=click.Path(path_type=Path), default=None,
               help="Directory for log files")
 @click.option("--debug", is_flag=True, help="Enable debug-level logging")
 @click.option("--quiet", is_flag=True, help="Suppress console logging")
 @click.help_option("-h", "--help")
 def create_vgrid_lsc2_v2_cli(hgrid, eta, vgrid_version, out_vgrid, config,
-                              debug_prefix, pileup_log, logdir, debug, quiet):
+                              debug_prefix, pileup_log, diagnostics, diagnostics_dir,
+                              logdir, debug, quiet):
     """Create SCHISM vgrid using LSC2 v2 pipeline (BETA).
 
     For the stable legacy generator, use create_vgrid_lsc2.
@@ -424,6 +453,10 @@ def create_vgrid_lsc2_v2_cli(hgrid, eta, vgrid_version, out_vgrid, config,
         with open(config, "r") as f:
             cfg = schism_yaml_load(f) or {}
 
+    cfg_diagnostics = cfg.get("diagnostics", False)
+    if diagnostics is not None:
+        cfg_diagnostics = diagnostics
+
     vgrid_gen_v2(
         hgrid=hgrid,
         vgrid_out=out_vgrid,
@@ -433,6 +466,8 @@ def create_vgrid_lsc2_v2_cli(hgrid, eta, vgrid_version, out_vgrid, config,
         algorithm=cfg.get("algorithm"),
         region_constraints=cfg.get("region_constraints"),
         constraint_taper_rings=int(cfg.get("constraint_taper_rings", 3)),
+        diagnostics=cfg_diagnostics,
+        diagnostics_dir=diagnostics_dir or cfg.get("diagnostics_dir"),
         debug_prefix=debug_prefix,
         pileup_log=pileup_log,
     )

@@ -24,6 +24,8 @@ from schimpy.create_station_output import create_station_output_cli
 from schimpy.param import set_param_cli
 from schimpy.bctide import bctide_cli
 from schimpy.relocate_source_sink import relocate_source_sink_cli
+from schimpy.vgrid_nlayer_to_gr3 import vgrid_nlayer_to_gr3_cli
+
 
 # Commands to be checked for utility before re-adding
 # from schimpy.check_mesh_skewness import check_skewness_cli
@@ -79,12 +81,14 @@ cli.add_command(create_station_output_cli, "create_station_output")
 cli.add_command(set_param_cli, "set_param")
 cli.add_command(bctide_cli, "bctide")
 cli.add_command(relocate_source_sink_cli, "relocate_source_sink")
+cli.add_command(vgrid_nlayer_to_gr3_cli, "vgrid_nlayer_to_gr3")
 
 # Commands to be checked for utility before re-adding
 # cli.add_command(check_skewness_cli, "check_skewness")
 # cli.add_command(combine_flux_cli, "combine_flux")
 # cli.add_command(convert_sav_class_to_number_cli, "convert_sav_class_to_number")
 # cli.add_command(create_mesh_n_levels_cli, "create_mesh_n_levels")
+
 # cli.add_command(cruise_plot_cli, "cruise_plot")
 # cli.add_command(cut_mesh_cli, "cut_mesh")
 # cli.add_command(download_hrr_clip_cli, "download_hrrr")

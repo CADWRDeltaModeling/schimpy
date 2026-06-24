@@ -1612,6 +1612,20 @@ class PipelineParams:
     constraint_taper_rings: int = 3      # BFS rings for Ltilde soft-blend at constraint edges
 
 
+
+
+def _write_debug_node_attr(mesh, debug: Optional[Dict[str, str]], key: str, values) -> None:
+    """Write a debug GR3 node-attribute field if requested.
+
+    Kept deliberately small so diagnostics can be emitted immediately after
+    the corresponding quantity is computed, rather than at the end of the
+    full vgrid pipeline.
+    """
+    if not debug or key not in debug:
+        return
+    write_mesh(mesh, debug[key], node_attr=np.asarray(values, dtype=float))
+    logger.info("   diagnostic %s → %s", key, debug[key])
+
 def run_pipeline(mesh,
                  depth: np.ndarray,
                  sizefun: VerticalSizeFunction,
@@ -1627,15 +1641,11 @@ def run_pipeline(mesh,
     h : (n, maxN) float
     tmin_arr : (n,) float  — per-node minimum layer thickness
 
-    If debug is a dict of filenames, optional GR3s will be written for inspection:
-      debug = {
-        "Lstar": "Lstar.gr3",
-        "Ltilde": "Lstar_smooth.gr3",
-        "Nlevels": "nlevels.gr3",
-        "Nlayers": "nlayers.gr3",
-        "tbottom": "t_bottom_target.gr3",
-        "bottom_thickness": "bottom_thickness_final.gr3"
-      }
+    If debug is a dict of filenames, optional GR3s will be written for inspection.
+    Diagnostics are emitted as soon as their source quantity is available:
+    Lstar/Ltilde/Nmin/Nmax/Nlevels/Nlayers/uniform_sigma/tbottom are written
+    before interface fitting; bottom_thickness is written after fitted interfaces
+    exist.
     """
 
     t0 = time.perf_counter()
@@ -1694,6 +1704,13 @@ def run_pipeline(mesh,
                   int((pp.n_max is not None and (pp.n_max < 99999).sum()) or 0)
         logger.info("   polygon constraints: soft-blended Ltilde at %d constrained nodes", n_blend)
 
+    _write_debug_node_attr(mesh, debug, "Lstar", Lstar)
+    _write_debug_node_attr(mesh, debug, "Ltilde", Ltilde)
+    if pp.n_min is not None:
+        _write_debug_node_attr(mesh, debug, "Nmin", pp.n_min)
+    if pp.n_max is not None:
+        _write_debug_node_attr(mesh, debug, "Nmax", pp.n_max)
+
     logger.info("   done in %.2f s", time.perf_counter() - t0)
 
     # B) hysteretic integerization (levels)
@@ -1734,6 +1751,9 @@ def run_pipeline(mesh,
         )
     Nlayers = (Nlevels - 1).astype(int)
     maxN = int(np.max(Nlevels))
+    _write_debug_node_attr(mesh, debug, "Nlevels", Nlevels)
+    _write_debug_node_attr(mesh, debug, "Nlayers", Nlayers)
+    _write_debug_node_attr(mesh, debug, "uniform_sigma", uniform_sigma_mask)
     logger.info("   done in %.2f s", time.perf_counter() - t1)
     
     t2 = time.perf_counter()
@@ -1746,6 +1766,7 @@ def run_pipeline(mesh,
 
     # bottom thickness target & smoothing
     tb = smooth_bottom_thickness(depth, hhat, valid, pp.fit.tmin, mesh)    # dpos to depth
+    _write_debug_node_attr(mesh, debug, "tbottom", tb)
     logger.info("   done in %.2f s", time.perf_counter() - t2)
 
 
@@ -1766,34 +1787,13 @@ def run_pipeline(mesh,
 
     logger.info("Total pipeline time: %.2f s", time.perf_counter() - t0)
 
-    # Optional debug outputs
-    if debug:
-        # Write scalars as GR3 node attributes using the provided mesh writer
-        if "Lstar" in debug:
-            write_mesh(mesh, debug["Lstar"], node_attr=Lstar)
-            write_mesh(mesh, debug["Lstar"], node_attr=Lstar)
-        if "Ltilde" in debug:
-            write_mesh(mesh, debug["Ltilde"], node_attr=Ltilde)
-        if "Nlevels" in debug:
-            write_mesh(mesh, debug["Nlevels"], node_attr=Nlevels.astype(float))
-        if "Nlayers" in debug:
-            write_mesh(mesh, debug["Nlayers"], node_attr=Nlayers.astype(float))
-        if "tbottom" in debug:
-            write_mesh(mesh, debug["tbottom"], node_attr=tb.astype(float))
-        # Final bottom thickness from h
-        bt = np.zeros_like(tb)
-        for i in range(len(tb)):
+    # Optional debug output that depends on fitted interfaces
+    if debug and "bottom_thickness" in debug:
+        bt = np.zeros(len(Nlevels), dtype=float)
+        for i in range(len(bt)):
             Ni = int(Nlevels[i])
             if Ni >= 2:
                 bt[i] = h[i, Ni-1] - h[i, Ni-2]
-        if "bottom_thickness" in debug:
-            write_mesh(mesh, debug["bottom_thickness"], node_attr=bt.astype(float))
-        if "uniform_sigma" in debug:
-            write_mesh(mesh, debug["uniform_sigma"],
-                       node_attr=uniform_sigma_mask.astype(float))
-        if "Nmin" in debug and pp.n_min is not None:
-            write_mesh(mesh, debug["Nmin"], node_attr=pp.n_min.astype(float))
-        if "Nmax" in debug and pp.n_max is not None:
-            write_mesh(mesh, debug["Nmax"], node_attr=pp.n_max.astype(float))
+        _write_debug_node_attr(mesh, debug, "bottom_thickness", bt)
 
     return sigma, Nlevels, h, tmin_arr
