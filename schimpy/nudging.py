@@ -10,12 +10,12 @@ to gaussian
 import os
 import copy
 import datetime
-import yaml
 import pandas as pd
 import numpy as np
 import xarray as xr
 from netCDF4 import Dataset
 from schimpy.schism_mesh import read_mesh, write_mesh
+from schimpy.yaml_util import yaml_from_file
 from schimpy.geo_tools import ll2utm
 from shapely.geometry import Polygon
 from schimpy import interp_2d
@@ -33,8 +33,9 @@ class Nudging(object):
     A class to create schism nudging
     """
 
-    def __init__(self, input, **kwargs):
+    def __init__(self, input, envvar=None, **kwargs):
         self.input = input
+        self.envvar = envvar
         self._interpolant = ["nearest", "inverse distance"]
         self._kernel = ["gaussian"]
 
@@ -45,9 +46,15 @@ class Nudging(object):
 
         logger.info("---read_yaml---")
 
-        with open(self.input) as file:
-            info = yaml.load(file, Loader=yaml.FullLoader)
+        info = yaml_from_file(self.input, envvar=self.envvar)
         nudging_info = info["nudging"]
+
+        if "out_dir" in info.keys():
+            self.out_dir = info["out_dir"]
+        else:
+            self.out_dir = "./"
+            logger.info("No out_dir specified, using current directory as output directory.")
+
         self.info = nudging_info
         self.nudge_step = nudging_info["step_nu_tr"]
         self.start_date = pd.to_datetime(nudging_info["start_date"])
@@ -266,9 +273,9 @@ class Nudging(object):
             suffix = self.output_suffix
 
             if v == "temperature":
-                nudging_fn = "TEM_nu_%s.nc" % suffix
+                nudging_fn = f"{self.out_dir}/TEM_nu_%s.nc" % suffix
             elif v == "salinity":
-                nudging_fn = "SAL_nu_%s.nc" % suffix
+                nudging_fn = f"{self.out_dir}/SAL_nu_%s.nc" % suffix
             else:
                 raise NotImplementedError("write %s as nuding nc not implemented" % v)
 
@@ -308,9 +315,9 @@ class Nudging(object):
 
 
             if v == "temperature":
-                nudge_gr3_fn = "TEM_nudge_%s.gr3" % suffix
+                nudge_gr3_fn = f"{self.out_dir}/TEM_nudge_%s.gr3" % suffix
             elif v == "salinity":
-                nudge_gr3_fn = "SAL_nudge_%s.gr3" % suffix
+                nudge_gr3_fn = f"{self.out_dir}/SAL_nudge_%s.gr3" % suffix
             else:
                 raise NotImplementedError("write %s as nuding gr3 not implemented" % v)
             write_mesh(self.mesh, fpath_mesh=nudge_gr3_fn, node_attr=weights_merged)
