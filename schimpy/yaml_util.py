@@ -110,3 +110,17 @@ def yaml_to_yaml(infile, outfile, envvar=None):
     data = yaml_from_file(infile, envvar=envvar)
     with open(outfile, "w") as file:
         file.write(yaml.safe_dump(data))
+
+def write_yaml(data, outfile):
+    """
+    Write a dictionary to a YAML file.
+
+    Parameters
+    ----------
+    data : dict
+        The data to write to the YAML file.
+    outfile : str|Path
+        The path to the output YAML file.
+    """
+    with open(outfile, "w") as file:
+        file.write(yaml.safe_dump(data))
