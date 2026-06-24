@@ -187,6 +187,14 @@ def _build_pipeline_params(section):
         pp_kwargs["L_smooth_passes"] = int(alg["Lsmooth_passes"])
     if "Lsmooth_kappa" in alg:
         pp_kwargs["L_smooth_kappa"] = float(alg["Lsmooth_kappa"])
+    if "Lsmooth_method" in alg:
+        pp_kwargs["L_smooth_method"] = str(alg["Lsmooth_method"])
+    if "Lsmooth_L_scale" in alg:
+        pp_kwargs["L_smooth_L_scale"] = float(alg["Lsmooth_L_scale"])
+    if "Lsmooth_depth_scale" in alg:
+        pp_kwargs["L_smooth_depth_scale"] = float(alg["Lsmooth_depth_scale"])
+    if "Lsmooth_length_power" in alg:
+        pp_kwargs["L_smooth_length_power"] = float(alg["Lsmooth_length_power"])
     if "constraint_taper_rings" in section:
         pp_kwargs["constraint_taper_rings"] = int(section["constraint_taper_rings"])
 

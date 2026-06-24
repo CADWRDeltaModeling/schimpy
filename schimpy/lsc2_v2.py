@@ -821,13 +821,116 @@ def smooth_scalar_on_mesh(mesh, field: np.ndarray,
                           passes: int = 2,
                           kappa: float = 0.5,
                           dt: float = 1.0) -> np.ndarray:
-    """Light Laplacian smoothing on a scalar field defined on mesh nodes.
-    Uses the user's numba kernel if available.
+    """Light isotropic Laplacian smoothing on a scalar field defined on mesh nodes.
+
+    This is the legacy LSC2-v2 smoother.  It is intentionally retained so
+    existing control files reproduce previous behavior unless the caller
+    explicitly selects an edge-aware method.
     """
-    # Build neighbor lists once
     neighbors = [np.array(mesh.get_neighbor_nodes(i), dtype=np.int32)
                  for i in range(mesh.nodes.shape[0])]
     return smooth_kernel_numba(field.astype(np.float64), neighbors, kappa, dt, passes)
+
+
+def _smooth_scalar_on_mesh_bilateral(mesh,
+                                     field: np.ndarray,
+                                     depth: np.ndarray,
+                                     passes: int = 2,
+                                     kappa: float = 0.5,
+                                     dt: float = 1.0,
+                                     L_scale: float = 1.25,
+                                     depth_scale: float = 4.0,
+                                     length_power: float = 0.0) -> np.ndarray:
+    """Edge-aware smoothing for scalar node fields such as L*.
+
+    The update is a graph diffusion, but each edge conductance is reduced when
+    neighboring nodes have a large contrast in the unsmoothed scalar field and/or
+    bathymetric depth:
+
+        w_ij = ell_ij**(-length_power)
+               exp(-(dL/L_scale)**2)
+               exp(-(dH/depth_scale)**2)
+
+    Using the *initial* field for dL makes this a bilateral filter: narrow
+    channels, pits, and submerged thalwegs can smooth along coherent features
+    without being diffused as strongly across their margins.  Set either scale
+    to <=0 to disable that factor.  length_power defaults to zero so the first
+    attempt changes only anisotropy, not the historical neighbor averaging
+    strength as a function of local mesh size.
+    """
+    x = np.asarray(field, dtype=np.float64).copy()
+    ref = x.copy()
+    H = np.asarray(depth, dtype=np.float64)
+    n = x.size
+
+    if passes <= 0 or kappa == 0.0:
+        return x
+
+    coords = np.asarray(mesh.nodes[:, 0:2], dtype=np.float64)
+    use_L = L_scale is not None and float(L_scale) > 0.0
+    use_H = depth_scale is not None and float(depth_scale) > 0.0
+    lp = float(length_power or 0.0)
+
+    neighbors = [np.asarray(mesh.get_neighbor_nodes(i), dtype=np.int32)
+                 for i in range(n)]
+    weights = []
+    for i, nbrs in enumerate(neighbors):
+        if nbrs.size == 0:
+            weights.append(np.zeros(0, dtype=np.float64))
+            continue
+        w = np.ones(nbrs.size, dtype=np.float64)
+        if lp != 0.0:
+            dxy = coords[nbrs] - coords[i]
+            ell = np.sqrt(np.sum(dxy * dxy, axis=1))
+            w *= np.power(np.maximum(ell, 1.0e-12), -lp)
+        if use_L:
+            dL = ref[nbrs] - ref[i]
+            w *= np.exp(-((dL / float(L_scale)) ** 2))
+        if use_H:
+            dH = H[nbrs] - H[i]
+            w *= np.exp(-((dH / float(depth_scale)) ** 2))
+        weights.append(w)
+
+    # Jacobi iterations with row-normalized weighted neighbor mean.
+    # Stability is comparable to the legacy smoother for kappa*dt <= 1.
+    alpha = float(kappa) * float(dt)
+    for _ in range(int(passes)):
+        old = x.copy()
+        for i, nbrs in enumerate(neighbors):
+            if nbrs.size == 0:
+                continue
+            w = weights[i]
+            sw = float(np.sum(w))
+            if sw <= 0.0 or not np.isfinite(sw):
+                continue
+            nbr_mean = float(np.dot(w, old[nbrs]) / sw)
+            x[i] = old[i] + alpha * (nbr_mean - old[i])
+    return x
+
+
+def smooth_Lstar_on_mesh(mesh,
+                         Lstar: np.ndarray,
+                         depth: np.ndarray,
+                         method: str = "isotropic",
+                         passes: int = 2,
+                         kappa: float = 0.5,
+                         dt: float = 1.0,
+                         L_scale: float = 1.25,
+                         depth_scale: float = 4.0,
+                         length_power: float = 0.0) -> np.ndarray:
+    """Smooth L* using either the legacy isotropic or edge-aware method."""
+    method = str(method or "isotropic").strip().lower()
+    if method in ("isotropic", "legacy", "laplace", "laplacian"):
+        return smooth_scalar_on_mesh(mesh, Lstar, passes=passes, kappa=kappa, dt=dt)
+    if method in ("bilateral", "edge_aware", "edge-aware", "anisotropic"):
+        return _smooth_scalar_on_mesh_bilateral(
+            mesh, Lstar, depth, passes=passes, kappa=kappa, dt=dt,
+            L_scale=L_scale, depth_scale=depth_scale,
+            length_power=length_power,
+        )
+    raise ValueError(
+        f"Unknown Lsmooth_method='{method}'. Expected isotropic or bilateral."
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -1604,6 +1707,10 @@ class PipelineParams:
     # Smoothing & quantization
     L_smooth_passes: int = 2
     L_smooth_kappa: float = 0.5
+    L_smooth_method: str = "isotropic"
+    L_smooth_L_scale: float = 1.25
+    L_smooth_depth_scale: float = 4.0
+    L_smooth_length_power: float = 0.0
     hysteresis: HysteresisParams = field(default_factory=HysteresisParams)
     fit: FitParams = field(default_factory=FitParams)
     # Polygon region constraints (per-node arrays, or None)
@@ -1655,7 +1762,21 @@ def run_pipeline(mesh,
     dpos = np.maximum(depth, 1e-6)
     Lstar = compute_Lstar(dpos, sizefun, mesh=mesh)
     #Lstar = compute_Lstar(depth, sizefun, mesh=mesh)
-    Ltilde = smooth_scalar_on_mesh(mesh, Lstar, passes=pp.L_smooth_passes, kappa=pp.L_smooth_kappa, dt=1.0)
+    Ltilde = smooth_Lstar_on_mesh(
+        mesh, Lstar, dpos,
+        method=pp.L_smooth_method,
+        passes=pp.L_smooth_passes,
+        kappa=pp.L_smooth_kappa,
+        dt=1.0,
+        L_scale=pp.L_smooth_L_scale,
+        depth_scale=pp.L_smooth_depth_scale,
+        length_power=pp.L_smooth_length_power,
+    )
+    logger.info(
+        "   L* smoothing: method=%s passes=%d kappa=%.3g L_scale=%.3g depth_scale=%.3g length_power=%.3g",
+        pp.L_smooth_method, pp.L_smooth_passes, pp.L_smooth_kappa,
+        pp.L_smooth_L_scale, pp.L_smooth_depth_scale, pp.L_smooth_length_power,
+    )
     # Apply optional boundary priors softly (no shocks)
     Ltilde = apply_boundary_priors_to_Ltilde(mesh, Ltilde, pp.priors)
 
