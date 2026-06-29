@@ -130,7 +130,7 @@ class hotstart(object):
             self.run_start = "default"
         else:
             self.run_start = _to_timestamp(run_start_raw, "run_start")
-        self.time_step = int(hotstart_info["time_step"])
+        self.time_step = int(float(hotstart_info["time_step"]))
         self.hgrid_fn = hotstart_info["hgrid_input_file"]
         self.vgrid_fn = hotstart_info["vgrid_input_file"]
         variables = list(hotstart_info.keys())
@@ -288,7 +288,14 @@ class hotstart(object):
 
         return self._mesh_cache[key]
 
-    def create_hotstart(self):
+    def create_hotstart(
+        self,
+        write_visit_nc=False,
+        visit_outname="schout_hotstart.nc",
+        visit_hgrid_fn=None,
+        visit_vgrid_fn=None,
+        visit_vgrid_version=None,
+    ):
         self.read_yaml()
         mesh = self.get_mesh(self.hgrid_fn, self.vgrid_fn, self.vgrid_version)
         self.mesh = mesh
@@ -384,6 +391,36 @@ class hotstart(object):
         self.depth = self.mesh.build_z(elev=self.nc_dataset["elevation"].values)
         self.wet_dry_check()
         self.map_to_schism()
+
+        # write yaml to netCDF
+        self.nc_dataset.attrs["yaml_input"] = str(self.info)
+
+        if write_visit_nc:
+            # create a hotstart file first, then convert to VisIt-friendly output
+            encoding = None
+            ds_out = self.nc_dataset
+            if "tracer_list" in ds_out.coords:
+                tracer_values = [str(x) for x in ds_out["tracer_list"].values]
+                ds_out = ds_out.drop_vars("tracer_list")
+                ds_out = ds_out.assign_coords(
+                    tracer_list=("tracer_list", np.array(tracer_values, dtype=object))
+                )
+                encoding = {"tracer_list": {"dtype": "S10"}}
+
+            ds_out.to_netcdf(self.output_fn, encoding=encoding)
+            hotstart_to_outputnc(
+                self.output_fn,
+                self.date.strftime("%Y-%m-%d"),
+                hgrid_fn=visit_hgrid_fn or self.hgrid_fn,
+                vgrid_fn=visit_vgrid_fn or self.vgrid_fn,
+                vgrid_version=(
+                    self.vgrid_version
+                    if visit_vgrid_version is None
+                    else visit_vgrid_version
+                ),
+                outname=visit_outname,
+            )
+
         # Close source hotstart datasets, if any
         self.close_hotstart_cache()
         return self.nc_dataset
@@ -545,18 +582,49 @@ class hotstart(object):
             if isinstance(var_values, str):
                 nc_dataset = nc_dataset.rename({var_values: key})
             else:
+                resolved_vars = []
+                for v in var_values:
+                    if v in nc_dataset:
+                        resolved_vars.append(v)
+                        continue
+
+                    # Recover missing tracer element fields from node fields.
+                    # This can happen when upstream data are node-only but
+                    # map_to_schism still needs *_el for packing tr_el.
+                    if v.endswith("_el"):
+                        v_nd = v.replace("_el", "_nd")
+                        if v_nd in nc_dataset:
+                            nd_vals = np.asarray(nc_dataset[v_nd].values)
+                            el_vals = np.asarray(
+                                [nd_vals[el].mean(axis=0) for el in self.mesh.elems]
+                            )
+                            nc_dataset[v] = xr.DataArray(
+                                el_vals,
+                                dims=["elem", "nVert"],
+                            )
+                            resolved_vars.append(v)
+                            continue
+
+                    raise KeyError(
+                        f"Required tracer field '{v}' is missing while building '{key}'."
+                    )
+
                 var_temp = np.asarray(
-                    [nc_dataset[var_values][v].values for v in var_values]
+                    [nc_dataset[resolved_vars][v].values for v in resolved_vars]
                 )
                 var_temp = np.transpose(var_temp, (1, 2, 0))
-                var_dim = nc_dataset[var_values[0]].dims
+                var_dim = nc_dataset[resolved_vars[0]].dims
                 var_dim = var_dim + ("ntracers",)
                 v1_sub = xr.Dataset({key: (var_dim, var_temp)})
                 nc_dataset = nc_dataset.merge(v1_sub)
-                nc_dataset = nc_dataset.drop_vars(var_values)
+                nc_dataset = nc_dataset.drop_vars(resolved_vars)
 
         if self.modules:
-            nc_dataset["tracer_list"] = np.array(tr_mname, dtype='U')
+            # Use fixed-width byte strings so NetCDF encoding is stable across
+            # pandas/xarray string backends (including ArrowStringArray).
+            nc_dataset = nc_dataset.assign_coords(
+                tracer_list=("tracer_list", np.asarray(tr_mname, dtype="S10"))
+            )
         self.nc_dataset = nc_dataset
 
 
@@ -590,7 +658,9 @@ class VariableField(object):
                 depths[self.mesh.edges[:, 0]] + depths[self.mesh.edges[:, 1]]
             ) / 2
         elif self.centering == "elem":
-            self.elem_depths = [self.mesh.z[e].mean(axis=0) for e in self.mesh.elems]
+            self.elem_depths = np.asarray(
+                [self.mesh.z[e].mean(axis=0) for e in self.mesh.elems]
+            )
         self.date = date
         self.crs = crs
         self.n_edges = mesh.n_edges()
@@ -763,7 +833,7 @@ class VariableField(object):
                 "nVert": (mesh.n_vert_levels, edge_depths),
             }
         elif self.centering == "elem":
-            elem_depths = [mesh_depth[e].mean(axis=0) for e in mesh.elems]
+            elem_depths = np.asarray([mesh_depth[e].mean(axis=0) for e in mesh.elems])
             centering_options["elem"] = {
                 "elem": (
                     mesh.n_elems,
@@ -1053,7 +1123,11 @@ class VariableField(object):
         if self.ini_meta["smoothing"]:
             raise NotImplementedError("Smoothing not implemented yet")
 
-        v_merge = np.zeros((self.n_hgrid, self.n_vgrid))
+        if self.variable_name == "tke":
+            v_merge = np.zeros((6, self.n_hgrid, self.n_vgrid))
+            tke_vars = ["q2", "xl", "dfv", "dfh", "dfq1", "dfq2"]
+        else:
+            v_merge = np.zeros((self.n_hgrid, self.n_vgrid))
         for i, r in enumerate(self.ini_meta["regions"]):
             ini_meta = r["initializer"]
             initializer_key = self.get_key(ini_meta)
@@ -1066,16 +1140,40 @@ class VariableField(object):
                     "region %f has nan in %s field" % (r, self.variable_name)
                 )
             if self.variable_name == "tke":
-                v_merge[:, inpoly, :] = v
-            else:
-                if type(v) == xr.core.dataarray.DataArray:
-                    # for cases where hotstart is returning 2D array
-                    v_merge[inpoly, :] = np.array(v)[:, np.newaxis]
+                if isinstance(v, xr.Dataset):
+                    v_arr = np.stack([np.asarray(v[name]) for name in tke_vars], axis=0)
+                elif isinstance(v, xr.DataArray):
+                    v_arr = np.asarray(v)
                 else:
-                    try:
-                        v_merge[inpoly, :] = v
-                    except ValueError:
-                        v_merge[inpoly, :] = v[:, np.newaxis]
+                    v_arr = np.asarray(v)
+
+                if v_arr.ndim == 2:
+                    # A single 3D field was provided; apply it to all tke components.
+                    v_arr = np.repeat(v_arr[np.newaxis, :, :], 6, axis=0)
+                elif v_arr.ndim == 3 and v_arr.shape[0] != 6 and v_arr.shape[-1] == 6:
+                    v_arr = np.transpose(v_arr, (2, 0, 1))
+
+                if v_arr.shape[0] != 6:
+                    raise ValueError(
+                        "tke patch initializer must return 6 components; got shape %s"
+                        % (v_arr.shape,)
+                    )
+
+                v_merge[:, inpoly, :] = v_arr
+            else:
+                v_arr = np.asarray(v)
+                if v_arr.ndim == 1:
+                    v_arr = v_arr[:, np.newaxis]
+                elif v_arr.ndim == 3 and v_arr.shape[1] == 1:
+                    v_arr = np.squeeze(v_arr, axis=1)
+
+                if v_arr.ndim != 2:
+                    raise ValueError(
+                        "patch initializer for %s must return a 1D/2D field; got shape %s"
+                        % (self.variable_name, v_arr.shape)
+                    )
+
+                v_merge[inpoly, :] = v_arr
         return v_merge
 
     # USGS cast (2D observational points)
@@ -1139,7 +1237,7 @@ class VariableField(object):
 
         # loop through each station and perform vertical interpolations for the nearest grid
         # the depths computed are negative but polaris depths are positive
-        grid_depths = self.vgrid[inpoly, :] * -1.0
+        grid_depths = np.asarray(self.vgrid)[inpoly, :] * -1.0
         for s in polaris_cast.index.unique():
             grid_nearest = np.where(grid_df.nearest == s)[0]
             zc = polaris_cast.loc[s]
@@ -1291,14 +1389,15 @@ class VariableField(object):
 
         grid1 = self.define_new_grid(mesh1)  # mesh to be interpolated from
         hgrid1 = list(grid1.values())[0][1]
-        vgrid1 = list(grid1.values())[1][1]
+        vgrid1 = np.asarray(list(grid1.values())[1][1])
+        vgrid_self = np.asarray(self.vgrid)
 
         if inpoly is None:
             hgrid2 = self.hgrid
-            vgrid2 = self.vgrid
+            vgrid2 = vgrid_self
         else:
             hgrid2 = self.hgrid[inpoly]  # mesh to be interpolated into
-            vgrid2 = self.vgrid[inpoly, :]
+            vgrid2 = vgrid_self[inpoly, :]
 
         compare_mesh_flag = False
         if "hotstart_nc_hfn" in self.hotstart_ini:
@@ -1441,11 +1540,15 @@ class VariableField(object):
         pass
 
     def create_dataarray(self, var):
+        # xarray>=2024 is stricter: passing a DataArray directly as the data
+        # payload in Dataset variable tuples is ambiguous. Normalize to ndarray.
+        var_data = var.data if isinstance(var, xr.DataArray) else var
+
         # for prism (tracer variables), tr_el and tr_nd0 need to be calculated.
         if self.centering == "prism":
             # convert from node to element values for tracers
             # first average to the node center horizontally
-            var_temp = self.node2elem_values(var)
+            var_temp = self.node2elem_values(var_data)
             var_temp = np.asarray(var_temp)
             var_el = np.zeros((self.n_elems, self.n_vert_levels))
             # then average to the element center vertically
@@ -1456,21 +1559,21 @@ class VariableField(object):
 
             ds = xr.Dataset(
                 {
-                    "%s_nd" % name: (["node", "nVert"], var),
-                    "%s_nd0" % name: (["node", "nVert"], var),
+                    "%s_nd" % name: (["node", "nVert"], var_data),
+                    "%s_nd0" % name: (["node", "nVert"], var_data),
                     "%s_el" % name: (["elem", "nVert"], var_el),
                 }
             )
         elif self.centering == "node2D":
             ds_var = xr.DataArray(
-                np.squeeze(var),  # coords=[range(self.n_hgrid)],
+                np.squeeze(var_data),  # coords=[range(self.n_hgrid)],
                 dims=[self.hgrid_name],
                 name=self.variable_name,
             )
             ds = ds_var.to_dataset()
         elif self.centering in ["bed", "bedfrac"]:
             ds_var = xr.DataArray(
-                var,  # coords=[range(self.n_hgrid),range(self.n_vgrid),range(self.n_sdim)],
+                var_data,  # coords=[range(self.n_hgrid),range(self.n_vgrid),range(self.n_sdim)],
                 dims=[self.hgrid_name, self.vgrid_name, self.sdim_name],
                 name=self.variable_name,
             )
@@ -1479,11 +1582,11 @@ class VariableField(object):
             var_name = ["q2", "xl", "dfv", "dfh", "dfq1", "dfq2"]
             ds = xr.Dataset()
             for v_ind, name in enumerate(var_name):
-                ds_ar = xr.Dataset({name: (["node", "nVert"], var[v_ind])})
+                ds_ar = xr.Dataset({name: (["node", "nVert"], var_data[v_ind])})
                 ds = ds.merge(ds_ar)
         else:
             ds_var = xr.DataArray(
-                var,  # coords=[range(self.n_hgrid),range(self.n_vgrid)],
+                var_data,  # coords=[range(self.n_hgrid),range(self.n_vgrid)],
                 dims=[self.hgrid_name, self.vgrid_name],
                 name=self.variable_name,
             )
@@ -1730,11 +1833,43 @@ def hotstart_to_outputnc(
         "hgrid_edge_y": "SCHISM_hgrid_edge_y",
     }
 
-    if not os.path.exists("hgrid.nc"):
+    hgrid_nc_path = "hgrid.nc"
+    hot_nodes = hnc.sizes.get("nSCHISM_hgrid_node", hnc.sizes.get("node"))
+    rebuild_hgrid_nc = not os.path.exists(hgrid_nc_path)
+    generated_hgrid_nc = False
+
+    if not rebuild_hgrid_nc:
+        cached = xr.open_dataset(hgrid_nc_path)
+        cached_nodes = cached.sizes.get(
+            "n_hgrid_node", cached.sizes.get("nSCHISM_hgrid_node")
+        )
+        cached.close()
+        if (
+            hot_nodes is not None
+            and cached_nodes is not None
+            and int(cached_nodes) != int(hot_nodes)
+        ):
+            rebuild_hgrid_nc = True
+
+    if rebuild_hgrid_nc:
+        if os.path.exists(hgrid_nc_path):
+            os.remove(hgrid_nc_path)
         mesh = read_mesh(hgrid_fn, vgrid_fn, vgrid_version)
-        write_mesh(mesh, "hgrid.nc")
-    hgrid_nc = xr.open_dataset("hgrid.nc")
+        write_mesh(mesh, hgrid_nc_path)
+        generated_hgrid_nc = True
+
+    hgrid_nc = xr.open_dataset(hgrid_nc_path)
     hgrid_nc = hgrid_nc.rename(grid_newname)
+
+    # Validate mesh compatibility early with a clear message.
+    for dim in ["nSCHISM_hgrid_node", "nSCHISM_hgrid_face", "nSCHISM_hgrid_edge"]:
+        if dim in hnc.sizes and dim in hgrid_nc.sizes:
+            if int(hnc.sizes[dim]) != int(hgrid_nc.sizes[dim]):
+                raise ValueError(
+                    f"Hotstart mesh does not match provided hgrid/vgrid for dim '{dim}': "
+                    f"hotstart={hnc.sizes[dim]}, hgrid={hgrid_nc.sizes[dim]}. "
+                    f"hotstart_fn={hotstart_fn}, hgrid_fn={hgrid_fn}, vgrid_fn={vgrid_fn}"
+                )
 
     # VisIt only accepts projected coordinates
     for c in ["edge", "face", "node"]:
@@ -1767,48 +1902,67 @@ def hotstart_to_outputnc(
 
     # add zcor and time dimension
     # zcor is positive upwards: all wet node values are negative.
-    zcor = hnc.z.values[np.newaxis, :]
+    if "z" in hnc.variables:
+        z_source = hnc["z"]
+    elif "z" in hgrid_nc.variables:
+        z_source = hgrid_nc["z"]
+    else:
+        raise ValueError(
+            "Neither input hotstart nor hgrid.nc contains 'z'; cannot build zcor for VisIt output."
+        )
+
+    zcor = z_source.values[np.newaxis, :]
     hgrid_nc["zcor"] = xr.DataArray(
         zcor, dims=["time", "nSCHISM_hgrid_node", "nSCHISM_vgrid_layers"]
     )
     hgrid_nc.zcor.attrs["mesh"] = "SCHISM_hgrid"
     hgrid_nc.zcor.attrs["data_horizontal_center"] = "node"
     hgrid_nc.zcor.attrs["data_vertical_center"] = "full"
-    hgrid_nc.zcor.attrs["i23d"] = hgrid_nc.z.i23d
-    hgrid_nc.zcor.attrs["ivs"] = hgrid_nc.z.ivs
+    hgrid_nc.zcor.attrs["i23d"] = z_source.attrs.get("i23d", 2)
+    hgrid_nc.zcor.attrs["ivs"] = z_source.attrs.get("ivs", 1)
     hgrid_nc.zcor.attrs["missing_value"] = np.nan
-    hgrid_nc = hgrid_nc.drop_vars("z")
+    if "z" in hgrid_nc.variables:
+        hgrid_nc = hgrid_nc.drop_vars("z")
 
-    # replace tr_nd by the actual variable name.
-    for i, v in enumerate(hnc["tracer_list"].values):
-        v_values = hnc.tr_nd.isel(ntracers=i).values[np.newaxis, :]
-        ds_v = xr.DataArray(
-            v_values,  # coords=[time,n_face,n_vert],
-            dims=["time", "nSCHISM_hgrid_node", "nSCHISM_vgrid_layers"],
-            name=v + "_nd",
-        )
-        ds_v.attrs["mesh"] = "SCHISM_hgrid"
-        ds_v.attrs["data_horizontal_center"] = "node"
-        ds_v.attrs["data_vertical_center"] = "full"
-        ds_v.attrs["i23d"] = 2  # full level on node
-        ds_v.attrs["ivs"] = hgrid_nc.zcor.ivs
-        hnc = xr.merge([hnc, ds_v])
+    has_tracers = all(v in hnc.variables for v in ["tracer_list", "tr_nd", "tr_el"])
 
-    # replace tr_el by the actual variable name.
-    for i, v in enumerate(hnc["tracer_list"].values):
-        v_values = hnc.tr_el.isel(ntracers=i).values[np.newaxis, :]
-        ds_v = xr.DataArray(
-            v_values,  # coords=[time,n_face,n_vert],
-            dims=["time", "nSCHISM_hgrid_face", "nSCHISM_vgrid_layers"],
-            name=v + "_el",
-        )
-        ds_v.attrs["mesh"] = "SCHISM_hgrid"
-        ds_v.attrs["data_horizontal_center"] = "elem"
-        ds_v.attrs["data_vertical_center"] = "half"
-        ds_v.attrs["i23d"] = 6  # 3d half level on element
-        ds_v.attrs["ivs"] = hgrid_nc.zcor.ivs
-        hnc = xr.merge([hnc, ds_v.astype(float)])
-    hnc = hnc.drop_vars(["tr_el", "tracer_list", "tr_nd", "tr_nd0"])
+    if has_tracers:
+        # replace tr_nd by the actual variable name.
+        for i, v in enumerate(hnc["tracer_list"].values):
+            tracer_name = v.decode() if isinstance(v, (bytes, np.bytes_)) else str(v)
+            v_values = hnc.tr_nd.isel(ntracers=i).values[np.newaxis, :]
+            ds_v = xr.DataArray(
+                v_values,  # coords=[time,n_face,n_vert],
+                dims=["time", "nSCHISM_hgrid_node", "nSCHISM_vgrid_layers"],
+                name=tracer_name + "_nd",
+            )
+            ds_v.attrs["mesh"] = "SCHISM_hgrid"
+            ds_v.attrs["data_horizontal_center"] = "node"
+            ds_v.attrs["data_vertical_center"] = "full"
+            ds_v.attrs["i23d"] = 2  # full level on node
+            ds_v.attrs["ivs"] = hgrid_nc.zcor.ivs
+            hnc = xr.merge([hnc, ds_v])
+
+        # replace tr_el by the actual variable name.
+        for i, v in enumerate(hnc["tracer_list"].values):
+            tracer_name = v.decode() if isinstance(v, (bytes, np.bytes_)) else str(v)
+            v_values = hnc.tr_el.isel(ntracers=i).values[np.newaxis, :]
+            ds_v = xr.DataArray(
+                v_values,  # coords=[time,n_face,n_vert],
+                dims=["time", "nSCHISM_hgrid_face", "nSCHISM_vgrid_layers"],
+                name=tracer_name + "_el",
+            )
+            ds_v.attrs["mesh"] = "SCHISM_hgrid"
+            ds_v.attrs["data_horizontal_center"] = "elem"
+            ds_v.attrs["data_vertical_center"] = "half"
+            ds_v.attrs["i23d"] = 6  # 3d half level on element
+            ds_v.attrs["ivs"] = hgrid_nc.zcor.ivs
+            hnc = xr.merge([hnc, ds_v.astype(float)])
+
+    drop_candidates = ["tr_el", "tracer_list", "tr_nd", "tr_nd0"]
+    to_drop = [v for v in drop_candidates if v in hnc.variables]
+    if to_drop:
+        hnc = hnc.drop_vars(to_drop)
 
     hvar_t = list(hnc.variables)  # entire list
     hvar = [v for v in hvar_t if "nSCHISM_hgrid" in hnc[v].dims[0]]
@@ -1994,6 +2148,28 @@ def hotstart_to_outputnc(
     output_nc.attrs["_CoordSysBuilder"] = "ucar.nc2.dataset.conv.CF1Convention"
 
     output_nc.to_netcdf(outname, format="NETCDF4_CLASSIC")
+
+    # Close open datasets and clean up auto-generated hgrid cache file.
+    hnc.close()
+    hgrid_nc.close()
+    output_nc.close()
+    if generated_hgrid_nc and os.path.exists(hgrid_nc_path):
+        try:
+            os.remove(hgrid_nc_path)
+        except PermissionError:
+            # On Windows, netCDF backends may briefly hold a file handle.
+            import gc
+            import time
+
+            gc.collect()
+            time.sleep(0.2)
+            try:
+                os.remove(hgrid_nc_path)
+            except PermissionError:
+                logger.warning(
+                    "Could not remove temporary %s due to an active file handle; leaving it in place.",
+                    hgrid_nc_path,
+                )
 
 
 # the original mesh has to have attribute crs.
