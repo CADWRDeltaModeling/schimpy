@@ -669,7 +669,10 @@ class SchismMesh(TriQuadMesh):
             if node_values is not None:
                 df[value_name] = node_values
         elif feature_type == "edge":
-            features = self.get_centers_of_sides()[:, :2]
+            from shapely.geometry import Point
+
+            edge_centers = self.get_centers_of_sides()[:, :2]
+            features = [Point(xy[0], xy[1]) for xy in edge_centers]
             if edge_values is not None:
                 df[value_name] = edge_values
         df["geometry"] = features
