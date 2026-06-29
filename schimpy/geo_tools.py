@@ -129,8 +129,21 @@ def partition_check(
                 "categorizing cells based on nearest distance has not been implemented"
             )
         else:
-            string = ",".join(orphaned_cells.astype(str))
-            raise Exception("Orphaned nodes or cells found at %s" % string)
+            # Include XY coordinates to make debugging orphaned nodes/cells easier.
+            orphaned_info = []
+            for idx in orphaned_cells:
+                geom = mesh_gpd.geometry.iloc[idx]
+                if hasattr(geom, "x") and hasattr(geom, "y"):
+                    x, y = float(geom.x), float(geom.y)
+                else:
+                    c = geom.centroid
+                    x, y = float(c.x), float(c.y)
+                orphaned_info.append(f"{idx}:({x:.3f},{y:.3f})")
+
+            info_str = ", ".join(orphaned_info)
+            raise Exception(
+                "Orphaned nodes or cells found. index:(x,y) -> %s" % info_str
+            )
     # check if there are cells that belong to multiple polygons
     multi_labeled_cells = np.where(np.count_nonzero(ID_df, axis=1) > 1)[0]
     if len(multi_labeled_cells) >= 1:
