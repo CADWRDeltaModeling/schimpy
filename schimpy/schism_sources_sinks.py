@@ -438,6 +438,8 @@ def yaml2df(source_yaml):
     """
     with open(source_yaml, "r") as file:
         source_sink = yaml.safe_load(file)
+    if "sources_sinks" in source_sink.keys():
+        source_sink = source_sink["sources_sinks"]
     if {"sources", "sinks"} & source_sink.keys():
         sites, x, y, stype = [], [], [], []
         for v in ["sources", "sinks"]:
