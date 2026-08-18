@@ -139,15 +139,16 @@ def combine_flux(
 def normalize_df(df):
     normed = df.copy()
     for col in normed.columns:
-        col_min = normed[col].min()
-        col_max = normed[col].max()
-        if col_max == col_min:
-            if col_min != 0:
-                normed[col] = 1
+        if col != "__comment__":
+            col_min = normed[col].min()
+            col_max = normed[col].max()
+            if col_max == col_min:
+                if col_min != 0:
+                    normed[col] = 1
+                else:
+                    normed[col] = 0
             else:
-                normed[col] = 0
-        else:
-            normed[col] = (normed[col] - col_min) / (col_max - col_min)
+                normed[col] = (normed[col] - col_min) / (col_max - col_min)
     return normed
 
 
