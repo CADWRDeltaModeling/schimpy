@@ -715,7 +715,7 @@ def compute_height(
     if np.any(frac < 0.0):
         raise ValueError("sav_fractions must be nonnegative")
     if frac.shape[0] <= center_bin.max(initial=0):
-        raise ValueError("sav_fractions does not cover all density bins")
+        raise ValueError(f"sav_fractions does not cover all density bins. Need at least {center_bin.max(initial=0)}")
 
     if sav_min_height is not None:
         sav_min_height = float(sav_min_height)

@@ -191,7 +191,7 @@ def read_th(input_path, time_basis=None, to_timestamp=True, elapsed_unit="s", he
 
         try:
             out_df = pd.read_table(tmp_path, sep=r"\s+", index_col="datetime")
-            out_df.index = pd.to_datetime(out_df.index, format="%Y-%m-%dT%H:%M")
+            out_df.index = pd.to_datetime(out_df.index)
             if comments_dict:
                 out_df["__comment__"] = None
                 for idx, comment in comments_dict.items():
