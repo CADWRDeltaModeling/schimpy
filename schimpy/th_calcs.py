@@ -130,8 +130,15 @@ def combine_flux(
     for col_name, flux_cols in comb_dict.items():
         print(f"\tCombining {col_name} from {','.join(flux_cols)}")
 
-        combtemp = flux_df.loc[:, flux_cols].copy()
-        out_df[col_name] = combtemp.sum(axis=1)
+        out_df[col_name] = 0.0
+        for flux_col in flux_cols:
+            if flux_col.startswith("-"):
+                source_col = flux_col[1:]
+                multiplier = -1.0
+            else:
+                source_col = flux_col
+                multiplier = 1.0
+            out_df[col_name] += multiplier * flux_df[source_col]
 
     return out_df
 
