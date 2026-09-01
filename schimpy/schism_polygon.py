@@ -200,9 +200,29 @@ class SchismPolygonShapefileReader(SchismPolygonIo):
             # fld_idx = [field_names.index(x)
             #            for x in ('name', 'type', 'attribute')]
             polygons = []
+            
+            for feature in layer:
+                if feature is None:
+                    print("Null feature")
+                    continue
+
+                geom = feature.GetGeometryRef()
+
+                if geom is None:
+                    print(
+                        "Null geometry:",
+                        feature.GetFID(),
+                        feature.items()
+                    )
+                    continue
+            
             for feature in layer:
                 geom = feature.GetGeometryRef()
                 name_geom = geom.GetGeometryName()
+                if name_geom == "MULTIPOLYGON": 
+                    raise ValueError("MULTIPOLYGONs are not supported. Please convert to POLYGONs.")
+                elif geom.GetGeometryCount() > 1:
+                    print("MULTIPOLYGON detected. It will be split into individual POLYGONs. This is probably not desired behavior. ")
                 if name_geom in ("POLYGON", "MULTIPOLYGON"):
                     if name_geom == "MULTIPOLYGON":
                         geoms = [g for g in geom]
