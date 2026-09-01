@@ -423,13 +423,14 @@ class SchismSetup(object):
             up_path, down_path = self.mesh.find_two_neighboring_node_paths(
                 struct.coords
             )
+            self._validate_node_paths(name, up_path, down_path)
             struct.node_pairs = list(zip(up_path, down_path))
             # Reference pair
             ref = item.get("reference", "self")
             struct.reference = ref
             if ref == "self":
                 struct.reference_pair = self._generate_reference_pair(
-                    up_path, down_path
+                    up_path, down_path, name
                 )
             else:
                 struct.reference_pair = None
@@ -456,18 +457,118 @@ class SchismSetup(object):
         struct_writer = SchismStructureIO(self._input)
         struct_writer.write(fname)
 
-    def _generate_reference_pair(self, up_path, down_path):
+    def _node_label(self, node_i):
+        """Format a node index and its coordinates for an error message"""
+        x, y = self.mesh.nodes[node_i, :2]
+        return "{} at ({:.2f}, {:.2f})".format(node_i + 1, x, y)
+
+    def _validate_node_paths(self, name, up_path, down_path):
+        """Check that two node paths form a legal SCHISM hydraulic structure.
+
+        SCHISM pairs the ``i``-th node of each path across the structure, so the
+        paths must be the same length and each pair must sit on a real edge.  The
+        strip between consecutive pairs must also close cleanly: either one quad,
+        or two triangles sharing the diagonal.  A line segment placed badly (ending
+        inside the mesh, cutting a corner, or crossing a fan of elements) produces
+        paths that violate one of these, and the failure is silent unless caught
+        here.
+
+        Parameters
+        ----------
+        name : str
+            Structure name, used in error messages.
+        up_path, down_path : list of int
+            Node index paths on either side of the structure line.
+
+        Raises
+        ------
+        ValueError
+            If the paths cannot form a valid structure.
+        """
+        mesh = self.mesh
+        prefix = "Structure '{}': ".format(name)
+
+        if len(up_path) == 0 or len(down_path) == 0:
+            raise ValueError(
+                prefix + "the line segment did not cross any element edges. "
+                "Check that end_points span the channel and lie outside the mesh."
+            )
+        if len(up_path) != len(down_path):
+            raise ValueError(
+                prefix
+                + "the two sides of the structure have {} and {} nodes. "
+                "They must match one-to-one, so the line segment must cut all the "
+                "way across the mesh strip.".format(len(up_path), len(down_path))
+            )
+
+        for i, (up_i, down_i) in enumerate(zip(up_path, down_path)):
+            if up_i == down_i:
+                raise ValueError(
+                    prefix
+                    + "node pair {} repeats node {}.".format(i, self._node_label(up_i))
+                )
+            if mesh.find_edge((up_i, down_i)) is None:
+                raise ValueError(
+                    prefix
+                    + "node pair {} is not an edge: {} and {} are not connected.".format(
+                        i, self._node_label(up_i), self._node_label(down_i)
+                    )
+                )
+
+        for path, side in ((up_path, "upstream"), (down_path, "downstream")):
+            for i in range(len(path) - 1):
+                if mesh.find_edge((path[i], path[i + 1])) is None:
+                    raise ValueError(
+                        prefix
+                        + "the {} path is broken between nodes {} and {}.".format(
+                            side, self._node_label(path[i]), self._node_label(path[i + 1])
+                        )
+                    )
+
+        for i in range(len(up_path) - 1):
+            corners = {up_path[i], up_path[i + 1], down_path[i + 1], down_path[i]}
+            if len(corners) != 4:
+                raise ValueError(
+                    prefix
+                    + "node pairs {} and {} do not span four distinct nodes.".format(
+                        i, i + 1
+                    )
+                )
+            cell = [
+                e
+                for e in mesh.get_elems_i_from_node(up_path[i])
+                if set(mesh.elem(e)).issubset(corners)
+            ]
+            if len(cell) == 1 and len(mesh.elem(cell[0])) == 4:
+                continue
+            if len(cell) == 2 and all(len(mesh.elem(e)) == 3 for e in cell):
+                shared = set(mesh.elem(cell[0])).intersection(mesh.elem(cell[1]))
+                if len(shared) == 2:
+                    continue
+            raise ValueError(
+                prefix
+                + "node pairs {} and {} do not bound one quad or two triangles "
+                "sharing a diagonal; {} element(s) found between {} and {}.".format(
+                    i,
+                    i + 1,
+                    len(cell),
+                    self._node_label(up_path[i]),
+                    self._node_label(down_path[i + 1]),
+                )
+            )
+
+    def _generate_reference_pair(self, up_path, down_path, name=None):
         """Generate a new referece pair from the current node pairs.
         For now, it picks the neighboring nodes around the
         middle node pair.
         node_pairs = the list of node pairs
         return = the new reference pair
         """
-        ref_up = self._find_reference_node(up_path, down_path)
-        ref_down = self._find_reference_node(down_path, up_path)
+        ref_up = self._find_reference_node(up_path, down_path, name)
+        ref_down = self._find_reference_node(down_path, up_path, name)
         return (ref_up, ref_down)
 
-    def _find_reference_node(self, path1, path2):
+    def _find_reference_node(self, path1, path2, name=None):
         # TODO: The safety of this code needs to check further
         mesh = self.mesh
         # path1
@@ -478,7 +579,12 @@ class SchismSetup(object):
             if not (n in path1 or n in path2):
                 candidates.append(n)
         if len(candidates) < 1:
-            raise Exception("No reference node founde")
+            raise ValueError(
+                "Structure '{}': no reference node available next to {}. "
+                "Every neighbor already belongs to the structure itself.".format(
+                    name, self._node_label(center_node_i)
+                )
+            )
         elif len(candidates) == 1:
             return candidates[0]
         else:
