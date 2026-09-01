@@ -100,3 +100,34 @@ def test_click_cli_set():
     )
     assert result.exit_code == 0
     assert "work_dir: 2018/118" in result.output
+
+
+def test_include_list_concatenates_lists():
+    """A list-style include accumulates list sections such as ``structures``"""
+    fname = os.path.join(dir_testdata, "merge_agree.yaml")
+    with open(fname, "r") as f:
+        data = load(f)
+    names = [s["name"] for s in data["hydraulics"]["structures"]]
+    assert names == ["weir_north", "breach_west"]
+
+
+def test_include_list_agreeing_scalar_is_not_accumulated():
+    """A scalar repeated with the same value passes through untouched.
+
+    The former behavior applied ``+`` to every repeated key, which silently
+    doubled ``nudging`` and concatenated ``outputfile`` into nonsense.
+    """
+    fname = os.path.join(dir_testdata, "merge_agree.yaml")
+    with open(fname, "r") as f:
+        data = load(f)
+    assert data["hydraulics"]["nudging"] == 0.05
+    assert data["hydraulics"]["outputfile"] == "hydraulics.in"
+
+
+def test_include_list_disagreeing_scalar_warns_and_takes_first():
+    """A scalar that disagrees keeps the first file's value and warns"""
+    fname = os.path.join(dir_testdata, "merge_disagree.yaml")
+    with open(fname, "r") as f:
+        with pytest.warns(UserWarning, match="nudging"):
+            data = load(f)
+    assert data["hydraulics"]["nudging"] == 0.05

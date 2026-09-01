@@ -1,0 +1,5 @@
+structures:
+  - name: breach_west
+    type: transfer
+nudging: 0.05
+outputfile: hydraulics.in

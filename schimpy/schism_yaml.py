@@ -72,6 +72,71 @@ def substitute_env(env):
             break
 
 
+def merge_included_values(key, existing, incoming, existing_source, incoming_source):
+    """Merge two values that a list-style ``include`` supplied for the same key.
+
+    Lists are concatenated and mappings are merged recursively, which is what makes
+    ``include: [a.yaml, b.yaml]`` accumulate sections such as ``structures`` or
+    ``polygons``.  Scalars cannot be accumulated, so a scalar that repeats is kept
+    only if the two files agree; otherwise the first file wins and a warning names
+    the key and both files.
+
+    Parameters
+    ----------
+    key : str
+        Key being merged, used for messages.
+    existing, incoming : object
+        Values from the earlier and later included files.
+    existing_source, incoming_source : str
+        File names the two values came from, used for messages.
+
+    Returns
+    -------
+    object
+        The merged value.
+    """
+    if isinstance(existing, list) and isinstance(incoming, list):
+        return existing + incoming
+    if isinstance(existing, dict) and isinstance(incoming, dict):
+        merged = dict(existing)
+        for subkey, subvalue in incoming.items():
+            if subkey in merged:
+                merged[subkey] = merge_included_values(
+                    "{}.{}".format(key, subkey),
+                    merged[subkey],
+                    subvalue,
+                    existing_source,
+                    incoming_source,
+                )
+            else:
+                merged[subkey] = subvalue
+        return merged
+    if type(existing) is not type(incoming):
+        raise ValueError(
+            "Included files disagree on the type of '{}': {} in {} but {} in {}".format(
+                key,
+                type(existing).__name__,
+                existing_source,
+                type(incoming).__name__,
+                incoming_source,
+            )
+        )
+    if existing != incoming:
+        warnings.warn(
+            "Included files disagree on '{}': {!r} in {} and {!r} in {}. "
+            "Keeping {!r} from {}.".format(
+                key,
+                existing,
+                existing_source,
+                incoming,
+                incoming_source,
+                existing,
+                existing_source,
+            )
+        )
+    return existing
+
+
 class SubstituteComposer(Composer):
     """Composer with substitution"""
 
@@ -149,13 +214,21 @@ class SubstituteConstructor(SafeConstructor):
             fns = self.construct_sequence(node)
             if ".yaml" in fns[0]:
                 result = {}  # create dictionary to store all values in .yaml list
+                source_of = {}
                 for filename in self.construct_sequence(node):
                     tmp_rslt = self.extractFile(filename)
                     for key in tmp_rslt.keys():
                         if key in result.keys():
-                            result[key] = result[key] + tmp_rslt[key]
+                            result[key] = merge_included_values(
+                                key,
+                                result[key],
+                                tmp_rslt[key],
+                                source_of[key],
+                                filename,
+                            )
                         else:
                             result[key] = tmp_rslt[key]
+                            source_of[key] = filename
             else:
                 result = []
                 for filename in self.construct_sequence(node):

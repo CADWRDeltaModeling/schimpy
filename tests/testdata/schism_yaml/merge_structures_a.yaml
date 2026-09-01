@@ -1,0 +1,5 @@
+structures:
+  - name: weir_north
+    type: weir
+nudging: 0.05
+outputfile: hydraulics.in
