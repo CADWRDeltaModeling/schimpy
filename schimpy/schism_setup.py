@@ -605,6 +605,45 @@ class SchismSetup(object):
                     attr[inode] = valreplace
         return attr
 
+    def _parse_range_attribute_values(self, attribute, polygon_name=None):
+        """Parse a two-value range attribute for polygon operations.
+
+        ``range`` is a generic polygon operation, so values are interpreted
+        literally.  No vgrid-specific layer/level conversion is done here.
+        Accepts YAML lists/tuples/arrays as well as strings such as
+        ``"[6, 14]"`` or ``"6,14"``.
+        """
+        if isinstance(attribute, str):
+            s = attribute.strip()
+            if not s:
+                raise ValueError(
+                    "Range attribute is empty"
+                    + (f" for polygon {polygon_name!r}" if polygon_name else "")
+                )
+            try:
+                import ast
+                parsed = ast.literal_eval(s)
+            except (ValueError, SyntaxError):
+                parsed = [part.strip() for part in s.strip("[]()").split(",")]
+            attribute = parsed
+
+        if isinstance(attribute, np.ndarray):
+            vals = attribute.tolist()
+        elif isinstance(attribute, (list, tuple)):
+            vals = list(attribute)
+        else:
+            raise ValueError(
+                "Range attribute must be a two-value sequence or string"
+                + (f" for polygon {polygon_name!r}" if polygon_name else "")
+            )
+
+        if len(vals) != 2:
+            raise ValueError(
+                f"Range attribute parsed to {len(vals)} values; expected 2"
+                + (f" for polygon {polygon_name!r}" if polygon_name else "")
+            )
+        return vals[0], vals[1]
+
     def apply_polygons(self, polygons, default, global_imports=None):
         """Partition the grid with the given polygons.
         Each node (not element) will be assigned with an integer ID
@@ -652,11 +691,6 @@ class SchismSetup(object):
             attribute = polygon["attribute"]
             prop = {"name": name, "type": poly_type, "attribute": attribute}
             poly = SchismPolygon(shell=vertices, prop=prop)
-            if isinstance(attribute, str):
-                expr_str = self._parse_attribute(attribute)
-                expr = compile(expr_str, "fail.txt", "eval")
-            else:
-                expr = compile(str(attribute), "fail.txt", "eval")
 
             ## Add global variables
             newglobals = {}
@@ -664,9 +698,36 @@ class SchismSetup(object):
             newglobals["mesh"] = mesh
             newglobals["polygon"] = poly
 
-            # Evaluate
+            # Evaluate.  ``range`` has two attributes and is handled as a pair
+            # of literal/expression values; other operations retain the legacy
+            # scalar expression behavior.
             try:
-                nodes_sel, vals = self._evaluate_in_polygon(expr, poly, newglobals)
+                if poly_type == "range":
+                    lo_attr, hi_attr = self._parse_range_attribute_values(
+                        attribute, polygon_name=name
+                    )
+                    def _compile_attr(a):
+                        if isinstance(a, str):
+                            return compile(self._parse_attribute(a), "fail.txt", "eval")
+                        return compile(str(a), "fail.txt", "eval")
+                    nodes_sel, lo_vals = self._evaluate_in_polygon(
+                        _compile_attr(lo_attr), poly, newglobals.copy()
+                    )
+                    nodes_sel2, hi_vals = self._evaluate_in_polygon(
+                        _compile_attr(hi_attr), poly, newglobals.copy()
+                    )
+                    if list(nodes_sel2) != list(nodes_sel):
+                        raise RuntimeError(
+                            f"Range polygon {name!r} returned inconsistent node selections"
+                        )
+                    vals = (lo_vals, hi_vals)
+                else:
+                    if isinstance(attribute, str):
+                        expr_str = self._parse_attribute(attribute)
+                        expr = compile(expr_str, "fail.txt", "eval")
+                    else:
+                        expr = compile(str(attribute), "fail.txt", "eval")
+                    nodes_sel, vals = self._evaluate_in_polygon(expr, poly, newglobals)
             except:
                 self._logger.error("Polygon failed to evaluate: {}".format(name))
                 raise
@@ -686,6 +747,11 @@ class SchismSetup(object):
                 elif poly.type == "max":
                     attr[nodes_sel] = np.where(
                         attr[nodes_sel] > vals, vals, attr[nodes_sel]
+                    )
+                elif poly.type == "range":
+                    lo_vals, hi_vals = vals
+                    attr[nodes_sel] = np.minimum(
+                        np.maximum(attr[nodes_sel], lo_vals), hi_vals
                     )
                 else:
                     raise Exception(

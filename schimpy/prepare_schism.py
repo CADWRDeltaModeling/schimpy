@@ -327,7 +327,7 @@ def create_vgrid(s, inputs, logger):
         section.pop("hgrid", None)
         v2_only_keys = {
             "depth_function", "algorithm", "region_constraints",
-            "constraint_taper_rings", "dz_scale_gr3", "debug_prefix", "pileup_log",
+            "dz_scale_gr3", "debug_prefix", "pileup_log",
             "diagnostics", "diagnostics_dir",
         }
         stray = v2_only_keys & set(section.keys())
@@ -384,7 +384,6 @@ def create_vgrid(s, inputs, logger):
             depth_function=section.get("depth_function"),
             algorithm=section.get("algorithm"),
             region_constraints=section.get("region_constraints"),
-            constraint_taper_rings=int(section.get("constraint_taper_rings", 3)),
             dz_scale_gr3=section.get("dz_scale_gr3"),
             diagnostics=vgrid_diagnostics_enabled,
             diagnostics_dir=vgrid_diagnostics_dir,

@@ -36,8 +36,7 @@ from schimpy.lsc2_v2 import (
     run_pipeline,
 )
 from schimpy.schism_mesh import read_mesh, write_mesh
-from schimpy.schism_polygon import SchismPolygonDictConverter
-from schimpy.schism_setup import ensure_outdir
+from schimpy.schism_setup import SchismSetup, ensure_outdir
 from schimpy.schism_vertical_mesh import SchismLocalVerticalMesh, write_vmesh
 
 logger = logging.getLogger(__name__)
@@ -73,78 +72,189 @@ def _make_bilinear(params):
 
 
 # ---------------------------------------------------------------------------
-# Region constraint builder (works with polygon dicts from YAML include:)
+# Region constraint builder (uses SchismSetup.apply_polygons for node selection)
 # ---------------------------------------------------------------------------
 
-def _build_node_constraints_from_polygons(mesh, polygons):
-    """Build per-node n_min / n_max arrays from a list of SchismPolygon objects.
+def _layers_to_levels(value):
+    """Convert a user-facing layer count to internal Nlevels."""
+    return int(float(value)) + 1
 
-    Parameters
-    ----------
-    mesh : SchismMesh
-    polygons : list of SchismPolygon
-        Each polygon has .type ('min' or 'max') and .attribute (layer count).
 
-    Returns
-    -------
-    n_min, n_max : ndarray or None
-    """
-    from shapely.geometry import Point
-    from shapely.prepared import prep as shapely_prep
-
-    n = mesh.nodes.shape[0]
-    n_min = np.full(n, 2, dtype=np.int32)
-    n_max = np.full(n, 99999, dtype=np.int32)
-    has_min = False
-    has_max = False
-
-    for poly in polygons:
-        ptype = str(poly.type).strip().lower()
-        # External convention: attribute = number of layers
-        # Internal convention: Nlevels = layers + 1
-        value = int(float(poly.attribute)) + 1
-        if ptype not in ("min", "max"):
-            logger.warning(
-                "region_constraints: skipping polygon '%s' with type='%s'",
-                poly.name, ptype,
+def _parse_range_attribute(attr, *, polygon_name):
+    """Parse a two-value layer-count range from YAML/GIS attributes."""
+    if isinstance(attr, str):
+        s = attr.strip()
+        if not s:
+            raise ValueError(
+                f"region_constraints polygon '{polygon_name}' has type='range' "
+                "but attribute is an empty string"
             )
-            continue
-        prepared = shapely_prep(poly)
-        for i in range(n):
-            pt = Point(float(mesh.nodes[i, 0]), float(mesh.nodes[i, 1]))
-            if prepared.contains(pt):
-                if ptype == "min":
-                    n_min[i] = max(n_min[i], value)
-                    has_min = True
-                else:
-                    n_max[i] = min(n_max[i], value)
-                    has_max = True
+        try:
+            import ast
+            parsed = ast.literal_eval(s)
+        except (ValueError, SyntaxError):
+            parsed = [part.strip() for part in s.strip("[]()").split(",")]
+        attr = parsed
 
-    conflict = n_min > n_max
-    if conflict.any():
-        idx = np.where(conflict)[0]
+    if isinstance(attr, np.ndarray):
+        vals = attr.tolist()
+    elif isinstance(attr, (list, tuple)):
+        vals = list(attr)
+    else:
         raise ValueError(
-            f"Polygon min > max at {conflict.sum()} nodes "
-            f"(first: node {idx[0]}, min={n_min[idx[0]]}, max={n_max[idx[0]]})"
+            f"region_constraints polygon '{polygon_name}' has type='range' "
+            f"but attribute={attr!r} is not a two-value sequence or string"
         )
 
-    n_min_out = n_min if has_min else None
-    n_max_out = n_max if has_max else None
-    n_constrained = int((n_min > 2).sum()) + int((n_max < 99999).sum())
+    if len(vals) != 2:
+        raise ValueError(
+            f"region_constraints polygon '{polygon_name}' has type='range' "
+            f"but attribute={attr!r} parsed to {len(vals)} values; "
+            "expected [min_layers, max_layers]"
+        )
+    return vals
+
+
+def _constraint_level_bounds_from_polygon_dict(polygon):
+    """Return (lo, hi) internal level-count bounds for one vgrid polygon dict.
+
+    User-facing region constraint attributes are layer counts.  The vgrid
+    algorithm works in level/interface counts, so conversion happens here and
+    only here.
+    """
+    name = polygon.get("name") or polygon.get("Name")
+    ptype = str(polygon.get("type", "none")).strip().lower()
+    attr = polygon.get("attribute")
+
+    if attr is None:
+        raise ValueError(f"region_constraints polygon {name!r} is missing attribute")
+
+    if ptype == "min":
+        lo = _layers_to_levels(attr)
+        hi = None
+    elif ptype == "max":
+        lo = None
+        hi = _layers_to_levels(attr)
+    elif ptype in ("none", "fixed", "set", ""):
+        lo = hi = _layers_to_levels(attr)
+    elif ptype == "range":
+        vals = _parse_range_attribute(attr, polygon_name=name)
+        lo = _layers_to_levels(vals[0])
+        hi = _layers_to_levels(vals[1])
+    else:
+        raise ValueError(
+            f"region_constraints polygon {name!r} has unsupported type={ptype!r}. "
+            "Expected one of: min, max, none, range."
+        )
+
+    if lo is not None and hi is not None and lo > hi:
+        raise ValueError(
+            f"region_constraints polygon {name!r} has min > max after conversion "
+            f"to levels (min={lo}, max={hi}). Constraint attributes are layer "
+            "counts in [min_layers, max_layers] order."
+        )
+    return lo, hi
+
+
+def _clone_polygon_with_type_and_attribute(polygon, ptype, attribute):
+    """Return a plain polygon dict with vgrid bounds converted to levels."""
+    out = dict(polygon)
+    out["type"] = ptype
+    out["attribute"] = attribute
+    return out
+
+def _build_node_constraints_from_polygon_dicts(mesh, polygon_dicts):
+    """Build vgrid n_min/n_max arrays using SchismSetup.apply_polygons.
+
+    Reuses common polygon infrastructure for node selection, but keeps
+    source tracking so min/max conflicts identify the responsible polygons.
+    """
+    n = mesh.nodes.shape[0]
+    min_polygons = []
+    max_polygons = []
+    min_sources = []
+    max_sources = []
+
+    for ipoly, polygon in enumerate(polygon_dicts):
+        lo, hi = _constraint_level_bounds_from_polygon_dict(polygon)
+        name = polygon.get("name", f"polygon_{ipoly}")
+        src = f"{ipoly}: {name}"
+
+        if lo is not None:
+            min_polygons.append(
+                _clone_polygon_with_type_and_attribute(polygon, "min", lo)
+            )
+            min_sources.append(src)
+
+        if hi is not None:
+            max_polygons.append(
+                _clone_polygon_with_type_and_attribute(polygon, "max", hi)
+            )
+            max_sources.append(src)
+
+    setup = SchismSetup(logger)
+    setup.mesh = mesh
+
+    n_min = None
+    n_max = None
+
+    min_source = np.full(n, "", dtype=object)
+    max_source = np.full(n, "", dtype=object)
+
+    if min_polygons:
+        n_min_work = np.full(n, 2, dtype=np.int32)
+
+        for poly, src in zip(min_polygons, min_sources):
+            vals = setup.apply_polygons([poly], default=2).astype(np.int32)
+            changed = vals > n_min_work
+            n_min_work[changed] = vals[changed]
+            min_source[changed] = src
+
+        n_min = n_min_work
+
+    if max_polygons:
+        n_max_work = np.full(n, 99999, dtype=np.int32)
+
+        for poly, src in zip(max_polygons, max_sources):
+            vals = setup.apply_polygons([poly], default=99999).astype(np.int32)
+            changed = vals < n_max_work
+            n_max_work[changed] = vals[changed]
+            max_source[changed] = src
+
+        n_max = n_max_work
+
+    n_min_check = n_min if n_min is not None else np.full(n, 2, dtype=np.int32)
+    n_max_check = n_max if n_max is not None else np.full(n, 99999, dtype=np.int32)
+
+    conflict = n_min_check > n_max_check
+    if conflict.any():
+        idx = np.where(conflict)[0]
+        i = idx[0]
+
+        raise ValueError(
+            f"Polygon min > max at {conflict.sum()} nodes.\n"
+            f"First conflict:\n"
+            f"  node        : {i}\n"
+            f"  min level   : {n_min_check[i]} from {min_source[i]}\n"
+            f"  max level   : {n_max_check[i]} from {max_source[i]}\n"
+            f"  min layers  : {n_min_check[i] - 1}\n"
+            f"  max layers  : {n_max_check[i] - 1}\n"
+            "Constraint attributes in the user interface are layer counts; internal diagnostics "
+            "Nmin/Nmax here are levels. Check for overlapping polygons with conflicting min/max layer counts. "
+            "Use type='range' with attribute=[min_layers, max_layers] to specify a range of allowed layers."
+            "Avoid complex polygons, MULTIPOLYGONs with holes or self-intersections, as they may produce unexpected node selections."
+        )
+
+    n_constrained = int((n_min_check > 2).sum()) + int((n_max_check < 99999).sum())
     logger.info(
         "region_constraints: %d polygons, %d node constraints applied",
-        len(polygons), n_constrained,
+        len(polygon_dicts), n_constrained,
     )
-    return n_min_out, n_max_out
 
+    return n_min, n_max
 
 def _load_region_constraints(mesh, rc_section):
-    """Parse the region_constraints section (dict with 'polygons' key)
-    and return (n_min, n_max) arrays.
-
-    The dict comes from YAML after include: expansion, so it contains
-    the polygon list inline.
-    """
+    """Parse the region_constraints section and return (n_min, n_max) arrays."""
     if rc_section is None:
         return None, None
     if not isinstance(rc_section, dict):
@@ -152,11 +262,11 @@ def _load_region_constraints(mesh, rc_section):
             "region_constraints must be a dict with a 'polygons' key "
             "(use 'include: <file>' to reference an external polygon YAML)."
         )
-    polygons = SchismPolygonDictConverter().read(rc_section)
+    polygons = rc_section.get("polygons") or []
     if not polygons:
         logger.warning("region_constraints section present but contains no polygons")
         return None, None
-    return _build_node_constraints_from_polygons(mesh, polygons)
+    return _build_node_constraints_from_polygon_dicts(mesh, polygons)
 
 
 # ---------------------------------------------------------------------------
@@ -195,8 +305,55 @@ def _build_pipeline_params(section):
         pp_kwargs["L_smooth_depth_scale"] = float(alg["Lsmooth_depth_scale"])
     if "Lsmooth_length_power" in alg:
         pp_kwargs["L_smooth_length_power"] = float(alg["Lsmooth_length_power"])
-    if "constraint_taper_rings" in section:
-        pp_kwargs["constraint_taper_rings"] = int(section["constraint_taper_rings"])
+
+    # Optional projected/Dirichlet-like diffusion for polygon constraints.
+    # This is intentionally nested and default-off so legacy configs reproduce.
+    cd = alg.get("constraint_diffusion", {}) or {}
+    if not isinstance(cd, dict):
+        raise TypeError("algorithm.constraint_diffusion must be a mapping if provided")
+    if "constraint_diffusion_enable" in alg:
+        pp_kwargs["constraint_diffusion_enable"] = bool(alg["constraint_diffusion_enable"])
+    if "enabled" in cd:
+        pp_kwargs["constraint_diffusion_enable"] = bool(cd["enabled"])
+    if "constraint_diffusion_passes" in alg:
+        pp_kwargs["constraint_diffusion_passes"] = int(alg["constraint_diffusion_passes"])
+    if "passes" in cd:
+        pp_kwargs["constraint_diffusion_passes"] = int(cd["passes"])
+    if "constraint_diffusion_weight" in alg:
+        pp_kwargs["constraint_diffusion_weight"] = float(alg["constraint_diffusion_weight"])
+    if "weight" in cd:
+        pp_kwargs["constraint_diffusion_weight"] = float(cd["weight"])
+    if "method" in cd:
+        pp_kwargs["constraint_diffusion_method"] = str(cd["method"])
+    if "constraint_diffusion_method" in alg:
+        pp_kwargs["constraint_diffusion_method"] = str(alg["constraint_diffusion_method"])
+    if "L_scale" in cd:
+        pp_kwargs["constraint_diffusion_L_scale"] = float(cd["L_scale"])
+    if "depth_scale" in cd:
+        pp_kwargs["constraint_diffusion_depth_scale"] = float(cd["depth_scale"])
+    if "length_power" in cd:
+        pp_kwargs["constraint_diffusion_length_power"] = float(cd["length_power"])
+    if "tol" in cd:
+        pp_kwargs["constraint_diffusion_tol"] = float(cd["tol"])
+
+    # Integer topological cleanup can be given as flat keys or as a nested
+    # integer_cleanup: {enabled, max_component_nodes, max_passes} section.
+    ic = alg.get("integer_cleanup", {}) or {}
+    if not isinstance(ic, dict):
+        raise TypeError("algorithm.integer_cleanup must be a mapping if provided")
+    if "integer_cleanup_enable" in alg:
+        pp_kwargs["integer_cleanup_enable"] = bool(alg["integer_cleanup_enable"])
+    if "enabled" in ic:
+        pp_kwargs["integer_cleanup_enable"] = bool(ic["enabled"])
+    if "integer_cleanup_max_nodes" in alg:
+        pp_kwargs["integer_cleanup_max_nodes"] = int(alg["integer_cleanup_max_nodes"])
+    if "max_component_nodes" in ic:
+        pp_kwargs["integer_cleanup_max_nodes"] = int(ic["max_component_nodes"])
+    if "integer_cleanup_max_passes" in alg:
+        pp_kwargs["integer_cleanup_max_passes"] = int(alg["integer_cleanup_max_passes"])
+    if "max_passes" in ic:
+        pp_kwargs["integer_cleanup_max_passes"] = int(ic["max_passes"])
+
 
     pp = PipelineParams(hysteresis=hyst, fit=fit, **pp_kwargs)
     return pp
@@ -242,7 +399,6 @@ def vgrid_gen_v2(
     depth_function=None,
     algorithm=None,
     region_constraints=None,
-    constraint_taper_rings=3,
     dz_scale_gr3=None,
     diagnostics=False,
     diagnostics_dir=None,
@@ -273,8 +429,6 @@ def vgrid_gen_v2(
         Nested dict with ``hysteresis`` and ``fit`` sub-dicts.
     region_constraints : dict, optional
         Dict with ``polygons`` key (from YAML ``include:`` expansion).
-    constraint_taper_rings : int
-        Soft-blend rings at constraint polygon edges.
     dz_scale_gr3 : str, optional
         Path to a scalar GR3 for per-node dz scaling.
     diagnostics : bool or dict, optional
@@ -331,7 +485,6 @@ def vgrid_gen_v2(
     section = {
         "depth_function": depth_function,
         "algorithm": algorithm,
-        "constraint_taper_rings": constraint_taper_rings,
     }
 
     # --- Size function ---
@@ -357,6 +510,8 @@ def vgrid_gen_v2(
         debug = {
             "Lstar": f"{debug_prefix}Lstar.gr3",
             "Ltilde": f"{debug_prefix}Lstar_smooth.gr3",
+            "Lconstrained": f"{debug_prefix}Lstar_constrained.gr3",
+            "Nlevels_raw": f"{debug_prefix}nlevels_raw.gr3",
             "Nlevels": f"{debug_prefix}nlevels.gr3",
             "Nlayers": f"{debug_prefix}nlayers.gr3",
             "tbottom": f"{debug_prefix}tbottom_target.gr3",
@@ -473,7 +628,6 @@ def create_vgrid_lsc2_v2_cli(hgrid, eta, vgrid_version, out_vgrid, config,
         depth_function=cfg.get("depth_function"),
         algorithm=cfg.get("algorithm"),
         region_constraints=cfg.get("region_constraints"),
-        constraint_taper_rings=int(cfg.get("constraint_taper_rings", 3)),
         diagnostics=cfg_diagnostics,
         diagnostics_dir=diagnostics_dir or cfg.get("diagnostics_dir"),
         debug_prefix=debug_prefix,

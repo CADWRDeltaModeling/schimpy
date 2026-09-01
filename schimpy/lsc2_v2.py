@@ -933,6 +933,296 @@ def smooth_Lstar_on_mesh(mesh,
     )
 
 
+def _constraint_diffusion_weights(mesh,
+                                  reference: np.ndarray,
+                                  depth: np.ndarray,
+                                  method: str = "isotropic",
+                                  L_scale: float = 1.25,
+                                  depth_scale: float = 4.0,
+                                  length_power: float = 0.0):
+    """Return neighbor lists and row-normalized weights for L-constraint diffusion.
+
+    The weight semantics intentionally match ``smooth_Lstar_on_mesh``:
+    ``isotropic`` gives an unweighted neighbor mean, while ``bilateral`` reduces
+    conductance across large L/depth jumps and can optionally include edge length.
+    """
+    method = str(method or "isotropic").strip().lower()
+    n = reference.size
+    coords = np.asarray(mesh.nodes[:, 0:2], dtype=np.float64)
+    ref = np.asarray(reference, dtype=np.float64)
+    H = np.asarray(depth, dtype=np.float64)
+    use_bilateral = method in ("bilateral", "edge_aware", "edge-aware", "anisotropic")
+    if method not in ("isotropic", "legacy", "laplace", "laplacian",
+                      "bilateral", "edge_aware", "edge-aware", "anisotropic"):
+        raise ValueError(
+            f"Unknown constraint_diffusion.method='{method}'. Expected isotropic or bilateral."
+        )
+
+    use_L = use_bilateral and L_scale is not None and float(L_scale) > 0.0
+    use_H = use_bilateral and depth_scale is not None and float(depth_scale) > 0.0
+    lp = float(length_power or 0.0) if use_bilateral else 0.0
+
+    neighbors = []
+    weights = []
+    for i in range(n):
+        nbrs = np.asarray(mesh.get_neighbor_nodes(i), dtype=np.int32)
+        neighbors.append(nbrs)
+        if nbrs.size == 0:
+            weights.append(np.zeros(0, dtype=np.float64))
+            continue
+        w = np.ones(nbrs.size, dtype=np.float64)
+        if lp != 0.0:
+            dxy = coords[nbrs] - coords[i]
+            ell = np.sqrt(np.sum(dxy * dxy, axis=1))
+            w *= np.power(np.maximum(ell, 1.0e-12), -lp)
+        if use_L:
+            dL = ref[nbrs] - ref[i]
+            w *= np.exp(-((dL / float(L_scale)) ** 2))
+        if use_H:
+            dH = H[nbrs] - H[i]
+            w *= np.exp(-((dH / float(depth_scale)) ** 2))
+        sw = float(np.sum(w))
+        if sw > 0.0 and np.isfinite(sw):
+            w /= sw
+        weights.append(w)
+    return neighbors, weights
+
+
+def diffuse_Ltilde_with_constraints(mesh,
+                                    Ltilde: np.ndarray,
+                                    depth: np.ndarray,
+                                    n_min: Optional[np.ndarray] = None,
+                                    n_max: Optional[np.ndarray] = None,
+                                    passes: int = 40,
+                                    weight: float = 0.6,
+                                    method: str = "isotropic",
+                                    L_scale: float = 1.25,
+                                    depth_scale: float = 4.0,
+                                    length_power: float = 0.0,
+                                    tol: float = 0.0) -> np.ndarray:
+    """Diffuse continuous level counts while respecting polygon constraints.
+
+    Fixed constraints (``n_min == n_max``) are treated as Dirichlet nodes and
+    are re-imposed every iteration.  Range/min/max constraints are box
+    constraints: after each screened diffusion update, constrained nodes are
+    projected back into their allowed interval.  Unconstrained nodes are free
+    except for the global two-level minimum.
+
+    This stage is intended to run after the ordinary L* smoother.  Unlike the
+    legacy inside-polygon clip, fixed constrained regions continue to act as
+    sources during smoothing, so their influence can propagate into adjacent
+    range polygons and unconstrained transition zones.
+    """
+    x0 = np.asarray(Ltilde, dtype=np.float64)
+    x = x0.copy()
+    n = x.size
+    if passes <= 0 or weight <= 0.0 or (n_min is None and n_max is None):
+        return x
+
+    lo = np.full(n, 2.0, dtype=np.float64)
+    hi = np.full(n, np.inf, dtype=np.float64)
+    if n_min is not None:
+        lo = np.maximum(lo, np.asarray(n_min, dtype=np.float64))
+    if n_max is not None:
+        hi = np.minimum(hi, np.asarray(n_max, dtype=np.float64))
+
+    bad = lo > hi
+    if np.any(bad):
+        i = int(np.flatnonzero(bad)[0])
+        raise ValueError(
+            f"constraint diffusion got inconsistent bounds at node {i}: lo={lo[i]} hi={hi[i]}"
+        )
+
+    constrained = np.isfinite(hi) | (lo > 2.0)
+    fixed = constrained & np.isfinite(hi) & np.isclose(lo, hi)
+
+    # Project once before iteration so fixed nodes are already sources.
+    x = np.minimum(np.maximum(x, lo), hi)
+    x[fixed] = lo[fixed]
+
+    alpha = min(max(float(weight), 0.0), 1.0)
+    neighbors, weights = _constraint_diffusion_weights(
+        mesh, x0, depth, method=method,
+        L_scale=L_scale, depth_scale=depth_scale, length_power=length_power,
+    )
+
+    last_delta = 0.0
+    for _ in range(int(passes)):
+        old = x.copy()
+        for i, nbrs in enumerate(neighbors):
+            if fixed[i] or nbrs.size == 0:
+                continue
+            w = weights[i]
+            if w.size == 0:
+                continue
+            nbr_mean = float(np.dot(w, old[nbrs]))
+            # Screened diffusion: retain a pull to the pre-constraint smoothed field.
+            x[i] = old[i] + alpha * (nbr_mean - old[i])
+
+        x = np.minimum(np.maximum(x, lo), hi)
+        x[fixed] = lo[fixed]
+        last_delta = float(np.max(np.abs(x - old)))
+        if tol and last_delta <= float(tol):
+            break
+
+    logger.info(
+        "   constraint diffusion: passes=%d weight=%.3g method=%s constrained=%d fixed=%d max_delta=%.3g",
+        int(passes), alpha, method, int(np.count_nonzero(constrained)),
+        int(np.count_nonzero(fixed)), last_delta,
+    )
+    return x
+
+
+def cleanup_integer_components(mesh,
+                               Nlevels: np.ndarray,
+                               max_component_nodes: int = 6,
+                               max_passes: int = 5,
+                               n_min: Optional[np.ndarray] = None,
+                               n_max: Optional[np.ndarray] = None) -> np.ndarray:
+    """Remove small strict-extremum components in integer level counts.
+
+    This is a post-quantization topological simplification of the integer
+    ``Nlevels`` field.  It repeatedly finds exact-value connected components
+    whose node count is small, but removes them only when they are strict local
+    extrema relative to their exterior boundary:
+
+      * hill: component value > every boundary value
+      * dip:  component value < every boundary value
+
+    Small components that form a legitimate transition band are preserved.  For
+    example, a small ``22`` component between exterior ``21`` and ``23`` values
+    is not removed.  This avoids eroding stepped ramps into cliffs.
+
+    The operation is scale-free: "small" is measured in mesh-node count, relying
+    on the mesh adaptation to encode physical scale.  It is also constraint-aware:
+    if polygon n_min/n_max arrays are present, candidate replacement values that
+    would violate any node in the component are ignored.
+    """
+    N = np.asarray(Nlevels, dtype=np.int32).copy()
+    max_nodes = int(max_component_nodes or 0)
+    max_passes = int(max_passes or 0)
+    if max_nodes <= 0 or max_passes <= 0:
+        return N
+
+    n = N.size
+    neighbors = [np.asarray(mesh.get_neighbor_nodes(i), dtype=np.int32)
+                 for i in range(n)]
+
+    if n_min is None:
+        nmin = np.full(n, -2**30, dtype=np.int32)
+    else:
+        nmin = np.asarray(n_min, dtype=np.int32)
+    if n_max is None:
+        nmax = np.full(n, 2**30, dtype=np.int32)
+    else:
+        nmax = np.asarray(n_max, dtype=np.int32)
+
+    total_components = 0
+    total_nodes = 0
+    total_hills = 0
+    total_dips = 0
+
+    for ipass in range(max_passes):
+        changed_components = 0
+        changed_nodes = 0
+        changed_hills = 0
+        changed_dips = 0
+
+        # Work high-to-low so unsupported peaks/ridges peel off naturally.
+        # Dips are still removed in the same pass when their value is reached.
+        values = np.unique(N).astype(np.int32)[::-1]
+
+        for value in values:
+            is_value = (N == value)
+            if not np.any(is_value):
+                continue
+            visited = np.zeros(n, dtype=bool)
+            seeds = np.flatnonzero(is_value)
+
+            for seed in seeds:
+                if visited[seed] or N[seed] != value:
+                    continue
+
+                # Flood-fill one exact-value component.
+                stack = [int(seed)]
+                visited[seed] = True
+                comp = []
+                boundary_vals = []
+
+                while stack:
+                    i = stack.pop()
+                    comp.append(i)
+                    for j in neighbors[i]:
+                        jj = int(j)
+                        if N[jj] == value:
+                            if not visited[jj]:
+                                visited[jj] = True
+                                stack.append(jj)
+                        else:
+                            boundary_vals.append(int(N[jj]))
+
+                if len(comp) > max_nodes or not boundary_vals:
+                    continue
+
+                comp_idx = np.asarray(comp, dtype=np.int32)
+                bvals = np.asarray(boundary_vals, dtype=np.int32)
+
+                # Only remove true local extrema.  If exterior values exist on
+                # both sides of the component value, it is a transition band,
+                # not a hill/dip artifact, and must be preserved.
+                bmin = int(np.min(bvals))
+                bmax = int(np.max(bvals))
+                is_hill = int(value) > bmax
+                is_dip = int(value) < bmin
+                if not (is_hill or is_dip):
+                    continue
+
+                # Respect polygon constraints, if present, for every node in C.
+                lo = int(np.max(nmin[comp_idx]))
+                hi = int(np.min(nmax[comp_idx]))
+                allowed = bvals[(bvals >= lo) & (bvals <= hi)]
+                if allowed.size == 0:
+                    continue
+
+                # Choose boundary mode; tie-break by closeness to current value,
+                # then by smaller value for deterministic behavior.
+                u, counts = np.unique(allowed, return_counts=True)
+                max_count = counts.max()
+                tied = u[counts == max_count]
+                repl = int(sorted(tied, key=lambda x: (abs(int(x) - int(value)), int(x)))[0])
+                if repl == int(value):
+                    continue
+
+                N[comp_idx] = repl
+                changed_components += 1
+                changed_nodes += len(comp_idx)
+                if is_hill:
+                    changed_hills += 1
+                else:
+                    changed_dips += 1
+
+        logger.info(
+            "   integer cleanup: pass %d removed %d extrema components "
+            "(%d nodes; hills=%d dips=%d)",
+            ipass + 1, changed_components, changed_nodes,
+            changed_hills, changed_dips,
+        )
+        total_components += changed_components
+        total_nodes += changed_nodes
+        total_hills += changed_hills
+        total_dips += changed_dips
+        if changed_components == 0:
+            break
+
+    if total_components:
+        logger.info(
+            "   integer cleanup: total removed %d extrema components "
+            "(%d nodes; hills=%d dips=%d)",
+            total_components, total_nodes, total_hills, total_dips,
+        )
+    return N
+
+
 # -----------------------------------------------------------------------------
 # B) Hysteretic quantization of levels (no regional bounds)
 # -----------------------------------------------------------------------------
@@ -1711,12 +2001,22 @@ class PipelineParams:
     L_smooth_L_scale: float = 1.25
     L_smooth_depth_scale: float = 4.0
     L_smooth_length_power: float = 0.0
+    constraint_diffusion_enable: bool = False
+    constraint_diffusion_passes: int = 40
+    constraint_diffusion_weight: float = 0.6
+    constraint_diffusion_method: str = "same"
+    constraint_diffusion_L_scale: Optional[float] = None
+    constraint_diffusion_depth_scale: Optional[float] = None
+    constraint_diffusion_length_power: Optional[float] = None
+    constraint_diffusion_tol: float = 0.0
+    integer_cleanup_enable: bool = False
+    integer_cleanup_max_nodes: int = 6
+    integer_cleanup_max_passes: int = 5
     hysteresis: HysteresisParams = field(default_factory=HysteresisParams)
     fit: FitParams = field(default_factory=FitParams)
     # Polygon region constraints (per-node arrays, or None)
     n_min: Optional[np.ndarray] = None   # int32, minimum Nlevels per node
     n_max: Optional[np.ndarray] = None   # int32, maximum Nlevels per node
-    constraint_taper_rings: int = 3      # BFS rings for Ltilde soft-blend at constraint edges
 
 
 
@@ -1777,56 +2077,65 @@ def run_pipeline(mesh,
         pp.L_smooth_method, pp.L_smooth_passes, pp.L_smooth_kappa,
         pp.L_smooth_L_scale, pp.L_smooth_depth_scale, pp.L_smooth_length_power,
     )
+
+
     # Apply optional boundary priors softly (no shocks)
     Ltilde = apply_boundary_priors_to_Ltilde(mesh, Ltilde, pp.priors)
 
-    # Apply polygon min/max constraints: soft blend Ltilde at constraint edges
-    # Ltilde is in level-count units (float), so targets are level counts too.
+    # Apply polygon constraints to the continuous level field.  The legacy path
+    # only clips inside constrained polygons.  The optional constraint-diffusion
+    # path treats fixed constraints as Dirichlet nodes and range/min/max
+    # constraints as projected box bounds during smoothing, so constrained
+    # regions continue to influence adjacent transition zones.
     if pp.n_min is not None or pp.n_max is not None:
-        rings = pp.constraint_taper_rings
-        n = len(Ltilde)
-        out = Ltilde.copy()
-        # For min constraints: where n_min > 2, nudge Ltilde UP so quantization
-        # naturally produces at least n_min levels.
-        if pp.n_min is not None:
-            seeds = np.where(pp.n_min > 2)[0]
-            if len(seeds) > 0:
-                target_L = pp.n_min[seeds].astype(float)  # level count
-                # For each seed, raise Ltilde if too small (would give too few levels)
-                for idx, s in enumerate(seeds):
-                    if out[s] < target_L[idx]:
-                        out[s] = target_L[idx]
-                # Taper: BFS from outer boundary of constrained region into unconstrained space
-                all_constrained = set(np.where(pp.n_min > 2)[0])
-                boundary_seeds = []
-                for s in all_constrained:
-                    for nb in mesh.get_neighbor_nodes(s):
-                        if nb not in all_constrained:
-                            boundary_seeds.append(nb)
-                            break
-                if boundary_seeds and rings > 0:
-                    dist = _rings_from_seeds(mesh, np.array(boundary_seeds, dtype=int), rings)
-                    for i in range(n):
-                        if i in all_constrained or dist[i] >= rings:
-                            continue
-                        w = 0.5 * (1.0 - np.cos(np.pi * np.clip((rings - dist[i]) / rings, 0, 1)))
-                        target_i = float(pp.n_min[i]) if pp.n_min[i] > 2 else out[i]
-                        out[i] = max(out[i], (1.0 - w) * out[i] + w * target_i)
-        # For max constraints: where n_max < 99999, nudge Ltilde DOWN
-        if pp.n_max is not None:
-            seeds = np.where(pp.n_max < 99999)[0]
-            if len(seeds) > 0:
-                target_L = pp.n_max[seeds].astype(float)  # level count
-                for idx, s in enumerate(seeds):
-                    if out[s] > target_L[idx]:
-                        out[s] = target_L[idx]
-        Ltilde = out
-        n_blend = int((pp.n_min is not None and (pp.n_min > 2).sum()) or 0) + \
-                  int((pp.n_max is not None and (pp.n_max < 99999).sum()) or 0)
-        logger.info("   polygon constraints: soft-blended Ltilde at %d constrained nodes", n_blend)
+        if pp.constraint_diffusion_enable:
+            method = str(pp.constraint_diffusion_method or "same")
+            if method.strip().lower() == "same":
+                method = pp.L_smooth_method
+            L_scale = (pp.L_smooth_L_scale if pp.constraint_diffusion_L_scale is None
+                       else pp.constraint_diffusion_L_scale)
+            depth_scale = (pp.L_smooth_depth_scale if pp.constraint_diffusion_depth_scale is None
+                           else pp.constraint_diffusion_depth_scale)
+            length_power = (pp.L_smooth_length_power if pp.constraint_diffusion_length_power is None
+                            else pp.constraint_diffusion_length_power)
+            Ltilde = diffuse_Ltilde_with_constraints(
+                mesh, Ltilde, dpos,
+                n_min=pp.n_min, n_max=pp.n_max,
+                passes=pp.constraint_diffusion_passes,
+                weight=pp.constraint_diffusion_weight,
+                method=method,
+                L_scale=L_scale,
+                depth_scale=depth_scale,
+                length_power=length_power,
+                tol=pp.constraint_diffusion_tol,
+            )
+        else:
+            out = Ltilde.copy()
+            n_raised = 0
+            n_lowered = 0
+
+            if pp.n_min is not None:
+                m = out < pp.n_min
+                n_raised = int(np.count_nonzero(m))
+                out[m] = pp.n_min[m].astype(float)
+
+            if pp.n_max is not None:
+                m = out > pp.n_max
+                n_lowered = int(np.count_nonzero(m))
+                out[m] = pp.n_max[m].astype(float)
+
+            Ltilde = out
+            n_constrained = int((pp.n_min is not None and (pp.n_min > 2).sum()) or 0) + \
+                            int((pp.n_max is not None and (pp.n_max < 99999).sum()) or 0)
+            logger.info(
+                "   polygon constraints: applied inside polygons only at %d constrained nodes "
+                "(raised Ltilde at %d, lowered at %d)",
+                n_constrained, n_raised, n_lowered,
+            )
 
     _write_debug_node_attr(mesh, debug, "Lstar", Lstar)
     _write_debug_node_attr(mesh, debug, "Ltilde", Ltilde)
+    _write_debug_node_attr(mesh, debug, "Lconstrained", Ltilde)
     if pp.n_min is not None:
         _write_debug_node_attr(mesh, debug, "Nmin", pp.n_min)
     if pp.n_max is not None:
@@ -1850,6 +2159,27 @@ def run_pipeline(mesh,
         Nlevels = np.minimum(Nlevels, pp.n_max)
         if clipped_dn:
             logger.info("   hard-clip: lowered Nlevels at %d nodes to meet n_max", clipped_dn)
+
+    _write_debug_node_attr(mesh, debug, "Nlevels_raw", Nlevels)
+
+    if pp.integer_cleanup_enable:
+        N_before_cleanup = Nlevels.copy()
+        Nlevels = cleanup_integer_components(
+            mesh, Nlevels,
+            max_component_nodes=pp.integer_cleanup_max_nodes,
+            max_passes=pp.integer_cleanup_max_passes,
+            n_min=pp.n_min,
+            n_max=pp.n_max,
+        )
+        n_changed = int(np.count_nonzero(Nlevels != N_before_cleanup))
+        if n_changed:
+            delta = Nlevels.astype(np.int32) - N_before_cleanup.astype(np.int32)
+            logger.info(
+                "   integer cleanup: changed %d nodes (min Δ=%d max Δ=%d)",
+                n_changed, int(delta.min()), int(delta.max()),
+            )
+        else:
+            logger.info("   integer cleanup: no Nlevels changed")
 
     # --- Per-node tmin: relax where hysteresis asks for more levels than
     #     the global tmin allows, instead of capping Nlevels down. ---
