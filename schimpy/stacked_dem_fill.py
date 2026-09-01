@@ -1,16 +1,10 @@
 """Routines to fill elevation (or other scalar) values at points from a prioritized list of rasters"""
 
 import click
+from osgeo import gdal, ogr, osr
 
-try:
-    from osgeo import gdal
-    gdal.UseExceptions()
-    from osgeo.gdalconst import *
-
-    gdal.TermProgress = gdal.TermProgress_nocb
-except ImportError:
-    import gdal
-    from gdalconst import *
+gdal.UseExceptions()
+gdal.TermProgress = gdal.TermProgress_nocb
 
 import yaml
 import hashlib
@@ -22,7 +16,81 @@ import os
 import diskcache as dc
 import json
 import geopandas as gpd
-from shapely.geometry import Point
+from shapely.geometry import Point, box
+from shapely.ops import unary_union
+
+
+
+
+
+
+def _get_by_yaml_root(data, yaml_root):
+    node = data
+    for part in yaml_root.split("/"):
+        if not part:
+            continue
+        node = node[part]
+    return node
+
+
+def read_dem_list(dem_source, yaml_root="dem_list", envvar=None):
+    """
+    Read DEM stack from:
+      - list/tuple of filenames
+      - plain text file, one DEM per line
+      - simple YAML list
+      - YAML mapping at yaml_root, e.g. dem_list or mesh/dem_list
+
+    For SCHISM config YAML with includes/substitution, use schism_yaml.load.
+    """
+    if isinstance(dem_source, (list, tuple)):
+        return list(dem_source)
+
+    dem_source = str(dem_source)
+
+    if dem_source.endswith(".txt"):
+        with open(dem_source, "r") as f:
+            return [
+                line.strip()
+                for line in f
+                if line.strip() and not line.lstrip().startswith("#")
+            ]
+
+    if dem_source.endswith((".yaml", ".yml")):
+        try:
+            from schimpy import schism_yaml
+            with open(dem_source, "r") as f:
+                data = schism_yaml.load(f, envvar=envvar)
+        except Exception:
+            with open(dem_source, "r") as f:
+                data = yaml.safe_load(f)
+
+        if isinstance(data, list):
+            return data
+
+        node = _get_by_yaml_root(data, yaml_root)
+
+        # Accept either:
+        # dem_list: [a.tif, b.tif]
+        # dem_list: {dem_files: [...]}
+        # dem_list: {dem_list: [...]}
+        if isinstance(node, dict):
+            if "dem_files" in node:
+                node = node["dem_files"]
+            elif "dem_list" in node:
+                node = node["dem_list"]
+
+        if not isinstance(node, list):
+            raise ValueError(
+                f"YAML root '{yaml_root}' did not resolve to a DEM filename list"
+            )
+
+        return node
+
+    raise ValueError(f"Unsupported DEM list source: {dem_source}")
+
+
+
 
 
 
@@ -46,7 +114,7 @@ def _stacked_dem_fill(
         if not os.path.exists(infile):
             raise ValueError("File does not exist: %s" % infile)
         print("Using DEM: %s" % infile)
-        indataset = gdal.Open(infile, GA_ReadOnly)
+        indataset = gdal.Open(infile, gdal.GA_ReadOnly)
         gt = indataset.GetGeoTransform()
         rb = indataset.GetRasterBand(1)
         dem = rb.ReadAsArray()
@@ -215,48 +283,17 @@ def stacked_dem_fill(
 
 def create_dem_sampler(
     dem_list,
-    # 'cache_dir' and 'q' kept only for backward compatibility; no longer used here
-    cache_dir: str = None,
-    q: float = None,
+    cache_dir=None,
+    q=None,
     *,
-    out_dir: str = "logs",
-    require_all: bool = False,
-    na_fill: float = DEFAULT_NA_FILL,
-    negate: bool = True,
+    out_dir="logs",
+    require_all=False,
+    na_fill=DEFAULT_NA_FILL,
+    negate=True,
+    yaml_root="dem_list",
+    envvar=None,
 ):
-    """
-    Return a callable dem_sampler(points_xy) that uses stacked_dem_fill.
-    Caching now lives inside stacked_dem_fill; this factory is intentionally thin.
-    Default is depth based (negated)
-
-    Parameters
-    ----------
-    dem_list : str | list[str]
-        YAML path (list of DEM files) or a list of DEM file paths.
-    cache_dir, q : deprecated
-        Ignored; retained to avoid breaking older call sites.
-    out_dir : str
-        Output/log directory passed through to stacked_dem_fill (also hosts the cache).
-    require_all : bool
-        See stacked_dem_fill.
-    na_fill : float | None
-        See stacked_dem_fill.
-    negate : bool
-        If True, return depth (+down). Default is true
-
-    Returns
-    -------
-    callable
-        dem_sampler(points_xy[, values=None]) -> np.ndarray
-    """
-    if isinstance(dem_list, str):
-        with open(dem_list, "r") as f:
-            dem_files = yaml.safe_load(f)
-            if "dem_list" in dem_files:
-                dem_files = dem_files["dem_files"]
-                print(dem_files)
-    else:
-        dem_files = list(dem_list)
+    dem_files = read_dem_list(dem_list, yaml_root=yaml_root, envvar=envvar)
 
     def dem_sampler(points_xy, values=None):
         return stacked_dem_fill(
@@ -610,25 +647,457 @@ def stacked_dem_fill_interpolate(filename, demfile, elev2depth, fill):
         raise ValueError("Input file format not recognized (no gr3 or 2dm extension")
 
 
-@click.command()
+
+
+
+def _crs_id(crs_wkt):
+    if not crs_wkt:
+        return None
+
+    srs = osr.SpatialReference()
+    srs.ImportFromWkt(crs_wkt)
+    srs.AutoIdentifyEPSG()
+
+    auth_name = srs.GetAuthorityName(None)
+    auth_code = srs.GetAuthorityCode(None)
+
+    if auth_name and auth_code:
+        return f"{auth_name}:{auth_code}"
+
+    return None
+
+
+def _crs_equal(crs_wkt, reference_wkt):
+    """Compare two CRS definitions that could not be identified by authority code."""
+    if not crs_wkt or not reference_wkt:
+        return not crs_wkt and not reference_wkt
+
+    srs = osr.SpatialReference()
+    srs.ImportFromWkt(crs_wkt)
+    ref = osr.SpatialReference()
+    ref.ImportFromWkt(reference_wkt)
+
+    return bool(srs.IsSame(ref))
+
+
+def _dem_valid_support_mask(dem):
+    """Mask of bilinear-supported cells between raster centers."""
+    valid = ~np.isnan(dem)
+    return (
+        valid[:-1, :-1]
+        & valid[:-1, 1:]
+        & valid[1:, :-1]
+        & valid[1:, 1:]
+    )
+
+
+def _support_cell_transform(gt):
+    """
+    Return geotransform for the bilinear support mask.
+
+    Original raster values are interpreted at cell centers in bilinear().
+    The support mask cell [i,j] covers the rectangle bounded by neighboring
+    raster centers.
+    """
+    return (
+        gt[0] + 0.5 * gt[1],
+        gt[1],
+        gt[2],
+        gt[3] + 0.5 * gt[5],
+        gt[4],
+        gt[5],
+    )
+
+
+def _polygonize_mask(mask, gt, crs_wkt=None):
+    """Polygonize a boolean mask into a GeoDataFrame."""
+    mem_drv = gdal.GetDriverByName("MEM")
+    ny, nx = mask.shape
+    ds = mem_drv.Create("", nx, ny, 1, gdal.GDT_Byte)
+    ds.SetGeoTransform(gt)
+    if crs_wkt:
+        ds.SetProjection(crs_wkt)
+
+    band = ds.GetRasterBand(1)
+    band.WriteArray(mask.astype(np.uint8))
+    band.SetNoDataValue(0)
+
+    drv = ogr.GetDriverByName("MEM")
+    vds = drv.CreateDataSource("")
+    srs = osr.SpatialReference()
+    if crs_wkt:
+        srs.ImportFromWkt(crs_wkt)
+
+    layer = vds.CreateLayer("mask", srs=srs, geom_type=ogr.wkbPolygon)
+    field = ogr.FieldDefn("value", ogr.OFTInteger)
+    layer.CreateField(field)
+
+    gdal.Polygonize(band, band, layer, 0, [], callback=None)
+
+    geoms = []
+    for feat in layer:
+        if feat.GetField("value") == 1:
+            geom = feat.GetGeometryRef()
+            geoms.append(bytes(geom.ExportToWkb()))
+
+    if not geoms:
+        return gpd.GeoDataFrame(geometry=[], crs=crs_wkt)
+
+    return gpd.GeoDataFrame(
+        geometry=gpd.GeoSeries.from_wkb(geoms, crs=crs_wkt),
+        crs=crs_wkt,
+    )
+
+
+def _read_dem_as_nan(infile):
+    ds = gdal.Open(infile, gdal.GA_ReadOnly)
+    if ds is None:
+        raise ValueError(f"Could not open DEM: {infile}")
+
+    gt = ds.GetGeoTransform()
+    crs_wkt = ds.GetProjection()
+    band = ds.GetRasterBand(1)
+    dem = band.ReadAsArray().astype(float)
+    nd = band.GetNoDataValue()
+
+    if nd is not None:
+        dem[dem == nd] = np.nan
+    dem[dem < -20000] = np.nan  # mimic stacked_dem_fill cleanup
+
+    return ds, dem, gt, crs_wkt
+
+
+def stacked_dem_source_regions(
+    files,
+    out_dir,
+    output_name="dem_source_regions.gpkg",
+    write_overlap=True,
+    write_gaps=True,
+    overlap_name="dem_overlap_regions.gpkg",
+    gaps_name="dem_gaps.gpkg",
+):
+    """
+    Create polygon layers describing which DEM wins in a prioritized DEM stack.
+
+    The source regions mimic stacked_dem_fill priority:
+    earlier DEMs claim areas first; later DEMs only claim areas not already
+    covered by higher-priority bilinear support.
+
+    Outputs
+    -------
+    dem_source_regions.gpkg
+        Authoritative first-winning DEM regions.
+    dem_overlap_regions.gpkg, optional
+        Areas where two or more DEMs have bilinear support.
+    dem_gaps.gpkg, optional
+        Bounding-area gaps where no DEM has bilinear support.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+
+    claimed = None
+    all_support = []
+    source_rows = []
+
+    reference_crs = None
+
+    for priority, infile in enumerate(files):
+        if not os.path.exists(infile):
+            raise ValueError(f"File does not exist: {infile}")
+
+        ds, dem, gt, crs_wkt = _read_dem_as_nan(infile)
+
+        if reference_crs is None:
+            reference_crs = crs_wkt
+            reference_crs_id = _crs_id(crs_wkt)
+        else:
+            crs_id = _crs_id(crs_wkt)
+
+            if reference_crs_id and crs_id:
+                same_crs = crs_id == reference_crs_id
+            else:
+                same_crs = _crs_equal(crs_wkt, reference_crs)
+
+            if not same_crs:
+                raise ValueError(
+                    f"DEM CRS mismatch for {infile}: "
+                    f"{crs_id} != {reference_crs_id}"
+                )
+
+        support = _dem_valid_support_mask(dem)
+        support_gt = _support_cell_transform(gt)
+        support_gdf = _polygonize_mask(support, support_gt, crs_wkt)
+
+        if support_gdf.empty:
+            continue
+
+        support_geom = unary_union(support_gdf.geometry)
+        all_support.append(
+            {
+                "priority": priority,
+                "dem": os.path.basename(infile),
+                "path": infile,
+                "geometry": support_geom,
+            }
+        )
+
+        if claimed is None:
+            use_geom = support_geom
+            claimed = support_geom
+        else:
+            use_geom = support_geom.difference(claimed)
+            claimed = unary_union([claimed, use_geom])
+
+        if not use_geom.is_empty:
+            source_rows.append(
+                {
+                    "priority": priority,
+                    "dem": os.path.basename(infile),
+                    "path": infile,
+                    "geometry": use_geom,
+                }
+            )
+
+        ds = None
+
+    source_gdf = gpd.GeoDataFrame(source_rows, geometry="geometry", crs=reference_crs)
+    source_path = os.path.join(out_dir, output_name)
+    source_gdf.to_file(source_path, driver="GPKG")
+
+    outputs = {"source_regions": source_path}
+
+    if write_overlap and all_support:
+        overlap_rows = []
+        for i in range(len(all_support)):
+            for j in range(i + 1, len(all_support)):
+                inter = all_support[i]["geometry"].intersection(all_support[j]["geometry"])
+                if not inter.is_empty:
+                    overlap_rows.append(
+                        {
+                            "dem_a": all_support[i]["dem"],
+                            "priority_a": all_support[i]["priority"],
+                            "dem_b": all_support[j]["dem"],
+                            "priority_b": all_support[j]["priority"],
+                            "geometry": inter,
+                        }
+                    )
+
+        overlap_gdf = gpd.GeoDataFrame(
+            overlap_rows, geometry="geometry", crs=reference_crs
+        )
+        overlap_path = os.path.join(out_dir, overlap_name)
+        overlap_gdf.to_file(overlap_path, driver="GPKG")
+        outputs["overlap_regions"] = overlap_path
+
+    if write_gaps and all_support:
+        # Gap diagnostic over the union of DEM bounds, not the whole world.
+        bounds_union = unary_union([g["geometry"].envelope for g in all_support])
+        support_union = unary_union([g["geometry"] for g in all_support])
+        gaps = bounds_union.difference(support_union)
+
+        gaps_gdf = gpd.GeoDataFrame(
+            [{"geometry": gaps}] if not gaps.is_empty else [],
+            geometry="geometry",
+            crs=reference_crs,
+        )
+        gaps_path = os.path.join(out_dir, gaps_name)
+        gaps_gdf.to_file(gaps_path, driver="GPKG")
+        outputs["gaps"] = gaps_path
+
+    return outputs
+
+
+
+
+
+@click.group()
+def stacked_dem_cli():
+    """Tools for prioritized stacked DEM filling and source-region polygons."""
+    pass
+
+@stacked_dem_cli.command("fill")
 @click.argument("filename", type=click.Path(exists=True))
 @click.argument("demfile", type=click.Path(exists=True))
+@click.option(
+    "--yaml-root",
+    default="dem_list",
+    show_default=True,
+    help=(
+        "Slash-separated YAML path to the DEM list. "
+        "Use 'dem_list' for a simple DEM-list YAML, or 'mesh/dem_list' "
+        "for prepare_schism-style configuration files."
+    ),
+)
 @click.option(
     "--elev2depth",
     is_flag=True,
     default=False,
-    help="Convert elevation to depth by flipping sign. Typical for gr3 format, less so with 2dm.",
+    help=(
+        "Convert DEM elevations to SCHISM depth by multiplying sampled values "
+        "by -1. This is typical for gr3 depth files and unusual for 2dm files."
+    ),
 )
 @click.option(
     "--fill",
+    "na_fill",
     default=DEFAULT_NA_FILL,
     type=float,
-    help="Fill value for areas not covered by supplied rasters.",
+    show_default=True,
+    help=(
+        "Fallback value used for points not covered by any DEM with valid "
+        "bilinear support. Only used when missing points are allowed."
+    ),
 )
-def stacked_fill_cli():
-    """Command line interface to stacked_dem_fill."""
+def fill_cmd(filename, demfile, yaml_root, elev2depth, na_fill):
+    """
+    Fill node elevations/depths in a SCHISM mesh file from a prioritized DEM stack.
+
+    FILENAME is the mesh-like file to modify in place. Supported formats are:
+
+      - .gr3
+      - .2dm
+
+    A backup is written as FILENAME.bak before modification.
+
+    DEMFILE may be:
+
+      - a plain text file with one DEM path per line,
+      - a simple YAML list,
+      - a YAML mapping containing a DEM list at --yaml-root,
+      - a prepare_schism-style YAML file with includes/substitution.
+
+    DEMs are tried in order. For each mesh node, the first DEM with valid
+    bilinear support supplies the value. Bilinear support means the four
+    surrounding raster values are in bounds and not NoData/NaN.
+
+    Examples:
+
+      stacked_dem fill hgrid.gr3 dem_list.yaml --elev2depth
+
+      stacked_dem fill hgrid.gr3 main_bay_delta.yaml \\
+          --yaml-root mesh/dem_list \\
+          --elev2depth
+
+      stacked_dem fill mesh.2dm main_bay_delta_echo.yaml \\
+          --yaml-root mesh/dem_list \\
+          --fill 2.0
+    """
+    files = read_dem_list(demfile, yaml_root=yaml_root)
+
+    stacked_dem_fill_interpolate(
+        filename=filename,
+        files=files,
+        elev2depth=elev2depth,
+        fill=na_fill,
+    )
     
-    stacked_dem_fill_interpolate(filename, demfile, elev2depth, fill)
+
+@stacked_dem_cli.command("poly")
+@click.argument("demfile", type=click.Path(exists=True))
+@click.argument("out_dir", type=click.Path())
+@click.option(
+    "--yaml-root",
+    default="dem_list",
+    show_default=True,
+    help=(
+        "Slash-separated YAML path to the DEM list. "
+        "Use 'dem_list' for a simple DEM-list YAML, or 'mesh/dem_list' "
+        "for prepare_schism-style configuration files."
+    ),
+)
+@click.option(
+    "--output",
+    "source_output",
+    default="dem_source_regions.gpkg",
+    show_default=True,
+    help=(
+        "Output polygon file for priority-resolved DEM source regions. "
+        "Each polygon identifies the first DEM in the stack that has valid "
+        "bilinear support there."
+    ),
+)
+@click.option(
+    "--overlap-output",
+    default="dem_overlap_regions.gpkg",
+    show_default=True,
+    help=(
+        "Optional diagnostic polygon file showing where two or more DEMs "
+        "have valid bilinear support. Priority still determines which DEM "
+        "wins in the source regions."
+    ),
+)
+@click.option(
+    "--gap-output",
+    default="dem_gaps.gpkg",
+    show_default=True,
+    help=(
+        "Optional diagnostic polygon file showing areas inside the combined "
+        "DEM extent where no DEM has valid bilinear support."
+    ),
+)
+@click.option(
+    "--no-overlap",
+    is_flag=True,
+    help="Do not write the overlap diagnostic layer.",
+)
+@click.option(
+    "--no-gaps",
+    is_flag=True,
+    help="Do not write the gap diagnostic layer.",
+)
+def poly_cmd(
+    demfile,
+    out_dir,
+    yaml_root,
+    source_output,
+    overlap_output,
+    gap_output,
+    no_overlap,
+    no_gaps,
+):
+    """
+    Build polygon layers describing a prioritized stacked DEM.
+
+    DEMFILE may be:
+      - a plain text file with one DEM path per line,
+      - a simple YAML list,
+      - a YAML mapping containing a DEM list at --yaml-root,
+      - a prepare_schism-style YAML file with includes/substitution.
+
+    The source-region output answers:
+
+        If stacked_dem_fill sampled this location, which DEM would provide
+        the value?
+
+    A DEM qualifies only where bilinear interpolation has valid support, meaning
+    the four surrounding raster values are in bounds and not NoData/NaN. Earlier
+    DEMs in the list take priority over later DEMs.
+
+    Examples:
+
+        stacked_dem poly dem_list.yaml logs/dem_regions
+
+        stacked_dem poly main_bay_delta.yaml logs/dem_regions \\
+            --yaml-root mesh/dem_list
+
+        stacked_dem poly main_bay_delta_echo.yaml logs/dem_regions \\
+            --yaml-root mesh/dem_list \\
+            --no-overlap
+    """
+    files = read_dem_list(demfile, yaml_root=yaml_root)
+
+    outputs = stacked_dem_source_regions(
+        files=files,
+        out_dir=out_dir,
+        output_name=source_output,
+        write_overlap=not no_overlap,
+        write_gaps=not no_gaps,
+        overlap_name=overlap_output,
+        gaps_name=gap_output,
+    )
+
+    for label, path in outputs.items():
+        click.echo(f"Wrote {label}: {path}")
+
 
 if __name__ == "__main__":
-    stacked_fill_cli()
+    stacked_dem_cli()
