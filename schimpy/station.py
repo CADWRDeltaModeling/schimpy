@@ -91,6 +91,8 @@ def read_staout(
 
     """
 
+    reftime = pd.Timestamp(reftime)
+
     if isinstance(station_infile, str):
         station_in = read_station_in(station_infile)
     else:
