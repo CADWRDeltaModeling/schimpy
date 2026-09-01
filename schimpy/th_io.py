@@ -190,8 +190,12 @@ def read_th(input_path, time_basis=None, to_timestamp=True, elapsed_unit="s", he
             tmp_path = tmp.name
 
         try:
-            out_df = pd.read_table(tmp_path, sep=r"\s+", index_col="datetime")
-            out_df.index = pd.to_datetime(out_df.index)
+            # Use the actual first-column name from the header as the index
+            # column so files that say "time" instead of "datetime" are handled.
+            time_col = header_line.split()[0] if header_line is not None else 0
+            out_df = pd.read_table(tmp_path, sep=r"\s+", index_col=time_col, low_memory=False)
+            out_df.index = pd.to_datetime(out_df.index, format="mixed")
+            out_df.index.name = "datetime"
             if comments_dict:
                 out_df["__comment__"] = None
                 for idx, comment in comments_dict.items():
