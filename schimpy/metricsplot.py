@@ -48,8 +48,7 @@ def safe_window(ts, window):
     if ts is None:
         return None
     # If this line bombs recommend fixing the problem upstream, not catching
-    unit = ts.unit
-
+    unit = getattr(ts, "unit", None)
     if ts.last_valid_index() is None or ts.first_valid_index() is None:
         print("      No valid time indexes found")
         return None
