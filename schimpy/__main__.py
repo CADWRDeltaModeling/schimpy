@@ -25,7 +25,7 @@ from schimpy.param import set_param_cli
 from schimpy.bctide import bctide_cli
 from schimpy.relocate_source_sink import relocate_source_sink_cli
 from schimpy.vgrid_nlayer_to_gr3 import vgrid_nlayer_to_gr3_cli
-
+from schimpy.stacked_dem_fill import stacked_dem_cli
 
 # Commands to be checked for utility before re-adding
 # from schimpy.check_mesh_skewness import check_skewness_cli
@@ -40,7 +40,7 @@ from schimpy.vgrid_nlayer_to_gr3 import vgrid_nlayer_to_gr3_cli
 # from schimpy.grid_opt import grid_opt_cli
 # from schimpy.material_poly import material_poly_cli
 # from schimpy.simulation_timing import simulation_timing_cli
-# from schimpy.stacked_dem_fill import stacked_fill_cli
+# 
 # from schimpy.mesh_volume_tvd import mesh_volume_tvd_cli
 # from schimpy.subset_schism_output import subset_schism_output_cli
 # from schimpy.scripts.archive_ts import archive_ts_cli
@@ -82,6 +82,8 @@ cli.add_command(set_param_cli, "set_param")
 cli.add_command(bctide_cli, "bctide")
 cli.add_command(relocate_source_sink_cli, "relocate_source_sink")
 cli.add_command(vgrid_nlayer_to_gr3_cli, "vgrid_nlayer_to_gr3")
+cli.add_command(stacked_dem_cli, "stacked_dem")
+
 
 # Commands to be checked for utility before re-adding
 # cli.add_command(check_skewness_cli, "check_skewness")
