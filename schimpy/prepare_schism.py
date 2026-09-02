@@ -71,7 +71,30 @@ def check_min_schimpy_version(inputs) -> None:
         )
 
 
-def create_hgrid(s, inputs, logger):
+def resolve_diagnostics_dir(inputs, diagnostics_dir=None):
+    """Resolve the diagnostics root for a run.
+
+    The diagnostics directory is derived, not user input. ``process_prepare_yaml``
+    supplies it explicitly; standalone callers get a default under the output dir.
+
+    Parameters
+    ----------
+    inputs : dict
+        Inputs from an input file, used only for ``prepro_output_dir``.
+    diagnostics_dir : str, optional
+        Explicit diagnostics root. When None, ``<prepro_output_dir>/diagnostics``.
+
+    Returns
+    -------
+    str
+    """
+    if diagnostics_dir is not None:
+        return diagnostics_dir
+    return os.path.join(inputs["prepro_output_dir"], "diagnostics")
+
+
+def create_hgrid(s, inputs, logger, diagnostics_dir=None):
+    diagnostics_dir = resolve_diagnostics_dir(inputs, diagnostics_dir)
     """Preprocess the hgrid file"""
     section_name = "mesh"
     section = inputs.get(section_name)
@@ -84,7 +107,7 @@ def create_hgrid(s, inputs, logger):
             )
         small_area_param = section.get("small_areas")
         if small_area_param is not None:
-            small_area_param["prepro_output_dir"] = inputs["diagnostics_dir"]
+            small_area_param["prepro_output_dir"] = diagnostics_dir
             # This just emits warnings unless the fail threshold is met
             small_areas(s.mesh, logger=logger, **small_area_param)
 
@@ -151,7 +174,7 @@ def create_hgrid(s, inputs, logger):
                 s.mesh.nodes[:, 2] = stacked_dem_fill(
                     dem_list,
                     s.mesh.nodes[:, :2],
-                    inputs["diagnostics_dir"],
+                    diagnostics_dir,
                     require_all=False,
                     na_fill=default_depth_for_missing_dem,
                     negate=True,
@@ -245,7 +268,7 @@ def create_hgrid(s, inputs, logger):
                     stacked_dem_fill(
                         dem_list,
                         s.mesh.nodes[:, :2],
-                        inputs["diagnostics_dir"],
+                        diagnostics_dir,
                         require_all=False,
                         na_fill=default_depth_for_missing_dem,
                     )
@@ -292,14 +315,13 @@ def create_hgrid(s, inputs, logger):
             s.write_hgrid_ll(hgrid_ll_fpath, boundary=True)
 
 
-def create_vgrid(s, inputs, logger):
+def create_vgrid(s, inputs, logger, diagnostics_dir=None):
     section_name = "vgrid"
     section = inputs.get(section_name)
     if section is None:
         return
 
     output_dir = inputs["prepro_output_dir"]
-    diagnostics_dir = inputs["diagnostics_dir"]
 
     # --- Resolve hgrid (shared by v1 and v2) ---
     if "hgrid" in section:
@@ -320,6 +342,7 @@ def create_vgrid(s, inputs, logger):
         )
 
     gen_version = str(gen_version).strip().lower()
+    diagnostics_dir = resolve_diagnostics_dir(inputs, diagnostics_dir)
 
     if gen_version == "v1":
         logger.info("Using stable legacy vgrid generator (v1)")
@@ -685,7 +708,7 @@ def create_station_output(inputs, logger):
             )
 
 
-def update_spatial_inputs(s, inputs, logger):
+def update_spatial_inputs(s, inputs, logger, diagnostics_dir=None):
     """Create SCHISM grid inputs.
 
     Parameters
@@ -694,9 +717,12 @@ def update_spatial_inputs(s, inputs, logger):
         schism setup object
     inputs: dict
         inputs from an input file
+    diagnostics_dir: str, optional
+        Directory for intermediate and debug output. Defaults to a
+        ``diagnostics`` subdirectory of the preprocessor output directory.
     """
-    create_hgrid(s, inputs, logger)
-    create_vgrid(s, inputs, logger)
+    create_hgrid(s, inputs, logger, diagnostics_dir)
+    create_vgrid(s, inputs, logger, diagnostics_dir)
     create_gr3_with_polygons(s, inputs, logger)
     create_source_sink(s, inputs, logger)
     create_prop_with_polygons(s, inputs, logger)
@@ -830,7 +856,17 @@ def echo_file_header():
 
 
 def process_prepare_yaml(in_fname, use_logging=True, write_echo=True, envvar=None):
-    """Process the main input YAML file and return the inputs dict without processing any SCHISM inputs."""
+    """Process the main input YAML file and return the inputs dict without processing any SCHISM inputs.
+
+    Returns
+    -------
+    inputs : dict
+    outdir : str
+    logger : logging.Logger
+    diagnostics_dir : str
+        Directory for intermediate and debug output. Derived from ``outdir``,
+        so it is kept out of ``inputs`` and out of the echoed configuration.
+    """
 
     if not os.path.exists(in_fname):
         raise ValueError("Main input file not found")
@@ -868,7 +904,6 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True, envvar=Non
     # Create diagnostics subdirectory for intermediate/debug outputs
     diagnostics_dir = os.path.join(outdir, "diagnostics")
     os.makedirs(diagnostics_dir, exist_ok=True)
-    inputs["diagnostics_dir"] = diagnostics_dir
 
     if write_echo:
         out_fname = (
@@ -880,12 +915,14 @@ def process_prepare_yaml(in_fname, use_logging=True, write_echo=True, envvar=Non
             f.write(echo_file_header())
             f.write(schism_yaml.safe_dump(inputs))
 
-    return inputs, outdir, logger
+    return inputs, outdir, logger, diagnostics_dir
 
 
 def prepare_schism(args, use_logging=True):
     envvar = getattr(args, "envvar", None)
-    inputs, outdir, logger = process_prepare_yaml(args.main_inputfile, use_logging, envvar=envvar)
+    inputs, outdir, logger, diagnostics_dir = process_prepare_yaml(
+        args.main_inputfile, use_logging, envvar=envvar
+    )
 
     hgrid = None
     # Mesh section
@@ -909,7 +946,7 @@ def prepare_schism(args, use_logging=True):
             # Read the grid file to be processed
             mesh_input_fpath = os.path.expanduser(mesh_items["mesh_inputfile"])
             s = create_schism_setup(mesh_input_fpath, logger)
-            update_spatial_inputs(s, inputs, logger)
+            update_spatial_inputs(s, inputs, logger, diagnostics_dir)
             hgrid = s.mesh
         else:
             raise ValueError("No mesh input file in the mesh section.")
