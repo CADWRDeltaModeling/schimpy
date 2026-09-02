@@ -26,6 +26,7 @@ from schimpy.bctide import bctide_cli
 from schimpy.relocate_source_sink import relocate_source_sink_cli
 from schimpy.vgrid_nlayer_to_gr3 import vgrid_nlayer_to_gr3_cli
 from schimpy.stacked_dem_fill import stacked_dem_cli
+from schimpy.inundate_island import inundate_island_cli
 
 # Commands to be checked for utility before re-adding
 # from schimpy.check_mesh_skewness import check_skewness_cli
@@ -83,6 +84,7 @@ cli.add_command(bctide_cli, "bctide")
 cli.add_command(relocate_source_sink_cli, "relocate_source_sink")
 cli.add_command(vgrid_nlayer_to_gr3_cli, "vgrid_nlayer_to_gr3")
 cli.add_command(stacked_dem_cli, "stacked_dem")
+cli.add_command(inundate_island_cli, "inundate_island")
 
 
 # Commands to be checked for utility before re-adding

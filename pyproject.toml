@@ -160,6 +160,7 @@ splice_netcdf = "schimpy.splice_netcdf:splice_netcdf_cli"
 check_vgrid = "schimpy.check_vgrid:check_vgrid_cli"
 vgrid_nlayer_to_gr3 = "schimpy.vgrid_nlayer_to_gr3:vgrid_nlayer_to_gr3_cli"
 stacked_dem = "schimpy.stacked_dem_fill:stacked_dem_cli"
+inundate_island = "schimpy.inundate_island:inundate_island_cli"
 
 # check_skewness = "schimpy.check_skewness:check_skewness_cli"
 # combine_flux = "schimpy.combine_flux:combine_flux_cli"

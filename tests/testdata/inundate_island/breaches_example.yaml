@@ -1,0 +1,61 @@
+# Sample specification for schimpy.inundate_island.
+#
+# Each breach is two points along the levee, ordered LEFT then RIGHT as seen
+# looking INTO the island. That ordering decides which side of the structure is
+# the island interior, so it is not cosmetic.
+#
+# Depths are positive down, matching gr3:
+#   min_depth  undisturbed ground at the rim of the dredge footprint.
+#              Also sets the initial pool level, as -min_depth - freeboard.
+#   max_depth  dredged invert at the centre of the opening.
+#
+# The dredge runs a little past the opening at each end, by one local edge
+# length, so the structure's own end nodes and its reference pair sit on
+# dredged ground rather than on the taper. Override with dredge_pad.
+#
+# major_axis_len is the FULL ellipse axis through the levee. Omit it and the
+# generator uses twice the edge-length factor, which defaults to a reach of
+# 3 local edge lengths each way.
+
+islands:
+  - name: upper_andrus
+    # Either 'infer', which fills inward from the breaches, or a polygon in the
+    # same form the preprocessor polygon files use. 'infer' is the usual choice
+    # and requires the island to join the grid only at its breaches.
+    polygon: infer
+
+    breaches:
+      - name: main_1
+        left: [625596.0, 4228143.9]
+        right: [625856.1, 4228287.9]
+        min_depth: -0.20
+        max_depth: 4.09
+        structure:
+          type: transfer
+          configuration:
+            flow: 0.0
+
+      - name: main_2
+        left: [626256.6, 4232640.2]
+        right: [626183.8, 4232927.4]
+        min_depth: -2.50
+        max_depth: 1.79
+        major_axis_len: 240.0
+        structure:
+          type: transfer
+          configuration:
+            flow: 0.0
+
+# Drawn explicitly instead, when the island is not enclosed by its breaches:
+#
+#   - name: sherman
+#     polygon:
+#       name: sherman
+#       type: none
+#       vertices:
+#         - [625400.0, 4227400.0]
+#         - [628000.0, 4227400.0]
+#         - [628000.0, 4233200.0]
+#         - [625400.0, 4233200.0]
+#     breaches:
+#       - ...
