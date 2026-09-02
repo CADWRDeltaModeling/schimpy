@@ -78,8 +78,9 @@ class TestBuildPipelineParams:
                 "Lsmooth_kappa": 0.8,
                 "hysteresis": {"delta_up": 1.1, "Jmax": 0},
                 "fit": {"kappa": 0.55, "tmin": 0.45, "sm_iters": 2},
+                "constraint_diffusion": {"enabled": True, "passes": 5, "weight": 0.4},
+                "integer_cleanup": {"enabled": True, "max_component_nodes": 12},
             },
-            "constraint_taper_rings": 5,
         }
         pp = _build_pipeline_params(section)
         assert pp.L_smooth_passes == 30
@@ -89,7 +90,11 @@ class TestBuildPipelineParams:
         assert pp.fit.kappa == 0.55
         assert pp.fit.tmin == 0.45
         assert pp.fit.sm_iters == 2
-        assert pp.constraint_taper_rings == 5
+        assert pp.constraint_diffusion_enable is True
+        assert pp.constraint_diffusion_passes == 5
+        assert pp.constraint_diffusion_weight == 0.4
+        assert pp.integer_cleanup_enable is True
+        assert pp.integer_cleanup_max_nodes == 12
 
 
 class TestLoadRegionConstraints:

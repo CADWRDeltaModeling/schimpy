@@ -28,9 +28,9 @@ def _changed_body_lines(a: str, b: str):
             body.append(line)
     return body
 
-def test_param_writer_changes_only_start_fields(datadir):
+def test_param_writer_changes_only_start_fields(datadir, tmp_path):
     src = datadir / "param.nml"
-    out = datadir / "param.nml.test"
+    out = tmp_path / "param.nml.test"
 
     original_text = src.read_text(encoding="utf-8")
 

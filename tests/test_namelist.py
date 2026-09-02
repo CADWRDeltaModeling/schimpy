@@ -1,3 +1,5 @@
+import pytest
+
 from schimpy import nml
 
 def test_namelist_parser():
@@ -66,20 +68,22 @@ def test_write_namelist():
     output = nml.write(namelist_data)
     assert output == expected_output, f"Expected: {expected_output}\nGot: {output}"
 
-def test_sample_param_nml():
+@pytest.mark.integration
+def test_sample_param_nml(tmp_path):
     url = 'https://raw.githubusercontent.com/schism-dev/schism/master/sample_inputs/param.nml'
     import urllib.request
     with urllib.request.urlopen(url) as response:
         content = response.read().decode("utf-8")
-    with open('param-original.nml','w') as fh: fh.write(content)
+    (tmp_path / 'param-original.nml').write_text(content)
     from schimpy import nml
     params = nml.parse(content)
-    with open('param.nml','w') as fh: fh.write(nml.write(params))
-    with open('param.nml','r') as fh:
-        params2 = nml.parse(fh.read())
-    with open('param2.nml','w') as fh: fh.write(nml.write(params2))
+    first = tmp_path / 'param.nml'
+    second = tmp_path / 'param2.nml'
+    first.write_text(nml.write(params))
+    params2 = nml.parse(first.read_text())
+    second.write_text(nml.write(params2))
     import filecmp
-    assert filecmp.cmp('param.nml','param2.nml'), 'Reading and writing from parser to writer is resulting in differences!'
+    assert filecmp.cmp(first, second), 'Reading and writing from parser to writer is resulting in differences!'
 
 
 def test_mapping():

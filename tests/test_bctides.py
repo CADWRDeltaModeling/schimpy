@@ -197,7 +197,10 @@ def test_write_bctides_valid(tmp_path):
     #assert "GEN" in content
     #assert "SED" in content
     #assert "AGE" in content
-    assert "tidal" not in content  # Should not literally write "tidal"
+    # The standard header comments mention "earth tidal potential", so only the
+    # data fields can be checked for the leaked YAML keyword.
+    data = "\n".join(line.split("!")[0] for line in content.splitlines())
+    assert "tidal" not in data  # Should not literally write "tidal"
     assert "1 " in content  # number of open boundaries
 
 def test_write_bctides_local_tidal_arrays(tmp_path):
