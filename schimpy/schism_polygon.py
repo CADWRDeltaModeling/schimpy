@@ -159,7 +159,8 @@ class SchismPolygonYamlReader(SchismPolygonIo):
 
     def read(self, fpath, yaml_root=None, envvar=None):
         if os.path.exists(fpath):
-            raw = yaml_from_file(fpath, envvar=envvar)
+            # Raw load keeps attributes as text, matching the shapefile reader.
+            raw = yaml_from_file(fpath, envvar=envvar, raw=True)
             if yaml_root is not None:
                 for key in yaml_root.split("."):
                     if not isinstance(raw, dict) or key not in raw:

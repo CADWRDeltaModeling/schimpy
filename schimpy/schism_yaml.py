@@ -407,8 +407,12 @@ def load(stream, envvar=None, collapse_nested=True):
         loader.dispose()
 
 
-def load_raw(stream):
-    """Load a schism YAML"""
+def load_raw(stream, envvar=None):
+    """Load a schism YAML leaving every scalar as a string.
+
+    Used where the text of a value matters, such as polygon attributes that are
+    later compiled as expressions.
+    """
     # First round to get environmental variables
     loader = RawLoader(stream)
     try:
@@ -422,6 +426,8 @@ def load_raw(stream):
     for key in substitute_keywords:
         if key in data:
             env.update(data[key])
+    if envvar is not None:
+        env.update(envvar)
     substitute_env(env)
     loader = SubstituteRawLoader(stream, env)
     try:

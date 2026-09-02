@@ -106,9 +106,22 @@ Homepage = "https://cadwrdeltamodeling.github.io/schimpy/"
 
 [tool.flake8]
 exclude = ["docs"]
-
 [tool.ruff.lint]
 select = ["NPY201"]
+
+[tool.pytest.ini_options]
+norecursedirs = [".*", "*.egg*", "build", "dist", "conda.recipe"]
+addopts = [
+    "--junitxml=junit.xml",
+    "--ignore=setup.py",
+    "--tb=native",
+    "--strict-markers",
+    "--durations=20"
+]
+markers = [
+    "serial: execute test serially (to avoid race conditions)",
+    "integration: requires network connectivity or external data"
+]
 
 [tool.setuptools.packages.find]
 include = ["schimpy","schimpy.util"]
