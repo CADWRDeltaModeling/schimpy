@@ -1,4 +1,4 @@
-from schimpy.schism_yaml import load
+from schimpy.schism_yaml import load, load_raw
 import pandas as pd
 import string
 import yaml
@@ -76,7 +76,7 @@ def yaml_from_dict(input_dict, envvar=None):
     return load(stream)
 
 
-def yaml_from_file(filename, envvar=None):
+def yaml_from_file(filename, envvar=None, raw=False):
     """
     Load a YAML file and return its contents.
 
@@ -84,6 +84,11 @@ def yaml_from_file(filename, envvar=None):
     ----------
     filename : str|Path
         The path to the YAML file.
+    envvar : dict, optional
+        Variables to substitute into the YAML.
+    raw : bool, optional
+        If True, leave every scalar as a string instead of resolving YAML
+        types. Needed where the literal text of a value matters.
 
     Returns
     -------
@@ -91,6 +96,8 @@ def yaml_from_file(filename, envvar=None):
         The contents of the YAML file as a dictionary.
     """
     with open(filename, "r") as file:
+        if raw:
+            return load_raw(file, envvar=envvar)
         return load(file, envvar=envvar)
 
 
