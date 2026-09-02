@@ -99,6 +99,7 @@ class hotstart(object):
         self.nc_dataset = None
         self.modules = modules
         self.crs = crs
+        self.h0 = 0.01  # SCHISM default; overridden from param.nml or the yaml
         self._hotstart_cache = {}
         self._mesh_cache = {}  # hgrid_fn -> mesh object
         if envvar is None:
@@ -204,9 +205,28 @@ class hotstart(object):
             "restart_time",
             "time_step",
             "sediment_input_file",
+            "max_blw_bed",
+            "novel_node_tol",
+            "h0",
         ]
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
+
+        if "max_blw_bed" in hotstart_info.keys():
+            self.max_blw_bed = float(hotstart_info["max_blw_bed"])
+            if self.max_blw_bed < 0.0:
+                raise ValueError(
+                    "max_blw_bed must be non-negative, got %s" % self.max_blw_bed
+                )
+        else:
+            self.max_blw_bed = None
+
+        # identity tolerance, not a physical distance
+        if "novel_node_tol" in hotstart_info.keys():
+            self.novel_node_tol = float(hotstart_info["novel_node_tol"])
+        else:
+            self.novel_node_tol = 1.0e-3
+
         # 5.8 and below is the old version
         self.vgrid_version = hotstart_info["vgrid_version"]
 
@@ -227,6 +247,11 @@ class hotstart(object):
                     raise ValueError("param_nml needs to be defined in %s" % self.input)
             # for all other modules, param.nml will not be used.
             self.param_nml = "param.nml"
+
+        if os.path.isfile(self.param_nml):
+            self.h0 = float(read_param_nml(self.param_nml).get("h0", self.h0))
+        if "h0" in hotstart_info.keys():
+            self.h0 = float(hotstart_info["h0"])
 
         if (
             self.modules
@@ -321,6 +346,9 @@ class hotstart(object):
                 self.hotstart_ini["source_vgrid_version"] = initializer["hotstart_nc"][
                     "source_vgrid_version"
                 ]
+                self.hotstart_ini["data_source"] = initializer["hotstart_nc"][
+                    "data_source"
+                ]
             elif "patch_init" in initializer and (not self.hotstart_ini):
                 patch_init = [
                     list(ini["initializer"].keys())[0]
@@ -337,6 +365,7 @@ class hotstart(object):
                         self.hotstart_ini["source_vgrid_version"] = sub_init[
                             "source_vgrid_version"
                         ]
+                        self.hotstart_ini["data_source"] = sub_init["data_source"]
 
             if self.hotstart_ini:
                 hotstart_mesh = self.get_mesh(
@@ -355,6 +384,10 @@ class hotstart(object):
                 else:
                     self.initialize_netcdf()
             self.nc_dataset = self.nc_dataset.merge(var)
+
+        if self.max_blw_bed is not None:
+            self.fix_novel_elevation()
+
         #  cumsum_eta is required by the most recent version of schism.
         self.nc_dataset = self.nc_dataset.assign(cumsum_eta=self.nc_dataset.elevation)
         if (
@@ -400,7 +433,10 @@ class hotstart(object):
             encoding = None
             ds_out = self.nc_dataset
             if "tracer_list" in ds_out.coords:
-                tracer_values = [str(x) for x in ds_out["tracer_list"].values]
+                tracer_values = [
+                    x.decode() if isinstance(x, bytes) else str(x)
+                    for x in ds_out["tracer_list"].values
+                ]
                 ds_out = ds_out.drop_vars("tracer_list")
                 ds_out = ds_out.assign_coords(
                     tracer_list=("tracer_list", np.array(tracer_values, dtype=object))
@@ -424,6 +460,95 @@ class hotstart(object):
         # Close source hotstart datasets, if any
         self.close_hotstart_cache()
         return self.nc_dataset
+
+    def fix_novel_elevation(self):
+        """Repair elevation at target nodes that have no counterpart in the source grid.
+
+        A node whose nearest source node lies farther away than ``novel_node_tol`` is
+        treated as novel, as happens when the grid is extended into a restoration site
+        or island. Its elevation is re-taken from the nearest *wet* source node and then
+        floored so the water surface sits no more than ``max_blw_bed`` below the local
+        bed. Nodes carried over from the source grid are left untouched, so a same-grid
+        transfer is unchanged.
+
+        Raises
+        ------
+        ValueError
+            If elevation is not among the hotstart variables, if no ``hotstart_nc``
+            initializer supplied a ``source_hgrid`` to identify novel nodes against, or
+            if the source hotstart contains no wet nodes.
+
+        Notes
+        -----
+        This is a post-correction. Donor selection inside ``interp_from_mesh`` remains
+        unfiltered; the durable fix belongs there.
+        """
+        from scipy.spatial import cKDTree
+
+        if "elevation" not in self.nc_dataset:
+            raise ValueError(
+                "max_blw_bed was set but 'elevation' is not among the hotstart variables."
+            )
+        if "hotstart_nc_dist" not in self.hotstart_ini:
+            raise ValueError(
+                "max_blw_bed requires a hotstart_nc initializer with source_hgrid so that "
+                "novel nodes can be identified against a source grid. None was found."
+            )
+
+        dist = np.asarray(self.hotstart_ini["hotstart_nc_dist"], dtype=float)
+        novel = dist > self.novel_node_tol
+        n_novel = int(novel.sum())
+        logger.info(
+            "Nodes with no source counterpart within %g: %d of %d",
+            self.novel_node_tol,
+            n_novel,
+            novel.size,
+        )
+        if n_novel == 0:
+            return
+
+        src_mesh = self.get_mesh(
+            self.hotstart_ini["hotstart_nc_hfn"],
+            self.hotstart_ini["hotstart_nc_vfn"],
+            self.hotstart_ini["source_vgrid_version"],
+        )
+        src = self.get_hotstart_data(self.hotstart_ini["data_source"])
+        eta_src = np.asarray(src["eta2"].values, dtype=float)
+
+        # eta at a dry source node is vestigial, so only wet nodes are valid donors
+        wet_src = np.flatnonzero((src_mesh.nodes[:, 2] + eta_src) > 0.0)
+        if wet_src.size == 0:
+            raise ValueError(
+                "No wet nodes in source hotstart %s to serve as donors."
+                % self.hotstart_ini["data_source"]
+            )
+
+        donor_dist, donor = cKDTree(src_mesh.nodes[wet_src, :2]).query(
+            self.mesh.nodes[novel, :2]
+        )
+        eta = np.asarray(self.nc_dataset["elevation"].values, dtype=float).copy()
+        eta[novel] = eta_src[wet_src[donor]]
+
+        floor = -self.mesh.nodes[novel, 2] - self.max_blw_bed
+        n_floored = int((eta[novel] < floor).sum())
+        eta[novel] = np.maximum(eta[novel], floor)
+
+        self.nc_dataset["elevation"] = xr.DataArray(
+            eta, dims=self.nc_dataset["elevation"].dims
+        )
+        logger.info(
+            "Wet donors: %d of %d source nodes eligible, donor distance median %.1f, max %.1f",
+            wet_src.size,
+            eta_src.size,
+            float(np.median(donor_dist)),
+            float(donor_dist.max()),
+        )
+        logger.info(
+            "Floored to %g below bed at %d of %d novel nodes",
+            self.max_blw_bed,
+            n_floored,
+            n_novel,
+        )
 
     def generate_3D_field(self, variable):
         v_meta = self.info[variable]
@@ -522,23 +647,16 @@ class hotstart(object):
         modify idry_e, idry, and idry_s based on eta2 and water depth.
         """
         self.nc_dataset["z"] = xr.DataArray(self.depths, dims=["node", "nVert"])
-        dry_nodes = np.where(self.depths.min(axis=1) >= 0)[0]
-        if any(dry_nodes):
-            idry = self.nc_dataset["idry"].values
-            idry[dry_nodes] = 1  # dry cells have positive z values
-            idry_s = np.array(
-                [idry[n].mean(axis=0) for n in self.mesh.edges[:, :2]]
-            )  # node to side
-            # if there is one dry node, the element is dry?
-            idry_s[idry_s != 0] = 1
-            idry_e = np.array(
-                [idry[list(n)].mean(axis=0) for n in self.mesh.elems]
-            )  # node to elem
-            # if there is one dry node, the side is dry?
-            idry_e[idry_e != 0] = 1
-            self.nc_dataset["idry_s"] = xr.DataArray(idry_s, dims=["side"])
-            self.nc_dataset["idry"] = xr.DataArray(idry, dims=["node"])
-            self.nc_dataset["idry_e"] = xr.DataArray(idry_e, dims=["elem"])
+        eta = np.squeeze(np.asarray(self.nc_dataset["elevation"].values, dtype=float))
+        idry = np.where(self.mesh.nodes[:, 2] + eta <= self.h0, 1, 0)
+        idry_s = idry[self.mesh.edges[:, :2]].max(axis=1)
+        idry_e = np.array([idry[list(n)].max() for n in self.mesh.elems])
+        self.nc_dataset["idry"] = xr.DataArray(idry, dims=["node"])
+        self.nc_dataset["idry_s"] = xr.DataArray(idry_s, dims=["side"])
+        self.nc_dataset["idry_e"] = xr.DataArray(idry_e, dims=["elem"])
+        logger.info(
+            "Dry nodes at h0=%g: %d of %d", self.h0, int(idry.sum()), idry.size
+        )
 
     def map_to_schism(self):
         """
@@ -2222,7 +2340,10 @@ def create_hotstart_cli(input_file, input_opt, logdir, debug, quiet):
     # Ensure tracer_list is numpy string array, not ArrowStringArray
     if 'tracer_list' in hnc.coords:
         # Force conversion by dropping and recreating with object dtype
-        tracer_values = [str(x) for x in hnc['tracer_list'].values]
+        tracer_values = [
+            x.decode() if isinstance(x, bytes) else str(x)
+            for x in hnc['tracer_list'].values
+        ]
         hnc = hnc.drop_vars('tracer_list')
         hnc = hnc.assign_coords(tracer_list=('tracer_list', np.array(tracer_values, dtype=object)))
     hnc.to_netcdf(output_fn, encoding={'tracer_list': {'dtype': 'S10'}})
