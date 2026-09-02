@@ -536,7 +536,9 @@ class SchismSetup(object):
                 )
             cell = [
                 e
-                for e in mesh.get_elems_i_from_node(up_path[i])
+                for e in set().union(
+                    *(mesh.get_elems_i_from_node(n) for n in corners)
+                )
                 if set(mesh.elem(e)).issubset(corners)
             ]
             if len(cell) == 1 and len(mesh.elem(cell[0])) == 4:
