@@ -205,27 +205,19 @@ class hotstart(object):
             "restart_time",
             "time_step",
             "sediment_input_file",
-            "max_blw_bed",
-            "novel_node_tol",
             "h0",
         ]
         variables = [v for v in variables if v not in rfl]
         self.variables = variables
 
-        if "max_blw_bed" in hotstart_info.keys():
-            self.max_blw_bed = float(hotstart_info["max_blw_bed"])
-            if self.max_blw_bed < 0.0:
-                raise ValueError(
-                    "max_blw_bed must be non-negative, got %s" % self.max_blw_bed
-                )
-        else:
-            self.max_blw_bed = None
-
-        # identity tolerance, not a physical distance
-        if "novel_node_tol" in hotstart_info.keys():
-            self.novel_node_tol = float(hotstart_info["novel_node_tol"])
-        else:
-            self.novel_node_tol = 1.0e-3
+        moved = [k for k in ("max_blw_bed", "novel_node_tol") if k in hotstart_info]
+        if moved:
+            raise ValueError(
+                "%s belongs under the hotstart_nc initializer that uses it, not at the "
+                "hotstart level, so that it applies only to the nodes that initializer "
+                "supplies. Move it beside data_source and source_hgrid."
+                % " and ".join(moved)
+            )
 
         # 5.8 and below is the old version
         self.vgrid_version = hotstart_info["vgrid_version"]
@@ -385,9 +377,6 @@ class hotstart(object):
                     self.initialize_netcdf()
             self.nc_dataset = self.nc_dataset.merge(var)
 
-        if self.max_blw_bed is not None:
-            self.fix_novel_elevation()
-
         #  cumsum_eta is required by the most recent version of schism.
         self.nc_dataset = self.nc_dataset.assign(cumsum_eta=self.nc_dataset.elevation)
         if (
@@ -460,95 +449,6 @@ class hotstart(object):
         # Close source hotstart datasets, if any
         self.close_hotstart_cache()
         return self.nc_dataset
-
-    def fix_novel_elevation(self):
-        """Repair elevation at target nodes that have no counterpart in the source grid.
-
-        A node whose nearest source node lies farther away than ``novel_node_tol`` is
-        treated as novel, as happens when the grid is extended into a restoration site
-        or island. Its elevation is re-taken from the nearest *wet* source node and then
-        floored so the water surface sits no more than ``max_blw_bed`` below the local
-        bed. Nodes carried over from the source grid are left untouched, so a same-grid
-        transfer is unchanged.
-
-        Raises
-        ------
-        ValueError
-            If elevation is not among the hotstart variables, if no ``hotstart_nc``
-            initializer supplied a ``source_hgrid`` to identify novel nodes against, or
-            if the source hotstart contains no wet nodes.
-
-        Notes
-        -----
-        This is a post-correction. Donor selection inside ``interp_from_mesh`` remains
-        unfiltered; the durable fix belongs there.
-        """
-        from scipy.spatial import cKDTree
-
-        if "elevation" not in self.nc_dataset:
-            raise ValueError(
-                "max_blw_bed was set but 'elevation' is not among the hotstart variables."
-            )
-        if "hotstart_nc_dist" not in self.hotstart_ini:
-            raise ValueError(
-                "max_blw_bed requires a hotstart_nc initializer with source_hgrid so that "
-                "novel nodes can be identified against a source grid. None was found."
-            )
-
-        dist = np.asarray(self.hotstart_ini["hotstart_nc_dist"], dtype=float)
-        novel = dist > self.novel_node_tol
-        n_novel = int(novel.sum())
-        logger.info(
-            "Nodes with no source counterpart within %g: %d of %d",
-            self.novel_node_tol,
-            n_novel,
-            novel.size,
-        )
-        if n_novel == 0:
-            return
-
-        src_mesh = self.get_mesh(
-            self.hotstart_ini["hotstart_nc_hfn"],
-            self.hotstart_ini["hotstart_nc_vfn"],
-            self.hotstart_ini["source_vgrid_version"],
-        )
-        src = self.get_hotstart_data(self.hotstart_ini["data_source"])
-        eta_src = np.asarray(src["eta2"].values, dtype=float)
-
-        # eta at a dry source node is vestigial, so only wet nodes are valid donors
-        wet_src = np.flatnonzero((src_mesh.nodes[:, 2] + eta_src) > 0.0)
-        if wet_src.size == 0:
-            raise ValueError(
-                "No wet nodes in source hotstart %s to serve as donors."
-                % self.hotstart_ini["data_source"]
-            )
-
-        donor_dist, donor = cKDTree(src_mesh.nodes[wet_src, :2]).query(
-            self.mesh.nodes[novel, :2]
-        )
-        eta = np.asarray(self.nc_dataset["elevation"].values, dtype=float).copy()
-        eta[novel] = eta_src[wet_src[donor]]
-
-        floor = -self.mesh.nodes[novel, 2] - self.max_blw_bed
-        n_floored = int((eta[novel] < floor).sum())
-        eta[novel] = np.maximum(eta[novel], floor)
-
-        self.nc_dataset["elevation"] = xr.DataArray(
-            eta, dims=self.nc_dataset["elevation"].dims
-        )
-        logger.info(
-            "Wet donors: %d of %d source nodes eligible, donor distance median %.1f, max %.1f",
-            wet_src.size,
-            eta_src.size,
-            float(np.median(donor_dist)),
-            float(donor_dist.max()),
-        )
-        logger.info(
-            "Floored to %g below bed at %d of %d novel nodes",
-            self.max_blw_bed,
-            n_floored,
-            n_novel,
-        )
 
     def generate_3D_field(self, variable):
         v_meta = self.info[variable]
@@ -1442,6 +1342,10 @@ class VariableField(object):
             self.tr_index = np.where(np.array(self.tr_mname) == var)[0][0]
         hotstart_data = self.hotstart.get_hotstart_data(data_source)
 
+        max_blw_bed = self._validated_max_blw_bed(ini_meta)
+        novel_node_tol = float(ini_meta.get("novel_node_tol", 1.0e-3))
+        src_wet = self._source_wet_mask(ini_meta, hotstart_data)
+
         if "source_hgrid" not in ini_meta.keys():  # if the grids are exactly the same
             if self.tr_index is not None:
                 v = hotstart_data[yaml_var[var]].isel(ntracers=self.tr_index)
@@ -1458,12 +1362,22 @@ class VariableField(object):
                 v = self.interp_from_mesh(
                     ini_meta["source_hgrid"],
                     vin,
-                    inpoly,
-                    dist=ini_meta["distance_threshold"],
+                    inpoly=inpoly,
+                    dist_th=ini_meta["distance_threshold"],
                     method=ini_meta["method"],
+                    src_wet=src_wet,
+                    novel_node_tol=novel_node_tol,
+                    max_blw_bed=max_blw_bed,
                 )
             else:
-                v = self.interp_from_mesh(ini_meta["source_hgrid"], vin, inpoly)
+                v = self.interp_from_mesh(
+                    ini_meta["source_hgrid"],
+                    vin,
+                    inpoly=inpoly,
+                    src_wet=src_wet,
+                    novel_node_tol=novel_node_tol,
+                    max_blw_bed=max_blw_bed,
+                )
         elif ("source_hgrid" in ini_meta.keys()) and (
             "source_vgrid" in ini_meta.keys()
         ):
@@ -1480,6 +1394,9 @@ class VariableField(object):
                     dist_th=ini_meta["distance_threshold"],
                     method=ini_meta["method"],
                     vgrid_version=ini_meta["source_vgrid_version"],
+                    src_wet=src_wet,
+                    novel_node_tol=novel_node_tol,
+                    max_blw_bed=max_blw_bed,
                 )
             else:
                 v = self.interp_from_mesh(
@@ -1488,9 +1405,47 @@ class VariableField(object):
                     ini_meta["source_vgrid"],
                     ini_meta["source_vgrid_version"],
                     inpoly,
+                    src_wet=src_wet,
+                    novel_node_tol=novel_node_tol,
+                    max_blw_bed=max_blw_bed,
                 )
+
         hotstart_data.close()
         return v
+
+    def _validated_max_blw_bed(self, ini_meta):
+        """Return the bed-relative floor, which only elevation may carry."""
+        present = "max_blw_bed" in ini_meta
+        if self.variable_name == "elevation":
+            if not present:
+                raise ValueError(
+                    "hotstart_nc for elevation must set max_blw_bed, the largest "
+                    "distance the water surface may sit below the local bed."
+                )
+            value = float(ini_meta["max_blw_bed"])
+            if value < 0.0:
+                raise ValueError(
+                    "max_blw_bed must be non-negative, got %s" % value
+                )
+            return value
+        if present:
+            raise ValueError(
+                "max_blw_bed is a free surface constraint and cannot be applied to "
+                "'%s'." % self.variable_name
+            )
+        return None
+
+    def _source_wet_mask(self, ini_meta, hotstart_data):
+        """Flag source nodes holding a real water column, or None if not comparable."""
+        if "source_hgrid" not in ini_meta:
+            return None
+        src_mesh = self.hotstart.get_mesh(
+            ini_meta["source_hgrid"],
+            ini_meta.get("source_vgrid"),
+            ini_meta.get("source_vgrid_version", "5.10"),
+        )
+        eta_src = np.asarray(hotstart_data["eta2"].values, dtype=float)
+        return (src_mesh.nodes[:, 2] + eta_src) > self.hotstart.h0
 
     def interp_from_mesh(
         self,
@@ -1501,6 +1456,9 @@ class VariableField(object):
         inpoly=None,
         dist_th=None,
         method=None,
+        src_wet=None,
+        novel_node_tol=1.0e-3,
+        max_blw_bed=None,
     ):
 
         mesh1 = self.hotstart.get_mesh(hgrid_fn, vgrid_fn, vgrid_version)
@@ -1542,6 +1500,13 @@ class VariableField(object):
             print("\thorizontal interpolation completed!")
             dist = np.asarray(dist, dtype=float)
             indices = np.asarray(indices)
+
+        novel = None
+        if src_wet is not None:
+            # scoped to hgrid2, so a region initialized by other means is untouched
+            indices, novel = redirect_to_wet_donors(
+                hgrid1, src_wet, hgrid2, indices, dist, novel_node_tol
+            )
 
         if (
             dist_th is not None
@@ -1652,6 +1617,21 @@ class VariableField(object):
                         )
                         vout[i, :] = f(z2)
                 print("vertical grid interpolation completed!")
+
+        if max_blw_bed is not None and novel is not None and novel.any():
+            dp = self.node_z if inpoly is None else self.node_z[inpoly]
+            floor = -np.asarray(dp, dtype=float)[novel] - max_blw_bed
+            vout = np.asarray(vout, dtype=float)
+            # trailing axes are vertical levels; broadcast the per-node floor over them
+            floor = floor.reshape(-1, *([1] * (vout.ndim - 1)))
+            n_floored = int(np.any(vout[novel] < floor, axis=tuple(range(1, vout.ndim))).sum())
+            vout[novel] = np.maximum(vout[novel], floor)
+            logger.info(
+                "Floored to %g below bed at %d of %d novel nodes",
+                max_blw_bed,
+                n_floored,
+                int(novel.sum()),
+            )
         return vout
 
     def schout_nc(self, var, ini_meta=None, inpoly=None):
@@ -1710,6 +1690,77 @@ class VariableField(object):
             )
             ds = ds_var.to_dataset()
         return ds
+
+
+def redirect_to_wet_donors(src_xy, src_wet, tgt_xy, indices, dist, tol):
+    """Point target nodes with no source counterpart at the nearest wet source node.
+
+    A target node whose nearest source node lies farther than ``tol`` has no
+    counterpart in the source grid, as happens where a grid is extended into a
+    restoration site. Its donor is reselected from wet source nodes only, because
+    the state stored at a dry source node is vestigial and would otherwise be
+    carried into the new area.
+
+    Parameters
+    ----------
+    src_xy : array_like
+        Source node coordinates, shape (n_source, 2).
+    src_wet : array_like of bool
+        True where the source node holds a meaningful water column.
+    tgt_xy : array_like
+        Target node coordinates, shape (n_target, 2).
+    indices : array_like of int
+        Donor index into the source nodes for each target node.
+    dist : array_like of float
+        Distance from each target node to its current donor.
+    tol : float
+        Identity tolerance, not a physical distance.
+
+    Returns
+    -------
+    indices : numpy.ndarray
+        Donor indices with novel nodes reassigned. Nodes within ``tol`` keep the
+        donor they already had, even if that donor is dry.
+    novel : numpy.ndarray of bool
+        True where the node had no source counterpart.
+
+    Raises
+    ------
+    ValueError
+        If no source node is wet.
+    """
+    from scipy.spatial import cKDTree
+
+    novel = np.asarray(dist, dtype=float) > tol
+    indices = np.array(indices, copy=True)
+    if not novel.any():
+        return indices, novel
+
+    wet = np.flatnonzero(np.asarray(src_wet, dtype=bool))
+    if wet.size == 0:
+        raise ValueError(
+            "Source hotstart has no wet nodes to serve as donors for %d novel node(s)."
+            % int(novel.sum())
+        )
+
+    src_xy = np.asarray(src_xy, dtype=float)
+    tgt_xy = np.asarray(tgt_xy, dtype=float)
+    donor_dist, donor = cKDTree(src_xy[wet, :2]).query(tgt_xy[novel, :2])
+    indices[novel] = wet[donor]
+    logger.info(
+        "Nodes with no source counterpart within %g: %d of %d",
+        tol,
+        int(novel.sum()),
+        novel.size,
+    )
+    logger.info(
+        "Wet donors: %d of %d source nodes eligible, donor distance median %.1f, max %.1f",
+        wet.size,
+        src_xy.shape[0],
+        float(np.median(donor_dist)),
+        float(donor_dist.max()),
+    )
+    return indices, novel
 
 
 def read_param_nml(nml_fn):
