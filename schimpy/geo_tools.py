@@ -125,7 +125,7 @@ def partition_check(
     #     ID_df[other_id].loc[orphaned_cells] = True
     elif len(orphaned_cells) >= 1:
         if allow_incomplete:
-            NotImplementedError(
+            raise NotImplementedError(
                 "categorizing cells based on nearest distance has not been implemented"
             )
         else:
