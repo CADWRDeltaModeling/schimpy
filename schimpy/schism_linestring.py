@@ -66,13 +66,16 @@ class LineStringIo(object):
 
 
 class LineStringYamlReader(LineStringIo):
-    def read(self, fpath, envvar=None, **kwargs):
+    def read(self, fpath, envvar=None, preserve_zdim=False, **kwargs):
         data = yaml_from_file(fpath, envvar=envvar)["linestrings"]
         linestrings = []
         for row in data:
+            coords = row["coordinates"]
+            if not preserve_zdim:
+                coords = [pt[:2] for pt in coords]
             linestrings.append(
                 LineString(
-                    coordinates=row["coordinates"],
+                    coordinates=coords,
                     prop=dict([(k, row[k]) for k in row if k != "coordinates"]),
                 )
             )
@@ -80,12 +83,15 @@ class LineStringYamlReader(LineStringIo):
 
 
 class LineStringShapefileReader(LineStringIo):
-    def read(self, fpath, **kwargs):
+    def read(self, fpath, preserve_zdim=False, **kwargs):
         """
         Parameters
         ----------
         fpath: str
             input file name
+        preserve_zdim: bool, optional
+            Whether to preserve the Z dimension in coordinates if present.
+            Default is False (discard Z dimension and keep 2D).
 
         Returns
         -------
@@ -96,16 +102,27 @@ class LineStringShapefileReader(LineStringIo):
             datasource = Open(fpath)
             layer = datasource.GetLayer(0)
             feat = layer.GetFeature(0)
-            field_names = [
-                feat.GetFieldDefnRef(i).GetName() for i in range(feat.GetFieldCount())
-            ]
+            field_names = []
+            if feat is not None:
+                field_names = [
+                    feat.GetFieldDefnRef(i).GetName()
+                    for i in range(feat.GetFieldCount())
+                ]
+            layer.ResetReading()
             lines = []
             for feature in layer:
                 geom = feature.GetGeometryRef()
+                if geom is None:
+                    continue
                 name_geom = geom.GetGeometryName()
-                if name_geom in ("LINESTRING",):
+                if name_geom.startswith("LINESTRING"):
+                    shp_geom = loads(bytes(geom.ExportToWkb()))
+                    if not preserve_zdim:
+                        shp_geom = shapely.force_2d(shp_geom)
+                    elif getattr(shp_geom, "has_m", False):
+                        shp_geom = shapely.force_3d(shp_geom)
                     line = LineString(
-                        loads(bytes(geom.ExportToWkb())),
+                        shp_geom,
                         dict(
                             [
                                 (k, feature.GetField(i))
