@@ -534,13 +534,22 @@ def create_structures(s, inputs, logger):
 def get_structures_from_yaml(inputs):
     """Get structures from hydraulic_structures.yaml file"""
     structures = inputs.copy()
-    structure_items = ("name", "type", "end_points", "configuration", "reference")
+    structure_items = (
+        "name",
+        "type",
+        "end_points",
+        "pathway",
+        "gate_span",
+        "configuration",
+        "reference",
+    )
     configuration_items = (
         "n_duplicates",
         "elevation",
         "width",
         "height",
         "radius",
+        "flow",
         "coefficient",
         "op_downstream",
         "op_upstream",

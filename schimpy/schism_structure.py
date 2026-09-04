@@ -315,7 +315,7 @@ class SchismStructureIO(BaseIO):
             f.write(buf)
             # nduplicate
             k = "n_duplicates"
-            n_duplicates = struct.properties[k] if k in struct.properties else 0.0
+            n_duplicates = struct.properties[k] if k in struct.properties else 1
             buf = "%d ! n_duplicates\n" % n_duplicates
             f.write(buf)
             # parameters
@@ -399,7 +399,8 @@ class SchismStructureIO(BaseIO):
             else:
                 raise Exception("Not supported structure type")
 
-            buf = "%d ! time series enabled\n" % struct.properties["use_time_series"]
+            use_ts = struct.properties.get("use_time_series", 0)
+            buf = "%d ! time series enabled\n" % use_ts
             f.write(buf)
 
         f.flush()

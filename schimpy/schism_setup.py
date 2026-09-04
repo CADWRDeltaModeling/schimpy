@@ -411,19 +411,17 @@ class SchismSetup(object):
             name = item.get("name")
             self._logger.info("Processing structure: {}".format(name))
             struct.name = name
-            end_points = item.get("end_points")
-            if end_points is None:
+            pathway = item.get("pathway", item.get("end_points"))
+            if pathway is None:
                 self._logger.warning("No end_points in structure")
                 continue
-            struct.coords = np.array(end_points)
+            gate_span = item.get("gate_span")
+            up_path, down_path = self.structure_node_paths(name, pathway, gate_span)
+            span = gate_span if gate_span is not None else [pathway[0], pathway[-1]]
+            struct.coords = np.array(span, dtype=float)
             struct.type = item["type"].lower()
             struct.properties = item["configuration"]
 
-            # Find node pairs
-            up_path, down_path = self.mesh.find_two_neighboring_node_paths(
-                struct.coords
-            )
-            self._validate_node_paths(name, up_path, down_path)
             struct.node_pairs = list(zip(up_path, down_path))
             # Reference pair
             ref = item.get("reference", "self")
@@ -461,6 +459,116 @@ class SchismSetup(object):
         """Format a node index and its coordinates for an error message"""
         x, y = self.mesh.nodes[node_i, :2]
         return "{} at ({:.2f}, {:.2f})".format(node_i + 1, x, y)
+
+    def structure_node_paths(self, name, pathway, gate_span=None):
+        """Resolve a structure's node paths from a pathway along the barrier.
+
+        A two-point pathway is the familiar ``end_points`` case and resolves in
+        one step. A longer pathway is resolved segment by segment and the
+        resulting node pairs stitched, which is what lets a structure follow a
+        bent levee that no single chord can cut.
+
+        ``gate_span`` names the part of the pathway the structure itself
+        occupies, for a gate shorter than the barrier it sits in. Its two points
+        need only be near the intended ends; each snaps to the nearest node pair
+        and the contiguous run between them is taken.
+
+        Parameters
+        ----------
+        name : str
+            Structure name, used in error messages.
+        pathway : array_like
+            Two or more points along the barrier, ordered so the structure's
+            downstream side stays on the same hand throughout.
+        gate_span : array_like, optional
+            Two points bracketing the gated part of the pathway.
+
+        Returns
+        -------
+        up_path, down_path : list of int
+
+        Raises
+        ------
+        ValueError
+            If a segment crosses nothing, the segments cannot be stitched, or
+            the result is not a legal structure.
+        """
+        points = np.asarray(pathway, dtype=float)[:, :2]
+        if len(points) < 2:
+            raise ValueError(
+                "Structure '{}': pathway needs at least two points.".format(name)
+            )
+
+        pairs = []
+        for i in range(len(points) - 1):
+            up, down = self.mesh.find_two_neighboring_node_paths(points[i : i + 2])
+            if not up or not down:
+                raise ValueError(
+                    "Structure '{}': pathway segment {}, ({:.1f}, {:.1f}) to "
+                    "({:.1f}, {:.1f}), did not cross any element edges.".format(
+                        name, i, points[i][0], points[i][1],
+                        points[i + 1][0], points[i + 1][1],
+                    )
+                )
+            segment = list(zip(up, down))
+            if pairs:
+                segment = self._join_pair_chains(name, pairs[-1], segment, i)
+            pairs.extend(segment)
+
+        up_path = [p[0] for p in pairs]
+        down_path = [p[1] for p in pairs]
+        self._validate_node_paths(name, up_path, down_path)
+
+        if gate_span is not None:
+            up_path, down_path = self._select_gate_span(name, pairs, gate_span)
+            self._validate_node_paths(name, up_path, down_path)
+        return up_path, down_path
+
+    def _join_pair_chains(self, name, last_pair, segment, i):
+        """Orient and trim a segment's node pairs to continue an existing chain."""
+        mesh = self.mesh
+
+        def joined(a, b):
+            return a == b or mesh.find_edge((a, b)) is not None
+
+        last_up, last_down = last_pair
+        first_up, first_down = segment[0]
+        aligned = joined(last_up, first_up) and joined(last_down, first_down)
+        flipped = joined(last_up, first_down) and joined(last_down, first_up)
+        if flipped and not aligned:
+            segment = [(d, u) for u, d in segment]
+        elif not aligned:
+            raise ValueError(
+                "Structure '{}': pathway segment {} starts at nodes {} and {}, which "
+                "do not continue from {} and {}. The segments must meet on the "
+                "barrier.".format(
+                    name,
+                    i,
+                    self._node_label(first_up),
+                    self._node_label(first_down),
+                    self._node_label(last_up),
+                    self._node_label(last_down),
+                )
+            )
+        return segment[1:] if segment[0] == last_pair else segment
+
+    def _select_gate_span(self, name, pairs, gate_span):
+        """Take the run of node pairs bracketed by two approximate points."""
+        span = np.asarray(gate_span, dtype=float)[:, :2]
+        if len(span) != 2:
+            raise ValueError(
+                "Structure '{}': gate_span needs exactly two points, got {}.".format(
+                    name, len(span)
+                )
+            )
+        nodes = self.mesh.nodes[:, :2]
+        midpoints = np.array([0.5 * (nodes[u] + nodes[d]) for u, d in pairs])
+        ends = [
+            int(np.argmin(np.linalg.norm(midpoints - p, axis=1))) for p in span
+        ]
+        lo, hi = min(ends), max(ends)
+        chosen = pairs[lo : hi + 1]
+        return [p[0] for p in chosen], [p[1] for p in chosen]
 
     def _validate_node_paths(self, name, up_path, down_path):
         """Check that two node paths form a legal SCHISM hydraulic structure.
@@ -659,10 +767,13 @@ class SchismSetup(object):
                     on_line, neighbors = mesh.find_neighbors_on_segment(line_segment)
                     if widen:
                         on_line = on_line + neighbors
-                except:
+                except Exception:
                     self._logger.warning(
-                        "Elements not found for linestring {}".format(name)
+                        "Elements not found for linestring {} segment {}. Segment skipped.".format(
+                            name, ip
+                        )
                     )
+                    continue
 
                 node_local_nds = {}
                 for iel in on_line:
