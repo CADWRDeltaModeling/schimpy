@@ -7,7 +7,7 @@ Sides and elements are dry when any of their nodes is.
 import numpy as np
 import xarray as xr
 
-from schimpy.schism_hotstart import hotstart
+from schimpy.schism_hotstart import hotstart, prepare_schism_hotstart_output
 
 H0 = 0.01
 
@@ -59,3 +59,67 @@ def test_all_wet_leaves_everything_wet(triangle_mesh):
 
     np.testing.assert_array_equal(h.nc_dataset["idry"].values, [0, 0, 0])
     np.testing.assert_array_equal(h.nc_dataset["idry_e"].values, [0])
+
+
+def test_elevation_initializer_flags_override_evaluated_flags(triangle_mesh):
+    h = _hotstart_with_eta(triangle_mesh, ETA)
+    h.elevation_idry = np.array([1, 0, -1])
+
+    h.wet_dry_check()
+
+    expected_idry = np.array([1, 0, 0])
+    np.testing.assert_array_equal(h.nc_dataset["idry"].values, expected_idry)
+    edges = triangle_mesh.edges[:, :2]
+    expected_s = np.array([int(expected_idry[a] or expected_idry[b]) for a, b in edges])
+    np.testing.assert_array_equal(h.nc_dataset["idry_s"].values, expected_s)
+    np.testing.assert_array_equal(h.nc_dataset["idry_e"].values, [1])
+
+
+def test_schism_output_uses_model_dtypes_and_omits_helpers(tmp_path):
+    dataset = xr.Dataset(
+        {
+            "time": ("one", np.array([90], dtype=np.int64)),
+            "iths": ("one", np.array([1], dtype=np.int64)),
+            "ifile": ("one", np.array([1], dtype=np.int64)),
+            "nsteps_from_cold": ("one", np.array([1], dtype=np.int64)),
+            "idry": ("node", np.array([0, 1], dtype=np.int64)),
+            "idry_s": ("side", np.array([0], dtype=np.int64)),
+            "idry_e": ("elem", np.array([0], dtype=np.int64)),
+            "su2": (("side", "nVert"), np.ones((1, 2), dtype=np.float32)),
+            "sv2": (("side", "nVert"), np.ones((1, 2), dtype=np.float32)),
+            "we": (("elem", "nVert"), np.ones((1, 2), dtype=np.float32)),
+            "tr_nd": (
+                ("node", "nVert", "ntracers"),
+                np.ones((2, 2, 1), dtype=np.float32),
+            ),
+            "tr_nd0": (
+                ("node", "nVert", "ntracers"),
+                np.ones((2, 2, 1), dtype=np.float32),
+            ),
+            "z": (("node", "nVert"), np.zeros((2, 2), dtype=np.float32)),
+        },
+        coords={"tracer_list": ("ntracers", np.array(["TEM"], dtype="S10"))},
+    )
+
+    output = prepare_schism_hotstart_output(dataset)
+    output_path = tmp_path / "hotstart.nc"
+    output.to_netcdf(output_path)
+
+    with xr.open_dataset(output_path) as written:
+        for name in (
+            "iths",
+            "ifile",
+            "nsteps_from_cold",
+            "idry",
+            "idry_s",
+            "idry_e",
+        ):
+            assert written[name].dtype == np.int32
+        for name in ("time", "su2", "sv2", "we", "tr_nd", "tr_nd0"):
+            assert written[name].dtype == np.float64
+        assert "z" not in written
+        assert "tracer_list" not in written
+        assert "string10" not in written.dims
+
+    assert dataset["su2"].dtype == np.float32
+    assert "z" in dataset

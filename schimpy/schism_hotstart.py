@@ -56,6 +56,40 @@ from schimpy.schism_yaml import load
 from schimpy.yaml_util import yaml_from_file, yaml_from_dict
 
 
+SCHISM_HOTSTART_DTYPES = {
+    "time": np.float64,
+    "iths": np.int32,
+    "ifile": np.int32,
+    "nsteps_from_cold": np.int32,
+    "idry_e": np.int32,
+    "idry_s": np.int32,
+    "idry": np.int32,
+    "eta2": np.float64,
+    "cumsum_eta": np.float64,
+    "we": np.float64,
+    "tr_el": np.float64,
+    "su2": np.float64,
+    "sv2": np.float64,
+    "tr_nd": np.float64,
+    "tr_nd0": np.float64,
+    "q2": np.float64,
+    "xl": np.float64,
+    "dfv": np.float64,
+    "dfh": np.float64,
+    "dfq1": np.float64,
+    "dfq2": np.float64,
+}
+
+
+def prepare_schism_hotstart_output(dataset):
+    """Return a model-facing dataset matching SCHISM's hotstart schema."""
+    output = dataset.drop_vars(["z", "tracer_list"], errors="ignore")
+    for name, dtype in SCHISM_HOTSTART_DTYPES.items():
+        if name in output:
+            output[name] = output[name].astype(dtype)
+    return output
+
+
 def _to_timestamp(val, field_name="date"):
     """Convert *val* to ``pd.Timestamp``.
 
@@ -445,6 +479,7 @@ class hotstart(object):
                 ),
                 outname=visit_outname,
             )
+            prepare_schism_hotstart_output(self.nc_dataset).to_netcdf(self.output_fn)
 
         # Close source hotstart datasets, if any
         self.close_hotstart_cache()
@@ -487,7 +522,10 @@ class hotstart(object):
                 self,
                 self.hotstart_ini,
             )
-        return var.GenerateField()
+        field = var.GenerateField()
+        if variable == "elevation":
+            self.elevation_idry = var.idry
+        return field
 
     def initialize_netcdf(self, default_turbulence=True):
         if not self.nc_dataset:  # if the dataset is empty, initialize the nc file
@@ -544,11 +582,20 @@ class hotstart(object):
 
     def wet_dry_check(self):
         """
-        modify idry_e, idry, and idry_s based on eta2 and water depth.
+        Set wet/dry flags from elevation, preserving flags supplied by its initializer.
         """
         self.nc_dataset["z"] = xr.DataArray(self.depths, dims=["node", "nVert"])
         eta = np.squeeze(np.asarray(self.nc_dataset["elevation"].values, dtype=float))
         idry = np.where(self.mesh.nodes[:, 2] + eta <= self.h0, 1, 0)
+        if hasattr(self, "elevation_idry"):
+            supplied = self.elevation_idry >= 0
+            idry[supplied] = self.elevation_idry[supplied]
+            logger.info(
+                "Elevation initializer supplied wet/dry flags at %d nodes; "
+                "evaluated %d nodes from target depth and elevation",
+                int(supplied.sum()),
+                int((~supplied).sum()),
+            )
         idry_s = idry[self.mesh.edges[:, :2]].max(axis=1)
         idry_e = np.array([idry[list(n)].max() for n in self.mesh.elems])
         self.nc_dataset["idry"] = xr.DataArray(idry, dims=["node"])
@@ -709,6 +756,7 @@ class VariableField(object):
         self.vgrid = list(self.grid.values())[1][1]
         self.hgrid_name = list(self.grid.keys())[0]
         self.vgrid_name = list(self.grid.keys())[1]
+        self.idry = np.full(self.n_hgrid, -1, dtype=int)
 
         if vname in ["SED3D_bed", "SED3D_bedfrac"]:
             self.n_sdim = list(self.grid.values())[2][0]  # sediment dimension
@@ -962,8 +1010,8 @@ class VariableField(object):
         """
         Assigning a spatially uniformed value or an equation that's dependent on lat, lon
         """
-        if ini_meta:
-            value = self.get_value(ini_meta)
+        if ini_meta is not None:
+            value = self.get_value(ini_meta) if isinstance(ini_meta, dict) else ini_meta
         else:
             value = self.get_value(self.ini_meta)  # get variable values
 
@@ -1124,7 +1172,7 @@ class VariableField(object):
             allow_incomplete = False
         else:
             allow_incomplete = self.ini_meta["allow_incomplete"]
-        if poly_fn.endswith("shp") or poly_fn.endswith("ic"):
+        if poly_fn.lower().endswith((".shp", ".ic", ".yaml", ".yml")):
             # perform contiguity check and return a mapping array if successful.
             mapping = geo_tools.partition_check(
                 self.mesh,
@@ -1136,16 +1184,16 @@ class VariableField(object):
                 allow_incomplete,
             )
         else:
-            raise NotImplementedError("Poly_fn can only be shapefile or ic file")
+            raise NotImplementedError(
+                "regions_filename must be a shapefile, IC, or YAML polygon file"
+            )
 
         if self.ini_meta["smoothing"]:
             raise NotImplementedError("Smoothing not implemented yet")
 
+        v_merge = None
         if self.variable_name == "tke":
-            v_merge = np.zeros((6, self.n_hgrid, self.n_vgrid))
             tke_vars = ["q2", "xl", "dfv", "dfh", "dfq1", "dfq2"]
-        else:
-            v_merge = np.zeros((self.n_hgrid, self.n_vgrid))
         for i, r in enumerate(self.ini_meta["regions"]):
             ini_meta = r["initializer"]
             initializer_key = self.get_key(ini_meta)
@@ -1177,6 +1225,10 @@ class VariableField(object):
                         % (v_arr.shape,)
                     )
 
+                if v_merge is None:
+                    v_merge = np.zeros(
+                        (6, self.n_hgrid, self.n_vgrid), dtype=v_arr.dtype
+                    )
                 v_merge[:, inpoly, :] = v_arr
             else:
                 v_arr = np.asarray(v)
@@ -1191,6 +1243,10 @@ class VariableField(object):
                         % (self.variable_name, v_arr.shape)
                     )
 
+                if v_merge is None:
+                    v_merge = np.zeros(
+                        (self.n_hgrid, self.n_vgrid), dtype=v_arr.dtype
+                    )
                 v_merge[inpoly, :] = v_arr
         return v_merge
 
@@ -1345,6 +1401,9 @@ class VariableField(object):
         max_blw_bed = self._validated_max_blw_bed(ini_meta)
         novel_node_tol = float(ini_meta.get("novel_node_tol", 1.0e-3))
         src_wet = self._source_wet_mask(ini_meta, hotstart_data)
+        source_idry = None
+        if self.variable_name == "elevation" and "idry" in hotstart_data:
+            source_idry = np.asarray(hotstart_data["idry"].values, dtype=int)
 
         if "source_hgrid" not in ini_meta.keys():  # if the grids are exactly the same
             if self.tr_index is not None:
@@ -1366,6 +1425,7 @@ class VariableField(object):
                     dist_th=ini_meta["distance_threshold"],
                     method=ini_meta["method"],
                     src_wet=src_wet,
+                    source_idry=source_idry,
                     novel_node_tol=novel_node_tol,
                     max_blw_bed=max_blw_bed,
                 )
@@ -1375,6 +1435,7 @@ class VariableField(object):
                     vin,
                     inpoly=inpoly,
                     src_wet=src_wet,
+                    source_idry=source_idry,
                     novel_node_tol=novel_node_tol,
                     max_blw_bed=max_blw_bed,
                 )
@@ -1395,6 +1456,7 @@ class VariableField(object):
                     method=ini_meta["method"],
                     vgrid_version=ini_meta["source_vgrid_version"],
                     src_wet=src_wet,
+                    source_idry=source_idry,
                     novel_node_tol=novel_node_tol,
                     max_blw_bed=max_blw_bed,
                 )
@@ -1406,6 +1468,7 @@ class VariableField(object):
                     ini_meta["source_vgrid_version"],
                     inpoly,
                     src_wet=src_wet,
+                    source_idry=source_idry,
                     novel_node_tol=novel_node_tol,
                     max_blw_bed=max_blw_bed,
                 )
@@ -1439,6 +1502,8 @@ class VariableField(object):
         """Flag source nodes holding a real water column, or None if not comparable."""
         if "source_hgrid" not in ini_meta:
             return None
+        if "idry" in hotstart_data:
+            return np.asarray(hotstart_data["idry"].values, dtype=int) == 0
         src_mesh = self.hotstart.get_mesh(
             ini_meta["source_hgrid"],
             ini_meta.get("source_vgrid"),
@@ -1457,6 +1522,7 @@ class VariableField(object):
         dist_th=None,
         method=None,
         src_wet=None,
+        source_idry=None,
         novel_node_tol=1.0e-3,
         max_blw_bed=None,
     ):
@@ -1500,6 +1566,15 @@ class VariableField(object):
             print("\thorizontal interpolation completed!")
             dist = np.asarray(dist, dtype=float)
             indices = np.asarray(indices)
+
+        if source_idry is not None:
+            matched = dist <= novel_node_tol
+            target_indices = (
+                np.arange(self.n_hgrid, dtype=int)
+                if inpoly is None
+                else np.asarray(inpoly, dtype=int)
+            )
+            self.idry[target_indices[matched]] = source_idry[indices[matched]]
 
         novel = None
         if src_wet is not None:
@@ -2387,17 +2462,7 @@ def create_hotstart_cli(input_file, input_opt, logdir, debug, quiet):
     h = hotstart(input_path)
     h.create_hotstart()
     output_fn = h.output_fn
-    hnc = h.nc_dataset
-    # Ensure tracer_list is numpy string array, not ArrowStringArray
-    if 'tracer_list' in hnc.coords:
-        # Force conversion by dropping and recreating with object dtype
-        tracer_values = [
-            x.decode() if isinstance(x, bytes) else str(x)
-            for x in hnc['tracer_list'].values
-        ]
-        hnc = hnc.drop_vars('tracer_list')
-        hnc = hnc.assign_coords(tracer_list=('tracer_list', np.array(tracer_values, dtype=object)))
-    hnc.to_netcdf(output_fn, encoding={'tracer_list': {'dtype': 'S10'}})
+    prepare_schism_hotstart_output(h.nc_dataset).to_netcdf(output_fn)
     print(f"output to {output_fn} ")
 
 

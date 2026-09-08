@@ -8,7 +8,9 @@ positive down. They diverge only for genuinely 3D variables, where
 
 import numpy as np
 import pandas as pd
+import pytest
 
+from schimpy import geo_tools
 from schimpy.schism_setup import create_schism_setup
 from schimpy.schism_hotstart import VariableField
 
@@ -66,3 +68,48 @@ def test_simple_trend_3d_variable_z_is_layer_elevation(triangle_mesh, triangle_d
     np.testing.assert_allclose(vals[:, 0], np.maximum(0.1, triangle_dp) - 0.01)
     # the 0.1 clamp makes the two shallow nodes indistinguishable
     assert vals[1, 0] == vals[2, 0]
+
+
+def test_patch_init_accepts_yaml_region_polygons(triangle_mesh, monkeypatch):
+    """Generated inundation regions are YAML polygons consumed by partition_check."""
+    field = _field(triangle_mesh, "elevation", "0.0")
+    field.ini_meta = {
+        "regions_filename": "inundate_regions.yaml",
+        "regions": [],
+        "smoothing": False,
+    }
+
+    def accepted(*args, **kwargs):
+        raise RuntimeError("region YAML accepted")
+
+    monkeypatch.setattr(geo_tools, "partition_check", accepted)
+    with pytest.raises(RuntimeError, match="region YAML accepted"):
+        field.patch_init()
+
+
+def test_patch_init_preserves_domain_dtype(triangle_mesh, monkeypatch):
+    field = _field(triangle_mesh, "velocity_u", "0.0")
+    field.ini_meta = {
+        "regions_filename": "regions.yaml",
+        "smoothing": False,
+        "regions": [
+            {"region": "domain", "initializer": {"hotstart_nc": {}}},
+            {"region": "restoration", "initializer": {"simple_trend": 0.0}},
+        ],
+    }
+    mapping = np.full(field.n_hgrid, "domain", dtype=object)
+    mapping[-1] = "restoration"
+    monkeypatch.setattr(geo_tools, "partition_check", lambda *args, **kwargs: mapping)
+    monkeypatch.setattr(
+        field,
+        "hotstart_nc",
+        lambda ini_meta, inpoly: np.ones(
+            (len(inpoly), field.n_vgrid), dtype=np.float32
+        ),
+    )
+
+    values = field.patch_init()
+
+    assert values.dtype == np.float32
+    np.testing.assert_array_equal(values[:-1], 1.0)
+    np.testing.assert_array_equal(values[-1], 0.0)

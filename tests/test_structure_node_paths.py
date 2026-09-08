@@ -94,3 +94,25 @@ def test_broken_path_rejected(quad_setup):
     # nodes 1 and 3 are on the same row but not adjacent
     with pytest.raises(ValueError, match="path is broken"):
         quad_setup._validate_node_paths("gate", [0, 2], [3, 5])
+
+
+def test_pathway_segments_stitch_into_one_chain(quad_setup):
+    """A pathway broken at a node gives the same paths as the single chord."""
+    expected = _paths(quad_setup)
+    pathway = [[-10.0, 50.0], [100.0, 50.0], [210.0, 50.0]]
+    assert quad_setup.structure_node_paths("gate", pathway) == expected
+
+
+def test_gate_span_takes_the_run_between_the_nearest_pairs(quad_setup):
+    """The span points only have to be near the ends they mean."""
+    up, down = quad_setup.structure_node_paths(
+        "gate", CROSSING, gate_span=[[90.0, 55.0], [210.0, 45.0]]
+    )
+    full_up, full_down = _paths(quad_setup)
+    assert (up, down) == (full_up[1:], full_down[1:])
+
+
+def test_pathway_segment_off_the_mesh_rejected(quad_setup):
+    pathway = [[-10.0, 50.0], [210.0, 50.0], [210.0, 150.0]]
+    with pytest.raises(ValueError, match="did not cross any element edges"):
+        quad_setup.structure_node_paths("gate", pathway)

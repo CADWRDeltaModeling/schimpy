@@ -1,8 +1,18 @@
 # Sample specification for schimpy.inundate_island.
 #
-# Each breach is two points along the levee, ordered LEFT then RIGHT as seen
-# looking INTO the island. That ordering decides which side of the structure is
-# the island interior, so it is not cosmetic.
+# Each breach follows the levee, ordered as seen looking INTO the island, so the
+# interior is on the left. That ordering decides which side of the structure is
+# the island interior, so it is not cosmetic. Give the geometry either as
+#
+#   left / right   two points, the common case
+#   pathway        two or more points, for a levee that bends
+#
+# A pathway of more than two points also needs gate_span, the two points
+# bracketing the part of the pathway the gate itself occupies. The gate is
+# resolved by stitching the pathway's node pairs and then taking the run between
+# the pairs nearest those two points, so they need only be approximate. The
+# whole pathway still acts as the barrier that pens in the island; only the gate
+# span becomes a structure and gets dredged.
 #
 # Depths are positive down, matching gr3:
 #   min_depth  undisturbed ground at the rim of the dredge footprint.
@@ -41,6 +51,22 @@ islands:
         min_depth: -2.50
         max_depth: 1.79
         major_axis_len: 240.0
+        structure:
+          type: transfer
+          configuration:
+            flow: 0.0
+
+      # A bent levee reach with a short gate part way along it.
+      - name: bend
+        pathway:
+          - [626183.8, 4232927.4]
+          - [626010.0, 4233180.0]
+          - [625740.0, 4233210.0]
+        gate_span:
+          - [626000.0, 4233185.0]
+          - [625930.0, 4233195.0]
+        min_depth: -0.20
+        max_depth: 4.09
         structure:
           type: transfer
           configuration:
