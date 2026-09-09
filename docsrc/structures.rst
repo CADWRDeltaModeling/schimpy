@@ -33,7 +33,7 @@ reference nodes at which SCHISM samples water-surface elevation for the flow
 calculation. Actual flow may reverse; the nominal orientation controls the sign
 and selects the directional operating coefficient.
 
-.. figure:: documents/image/struct.png
+.. figure:: images/struct.png
    :alt: Paired node strings and reference nodes defining a hydraulic structure
    :align: center
 
@@ -107,7 +107,7 @@ A weir can be dry, free flowing, or submerged. Its ``elevation`` is the crest
 (or invert) elevation relative to the model datum and ``width`` is the width of
 one unit.
 
-.. figure:: documents/image/weir.png
+.. figure:: images/weir.png
    :alt: Free-flowing and submerged weir cases
    :align: center
 
@@ -189,7 +189,7 @@ A radial gate has invert ``elevation``, gate ``width``, and opening ``height``.
 The implementation uses the same rectangular wetted area as an orifice,
 :math:`A=W\min(H_{gate},z_h-z_{inv})`.
 
-.. figure:: documents/image/radial_gate.png
+.. figure:: images/radial_gate.png
    :alt: Radial gate dimensions and upstream and downstream water levels
    :align: center
 
@@ -271,8 +271,8 @@ preprocessor input:
 .. code-block:: yaml
 
    hydraulics:
-     input file: hydraulics.yaml
-     output file: hydraulics.in
+  include: hydraulics.yaml
+  outputfile: hydraulics.in
 
 A minimal structure file is:
 

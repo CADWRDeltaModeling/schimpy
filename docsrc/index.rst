@@ -38,6 +38,7 @@ Contents
    Installation <installation>
    Spatial data in SCHISM <spatial>
    Pre-processing <preprocessing>
+    Hydraulic Structures <structures>
    Working with SMS <sms>
    Model time <model_time>
    Populating Elevation/Depth Data <depth>

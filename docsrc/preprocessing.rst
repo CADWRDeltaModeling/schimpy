@@ -157,13 +157,16 @@ When any of nodes of an element falls in a polygon, the element will get the att
 Hydraulic Structures
 ''''''''''''''''''''
 
-The next section in the main input is 'hydraulics'. It has two sets of items: 'input file' and 'output file' as shown below. The scripts reads structure locations and configuration from the input file, and creates SCHISM native hydraulics structure input file. See the detail of the hydraulic structure input file at :ref:`structure_input`.
+The next section in the main input is ``hydraulics``. The ``include`` key
+provides the structure locations and configuration, and ``outputfile`` names
+the SCHISM native hydraulic-structure input written by the preprocessor. See
+the details at :ref:`structure_input`.
 
 .. code-block:: yaml
 
   hydraulics:
-    input file:  hydraulics.yaml
-    output file: hydraulics.in
+    include: hydraulics.yaml
+    outputfile: hydraulics.in
 
 
 Source/Sink
@@ -220,8 +223,8 @@ An example of a whole main input is shown below:
   prop with polygons:
     tvd.prop:    ${input_dir}/tvd.yaml
   hydraulics:
-    input file:  hydraulics.yaml
-    output file: hydraulics.in
+    include: hydraulics.yaml
+    outputfile: hydraulics.in
   source/sink:
     input file:  ${input_dir}/source_sink_mod.yaml
     output file: source_sink.in
@@ -331,8 +334,6 @@ The item, 'vertices' are a list of pairs of x and y coordinates of vertices of t
         598598 4213178
 
 In this example, nodes in the area that are not covered by the two polygons will be filled with the default value of one. The first polygon, 'coyote,' uses a constant value of three to give minimum value in the polygon area. The second polygon, 'confluence,' uses an equation.
-
-.. _structure_input:
 
 Hydraulic Structures Input
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
