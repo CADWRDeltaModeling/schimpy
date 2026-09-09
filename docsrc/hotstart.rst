@@ -1,57 +1,165 @@
 SCHISM hotstart
 ===============
 
+``schimpy.schism_hotstart`` creates a SCHISM ``hotstart.nc`` from a YAML
+configuration. It supports both an initial condition assembled from observations
+and formulas, and transfer of a prior hotstart onto the same or a changed mesh.
+
+Run the YAML directly; a separate Python driver is not needed::
+
+      create_hotstart hotstart.yaml
+
+The same command is available through the grouped CLI::
+
+      sch create_hotstart hotstart.yaml
+
+Core configuration
+------------------
+
+The ``hotstart`` block defines the target grid and model clock, followed by one
+initializer for every requested variable. For example::
+
+      hotstart:
+         date: 2021-10-05
+         run_start: 2020-09-30
+         time_step: 90
+         hgrid_input_file: hgrid.gr3
+         vgrid_input_file: vgrid.in.3d
+         vgrid_version: "5.10"
+         modules: [TEM, SAL]
+
+         elevation:
+            initializer:
+               simple_trend:
+                  value: max(0.97, -z-0.01)
+         temperature:
+            initializer:
+               simple_trend:
+                  value: 14.0
+         salinity:
+            initializer:
+               simple_trend:
+                  value: 0.0
+         velocity_u:
+            initializer:
+               simple_trend:
+                  value: 0.0
+         velocity_v:
+            initializer:
+               simple_trend:
+                  value: 0.0
+         velocity_w:
+            initializer:
+               simple_trend:
+                  value: 0.0
+
+For a new initial condition, ``run_start: default`` sets the origin to ``date``.
+For an ``ihot=2`` continuation, ``run_start`` is the original simulation origin
+and ``date`` is the restart moment. Schimpy derives ``time``, ``iths`` and
+``nsteps_from_cold`` from those values and ``time_step``.
+
+Initializers
+------------
+
+The supported initializers are:
+
+``simple_trend``
+      A constant or an expression in target-node ``x``, ``y`` and ``z``. In this
+      context ``z`` is depth, positive down.
+
+``obs_points``
+      Interpolation from station observations.
+
+``extrude_casts``
+      Interpolation and vertical extrusion from profile or cruise data.
+
+``text_init``
+      Values from a GR3-style ``.ic`` or ``.gr3`` file, or another supported
+      text initializer input.
+
+``hotstart_nc``
+      Values from a prior hotstart, optionally transferred from a source grid and
+      vertical grid.
+
+``patch_init``
+      Dispatch to different initializers by region. ``regions_filename`` may be a
+      region shapefile, an ``.ic`` file, or a schimpy polygon YAML file.
+
+``schout_nc`` is reserved but is not implemented.
+
+When elevation uses ``hotstart_nc``, its initializer must set a non-negative
+``max_blw_bed``. This is a lower bound on free-surface elevation for novel target
+nodes. A value of ``0.01`` permits the initialized surface to sit at most one
+centimetre below the target bed::
+
+      elevation:
+         initializer:
+            hotstart_nc:
+               data_source: source_hotstart.nc
+               source_hgrid: source_hgrid.gr3
+               source_vgrid: source_vgrid.in.3d
+               source_vgrid_version: "5.10"
+               max_blw_bed: 0.01
+
+Wet and dry flags
+-----------------
+
+Wet/dry handling depends on the elevation source. At target nodes that coincide
+with nodes in an elevation ``hotstart_nc``, schimpy retains the source ``idry``
+flag. Nodes without a matched source flag, including nodes initialized by
+``simple_trend`` or ``text_init``, are evaluated on the target grid. A node is
+dry when
+
+.. math::
+
+    H = dp + eta \le h0.
+
+Side and element flags are then derived from the completed target-node flags; a
+side or element is dry if any of its nodes is dry.
+
+Changed grids and inundation
+----------------------------
+
+For a changed-grid continuation, use ``patch_init`` for elevation. The unchanged
+domain normally uses ``hotstart_nc`` while each new area receives an explicit
+initializer. Tracers, velocities and turbulence variables usually transfer from
+the prior hotstart.
+
+``schimpy.inundate_island`` generates four mutually consistent inputs for a
+gradually inundated restoration area:
+
+* ``depth_enforce_inundate.yaml`` for the breach dredge;
+* ``elev_inundate.yaml`` for ``elev.ic``;
+* ``hydraulic_structures_inundate.yaml`` for the temporary structures; and
+* ``inundate_regions.yaml`` for hotstart ``patch_init``.
+
+Generate them with::
+
+      sch inundate_island --config breaches.yaml --hgrid hgrid.gr3 --out-dir .
+
+The generated regions contain ``domain`` first and one entry per restoration
+area. In the hotstart YAML, set ``allow_overlap: true`` and preserve that order:
+list ``domain`` first and restoration regions afterwards, because the last
+matching configured region wins. A common pattern is ``hotstart_nc`` for
+``domain`` and ``text_init`` from the generated ``elev.ic`` for each restoration
+region.
+
 Examples
 --------
 
+Applied Bay-Delta configurations are stored in the
+`BayDeltaSCHISM hotstart examples
+<https://github.com/CADWRDeltaModeling/BayDeltaSCHISM/tree/master/examples/hotstart>`_.
+They demonstrate regional constants, cruise casts, observations, changed-grid
+transfer, sediment, age and biology modules.
 
-
-Examples to create hotstart.nc for the following cases can be found 
-in `BayDeltaSCHISM <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM>`_
-All test cases are under the directory `examples/hotstart/ <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM/tree/master/examples/hotstart>`
-All test cases start from the same date and has the same destination grid. 
-
-
-.. table:: Examples
-
-   ========  ==========================================  ========================
-   Cases      Directory                                    Tracers
-   ========  ==========================================  ========================
-   basic      examples/basic/                              temp, salt
-   hotstart   examples/hotstart_from_previous_hotstart     temp, salt
-   flooding   examples/flooded_island                      temp, salt
-   age        examples/tracer_age                          temp, salt, gen, age 
-   sed        examples/sed                                 temp, salt, sed
-   bio        examples/bio                                 temp, salt, cos or icm
-   ========  ==========================================  ========================
-
-
-Steps
------
-
-To create a hotstart:
-
-#. Edit yaml file "hotstart.yaml": date, hgrid_input_file, and vgrid_input_file. 
-    
-#. Create domain division poplygons in a shapefile. For most applications, users can directly use hotstart_regions.shp in BayDeltaSCHISM/examples/hotstart/shapefile without any modification. However, if your domain is larger than the area covered by the polygon, an error will be generated: "Orphaned nodes or cells found at ........" Most of time, polygon overlapping should not be allowed (allow_overlap=False), except in "island_flooding" test case where "allow_overlap" is set to True.  
-
-   * Note that it is the responsibility of the users to create polygons that are non overlapping and complete. 
-  
-   * Hint: enable "snapping options" in qgis (normally under "project" menu) to create non overlaying polygons or us SMS instead. 
-
-#. Prepare extrude_casts data for San Francisco Bay.
-   * It is the user's responsiblity to create the cast data file
-  
-   * An `example file <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM/blob/master/examples/hotstart/data_in/polaris_transect_2021-04-20.csv>` is provided to demonstrate the format of the data file.
-  
-   * USGS data is available from \\cnrastore-bdo\Modeling_Data\usgs_cruise. 
-  
-   * Decide if suisun_marsh region should use "extrude_casts" or "obs_points". The general rule is that "extrude_casts" works best in the bay and observed data works best in the marsh. 
-    
-#. Prepare input data from observations.
-   * It is the user's responsiblity to create the observational input files. `Example input files <https://github.com/CADWRDeltaModeling/BayDeltaSCHISM/blob/master/examples/hotstart/data_in>` are provided to demonstrate the format of the file.
-
-#. Run python script "create_hotstart.py". 
+These examples are reference configurations, not self-contained test cases. The
+shared target grids, vertical grids and source hotstarts are not distributed, and
+some case directories retain legacy ``create_hotstart.py`` drivers or YAML that
+predates current required keys. Use the CLI and current schimpy source for the
+interface contract. The maintained generic inundation behavior is covered by
+``tests/test_inundate_island.py`` and the inundation notebook in
+``docsrc/notebooks/inundate_island.ipynb``.
 
 
 
