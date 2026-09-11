@@ -61,13 +61,15 @@ def test_all_wet_leaves_everything_wet(triangle_mesh):
     np.testing.assert_array_equal(h.nc_dataset["idry_e"].values, [0])
 
 
-def test_elevation_initializer_flags_override_evaluated_flags(triangle_mesh):
+def test_elevation_initializer_flags_preserve_dry_but_not_impossible_wet(
+    triangle_mesh,
+):
     h = _hotstart_with_eta(triangle_mesh, ETA)
     h.elevation_idry = np.array([1, 0, -1])
 
     h.wet_dry_check()
 
-    expected_idry = np.array([1, 0, 0])
+    expected_idry = np.array([1, 1, 0])
     np.testing.assert_array_equal(h.nc_dataset["idry"].values, expected_idry)
     edges = triangle_mesh.edges[:, :2]
     expected_s = np.array([int(expected_idry[a] or expected_idry[b]) for a, b in edges])
