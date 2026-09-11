@@ -11,6 +11,7 @@ from schimpy.model_time import model_time_cli
 from schimpy.sms2gr3 import convert_2dm_cli
 from schimpy.prepare_schism import prepare_schism_cli
 from schimpy.hotstart_inventory import hotstart_inventory_cli
+from schimpy.hotstart_fix import hotstart_fix_cli
 from schimpy.create_vgrid_lsc2 import create_vgrid_lsc2_cli
 from schimpy.create_vgrid_lsc2_v2 import create_vgrid_lsc2_v2_cli
 from schimpy.schism_hotstart import create_hotstart_cli
@@ -27,6 +28,7 @@ from schimpy.relocate_source_sink import relocate_source_sink_cli
 from schimpy.vgrid_nlayer_to_gr3 import vgrid_nlayer_to_gr3_cli
 from schimpy.stacked_dem_fill import stacked_dem_cli
 from schimpy.inundate_island import inundate_island_cli
+from schimpy.nc_bc_compatible import nc_bc_compatible_cli
 
 # Commands to be checked for utility before re-adding
 # from schimpy.check_mesh_skewness import check_skewness_cli
@@ -69,6 +71,7 @@ cli.add_command(model_time_cli, "model_time")
 cli.add_command(convert_2dm_cli, "convert_2dm")
 cli.add_command(prepare_schism_cli, "prepare_schism")
 cli.add_command(hotstart_inventory_cli, "hotstart_inventory")
+cli.add_command(hotstart_fix_cli, "hotstart_fix")
 cli.add_command(create_vgrid_lsc2_cli, "create_vgrid_lsc2")
 cli.add_command(create_vgrid_lsc2_v2_cli, "create_vgrid_lsc2_v2")
 cli.add_command(create_hotstart_cli, "create_hotstart")
@@ -85,6 +88,7 @@ cli.add_command(relocate_source_sink_cli, "relocate_source_sink")
 cli.add_command(vgrid_nlayer_to_gr3_cli, "vgrid_nlayer_to_gr3")
 cli.add_command(stacked_dem_cli, "stacked_dem")
 cli.add_command(inundate_island_cli, "inundate_island")
+cli.add_command(nc_bc_compatible_cli, "nc_bc_compatible")
 
 
 # Commands to be checked for utility before re-adding
