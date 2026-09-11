@@ -582,19 +582,24 @@ class hotstart(object):
 
     def wet_dry_check(self):
         """
-        Set wet/dry flags from elevation, preserving flags supplied by its initializer.
+        Set wet/dry flags from elevation and compatible initializer flags.
         """
         self.nc_dataset["z"] = xr.DataArray(self.depths, dims=["node", "nVert"])
         eta = np.squeeze(np.asarray(self.nc_dataset["elevation"].values, dtype=float))
-        idry = np.where(self.mesh.nodes[:, 2] + eta <= self.h0, 1, 0)
+        evaluated_idry = np.where(self.mesh.nodes[:, 2] + eta <= self.h0, 1, 0)
+        idry = evaluated_idry.copy()
         if hasattr(self, "elevation_idry"):
             supplied = self.elevation_idry >= 0
             idry[supplied] = self.elevation_idry[supplied]
+            incompatible_wet = supplied & (idry == 0) & (evaluated_idry == 1)
+            idry[incompatible_wet] = 1
             logger.info(
                 "Elevation initializer supplied wet/dry flags at %d nodes; "
-                "evaluated %d nodes from target depth and elevation",
+                "evaluated %d nodes from target depth and elevation; "
+                "corrected %d supplied wet flags incompatible with target depth",
                 int(supplied.sum()),
                 int((~supplied).sum()),
+                int(incompatible_wet.sum()),
             )
         idry_s = idry[self.mesh.edges[:, :2]].max(axis=1)
         idry_e = np.array([idry[list(n)].max() for n in self.mesh.elems])
