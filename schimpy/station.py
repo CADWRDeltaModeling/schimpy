@@ -492,12 +492,15 @@ def flux_stations_from_yaml(inp):
         raise ValueError(f"Could not find file {inp}")
     else:
         content = inp
-        if not "linestrings" in content:
+        if not (("linestrings" in content) or ("flow_outputs" in content)):
             raise ValueError(
-                "Could not fine 'linestrings' key. Was the input a string or filename? Valid file? For FLOW, make sure there is 'flow_station_input' parameter"
+                "Could not fine 'linestrings' or 'flow_outputs' key. Was the input a string or filename? Valid file? For FLOW, make sure there is 'flow_station_input' parameter"
             )
-    names = []
+    # accept either a bare {"linestrings": ...} mapping or one nested under "flow_outputs"
+    content = content.get("flow_outputs", content)
     linestrings = content["linestrings"]
+
+    names = []
     for ls in linestrings:
         if ls.get("Name") is not None:
             raise ValueError(
