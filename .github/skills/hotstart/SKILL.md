@@ -116,8 +116,9 @@ Do not guess these. They change the physics, not just the plumbing.
 - **Do not assume `eta` at a dry node is a physical water level.** By convention
   it is placed just below the bed and is an artifact.
 - **Do not assume wet/dry flags are always recomputed.** An elevation
-  `hotstart_nc` preserves source `idry` at coincident nodes; target-grid
-  `dp + eta` is used where no source flag is supplied.
+  `hotstart_nc` preserves source dry states at coincident nodes, but a source
+  wet state is forced dry when target-grid `dp + eta <= h0`; target-grid
+  `dp + eta` is also used where no source flag is supplied.
 - **Do not assume a region initializer covered every node you intended.** Verify
   coverage; polygons routinely clip a row short.
 - **Do not assume the grid you were handed is correct.** Verify that bathymetry
