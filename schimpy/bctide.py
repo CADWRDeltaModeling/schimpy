@@ -1,66 +1,128 @@
 # -*- coding: utf-8 -*-
-"""
+"""Generate SCHISM ``bctides.in`` files from a YAML boundary description.
 
-This class will read in a yaml file which defines SCHISM boundary and generate bctides.in.
-It supports  all type of elevation, velocity, salinity, temperature and tracer boundaries.
-At the end of this script, there is a synthetic example which demonstrates the format of bctide YAML file.
+All elevation, velocity, temperature, salinity and tracer boundary types read
+by SCHISM (``schism_init.F90``) are supported. Each open boundary lists its
+``variables``; each variable names a ``source`` keyword that maps one-to-one
+onto a SCHISM type code. A numeric ``source`` (or a list of numbers for a
+tracer module) means a constant (code 2). Omitting a variable means code 0.
 
+Source keywords
+---------------
+elevation (``iettype``)
+    ``th_text`` (1, ``elev.th``), number (2), ``tidal`` (3),
+    ``th_nc`` (4, ``elev2D.th.nc``), ``tidal_th_nc`` (5, tides added to
+    ``elev2D.th.nc``).
+velocity (``ifltype``)
+    ``th_text`` (1, ``flux.th``), number (2, discharge, negative is inflow),
+    ``tidal`` (3), ``th_nc`` (4, ``uv3D.th.nc``), ``tidal_th_nc`` (5),
+    ``th_nc_relaxed`` (-4), ``tidal_th_nc_relaxed`` (-5), ``flather_1`` (-1),
+    ``discharge_relation`` (-2).
+temperature, salinity (``itetype``, ``isatype``) and tracers (``itrtype``)
+    ``th_text`` (1), number or list of numbers (2), ``initial_profile`` (3),
+    ``th_nc`` (4, ``TEM_3D.th.nc``, ``SAL_3D.th.nc`` or ``[MOD]_3D.th.nc``).
+    Each requires ``nudge`` in [0, 1].
+
+See the "Boundary conditions (bctides)" chapter of the schimpy documentation
+for the complete YAML reference and examples.
 """
 from schimpy.schism_yaml import load
 from schimpy.schism_mesh import SchismMeshGr3Reader, BoundaryType
+from schimpy.logging_config import configure_logging, resolve_loglevel
 import datetime
-from zoneinfo import ZoneInfo
+import logging
 import numbers
+from pathlib import Path
 import numpy as np
 import click
 
 
 __all__ = ["bctide_cli"]
 
+logger = logging.getLogger(__name__)
 
-@click.command(
-    help=(
-        "The tool create SCHISM bctide inputs by reading a number of open boundary condition yaml and mesh \
-         from a  main input yaml \n\n"
-        "Example:\n"
-        "  bctide bctide_main.yaml\n "
+#: SCHISM type code used for a numeric (constant) ``source``.
+CONSTANT_CODE = 2
+
+#: Elevation ``source`` keywords and their SCHISM ``iettype`` codes.
+ELEVATION_SOURCES = {
+    "th_text": 1,
+    "tidal": 3,
+    "th_nc": 4,
+    "tidal_th_nc": 5,
+}
+
+#: Velocity ``source`` keywords and their SCHISM ``ifltype`` codes.
+VELOCITY_SOURCES = {
+    "th_text": 1,
+    "tidal": 3,
+    "th_nc": 4,
+    "tidal_th_nc": 5,
+    "th_nc_relaxed": -4,
+    "tidal_th_nc_relaxed": -5,
+    "flather_1": -1,
+    "discharge_relation": -2,
+}
+
+#: Temperature, salinity and tracer ``source`` keywords and their SCHISM codes.
+SCALAR_SOURCES = {
+    "th_text": 1,
+    "initial_profile": 3,
+    "th_nc": 4,
+}
+
+
+@click.command()
+@click.argument("main_yaml", type=click.Path(exists=True))
+@click.option("--logdir", type=click.Path(path_type=Path), default=None,
+              help="Directory for a log file.")
+@click.option("--debug", is_flag=True, help="Enable debug logging.")
+@click.option("--quiet", is_flag=True, help="Suppress console logging.")
+@click.help_option("-h", "--help")
+def bctide_cli(main_yaml, logdir, debug, quiet):
+    """Create SCHISM bctides.in files from MAIN_YAML.
+
+    MAIN_YAML names the mesh and lists one entry per bctides file to write:
+
+    \b
+        mesh:
+          mesh_inputfile: ./hgrid.gr3
+          open_boundaries: !include open_boundary.yaml   # optional
+        bctides:
+          include:
+            - bctides.in.2d.yaml
+            - bctides.in.3d.yaml
+
+    Each bctides entry is written to the file given by its ``name``. The
+    boundary assignment chosen for every open boundary is logged.
+
+    \b
+    Example:
+      bctide main_bctides.yaml
+    """
+    level, console = resolve_loglevel(debug=debug, quiet=quiet)
+    configure_logging(
+        package_name="schimpy",
+        level=level,
+        console=console,
+        logdir=logdir,
+        logfile_prefix="bctide",
     )
-)
-@click.argument('main_yaml', type=click.Path(exists=True))
+    with open(main_yaml, "r") as fn:
+        main_yaml_dict = load(fn)
 
-def bctide_cli(main_yaml):
-     """ read in main yaml file which contians the grid topology and
-         boundary condtion yaml files, this input file looks like below
-         mesh:
-         mesh_inputfile: ./hgrid.gr3  
-         open_boundaries: !include open_boundary.yaml
-  
-         bctides:
-         bctides.in.2d: !include bctides.in.2d.yaml
-         bctides.in.3d: !include bctides.in.3d.yaml
-         bctides.in.sed.3d: !include bctides.in.sed.3d.yaml
+    mesh_in = main_yaml_dict["mesh"]["mesh_inputfile"]
+    sr = SchismMeshGr3Reader()
 
-         for each boundary condition yaml file, it will generate the corresponding boundary
-         class and write out the SCHISM boundary condition btdides input file.
-         """
-     with open(main_yaml, "r") as fn:
-         main_yaml_dict = load(fn)
-
-     mesh_in = main_yaml_dict["mesh"]["mesh_inputfile"]
-     sr = SchismMeshGr3Reader()
-
-     hgrid = sr.read(mesh_in)
-     open_boundary_segments = None
-     if "open_boundaries" in main_yaml_dict["mesh"].keys():
-         open_boundary_segments = main_yaml_dict["mesh"]["open_boundaries"]
-     bctides_dic = main_yaml_dict.get("bctides")
-#     for bctides_key in bctides_dic.keys():
-     for bctides_yaml in bctides_dic:
-         out = bctides_yaml["name"]
-         print("---------processing bctides file %s----------" % out)
-         by = load_boundary(hgrid,bctides_yaml,open_boundary_segments)
-  #       by.write_bctides(bctides_key)
-         by.write_bctides(out)
+    hgrid = sr.read(mesh_in)
+    open_boundary_segments = None
+    if "open_boundaries" in main_yaml_dict["mesh"].keys():
+        open_boundary_segments = main_yaml_dict["mesh"]["open_boundaries"]
+    bctides_dic = main_yaml_dict.get("bctides")
+    for bctides_yaml in bctides_dic:
+        out = bctides_yaml["name"]
+        by = load_boundary(hgrid, bctides_yaml, open_boundary_segments)
+        by.write_bctides(out)
 
 def update_mesh_open_boundaries(mesh, segments):
     """Overtide mesh open boundaries with linestrings from segments dict
@@ -89,6 +151,80 @@ def update_mesh_open_boundaries(mesh, segments):
 
 def load_boundary(hgrid,fn,open_boundary_segments):
     return boundary(hgrid,fn,open_boundary_segments)
+
+
+def _source_code(variable, spec, table, label):
+    """Resolve the ``source`` of a boundary variable to a SCHISM type code.
+
+    Parameters
+    ----------
+    variable : str
+        Variable name used in error messages, e.g. ``"velocity"``.
+    spec : dict
+        Variable specification containing a ``source`` entry.
+    table : dict
+        Mapping of accepted ``source`` keywords to SCHISM type codes.
+    label : str
+        Boundary name used in error messages.
+
+    Returns
+    -------
+    code : int
+        SCHISM type code. A numeric source gives :data:`CONSTANT_CODE`.
+    keyword : str
+        The keyword, or ``"constant"`` for a numeric source.
+
+    Raises
+    ------
+    ValueError
+        If ``source`` is missing or is not a number or a keyword in `table`.
+    """
+    if "source" not in spec:
+        raise ValueError(f"Boundary '{label}': {variable} is missing 'source'.")
+    source = spec["source"]
+    if isinstance(source, numbers.Number) and not isinstance(source, bool):
+        return CONSTANT_CODE, "constant"
+    if isinstance(source, str) and source in table:
+        return table[source], source
+    raise ValueError(
+        f"Boundary '{label}': {variable} source {source!r} is not supported. "
+        f"Use a number for a constant or one of: {', '.join(table)}."
+    )
+
+
+def _unit_interval(spec, key, what, label):
+    """Return required factor ``spec[key]`` after checking it lies in [0, 1].
+
+    Parameters
+    ----------
+    spec : dict
+        Specification holding the factor.
+    key : str
+        Key of the factor, e.g. ``"nudge"`` or ``"inflow_relax"``.
+    what : str
+        Description used in error messages.
+    label : str
+        Boundary name used in error messages.
+
+    Returns
+    -------
+    float or int
+        The factor as given in the YAML.
+
+    Raises
+    ------
+    ValueError
+        If the factor is missing, not numeric or outside [0, 1].
+    """
+    if key not in spec:
+        raise ValueError(f"Boundary '{label}': {what} requires '{key}'.")
+    value = spec[key]
+    if (not isinstance(value, numbers.Number) or isinstance(value, bool)
+            or not 0.0 <= value <= 1.0):
+        raise ValueError(
+            f"Boundary '{label}': {what} '{key}' must be a number in [0, 1], got {value!r}."
+        )
+    return value
 
 
 class boundary(object):
@@ -168,40 +304,6 @@ class boundary(object):
                     )       
             update_mesh_open_boundaries(self.hgrid, self.boundary_segments)
 
-        self.elev_source = {
-            "elev history": 1,
-            "constant": 2,
-            "tidal": 3,
-            "2D elev history": 4,
-            "tidal and 2D elev history": 5,
-            "unspecified": 0,
-        }
-        self.vel_source = {
-            "flux history": 1,
-            "constant": 2,
-            "tidal": 3,
-            "3D uv history": 4,
-            "tidal and 3D uv history": 5,
-            "flather 1": -1,
-            "unspecified": 0,
-        }
-
-        self.temp_source = {
-            "temperature history": 1,
-            "constant": 2,
-            "initial profile": 3,
-            "3D temperature history": 4,
-            "unspecified": 0,
-        }
-
-        self.salt_source = {
-            "salinity history": 1,
-            "constant": 2,
-            "initial profile": 3,
-            "3D salinity history": 4,
-            "unspecified": 0,
-        }
-
         ## tracer order
         self.tracer_lst = {
             "GEN": 1,
@@ -214,12 +316,6 @@ class boundary(object):
             "TIMOR": 8,
             "FABM": 9,
             "DVD": 10,
-        }
-        self.tracer_source = {
-            "time history": 1,
-            "constant": 2,
-            "initial profile": 3,
-            "unspecified": 0,
         }
 
 ##   also read in tracer modules defined in the bctides yaml here
@@ -543,7 +639,357 @@ class boundary(object):
                     f"boundary '{bound_name}' is missing variable specification. Please specify {tracer_name} for inflow/bidirectional boundary."
                 )
 
+    _VARIABLES = ("elevation", "velocity", "temperature", "salinity", "tracers")
+
+    def _resolve_open_boundary(self, index, spec, num_nodes):
+        """Validate one open boundary and resolve its SCHISM type codes.
+
+        The checks mirror those SCHISM makes when reading ``bctides.in`` so that
+        problems surface during preprocessing rather than at model start.
+
+        Parameters
+        ----------
+        index : int
+            Zero-based position of the boundary in hgrid order.
+        spec : dict
+            The open boundary entry from the bctides YAML.
+        num_nodes : int
+            Number of nodes on the boundary.
+
+        Returns
+        -------
+        dict
+            Resolved assignment with keys ``label``, ``flow_direction``,
+            ``num_nodes``, one entry per variable in ``elevation``,
+            ``velocity``, ``temperature`` and ``salinity`` (each a dict with
+            ``code``, ``keyword``, ``spec`` and, for scalars, ``nudge``) and
+            ``tracers`` (a list ordered by SCHISM module order whose items are
+            None or dicts with ``module``, ``code``, ``keyword``, ``values``
+            and ``nudge``).
+
+        Raises
+        ------
+        ValueError
+            If the specification is incomplete, inconsistent or uses an
+            unsupported keyword.
+        """
+        bound_name = spec.get("name", "")
+        label = bound_name if bound_name else f"boundary_{index}"
+
+        if "flow_direction" not in spec:
+            raise ValueError(
+                f"Boundary '{label}' is missing required 'flow_direction'. "
+                "Use 'inflow', 'outflow' or 'bidirection'."
+            )
+        flow_direction = spec["flow_direction"]
+
+        variables = {}
+        for entry in spec.get("variables") or []:
+            if not isinstance(entry, dict) or len(entry) != 1:
+                raise ValueError(
+                    f"Boundary '{label}': each item under 'variables' must be a single "
+                    f"variable such as 'velocity: {{source: th_text}}'; got {entry!r}. "
+                    "Check the YAML indentation."
+                )
+            ((vname, vspec),) = entry.items()
+            if vname not in self._VARIABLES:
+                raise ValueError(
+                    f"Boundary '{label}': unknown variable '{vname}'. "
+                    f"Expected one of: {', '.join(self._VARIABLES)}."
+                )
+            if vspec is None:
+                raise ValueError(
+                    f"Boundary '{label}': '{vname}' has no specification. "
+                    "Check the YAML indentation."
+                )
+            if vname in variables:
+                raise ValueError(f"Boundary '{label}': '{vname}' is specified more than once.")
+            variables[vname] = vspec
+
+        if flow_direction == "outflow":
+            for vname in ("temperature", "salinity", "tracers"):
+                if vname in variables:
+                    raise ValueError(
+                        f"Boundary '{label}' is configured as an outflow; a {vname} "
+                        "boundary specification is not allowed."
+                    )
+        elif flow_direction in ("inflow", "bidirection"):
+            check_list = ["temperature", "salinity"]
+            if len(self.tracer_modules) > 0:
+                check_list.append("tracers")
+            elif "tracers" in variables:
+                raise ValueError(
+                    f"Boundary '{label}' has specified 'tracers' boundary conditions, but no "
+                    "tracer modules are defined in the bctides YAML. Please add tracer modules "
+                    "to the top-level 'modules' section or remove 'tracers' from the boundary."
+                )
+            for var in check_list:
+                self.check_inflow_boundary_spec(variables.get(var), label, var)
+        else:
+            raise ValueError(
+                f"Boundary '{label}' has invalid 'flow_direction' value: {flow_direction}. "
+                "Expected 'inflow', 'outflow', or 'bidirection'."
+            )
+
+        unset = {"code": 0, "keyword": None, "spec": None}
+        bc = {
+            "label": label,
+            "flow_direction": flow_direction,
+            "num_nodes": num_nodes,
+        }
+
+        elev = variables.get("elevation")
+        bc["elevation"] = dict(unset)
+        if elev is not None:
+            code, keyword = _source_code("elevation", elev, ELEVATION_SOURCES, label)
+            if code in (3, 5) and "constituents" not in elev:
+                raise ValueError(
+                    f"Boundary '{label}': elevation source '{keyword}' requires 'constituents'."
+                )
+            bc["elevation"] = {"code": code, "keyword": keyword, "spec": elev}
+        elev_id = bc["elevation"]["code"]
+
+        vel = variables.get("velocity")
+        bc["velocity"] = dict(unset)
+        if vel is not None:
+            code, keyword = _source_code("velocity", vel, VELOCITY_SOURCES, label)
+            if code in (3, 5, -5) and "constituents" not in vel:
+                raise ValueError(
+                    f"Boundary '{label}': velocity source '{keyword}' requires 'constituents'."
+                )
+            if code in (-1, -2) and elev_id != 0:
+                raise ValueError(
+                    f"Boundary '{label}': velocity source '{keyword}' requires that no "
+                    "elevation boundary be specified."
+                )
+            if code in (-4, -5):
+                if elev_id == 0:
+                    raise ValueError(
+                        f"Boundary '{label}': velocity source '{keyword}' requires an "
+                        "elevation boundary."
+                    )
+                for key in ("inflow_relax", "outflow_relax"):
+                    _unit_interval(vel, key, f"velocity source '{keyword}'", label)
+            if code == -2:
+                coefs = vel.get("coefficients")
+                if (not isinstance(coefs, list) or len(coefs) != 4
+                        or not all(isinstance(c, numbers.Number) for c in coefs)):
+                    raise ValueError(
+                        f"Boundary '{label}': velocity source 'discharge_relation' requires "
+                        f"'coefficients' as a list of 4 numbers, got {coefs!r}."
+                    )
+            if code == -1:
+                for key in ("eta_m0", "vnormal_nodes"):
+                    vals = vel.get(key)
+                    if not isinstance(vals, list) or len(vals) != num_nodes:
+                        raise ValueError(
+                            f"Boundary '{label}': velocity source 'flather_1' requires "
+                            f"'{key}' as a list with one entry per boundary node ({num_nodes})."
+                        )
+            bc["velocity"] = {"code": code, "keyword": keyword, "spec": vel}
+
+        for vname in ("temperature", "salinity"):
+            vspec = variables.get(vname)
+            bc[vname] = dict(unset)
+            if vspec is not None:
+                code, keyword = _source_code(vname, vspec, SCALAR_SOURCES, label)
+                nudge = _unit_interval(vspec, "nudge", vname, label)
+                bc[vname] = {"code": code, "keyword": keyword, "spec": vspec, "nudge": nudge}
+
+        tracer_specs = [None] * len(self.tracer_mod_pos)
+        tracers = variables.get("tracers")
+        if tracers is not None:
+            if not isinstance(tracers, list):
+                raise ValueError(
+                    f"Boundary '{label}': 'tracers' must be a list of module entries."
+                )
+            for tracer in tracers:
+                tracer_mod = tracer.get("module")
+                if tracer_mod not in self.tracer_mod_pos:
+                    raise ValueError(
+                        f"Tracer module '{tracer_mod}' is not defined in the bctides 'modules' section. "
+                        f"Please add it to the top-level modules list. "
+                        f"Valid modules: {', '.join(sorted(self.tracer_mod_pos.keys()))}"
+                    )
+                pos = self.tracer_mod_pos[tracer_mod]
+                if tracer_specs[pos] is not None:
+                    raise ValueError(
+                        f"Boundary '{label}': tracer module '{tracer_mod}' is specified more than once."
+                    )
+                if "relax" in tracer:
+                    raise ValueError(
+                        f"Boundary '{label}': tracer module '{tracer_mod}' uses 'relax'; "
+                        "the tracer factor is named 'nudge'."
+                    )
+                what = f"tracer module '{tracer_mod}'"
+                source = tracer.get("source")
+                values = None
+                if isinstance(source, (list, numbers.Number)) and not isinstance(source, bool):
+                    values = source if isinstance(source, list) else [source]
+                    if not all(isinstance(x, numbers.Number) for x in values):
+                        raise ValueError(
+                            f"Boundary '{label}': {what} constant source must contain only "
+                            f"numbers, got {source!r}."
+                        )
+                    if len(values) != self.tracer_mod_num[tracer_mod]:
+                        raise ValueError(
+                            f"Boundary '{label}': {what} boundary source length {len(values)} "
+                            "does not match number of tracers defined in module section: "
+                            f"{self.tracer_mod_num[tracer_mod]}"
+                        )
+                    code, keyword = CONSTANT_CODE, "constant"
+                else:
+                    code, keyword = _source_code(what, tracer, SCALAR_SOURCES, label)
+                nudge = _unit_interval(tracer, "nudge", what, label)
+                tracer_specs[pos] = {
+                    "module": tracer_mod,
+                    "code": code,
+                    "keyword": keyword,
+                    "values": values,
+                    "nudge": nudge,
+                }
+        bc["tracers"] = tracer_specs
+        return bc
+
+    @staticmethod
+    def _describe_assignment(bc):
+        """Return a one-line summary of a resolved boundary for logging.
+
+        Parameters
+        ----------
+        bc : dict
+            Resolved assignment from :meth:`_resolve_open_boundary`.
+
+        Returns
+        -------
+        str
+            Summary listing each assigned variable as ``keyword(code)``.
+        """
+        parts = []
+        for vname in ("elevation", "velocity", "temperature", "salinity"):
+            var = bc[vname]
+            if var["code"] == 0:
+                continue
+            text = f"{vname}={var['keyword']}({var['code']})"
+            if "nudge" in var:
+                text += f" nudge={var['nudge']}"
+            if var["code"] in (-4, -5):
+                text += (f" inflow_relax={var['spec']['inflow_relax']}"
+                         f" outflow_relax={var['spec']['outflow_relax']}")
+            parts.append(text)
+        for tracer in bc["tracers"]:
+            if tracer is not None:
+                parts.append(
+                    f"{tracer['module']}={tracer['keyword']}({tracer['code']}) "
+                    f"nudge={tracer['nudge']}"
+                )
+        summary = ", ".join(parts) if parts else "no variables assigned"
+        return f"Boundary '{bc['label']}' ({bc['flow_direction']}): {summary}"
+
+    def _write_tidal_constituents(self, outf, spec, fields, num_nodes, what, label):
+        """Write per-node tidal amplitude/phase blocks for one boundary.
+
+        Parameters
+        ----------
+        outf : file-like
+            Open ``bctides.in`` file.
+        spec : dict
+            Variable specification holding ``constituents``.
+        fields : sequence of str
+            Constituent fields written per node, e.g. ``("amplitude", "phase")``.
+        num_nodes : int
+            Number of nodes on the boundary.
+        what : str
+            Prefix used in error messages, e.g. ``"elev"``.
+        label : str
+            Boundary name used in error messages.
+        """
+        for tidal_constituent in spec["constituents"]:
+            name = tidal_constituent.get("name")
+            if name is None:
+                if isinstance(tidal_constituent, dict) and len(tidal_constituent) > 0:
+                    name = next(iter(tidal_constituent))
+                else:
+                    raise ValueError(
+                        f" {what} tidal constituent name is empty for open boundary {label} \n"
+                    )
+            outf.write(name + "\n")
+            entries = tidal_constituent[name]
+            arrays = [entries[k][field] for k, field in enumerate(fields)]
+            for kk in range(num_nodes):
+                vals = [
+                    self._handle_tidal_constituents_val(
+                        arr, name, f"{what}_{field}", label, kk
+                    )
+                    for arr, field in zip(arrays, fields)
+                ]
+                sep = "   " if len(vals) == 2 else " "
+                outf.write(sep.join(str(v) for v in vals) + "\n")
+
+    def _write_open_boundary(self, outf, bc):
+        """Write the type-code line and parameters for one open boundary.
+
+        Parameters
+        ----------
+        outf : file-like
+            Open ``bctides.in`` file.
+        bc : dict
+            Resolved assignment from :meth:`_resolve_open_boundary`.
+        """
+        label = bc["label"]
+        num_nodes = bc["num_nodes"]
+        elev = bc["elevation"]
+        vel = bc["velocity"]
+        codes = [num_nodes, elev["code"], vel["code"],
+                 bc["temperature"]["code"], bc["salinity"]["code"]]
+        codes += [t["code"] if t is not None else 0 for t in bc["tracers"]]
+        outf.write(" ".join(str(c) for c in codes) + " !  " + label + "\n")
+
+        if elev["code"] == CONSTANT_CODE:
+            outf.write(str(elev["spec"]["source"]) + "\n")
+        elif elev["code"] in (3, 5):
+            self._write_tidal_constituents(
+                outf, elev["spec"], ("amplitude", "phase"), num_nodes, "elev", label
+            )
+
+        vel_id = vel["code"]
+        vspec = vel["spec"]
+        if vel_id == CONSTANT_CODE:
+            outf.write(str(vspec["source"]) + "\n")
+        elif vel_id in (-4, -5):
+            outf.write(f"{vspec['inflow_relax']} {vspec['outflow_relax']}\n")
+        elif vel_id == -1:
+            outf.write("eta_mean\n")
+            for eta_m0 in vspec["eta_m0"]:
+                outf.write(str(eta_m0) + "\n")
+            outf.write("vn_mean\n")
+            for vn_node in vspec["vnormal_nodes"]:
+                vn_node = vn_node if isinstance(vn_node, list) else [vn_node]
+                outf.write(" ".join(str(vn) for vn in vn_node) + "\n")
+        elif vel_id == -2:
+            outf.write(" ".join(str(c) for c in vspec["coefficients"]) + "\n")
+        if vel_id in (3, 5, -5):
+            self._write_tidal_constituents(
+                outf, vspec, ("u_amplitude", "u_phase", "v_amplitude", "v_phase"),
+                num_nodes, "vel", label,
+            )
+
+        for vname in ("temperature", "salinity"):
+            var = bc[vname]
+            if var["code"] == CONSTANT_CODE:
+                outf.write(str(var["spec"]["source"]) + "\n")
+            if var["code"] > 0:
+                outf.write(str(var["nudge"]) + "\n")
+
+        for tracer in bc["tracers"]:
+            if tracer is None:
+                continue
+            if tracer["code"] == CONSTANT_CODE:
+                outf.write(" ".join(str(v) for v in tracer["values"]) + "\n")
+            outf.write(str(tracer["nudge"]) + "\n")
+
     def write_bctides(self, bctides_file):
+        logger.info("Writing bctides file %s", bctides_file)
  
         with open(bctides_file, "w") as outf:
             tt = self.date.strftime("%m/%d/%Y %H:%M")
@@ -728,335 +1174,11 @@ class boundary(object):
                 outf.write(str(num_open_boundaries) + " ! # of open boundary \n")
 
                 for i in range(num_open_boundaries):
-                    bound_name = self.open_boundaries[i]["name"]
-                    print("\tprocessing open boundary %s " % bound_name)
-                    num_nodes = len(hgrid.boundaries[i].nodes)
-                    node_id_lst = hgrid.boundaries[i].nodes
-                    elev_id = 0
-                    elev_boundary = None
-                    ## if flow_direction is given and is outflow, then
-                    ## this boundary shouldn't have any tracer boundary, such
-                    ## as temperature, salinity or other scalars
-                    
-
-                    ## flow_direction is must for open boundary, if not given, raise error
-                    if not("flow_direction" in self.open_boundaries[i].keys()):
-                        raise ValueError(
-                            f"Boundary '{bound_name}' is missing required 'flow_direction' specification. Please specify 'flow_direction' as either 'inflow' or 'outflow'."
-                        )
-
-                    # variables in YAML are provided as a list of dicts; helper to find a variable entry
-                    vars_list = self.open_boundaries[i].get("variables", [])
-                    def _get_var(name):
-                        for vv in vars_list:
-                            if isinstance(vv, dict) and name in vv:
-                                return vv[name]
-                        return None
-                    
-                    flow_direction = self.open_boundaries[i]["flow_direction"]
-                    if flow_direction == "outflow":
-                        if "temperature" in self.open_boundaries[i].keys():
-                            raise ValueError(
-                                f"Boundary '{bound_name}' is configured as an outflow; a temperature boundary "
-                                "specification is not allowed."
-                            )
-                        if "salinity" in self.open_boundaries[i].keys():
-                            raise ValueError(
-                                f"Boundary '{bound_name}' is configured as an outflow; a salinity boundary "
-                                "specification is not allowed."
-                            )
-                        if "tracers" in self.open_boundaries[i].keys():
-                            raise ValueError(
-                                f"Boundary '{bound_name}' is configured as an outflow; tracer "
-                                "specification is not allowed."
-                            )
-                    elif flow_direction == "inflow" or flow_direction == "bidirection":
-
-                        check_list = ["temperature", "salinity","tracers"]
-                        if len(self.tracer_modules) == 0: ## if no tracer module is defined, then tracers should not be specified in the boundary
-                            check_list = ["temperature", "salinity"]
-                            ## if tracers is specified in the boundary but no tracer module is defined, raise error
-                            if "tracers" in self.open_boundaries[i].keys():
-                                raise ValueError(
-                                    f"Boundary '{bound_name}' has specified 'tracers' boundary conditions, but no tracer modules are defined in the bctides YAML. \
-                                        Please add tracer modules to the top-level 'modules' section or remove 'tracers' specification from the boundary."
-                                )
-                        for var in check_list:
-                            self.check_inflow_boundary_spec(_get_var(var), bound_name,var)
-                    else:
-                        raise ValueError(
-                            f"Boundary '{bound_name}' has invalid 'flow_direction' value: {flow_direction}. "
-                            "Expected 'inflow', 'outflow', or 'bidirection'."
-                        )   
-
-
-
-
-                    if _get_var("elevation") is not None:
-                        elev_boundary = _get_var("elevation")
-                        elev_source = elev_boundary["source"]
-                        elev_key = elev_source
-                        if isinstance(elev_source, numbers.Number):
-                            elev_key = "constant"
-                        if ("tidal" in elev_key) and ("elev2D.th.nc" in elev_key):
-                            elev_key = "tidal elev2D.th.nc"
-
-                        try:
-                            elev_id = self.elev_source[elev_key]
-                        except:
-                            raise ValueError(
-                                elev_key + " elevation boundary is not supported"
-                            )
-
-                    vel_id = 0
-                    vel_boundary = None
-                    if _get_var("velocity") is not None:
-                        vel_boundary = _get_var("velocity")
-                        vel_source = vel_boundary["source"]
-                        vel_key = vel_source
-
-                        if isinstance(vel_source, numbers.Number):
-                            vel_key = "constant"
-                        if ("tidal" in vel_key) and ("uv3D.th.nc" in vel_key):
-                            vel_key = "tidal uv3D.th.nc"
-
-                        if ("flather " in vel_key) and ("1 " in vel_key):
-                            vel_key = "flather 1"
-
-                        try:
-                            vel_id = self.vel_source[vel_key]
-                        except:
-                            raise ValueError(
-                                vel_key + " velocity boundary is not supported"
-                            )
-
-                    ## output temperature and salinity boundary
-                    temp_id = 0
-                    temp_boundary = None
-                    if _get_var("temperature") is not None:
-                        temp_boundary = _get_var("temperature")
-                        temp_source = temp_boundary["source"]
-                        temp_key = temp_source
-                        if isinstance(temp_source, numbers.Number):
-                            temp_key = "constant"
-
-                        try:
-                            temp_id = self.temp_source[temp_key]
-                        except:
-                            raise ValueError(
-                                temp_key + " temperature boundary is not supported"
-                            )
-                    salt_id = 0
-                    salt_boundary = None
-                    if _get_var("salinity") is not None:
-                        salt_boundary = _get_var("salinity")
-                        salt_source = salt_boundary["source"]
-                        salt_key = salt_source
-                        if isinstance(salt_source, numbers.Number):
-                            salt_key = "constant"
-
-                        try:
-                            salt_id = self.salt_source[salt_key]
-                        except:
-                            raise ValueError(
-                                salt_key + " temperature boundary is not supported"
-                            )
-
-                    ## output tracer boundary
-                    tracer_boundary_sources = [0] * len(self.tracer_mod_pos)
-                    ## this list save sorted tracer boundary index according to SCHISM code order
-                    tracer_boundary_lst_sorted = []
-                    if _get_var("tracers") is not None:
-                        tracers_var = _get_var("tracers")
-                        boundary_tracer_mod_num = len(tracers_var)
-                        for j in range(boundary_tracer_mod_num):
-                            tracer_boundary = tracers_var[j]["source"]
-                            tracer_mod = tracers_var[j]["module"]
-                            ## if tracer mod not in self.tracer_mod_pos, raise error
-                            if not (tracer_mod in self.tracer_mod_pos.keys()):  
-                                raise ValueError(
-                                    f"Tracer module '{tracer_mod}' is not defined in the bctides 'modules' section. "
-                                    f"Please add it to the top-level modules list. "
-                                    f"Valid modules: {', '.join(sorted(self.tracer_mod_pos.keys()))}"
-                                )
-
-                            tracer_boundary_key = tracer_boundary
-                            ## set boundary key to "constant" if source is a number or list of numbers
-                            if isinstance(tracer_boundary, numbers.Number):
-                                tracer_boundary_key = "constant"
-                            elif isinstance(tracer_boundary, list):
-                                boundary_tracer_mod_num = len(tracer_boundary)
-                                ## if curent tracer mod has multiple tracers, check if the
-                                ## length of tracer_boundary match the number of tracers defined
-                                ## in self.tracer_mod_num
-                                if boundary_tracer_mod_num != self.tracer_mod_num[tracer_mod]:
-                                    raise ValueError( self.open_boundaries[i]["name"] + ": "+
-                                        tracer_mod + " boundary source length "
-                                        + str(boundary_tracer_mod_num)
-                                        + " does not match number of tracers defined in module section: "
-                                        + str(self.tracer_mod_num[tracer_mod])
-                                    )
-
-                                if all(
-                                    isinstance(x, numbers.Number)
-                                    for x in tracer_boundary
-                                ):
-                                    tracer_boundary_key = "constant"
-                                else:
-                                    raise ValueError(
-                                        tracer_mod
-                                        + " "
-                                        + str(tracer_boundary)
-                                        + " boundary is not supported"
-                                    )
-                            tracer_boundary_source = self.tracer_source[tracer_boundary_key]
-                            pos = self.tracer_mod_pos[tracer_mod]
-                            tracer_boundary_sources[pos] = tracer_boundary_source
-                            tracer_boundary_lst_sorted.append(j)
-
-                        tracer_boundary_lst_sorted.sort(
-                            key=lambda jj: self.tracer_mod_pos[
-                                tracers_var[jj]["module"]
-                            ]
-                        )
-                    outf.write(str(num_nodes) + " ")
-                    outf.write(str(elev_id) + " ")
-                    outf.write(str(vel_id) + " ")
-                    outf.write(str(temp_id) + " ")
-                    outf.write(str(salt_id) + " ")
-                    for ii in range(len(self.tracer_mod_pos)):
-                        outf.write(str(tracer_boundary_sources[ii]) + " ")
-                    ## add boundary name in the end of the line, if boundary name is empty, write "boundary_i" instead
-                    if bound_name == "":
-                        outf.write("!  boundary_" + str(i))    
-                    else:
-                        outf.write("!  " + bound_name)  
-                    outf.write("\n")
-
-                    ## output all the boundary parameters
-                    ## elevation boundary parameters
-                    if elev_id == 2:
-                        ## const
-                        outf.write(str(elev_source))
-                    elif (elev_id == 3) or (elev_id == 5):
-                        ## tidal forcing
-                        # write each tidal constituent: name line then amplitude/phase per node
-                        for tidal_constituent in elev_boundary["constituents"]:
-                            # name must exist (YAML examples use 'name' after normalization)
-                            name = tidal_constituent.get("name")
-                            if name is None:
-                                # fallback to first key if mapping style was used
-                                if isinstance(tidal_constituent, dict) and len(tidal_constituent) > 0:
-                                    name = next(iter(tidal_constituent))
-                                else:
-                                    ## raise error  
-                                    raise ValueError(f" elev tidal constituent name is empty for open boundary {i} \n")
-                            outf.write(name + "\n")
-                            amp = tidal_constituent[name][0]["amplitude"]
-                            phase = tidal_constituent[name][1]["phase"]
-
-                            for kk in range(num_nodes):
-                                node_id = node_id_lst[kk]
-                                #x = hgrid.nodes[node_id, 0]
-                                #y = hgrid.nodes[node_id, 1]
-                                amp_val = self._handle_tidal_constituents_val(amp,name,"elev_amplitude",i,kk)
-                                phase_val = self._handle_tidal_constituents_val(phase,name,"elev_phase",i,kk)
-
-                                outf.write(str(amp_val) + "   " + str(phase_val) + "\n")
-
-                    ## velocity boundary parameters
-                    if vel_id == 2:
-                        ## constp 
-                        outf.write(str(vel_source))
-                    elif (vel_id == 3) or (vel_id == 5):
-                        ## tidal forcing
-                        for tidal_constituent in vel_boundary["constituents"]:
-                            # name must exist (YAML examples use 'name' after normalization)
-                            name = tidal_constituent.get("name")
-                            if name is None:
-                                # fallback to first key if mapping style was used
-                                if isinstance(tidal_constituent, dict) and len(tidal_constituent) > 0:
-                                    name = next(iter(tidal_constituent))
-                                else:
-                                    ## raise error  
-                                    raise ValueError(f" vel tidal constituent name is empty for open boundary {i} \n")
-                            outf.write(name + "\n")
-                            u_amp = tidal_constituent[name][0]["u_amplitude"]
-                            u_phase = tidal_constituent[name][1]["u_phase"]
-                            v_amp = tidal_constituent[name][2]["v_amplitude"]
-                            v_phase = tidal_constituent[name][3]["v_phase"]
-
-                            for kk in range(num_nodes):
-
-                                node_id = node_id_lst[kk]
-
-
-                                u_amp_val = self._handle_tidal_constituents_val(u_amp,name,"u_amplitude",i,kk)
-                                u_phase_val = self._handle_tidal_constituents_val(u_phase,name,"u_phase",i,kk)
-                                v_amp_val = self._handle_tidal_constituents_val(v_amp,name,"v_amplitude",i,kk)
-                                v_phase_val = self._handle_tidal_constituents_val(v_phase,name,"v_phase",i,kk)
-                                
-                                
-                                outf.write(
-                                    str(u_amp_val)
-                                    + " "
-                                    + str(u_phase_val)
-                                    + " "
-                                    + str(v_amp_val)
-                                    + " "
-                                    + str(v_phase_val)
-                                    + "\n"
-                                )
-                    elif vel_id == -4:
-                        relax_inflow = vel_boundary["inflow_relax"]
-                        relax_outflow = vel_boundary["outflow_relax"]
-                        outf.write(str(relax_inflow) + " " + str(relax_outflow) + "\n")
-                    elif vel_id == -1:
-                        eta_mean = vel_boundary["eta_mean"]
-                        outf.write(str(eta_mean) + "\n")
-                        for kk in range(num_nodes):
-                            eta_m0 = vel_boundary["eta_m0"][kk]
-                            outf.write(str(eta_m0) + "\n")
-                        vn_mean = vel_boundary["vnormal_mean"]
-                        outf.write(str(vn_mean) + "\n")
-                        for kk in range(num_nodes):
-                            vn_node = vel_boundary["vnormal_nodes"][kk]
-                            for vn in vn_node:
-                                outf.write(str(vn) + " ")
-                            outf.write("\n")
-
-                    ## temperature bc parameters
-                    if temp_id == 2:
-                        temp_bc = temp_boundary["source"]
-                        outf.write(str(temp_bc) + "\n")
-                    if temp_id > 0:
-                        nudge = temp_boundary["nudge"]
-                        outf.write(str(nudge) + "\n")
-
-                    ## salt bc parameters
-                    if salt_id == 2:
-                        salt_bc = salt_boundary["source"]
-                        outf.write(str(salt_bc) + "\n")
-                    if salt_id > 0:
-                        nudge = salt_boundary["nudge"]
-                        outf.write(str(nudge) + "\n")
-
-                    ## tracer bc paraemters
-                    for ii in range(len(tracer_boundary_lst_sorted)):
-                        tracer_index = tracer_boundary_lst_sorted[ii]
-                        tracer = _get_var("tracers")[tracer_index]
-                        tracer_bc_source = tracer_boundary_sources[ii]
-                        if tracer_bc_source == 2:
-                            tracer_bc_const = tracer["source"]
-                            if isinstance(tracer_bc_const, list):
-                                for val in tracer_bc_const:
-                                    outf.write(str(val) + " ")
-                            else:
-                                outf.write(str(tracer_bc_const))
-                            outf.write("\n")
-                        if tracer_bc_source > 0:
-                            relax = tracer["relax"]
-                            outf.write(str(relax) + "\n ")
+                    bc = self._resolve_open_boundary(
+                        i, self.open_boundaries[i], len(hgrid.boundaries[i].nodes)
+                    )
+                    logger.info(self._describe_assignment(bc))
+                    self._write_open_boundary(outf, bc)
 
 
 if __name__ == "__main__":

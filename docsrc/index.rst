@@ -39,6 +39,7 @@ Contents
    Spatial data in SCHISM <spatial>
    Pre-processing <preprocessing>
     Hydraulic Structures <structures>
+   Boundary conditions (bctides) <bctides>
    Working with SMS <sms>
    Model time <model_time>
    Populating Elevation/Depth Data <depth>
