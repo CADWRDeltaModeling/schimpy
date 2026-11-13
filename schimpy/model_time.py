@@ -553,7 +553,8 @@ def get_headers(infile, no_index=True):
     if infile.split(".")[-1] == "th":
         with open(infile, "r") as headin:
             for line in headin:
-                if line.startswith("#"):
+                line = line.split("#", 1)[0]   # drop full-line and trailing comments
+                if not line.strip():           # blank, or comment-only line
                     continue
                 headers = line.split()
                 if len(headers) == 1:
