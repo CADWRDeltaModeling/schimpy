@@ -353,7 +353,13 @@ def set_dual_axes_ssc(ax1, filtered=False):
 
 
 def set_xaxis_dateformat(
-    ax, date_format=None, major_locator=None, rotate=None, pad=None
+    ax,
+    date_format=None,
+    major_locator=None,
+    rotate=None,
+    pad=None,
+    short_range_format=None,
+    short_range_days=3,
 ):
     """Set the date format of the ticks of the x-axis.
 
@@ -363,12 +369,28 @@ def set_xaxis_dateformat(
     ax: a Matplotlib axes
 
     date_format: A format of the ticks of the x-axis.
+
+    short_range_format: optional format (e.g. "%m/%d/%Y %H:%M") used instead of
+        date_format when the visible x-axis range is shorter than short_range_days.
+        Evaluated when ticks are drawn, so later changes to the limits are honored.
+
+    short_range_days: range threshold in days for short_range_format.
     """
     if major_locator is None:
         major_locator = mpl.dates.AutoDateLocator()
     ax.xaxis.set_major_locator(major_locator)
     if date_format is None:
         xformat = mpl.dates.AutoDateFormatter(major_locator)
+    elif short_range_format is not None:
+        long_fmt = mpl.dates.DateFormatter(date_format)
+        short_fmt = mpl.dates.DateFormatter(short_range_format)
+
+        def _format(x, pos=None):
+            lo, hi = ax.get_xlim()
+            fmt = short_fmt if abs(hi - lo) < short_range_days else long_fmt
+            return fmt(x, pos)
+
+        xformat = mpl.ticker.FuncFormatter(_format)
     else:
         xformat = mpl.dates.DateFormatter(date_format)
     ax.xaxis.set_major_formatter(xformat)

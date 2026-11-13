@@ -188,8 +188,8 @@ def struct_open_props(struct, th_data, out_freq="15min", datetime_idx=None):
         ]
     elif structtype == "culvert":
         # rad, elevation, op_down, op_up
-        up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "rad"]
-        down_cols_to_multiply = ["install", "ndup", "op_down", "elev", "rad"]
+        up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "radius"]
+        down_cols_to_multiply = ["install", "ndup", "op_down", "elev", "radius"]
     elif structtype == "radial_relheight":
         # width, height, elevation, op_down, op_up
         up_cols_to_multiply = ["install", "ndup", "op_up", "elev", "width", "height"]
