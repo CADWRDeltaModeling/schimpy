@@ -1,0 +1,30 @@
+# Documentation overlay for environment.yml; run from the repository root.
+# conda env create -n schimpy_doc -f environment.yml
+# conda env update -n schimpy_doc -f environment-doc.yml
+# Do not use --prune: this overlay does not describe the runtime dependencies.
+# conda activate schimpy_doc
+# python -m pip install --no-deps -e .
+# cd docsrc
+# make html
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - pip
+  - sphinx>=8.2,<9
+  - sphinx-rtd-theme
+  - sphinx-click
+  - sphinx-design
+  - sphinx-argparse
+  - sphinxcontrib-bibtex
+  - sphinxcontrib-mermaid
+  - myst-parser
+  - numpydoc
+  - pillow>=4.0.0
+  - nbsphinx
+  - nbconvert
+  - ipykernel
+  - docutils
+  - pandoc
+  - matplotlib
+  - ipython

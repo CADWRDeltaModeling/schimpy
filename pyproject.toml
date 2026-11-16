@@ -64,7 +64,7 @@ dependencies = [
 [project.optional-dependencies]
 # These are the tools needed to perform documentation
 doc = [
-    "sphinx",
+    "sphinx>=8.2,<9",
     "sphinx-rtd-theme",
     "sphinx-click",
     "sphinx-design",

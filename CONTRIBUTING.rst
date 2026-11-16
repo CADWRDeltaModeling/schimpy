@@ -42,6 +42,11 @@ schimpy could always use more documentation, whether as part of the
 official schimpy docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
+For the documentation environment, automatic API generation, ``make html``
+and GitHub Pages publishing, see :doc:`contributing_docs`. These instructions
+use ``environment.yml`` plus the documentation overlay and a separate
+``schimpy_doc`` environment.
+
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
@@ -64,14 +69,15 @@ Ready to contribute? Here's how to set up `schimpy` for local development.
 
     $ git clone git@github.com:your_name_here/schimpy.git
 
-3. Install your local copy into a conda enviornment. Assuming you have conda installed, 
-this is how you set up your fork for local development::
+3. Install your local copy into a Conda environment for runtime development::
 
-    $ # run commands in setup_devenv.bat on command line
-    # you now have a dev_schimpy conda environment
     $ cd schimpy/
-    $ conda activate dev_schimpy
-    $ pip install -e . # Do this last as you don't want pip pulling in any dependencies
+    $ conda env create -f environment.yml
+    $ conda activate schimpy
+    $ python -m pip install --no-deps -e .
+
+   Documentation contributors should use the separate ``schimpy_doc`` setup
+   described in :doc:`contributing_docs`.
 
 4. Create a branch for local development::
 

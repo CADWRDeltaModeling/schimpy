@@ -91,11 +91,15 @@ Do not embed Bay-Delta repository policy in reusable SCHISM preprocessing code.
 
 schimpy documentation should focus on CLI, functions and a manual for the preprocessor.
 
+For documentation environment setup and local builds, follow
+[docsrc/contributing_docs.rst](docsrc/contributing_docs.rst).
+Use the `documentation` skill for Sphinx setup, builds and troubleshooting.
+Use the runtime `environment.yml` plus the documentation overlay; `make html`
+generates API pages automatically. Do not edit generated `docsrc/_api/` files.
+
 ## Testing
 
 - Use `pytest`.
 - Use the SCHISM environment for formal or informal testing.
 - Mark network-dependent tests as `integration`.
 - Normal CI should exclude integration tests where appropriate.
-
-

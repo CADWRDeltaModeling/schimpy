@@ -43,7 +43,7 @@ autodoc_mock_imports = [
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+needs_sphinx = "8.2"
 
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -52,6 +52,7 @@ extensions = [
     "nbsphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.autodoc",
+    "sphinx.ext.apidoc",
     "sphinxarg.ext",  #'sphinx.ext.viewcode',
     "sphinx_click",
     "matplotlib.sphinxext.mathmpl",
@@ -62,6 +63,14 @@ extensions = [
     "sphinx.ext.doctest",
     "numpydoc",
     "sphinx_click",
+]
+
+apidoc_modules = [
+    {
+        "path": "../schimpy",
+        "destination": "_api",
+        "exclude_patterns": ["../schimpy/* - Copy.py"],
+    }
 ]
 
 # Figure configuration
@@ -127,6 +136,8 @@ exclude_patterns = [
     "*test*",
     "_build",
     "**.ipynb_checkpoints",
+    "_api/modules.rst",
+    "_api/schimpy.rst",
 ]
 
 # The name of the Pygments (syntax highlighting) style to use.

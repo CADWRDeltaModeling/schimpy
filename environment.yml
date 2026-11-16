@@ -1,0 +1,58 @@
+# Runtime + test environment for schimpy.
+# Keep in sync with [project] dependencies in pyproject.toml (the conda recipe is generated from it).
+# Minimum versions mostly serve to shrink the conda solve space.
+#
+#   conda env create -f environment.yml
+#   conda activate schimpy
+#   python -m pip install --no-deps -e .
+#
+# Documentation tools are supplied by a separate overlay, not this file.
+# The python version is coordinated with requires-python in pyproject.toml
+# and with .github/workflows/python-package-conda.yml and build_sphinx.yml.
+name: schimpy
+channels:
+  - conda-forge
+  - cadwr-dms
+  - nodefaults
+dependencies:
+  - python=3.12
+  - pip
+  # build / editable install
+  - setuptools>=68
+  - setuptools-scm>=6.2
+  # DWR packages (vtools3 and dms-datastore bring in utide, pint, omegaconf, etc.)
+  - vtools3>=3.11.1
+  - dms-datastore>=0.6.24
+  # core numerics and data handling
+  - numpy>=2.0
+  - pandas>=2
+  - xarray
+  - dask>=2024   # not imported directly; ensures xarray/vtools3 lazy paths are solved consistently
+  - netcdf4
+  - scipy>=1.8
+  - numba
+  - statsmodels
+  - pyyaml
+  - packaging
+  - click
+  - diskcache
+  # geospatial (conda-forge gdal includes the osgeo python bindings)
+  - gdal
+  - geopandas
+  - shapely>=2.0
+  - pyogrio
+  - pyproj
+  - rtree
+  - rasterio
+  # plotting
+  - matplotlib
+  - palettable
+  # numerical methods used by contour_smooth
+  - nodepy
+  # hrr3 (HRRR download) and cruise
+  - boto3
+  - pytz
+  - python-dateutil
+  # testing
+  - pytest>=3
+  - pytest-cov

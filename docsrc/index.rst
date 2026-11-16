@@ -52,6 +52,7 @@ Contents
    History <history>
    License <license_and_disclaimer>
    Contributing <contributing>
+   Building documentation <contributing_docs>
    Authors <authors>
    Project README <readme>
    
