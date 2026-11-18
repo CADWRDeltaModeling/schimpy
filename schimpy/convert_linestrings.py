@@ -10,7 +10,7 @@ from schimpy.yaml_util import yaml_from_file
 from shapely.geometry import LineString, mapping
 import click
 import geopandas as gpd
-
+from vtools.functions.unit_conversions import m_to_ft
 schema = {
     "geometry": "LineString",
     "properties": {"name": "str", "type": "str", "configuration": "str"},
@@ -23,19 +23,22 @@ def convert_structures_main(input_yaml, output_fn):
         inputs = yaml_from_file(input_yaml)
         structures = inputs.get("structures")
         structures = get_structures_from_yaml(structures)
-        # Build GeoDataFrame
-        gdf = gpd.GeoDataFrame(
-            [
-                {
-                    "geometry": LineString(struct["end_points"]),
-                    "name": struct["name"],
-                    "type": struct["type"],
-                    "configuration": str(struct["configuration"]),
-                }
-                for struct in structures
-            ],
-            crs="EPSG:26910",
-        )
+        # # Build GeoDataFrame
+        data = []
+        for struct in structures:
+
+            prop = {}
+            prop["geometry"] = LineString(struct["end_points"])
+            prop["name"] = struct["name"]
+            prop["type"] = struct["type"]
+            prop["elev (ft)"] = "%.2f" % m_to_ft(struct["configuration"]["elevation"])
+            if "width" in struct["configuration"]:
+                prop["width (ft)"] = "%.2f" % m_to_ft(struct["configuration"]["width"])
+            prop["configuration"] = str(struct["configuration"])
+
+            data.append(prop)
+
+        gdf = gpd.GeoDataFrame(data, crs="EPSG:26910")
         gdf.to_file(output_fn, driver="ESRI Shapefile")
     else:
         raise ValueError(
