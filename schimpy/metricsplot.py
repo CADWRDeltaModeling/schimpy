@@ -341,7 +341,12 @@ def plot_tss(ax, tss, labels, window=None, cell_method="inst"):
             if not hasattr(ts_plotted, "unit"):
                 raise Exception("No unit in time series")
             set_dual_axes(ax, ts_plotted, cell_method)
-            set_xaxis_dateformat(ax, date_format="%m/%d/%Y", rotate=25)
+            set_xaxis_dateformat(
+                ax,
+                date_format="%m/%d/%Y",
+                short_range_format="%m/%d/%Y %H:%M",
+                rotate=25,
+            )
         else:
             raise Exception("W$%RTE$#R")
     return lines

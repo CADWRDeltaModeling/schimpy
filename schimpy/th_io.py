@@ -65,8 +65,15 @@ def get_column_formats(filename):
         for line in f:
             line = line.rstrip("\n")
             if line.startswith("#"):
+                # Check for commented header
+                if "time" in line.lower() or "date" in line.lower():
+                    header = line.lstrip("#").split()
                 continue
             if header is None and not line.startswith("datetime") and not line.startswith("date") and not line.startswith("time"):
+                # For elapsed files without header, collect data to infer formats
+                data_lines.append(line)
+                if len(data_lines) >= 10:  # Sample first 10 lines
+                    break
                 continue
             if header is None and (line.startswith("datetime") or line.startswith("date") or line.startswith("time")):
                 header = line.split()
@@ -75,23 +82,43 @@ def get_column_formats(filename):
                 data_line = line.split("#")[0].rstrip() if "#" in line else line
                 data_lines.append(data_line)
 
-        if header is None or len(data_lines) == 0:
+        if len(data_lines) == 0:
             return formats
 
-        for col_idx, col_name in enumerate(header[1:], start=1):
+        # Determine number of columns from first data line
+        first_parts = data_lines[0].split()
+        num_cols = len(first_parts)
+        
+        # For elapsed files, first column is time, rest are data columns
+        start_col = 1 if header is None or header[0].lower() in ["time", "datetime", "date"] else 0
+        
+        for col_idx in range(start_col, num_cols):
             decimals_list = []
+            is_integer_col = True
+            
             for data_line in data_lines:
                 parts = data_line.split()
                 if col_idx < len(parts):
                     value_str = parts[col_idx]
                     if "." in value_str:
+                        is_integer_col = False
                         decimals = len(value_str.split(".")[1])
                         decimals_list.append(decimals)
                     else:
                         decimals_list.append(0)
-            if decimals_list:
+            
+            if header and col_idx < len(header):
+                col_name = header[col_idx]
+            else:
+                # For elapsed files without header, use column number
+                col_name = str(col_idx - start_col + 1)
+            
+            if is_integer_col:
+                formats[col_name] = "%d"
+            elif decimals_list:
                 max_decimals = max(decimals_list)
                 formats[col_name] = f"%.{max_decimals}f"
+    
     return formats
 
 
@@ -348,12 +375,14 @@ def write_th(
                                     format_str = None
                                     if col_name in col_formats:
                                         format_str = col_formats[col_name]
-                                    elif isinstance(col_name, int) and col_formats:
-                                        col_list = list(col_formats.keys())
-                                        if col_idx < len(col_list):
-                                            format_str = col_formats[col_list[col_idx]]
+                                    elif str(col_idx + 1) in col_formats:
+                                        format_str = col_formats[str(col_idx + 1)]
+                                    
                                     if format_str:
-                                        values.append(format_str % float(val))
+                                        if format_str == "%d":
+                                            values.append(str(int(float(val))))
+                                        else:
+                                            values.append(format_str % float(val))
                                     else:
                                         values.append(float_format % float(val))
                                 except Exception:
@@ -369,12 +398,22 @@ def write_th(
                 for i, tval in enumerate(elapsed_index):
                     tstr = elapsed_format % tval
                     row = []
-                    for val in data[i]:
+                    for col_idx, val in enumerate(data[i]):
                         if pd.isna(val):
                             row.append("nan")
                         else:
                             try:
-                                row.append(float_format % float(val))
+                                format_str = None
+                                if str(col_idx + 1) in col_formats:
+                                    format_str = col_formats[str(col_idx + 1)]
+                                
+                                if format_str:
+                                    if format_str == "%d":
+                                        row.append(str(int(float(val))))
+                                    else:
+                                        row.append(format_str % float(val))
+                                else:
+                                    row.append(float_format % float(val))
                             except Exception:
                                 row.append(str(val))
                     line = f"{tstr} " + " ".join(row)
@@ -409,12 +448,14 @@ def write_th(
                                 format_str = None
                                 if col_name in col_formats:
                                     format_str = col_formats[col_name]
-                                elif isinstance(col_name, int) and col_formats:
-                                    col_list = list(col_formats.keys())
-                                    if col_idx < len(col_list):
-                                        format_str = col_formats[col_list[col_idx]]
+                                elif str(col_idx + 1) in col_formats:
+                                    format_str = col_formats[str(col_idx + 1)]
+                                
                                 if format_str:
-                                    values.append(format_str % float(val))
+                                    if format_str == "%d":
+                                        values.append(str(int(float(val))))
+                                    else:
+                                        values.append(format_str % float(val))
                                 else:
                                     values.append(float_format % float(val))
                             except Exception:

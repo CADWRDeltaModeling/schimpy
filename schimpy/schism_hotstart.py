@@ -1395,6 +1395,7 @@ class VariableField(object):
             "SED3D_rough": "SED3D_rough",
             "SED3D_bed": "SED3D_bed",
             "SED3D_bedfrac": "SED3D_bedfrac",
+            "GEN_1": "tr_nd",
         }
         if (var not in yaml_var) and (var in self.tr_mname):
             yaml_var[var] = "tr_nd"
